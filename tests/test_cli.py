@@ -53,3 +53,30 @@ def test_cli_init_smoke(tmp_path):
     result = run_cli("init", "--root", str(tmp_path))
     assert result.returncode == 0
     assert (tmp_path / "data" / "registries" / "papers.csv").exists()
+
+
+def test_cli_project_search_and_report_smoke(tmp_path):
+    search = run_cli("search", "photocorrosion", "--project", "zis_photocatalysis")
+    assert search.returncode == 0
+    assert "zis_stability_2024" in search.stdout
+    report = run_cli(
+        "report",
+        "section-outline",
+        "--project",
+        "zis_photocatalysis",
+        "--theme",
+        "photocorrosion",
+        "--out",
+        str(tmp_path / "outline.md"),
+    )
+    assert report.returncode == 0
+    assert (tmp_path / "outline.md").exists()
+
+
+def test_cli_doctor_and_export_smoke(tmp_path):
+    doctor = run_cli("doctor", "--project", "zis_photocatalysis", "--out", str(tmp_path / "health.md"))
+    assert doctor.returncode == 0
+    assert (tmp_path / "health.md").exists()
+    export = run_cli("export", "claims-json", "--project", "zis_photocatalysis", "--out", str(tmp_path / "claims.json"))
+    assert export.returncode == 0
+    assert (tmp_path / "claims.json").exists()

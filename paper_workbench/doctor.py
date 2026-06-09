@@ -8,7 +8,7 @@ from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_notes
 from .registry import load_registry, validate_registry
 from .schema import ProjectProfile, ValidationFinding
-from .tags import load_themes, normalize_tag, theme_by_tag
+from .tags import group_claims_by_theme, load_themes, normalize_tag, theme_by_tag
 
 
 def _finding(severity: str, code: str, message: str, identifier: str = "", suggestion: str = "") -> ValidationFinding:
@@ -124,6 +124,30 @@ def workspace_health(
             )
     tag_theme = theme_by_tag(theme_defs)
     theme_ids = {theme.theme_id for theme in theme_defs}
+    grouped = group_claims_by_theme(claims, theme_defs)
+    for theme in theme_defs:
+        theme_claims = grouped.get(theme.theme_id, [])
+        theme_papers = {claim.paper_id for claim in theme_claims if claim.paper_id}
+        if len(theme_claims) < theme.min_claims:
+            findings.append(
+                _finding(
+                    "warning",
+                    "theme_under_supported",
+                    f"{theme.name} has {len(theme_claims)} supporting claim(s); target is {theme.min_claims}.",
+                    theme.theme_id,
+                    "Add more verified claims or adjust the theme threshold.",
+                )
+            )
+        if len(theme_papers) < theme.min_papers:
+            findings.append(
+                _finding(
+                    "warning",
+                    "theme_too_few_papers",
+                    f"{theme.name} has evidence from {len(theme_papers)} paper(s); target is {theme.min_papers}.",
+                    theme.theme_id,
+                    "Add evidence from more papers or adjust the theme threshold.",
+                )
+            )
     for claim in claims:
         if not (claim.section or claim.page):
             findings.append(
