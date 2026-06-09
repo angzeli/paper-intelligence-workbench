@@ -2,17 +2,18 @@
 
 The MVP is intentionally CLI-first, dependency-light, and local-only.
 
-## Near-Term Patches
+## Near-Term Patches for v0.3
 
 - Add more robust BibTeX string and macro handling.
 - Add optional HTML export for Markdown reports.
 - Add safer citation-key suggestions such as `FirstAuthorYearShortTitle`.
 - Add richer report filters for specific tags, statuses, and themes.
 - Add note repair diagnostics for malformed claim blocks.
+- Add non-destructive workspace migration reports for moving legacy `data/` work into profiles.
 
 ## Project Profiles
 
-A future version can support multiple literature-review projects in one workspace:
+v0.2 supports multiple literature-review projects in one workspace:
 
 ```text
 projects/zis_photocatalysis/
@@ -20,7 +21,7 @@ projects/finance_reading/
 projects/ml_methods/
 ```
 
-Each profile could keep separate registries, notes, themes, and reports.
+Each profile keeps separate registries, notes, themes, BibTeX files, and reports.
 
 ## Storage
 

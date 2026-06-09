@@ -1,0 +1,175 @@
+[
+  {
+    "paper_id": "synth_charge_2024",
+    "title": "Synthetic Charge Separation in Layered Photocatalyst Films",
+    "authors": [
+      {
+        "given": "Lena",
+        "family": "Example",
+        "raw_name": "Lena Example"
+      },
+      {
+        "given": "Arif",
+        "family": "Patel",
+        "raw_name": "Arif Patel"
+      }
+    ],
+    "year": "2024",
+    "journal": "Journal of Synthetic Photocatalysis",
+    "doi": "10.0000/synthetic.charge.2024",
+    "url": "https://example.local/synth_charge_2024",
+    "local_pdf_path": "",
+    "bibtex_key": "syntheticCharge2024",
+    "tags": [
+      "charge-separation",
+      "thin-film-fabrication",
+      "catalyst-stability"
+    ],
+    "reading_status": "read",
+    "notes_path": "data/notes/example_note_1.md",
+    "added_date": "2026-06-09",
+    "last_reviewed_date": "2026-06-09",
+    "priority": "high",
+    "project": "general",
+    "source_type": "journal_article",
+    "relevance_score": "4.5",
+    "reading_priority": "high",
+    "included_in_lit_review": "true",
+    "exclude_reason": "",
+    "user_comment": "Complete synthetic example"
+  },
+  {
+    "paper_id": "synth_photo_2023",
+    "title": "Synthetic Photocorrosion Failure Modes in Bench Cells",
+    "authors": [
+      {
+        "given": "Nora",
+        "family": "Test",
+        "raw_name": "Nora Test"
+      },
+      {
+        "given": "Jules",
+        "family": "Local",
+        "raw_name": "Jules Local"
+      }
+    ],
+    "year": "2023",
+    "journal": "Local Energy Notes",
+    "doi": "10.0000/synthetic.photo.2023",
+    "url": "https://example.local/synth_photo_2023",
+    "local_pdf_path": "",
+    "bibtex_key": "syntheticPhoto2023",
+    "tags": [
+      "photocorrosion",
+      "catalyst-stability"
+    ],
+    "reading_status": "partially_read",
+    "notes_path": "data/notes/example_note_2.md",
+    "added_date": "2026-06-09",
+    "last_reviewed_date": "2026-06-09",
+    "priority": "medium",
+    "project": "general",
+    "source_type": "review",
+    "relevance_score": "3.0",
+    "reading_priority": "high",
+    "included_in_lit_review": "true",
+    "exclude_reason": "",
+    "user_comment": "Weak claim and missing evidence location example"
+  },
+  {
+    "paper_id": "synth_adsorb_2022",
+    "title": "Unread Synthetic CO2 Adsorption Survey",
+    "authors": [
+      {
+        "given": "Casey",
+        "family": "Mock",
+        "raw_name": "Casey Mock"
+      }
+    ],
+    "year": "2022",
+    "journal": "Synthetic Review Letters",
+    "doi": "10.0000/synthetic.adsorb.2022",
+    "url": "https://example.local/synth_adsorb_2022",
+    "local_pdf_path": "",
+    "bibtex_key": "syntheticAdsorb2022",
+    "tags": [
+      "co2-adsorption"
+    ],
+    "reading_status": "unread",
+    "notes_path": "",
+    "added_date": "2026-06-09",
+    "last_reviewed_date": "",
+    "priority": "low",
+    "project": "general",
+    "source_type": "review",
+    "relevance_score": "1.5",
+    "reading_priority": "low",
+    "included_in_lit_review": "false",
+    "exclude_reason": "Out of current review scope",
+    "user_comment": "Unread paper without notes"
+  },
+  {
+    "paper_id": "synth_charge_dup_2024",
+    "title": "Synthetic Charge Separation in Layered Photocatalyst Films",
+    "authors": [
+      {
+        "given": "Lena",
+        "family": "Example",
+        "raw_name": "Lena Example"
+      }
+    ],
+    "year": "2024",
+    "journal": "Duplicate Synthetic Venue",
+    "doi": "10.0000/synthetic.charge.2024",
+    "url": "https://example.local/synth_charge_duplicate",
+    "local_pdf_path": "",
+    "bibtex_key": "syntheticChargeDuplicate2024",
+    "tags": [
+      "charge-separation"
+    ],
+    "reading_status": "skimmed",
+    "notes_path": "",
+    "added_date": "2026-06-09",
+    "last_reviewed_date": "",
+    "priority": "low",
+    "project": "general",
+    "source_type": "journal_article",
+    "relevance_score": "1.0",
+    "reading_priority": "low",
+    "included_in_lit_review": "false",
+    "exclude_reason": "Duplicate registry row",
+    "user_comment": "Intentional duplicate DOI and title example"
+  },
+  {
+    "paper_id": "synth_finance_2021",
+    "title": "Synthetic Evidence Weights for Finance Valuation Notes",
+    "authors": [
+      {
+        "given": "Mira",
+        "family": "Local",
+        "raw_name": "Mira Local"
+      }
+    ],
+    "year": "2021",
+    "journal": "Local Finance Methods",
+    "doi": "",
+    "url": "https://example.local/synth_finance_2021",
+    "local_pdf_path": "",
+    "bibtex_key": "",
+    "tags": [
+      "finance-valuation"
+    ],
+    "reading_status": "deeply_read",
+    "notes_path": "data/notes/example_note_3.md",
+    "added_date": "2026-06-09",
+    "last_reviewed_date": "2026-06-09",
+    "priority": "medium",
+    "project": "general",
+    "source_type": "other",
+    "relevance_score": "3.5",
+    "reading_priority": "medium",
+    "included_in_lit_review": "true",
+    "exclude_reason": "",
+    "user_comment": "Missing BibTeX key example"
+  }
+]

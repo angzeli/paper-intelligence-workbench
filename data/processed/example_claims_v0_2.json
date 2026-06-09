@@ -1,0 +1,55 @@
+[
+  {
+    "claim_id": "synth_charge_2024:c1",
+    "paper_id": "synth_charge_2024",
+    "claim_text": "Layered synthetic films increased the benchmark charge-separation score compared with the flat control.",
+    "evidence_type": "experimental_result",
+    "section": "Results section p. 4",
+    "page": "4",
+    "confidence": "high",
+    "tags": [
+      "charge-separation",
+      "thin-film-fabrication"
+    ],
+    "quote_or_paraphrase": "The note paraphrases a synthetic result table where the layered variant has the higher local score.",
+    "user_comment": "Strong example claim with a clear location.",
+    "supports_theme": "charge separation",
+    "strength": "strong",
+    "note_file": "data/notes/example_note_1.md"
+  },
+  {
+    "claim_id": "synth_photo_2023:c1",
+    "paper_id": "synth_photo_2023",
+    "claim_text": "The source suggests that unstable test conditions may contribute to photocorrosion-like degradation.",
+    "evidence_type": "review_statement",
+    "section": "",
+    "page": "",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "catalyst-stability"
+    ],
+    "quote_or_paraphrase": "The statement is paraphrased from a partially read synthetic discussion.",
+    "user_comment": "Needs re-reading before citation.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "data/notes/example_note_2.md"
+  },
+  {
+    "claim_id": "synth_finance_2021:c1",
+    "paper_id": "synth_finance_2021",
+    "claim_text": "The synthetic rubric treats direct model-comparison evidence as stronger than background commentary.",
+    "evidence_type": "method_description",
+    "section": "Methods p. 2",
+    "page": "2",
+    "confidence": "medium",
+    "tags": [
+      "finance-valuation"
+    ],
+    "quote_or_paraphrase": "The note paraphrases a local synthetic rubric description.",
+    "user_comment": "Non-chemistry example claim.",
+    "supports_theme": "finance valuation",
+    "strength": "moderate",
+    "note_file": "data/notes/example_note_3.md"
+  }
+]

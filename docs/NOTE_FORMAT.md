@@ -23,6 +23,7 @@ The parser expects these headings:
 ### Claim 1
 ## Open questions
 ## Follow-up actions
+## Personal reading notes
 ```
 
 Metadata uses bullet fields:
@@ -52,6 +53,8 @@ Claim blocks use bullet fields:
 ```
 
 The parser is conservative. Missing metadata, unknown evidence types, unknown strengths, and missing evidence locations are returned as warnings. The tool does not infer or fabricate claims from free-form prose.
+
+v0.2 tolerates extra blank lines, missing optional fields, personal reading notes, and claim headings such as `### Claim 1`, `### Evidence claim A`, or `### Evidence 1`. Claim parsing stops at the next heading, so open questions and follow-up actions are not absorbed into the claim block.
 
 Supported reading statuses:
 

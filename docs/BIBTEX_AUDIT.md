@@ -32,5 +32,9 @@ The audit reports:
 - invalid year format
 - BibTeX entries not linked to registry papers
 - registry papers without BibTeX entries
+- parse warnings for malformed entries where the lightweight parser can identify the problem
+- entry-type-specific required fields for articles, books, conference papers, theses, unpublished items, and misc entries
 
 The audit never invents citation data and does not aggressively rewrite entries. Suggestions are safe prompts for user review.
+
+The parser supports common brace-delimited and quote-delimited field values. It remains intentionally conservative and is not a full BibTeX or LaTeX interpreter.

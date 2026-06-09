@@ -22,6 +22,11 @@ The audit identifies:
 - themes with too few supporting claims
 - themes supported only by review statements
 - papers tagged for a theme but lacking a clear supporting claim
+- registry papers with broken local PDF paths
+- claims without confidence values
+- claims mapped to undefined themes
+- themes with too few supporting papers
+- included literature-review papers with weak or speculative evidence
 
 The audit does not decide whether a scientific claim is true. It only checks whether user-supplied evidence tracking is complete and internally consistent.
 

@@ -33,6 +33,12 @@ data/registries/example_papers.csv
 | `added_date` | no | ISO date when added. |
 | `last_reviewed_date` | no | ISO date when last reviewed. |
 | `priority` | no | User-defined priority. |
+| `project` | no | Project/profile label. |
+| `source_type` | no | Source category such as `journal_article`, `conference_paper`, `book`, `thesis`, `preprint`, `report`, `review`, `dataset`, or `other`. |
+| `relevance_score` | no | Optional numeric score from 0 to 5. |
+| `reading_priority` | no | Reading priority: `low`, `medium`, `high`, or `critical`. |
+| `included_in_lit_review` | no | Boolean-like value such as `true`/`false` or `yes`/`no`. |
+| `exclude_reason` | no | Reason for excluding a paper from the review. |
 | `user_comment` | no | User notes about the registry row. |
 
 ## Validation Rules
@@ -47,5 +53,13 @@ Registry validation checks:
 - duplicate normalized titles
 - duplicate BibTeX keys
 - absolute local PDF paths
+- invalid priority or reading priority
+- invalid source type
+- invalid relevance score
+- read or deeply read papers without `notes_path`
+- included papers without extracted claims when claims are supplied to validation
+- excluded papers without `exclude_reason`
+- DOI-like strings with malformed DOI shape
+- missing local PDF paths as warnings only
 
 The validator reports findings and suggestions. It does not auto-correct user data.

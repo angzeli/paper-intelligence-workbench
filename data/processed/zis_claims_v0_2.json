@@ -1,0 +1,37 @@
+[
+  {
+    "claim_id": "zis_charge_2025:c1",
+    "paper_id": "zis_charge_2025",
+    "claim_text": "The synthetic ZIS benchmark records stronger charge transfer for the treated variant.",
+    "evidence_type": "experimental_result",
+    "section": "Results p. 3",
+    "page": "3",
+    "confidence": "high",
+    "tags": [
+      "charge-separation"
+    ],
+    "quote_or_paraphrase": "The local note paraphrases a synthetic benchmark table.",
+    "user_comment": "Project-profile strong claim example.",
+    "supports_theme": "charge separation",
+    "strength": "strong",
+    "note_file": "projects/zis_photocatalysis/notes/zis_charge_2025.md"
+  },
+  {
+    "claim_id": "zis_stability_2024:c1",
+    "paper_id": "zis_stability_2024",
+    "claim_text": "The memo suggests photocorrosion risk may increase under unstable synthetic screening conditions.",
+    "evidence_type": "review_statement",
+    "section": "",
+    "page": "",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "catalyst-stability"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase from a review-style memo.",
+    "user_comment": "Needs location and stronger evidence.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/zis_photocatalysis/notes/zis_stability_2024.md"
+  }
+]

@@ -1,6 +1,6 @@
 # paper-intelligence-workbench
 
-`paper-intelligence-workbench` is a local-first CLI tool for small academic literature-review projects. It manages paper metadata, structured Markdown notes, user-recorded claims, evidence links, BibTeX validation, theme coverage, and citation-audit reports without cloud services, publisher scraping, databases, or LLM APIs.
+`paper-intelligence-workbench` is a local-first CLI tool for small academic literature-review projects. It manages paper metadata, structured Markdown notes, user-recorded claims, evidence links, BibTeX validation, project profiles, theme coverage, and citation-audit reports without cloud services, publisher scraping, databases, or LLM APIs.
 
 The MVP is designed for projects with roughly 10 to 100 papers where a student or researcher wants to know which papers are read, which claims are supported, which citations are incomplete, and which literature-review themes still need stronger evidence.
 
@@ -13,6 +13,9 @@ The MVP is designed for projects with roughly 10 to 100 papers where a student o
 - Maps tags to review themes.
 - Searches registry rows, note bodies, and claims.
 - Generates Markdown reports for inventory, reading status, BibTeX audit, evidence maps, citation audits, missing notes, and weak claims.
+- Manages multiple project profiles under `projects/`.
+- Runs workspace health diagnostics with `paperwb doctor`.
+- Exports claims, registries, reading lists, and theme-specific claim data.
 
 ## What It Does Not Do
 
@@ -78,6 +81,28 @@ paperwb report evidence-map --registry data/registries/example_papers.csv --bibt
 paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json
 ```
 
+Run v0.2 diagnostics and a section outline:
+
+```bash
+paperwb doctor --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/workspace_health.md
+paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/photocorrosion_section_outline.md
+```
+
+## Project Profile Workflow
+
+Project profiles keep independent registry, notes, BibTeX, themes, and reports under `projects/`.
+
+```bash
+paperwb project list
+paperwb project init demo_review
+paperwb project validate zis_photocatalysis
+paperwb search photocorrosion --project zis_photocatalysis
+paperwb report evidence-map --project zis_photocatalysis
+paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json
+```
+
+The legacy `data/` workflow remains supported.
+
 ## Data Folder Convention
 
 ```text
@@ -90,6 +115,7 @@ data/
 reports/        # generated Markdown reports
 notebooks/      # lightweight workflow notebooks
 docs/           # workflow documentation
+projects/       # optional independent review profiles
 ```
 
 ## Registry Schema
@@ -149,6 +175,10 @@ paperwb report bibtex-audit
 paperwb report evidence-map
 paperwb report citation-audit
 paperwb report reading-status
+paperwb report section-outline --theme photocorrosion
+paperwb doctor
+paperwb export claims --out data/processed/claims.csv
+paperwb project list
 paperwb checklist --theme photocorrosion
 ```
 
@@ -158,8 +188,15 @@ paperwb checklist --theme photocorrosion
 - Markdown note parsing expects the provided template headings.
 - Search is substring-based only.
 - Theme mapping is tag-based only.
-- No SQLite backend is included in v1.
+- No SQLite backend is included in v0.2.
 - Citation audit checks completeness of user notes, not scientific correctness.
+
+## More Documentation
+
+- [docs/PROJECT_PROFILES.md](docs/PROJECT_PROFILES.md)
+- [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
+- [docs/EVIDENCE_MAPS.md](docs/EVIDENCE_MAPS.md)
+- [docs/WORKFLOW_EXAMPLES.md](docs/WORKFLOW_EXAMPLES.md)
 
 ## Roadmap
 

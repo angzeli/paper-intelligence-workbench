@@ -10,6 +10,18 @@ from .registry import filter_papers, save_registry, save_registry_json
 from .schema import Claim, Paper, dataclass_to_plain
 
 
+def _relativize_note_file(row: dict) -> dict:
+    note_file = row.get("note_file", "")
+    if note_file:
+        path = Path(note_file)
+        if path.is_absolute():
+            try:
+                row["note_file"] = str(path.relative_to(Path.cwd()))
+            except ValueError:
+                row["note_file"] = path.name
+    return row
+
+
 def export_registry_csv(papers: list[Paper], out: str | Path) -> Path:
     return save_registry(papers, out)
 
@@ -23,7 +35,7 @@ def export_claims_csv(claims: list[Claim], out: str | Path) -> Path:
 
 
 def export_claims_json(claims: list[Claim], out: str | Path) -> Path:
-    return write_json(out, [dataclass_to_plain(claim) for claim in claims])
+    return write_json(out, [_relativize_note_file(dataclass_to_plain(claim)) for claim in claims])
 
 
 def reading_list_markdown(papers: list[Paper], *, tag: str = "", status: str = "") -> str:
