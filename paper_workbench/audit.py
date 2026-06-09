@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .bibtex import validate_bibtex
-from .registry import detect_duplicate_doi, detect_duplicate_title
+from .registry import detect_duplicate_doi, detect_duplicate_title, parse_boolish, validate_registry
 from .schema import BibTeXEntry, CitationAuditFinding, Claim, EvidenceType, Paper, PaperNote
 from .tags import group_claims_by_theme, normalize_tag, parse_tags, theme_by_tag
 
@@ -103,20 +103,12 @@ def citation_audit(
                 suggestion="Check whether these registry rows describe the same paper.",
             )
         )
-    for finding in validate_bibtex(bibtex_entries, papers):
-        if finding.code in {"bibtex_not_linked_to_registry", "registry_bibtex_key_missing_from_library"}:
-            findings.append(
-                CitationAuditFinding(
-                    finding.severity,
-                    finding.code,
-                    finding.message,
-                    paper_id=finding.identifier,
-                    suggestion=finding.suggestion,
-                )
-            )
     grouped = group_claims_by_theme(claims, themes)
+    theme_ids = {theme.theme_id for theme in themes}
+    tag_theme_map = theme_by_tag(themes)
     for theme in themes:
         theme_claims = grouped.get(theme.theme_id, [])
+        theme_papers = {claim.paper_id for claim in theme_claims if claim.paper_id}
         if len(theme_claims) < theme.min_claims:
             findings.append(
                 CitationAuditFinding(
@@ -125,6 +117,16 @@ def citation_audit(
                     f"{theme.name} has {len(theme_claims)} supporting claim(s); target is {theme.min_claims}.",
                     theme=theme.theme_id,
                     suggestion="Add more verified claims or lower the theme's stated coverage expectations.",
+                )
+            )
+        if len(theme_papers) < theme.min_papers:
+            findings.append(
+                CitationAuditFinding(
+                    "warning",
+                    "theme_too_few_papers",
+                    f"{theme.name} has evidence from {len(theme_papers)} paper(s); target is {theme.min_papers}.",
+                    theme=theme.theme_id,
+                    suggestion="Add more papers with verified claims for this theme.",
                 )
             )
         if theme_claims and all(claim.evidence_type == EvidenceType.REVIEW_STATEMENT.value for claim in theme_claims):
@@ -137,7 +139,64 @@ def citation_audit(
                     suggestion="Look for direct experimental, methodological, or theoretical evidence.",
                 )
             )
-    tag_theme_map = theme_by_tag(themes)
+    for finding in validate_registry(papers, root=root, claims=claims):
+        if finding.code in {"missing_local_pdf_path", "absolute_pdf_path", "duplicate_bibtex_key", "included_without_claims"}:
+            findings.append(
+                CitationAuditFinding(
+                    finding.severity,
+                    finding.code,
+                    finding.message,
+                    paper_id=finding.identifier,
+                    suggestion=finding.suggestion,
+                )
+            )
+    for finding in validate_bibtex(bibtex_entries, papers):
+        if finding.code in {"bibtex_not_linked_to_registry", "registry_bibtex_key_missing_from_library", "duplicate_bibtex_key", "duplicate_bibtex_doi"}:
+            findings.append(
+                CitationAuditFinding(
+                    finding.severity,
+                    finding.code,
+                    finding.message,
+                    paper_id=finding.identifier,
+                    suggestion=finding.suggestion,
+                )
+            )
+    for claim in claims:
+        if not claim.confidence:
+            findings.append(
+                CitationAuditFinding(
+                    "warning",
+                    "claim_missing_confidence",
+                    f"{claim.claim_id} has no confidence value.",
+                    paper_id=claim.paper_id,
+                    claim_id=claim.claim_id,
+                    suggestion="Add confidence before using this claim in a literature-review outline.",
+                )
+            )
+        if claim.supports_theme and normalize_tag(claim.supports_theme) not in theme_ids:
+            findings.append(
+                CitationAuditFinding(
+                    "warning",
+                    "claim_theme_without_definition",
+                    f"{claim.claim_id} is tagged to undefined theme {claim.supports_theme!r}.",
+                    paper_id=claim.paper_id,
+                    claim_id=claim.claim_id,
+                    theme=claim.supports_theme,
+                    suggestion="Define the theme or correct Supports theme.",
+                )
+            )
+    weak_claim_papers = {claim.paper_id for claim in claims if claim.strength in {"weak", "speculative"}}
+    for paper in papers:
+        if parse_boolish(paper.included_in_lit_review) is True and paper.paper_id in weak_claim_papers:
+            findings.append(
+                CitationAuditFinding(
+                    "warning",
+                    "included_paper_with_weak_evidence",
+                    f"{paper.paper_id} is included in the literature review but has weak/speculative evidence.",
+                    paper_id=paper.paper_id,
+                    suggestion="Re-read or add stronger evidence before relying on this paper.",
+                )
+            )
     for paper in papers:
         mapped_themes = {tag_theme_map[tag].theme_id for tag in parse_tags(paper.tags) if tag in tag_theme_map}
         for theme_id in mapped_themes:

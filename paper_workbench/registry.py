@@ -10,7 +10,7 @@ import re
 import unicodedata
 
 from .io import read_csv_rows, write_csv_rows, write_json
-from .schema import Author, Paper, ReadingStatus, ValidationFinding, dataclass_to_plain, enum_values
+from .schema import Author, Claim, Paper, ReadingStatus, SourceType, ValidationFinding, dataclass_to_plain, enum_values
 from .tags import format_tags, parse_tags
 
 
@@ -30,16 +30,35 @@ REGISTRY_FIELDS = [
     "added_date",
     "last_reviewed_date",
     "priority",
+    "project",
+    "source_type",
+    "relevance_score",
+    "reading_priority",
+    "included_in_lit_review",
+    "exclude_reason",
     "user_comment",
 ]
+
+PRIORITY_VALUES = {"", "low", "medium", "high", "critical"}
+BOOLEAN_TRUE = {"true", "yes", "y", "1", "included"}
+BOOLEAN_FALSE = {"false", "no", "n", "0", "excluded"}
+READ_STATUSES_WITH_NOTES = {ReadingStatus.READ.value, ReadingStatus.DEEPLY_READ.value}
+DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$", re.IGNORECASE)
 
 
 def normalize_doi(value: str) -> str:
     doi = (value or "").strip().lower()
     doi = re.sub(r"^https?://(dx\.)?doi\.org/", "", doi)
     doi = re.sub(r"^doi:\s*", "", doi)
-    doi = doi.strip().rstrip(".")
+    doi = doi.strip().strip("<>").rstrip(".")
     return doi
+
+
+def looks_like_malformed_doi(value: str) -> bool:
+    doi = normalize_doi(value)
+    if not doi:
+        return False
+    return doi.startswith("10.") and DOI_RE.fullmatch(doi) is None
 
 
 def normalize_title(value: str) -> str:
@@ -80,6 +99,17 @@ def validate_reading_status(value: str) -> str:
     return normalized
 
 
+def parse_boolish(value: str) -> bool | None:
+    normalized = (value or "").strip().lower()
+    if not normalized:
+        return None
+    if normalized in BOOLEAN_TRUE:
+        return True
+    if normalized in BOOLEAN_FALSE:
+        return False
+    return None
+
+
 def paper_from_row(row: dict[str, str]) -> Paper:
     return Paper(
         paper_id=(row.get("paper_id") or "").strip(),
@@ -97,6 +127,12 @@ def paper_from_row(row: dict[str, str]) -> Paper:
         added_date=(row.get("added_date") or "").strip(),
         last_reviewed_date=(row.get("last_reviewed_date") or "").strip(),
         priority=(row.get("priority") or "").strip(),
+        project=(row.get("project") or "").strip(),
+        source_type=(row.get("source_type") or "").strip(),
+        relevance_score=(row.get("relevance_score") or "").strip(),
+        reading_priority=(row.get("reading_priority") or "").strip(),
+        included_in_lit_review=(row.get("included_in_lit_review") or "").strip(),
+        exclude_reason=(row.get("exclude_reason") or "").strip(),
         user_comment=(row.get("user_comment") or "").strip(),
     )
 
@@ -118,6 +154,12 @@ def paper_to_row(paper: Paper) -> dict[str, str]:
         "added_date": paper.added_date,
         "last_reviewed_date": paper.last_reviewed_date,
         "priority": str(paper.priority),
+        "project": paper.project,
+        "source_type": paper.source_type,
+        "relevance_score": str(paper.relevance_score),
+        "reading_priority": str(paper.reading_priority),
+        "included_in_lit_review": str(paper.included_in_lit_review),
+        "exclude_reason": paper.exclude_reason,
         "user_comment": paper.user_comment,
     }
 
@@ -181,6 +223,12 @@ def add_paper(
     reading_status: str = ReadingStatus.UNREAD.value,
     notes_path: str = "",
     priority: str = "",
+    project: str = "",
+    source_type: str = "",
+    relevance_score: str = "",
+    reading_priority: str = "",
+    included_in_lit_review: str = "",
+    exclude_reason: str = "",
     user_comment: str = "",
     paper_id: str = "",
 ) -> Paper:
@@ -202,6 +250,12 @@ def add_paper(
         notes_path=notes_path.strip(),
         added_date=date.today().isoformat(),
         priority=str(priority).strip(),
+        project=project.strip(),
+        source_type=source_type.strip(),
+        relevance_score=str(relevance_score).strip(),
+        reading_priority=str(reading_priority).strip(),
+        included_in_lit_review=str(included_in_lit_review).strip(),
+        exclude_reason=exclude_reason.strip(),
         user_comment=user_comment.strip(),
     )
     papers.append(paper)
@@ -238,29 +292,18 @@ def filter_papers(
     return result
 
 
-def _duplicate_groups(pairs: list[tuple[str, str]], skip_empty: bool = True) -> dict[str, list[str]]:
-    grouped: dict[str, list[str]] = defaultdict(list)
-    for identifier, value in pairs:
-        if skip_empty and not value:
-            continue
-        grouped[value].append(identifier)
-    return {value: ids for value, ids in grouped.items() if len(ids) > 1}
-
-
-def detect_duplicate_doi(papers: list[Paper]) -> dict[str, list[str]]:
-    return _duplicate_groups([(paper.paper_id, normalize_doi(paper.doi)) for paper in papers])
-
-
-def detect_duplicate_title(papers: list[Paper]) -> dict[str, list[str]]:
-    return _duplicate_groups([(paper.paper_id, normalize_title(paper.title)) for paper in papers])
-
-
-def detect_duplicate_bibtex_keys(papers: list[Paper]) -> dict[str, list[str]]:
-    return _duplicate_groups([(paper.paper_id, paper.bibtex_key.strip()) for paper in papers])
-
-
-def validate_registry(papers: list[Paper]) -> list[ValidationFinding]:
+def validate_registry(
+    papers: list[Paper],
+    *,
+    root: str | Path | None = None,
+    claims: list[Claim] | None = None,
+) -> list[ValidationFinding]:
     findings: list[ValidationFinding] = []
+    root_path = Path(root) if root is not None else None
+    claims_by_paper: dict[str, list[Claim]] = {}
+    if claims is not None:
+        for claim in claims:
+            claims_by_paper.setdefault(claim.paper_id, []).append(claim)
     ids = _duplicate_groups([(paper.paper_id, paper.paper_id) for paper in papers])
     for paper_id, duplicate_ids in ids.items():
         findings.append(
@@ -310,6 +353,101 @@ def validate_registry(papers: list[Paper]) -> list[ValidationFinding]:
                     suggestion="Use a four-digit publication year when known.",
                 )
             )
+        if paper.priority.lower() not in PRIORITY_VALUES:
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="invalid_priority",
+                    message=f"{paper.paper_id} has priority {paper.priority!r}.",
+                    identifier=paper.paper_id,
+                    suggestion=f"Use one of: {', '.join(sorted(value for value in PRIORITY_VALUES if value))}.",
+                )
+            )
+        if paper.reading_priority.lower() not in PRIORITY_VALUES:
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="invalid_reading_priority",
+                    message=f"{paper.paper_id} has reading_priority {paper.reading_priority!r}.",
+                    identifier=paper.paper_id,
+                    suggestion=f"Use one of: {', '.join(sorted(value for value in PRIORITY_VALUES if value))}.",
+                )
+            )
+        if paper.source_type and paper.source_type not in enum_values(SourceType):
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="invalid_source_type",
+                    message=f"{paper.paper_id} has source_type {paper.source_type!r}.",
+                    identifier=paper.paper_id,
+                    suggestion=f"Use one of: {', '.join(sorted(enum_values(SourceType)))}.",
+                )
+            )
+        if paper.relevance_score:
+            try:
+                score = float(paper.relevance_score)
+            except ValueError:
+                findings.append(
+                    ValidationFinding(
+                        severity="warning",
+                        code="invalid_relevance_score",
+                        message=f"{paper.paper_id} has non-numeric relevance_score {paper.relevance_score!r}.",
+                        identifier=paper.paper_id,
+                        suggestion="Use a number from 0 to 5 or leave relevance_score blank.",
+                    )
+                )
+            else:
+                if score < 0 or score > 5:
+                    findings.append(
+                        ValidationFinding(
+                            severity="warning",
+                            code="invalid_relevance_score",
+                            message=f"{paper.paper_id} has relevance_score {paper.relevance_score}; expected 0-5.",
+                            identifier=paper.paper_id,
+                            suggestion="Use a number from 0 to 5.",
+                        )
+                    )
+        included = parse_boolish(paper.included_in_lit_review)
+        if paper.included_in_lit_review and included is None:
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="invalid_included_in_lit_review",
+                    message=f"{paper.paper_id} has included_in_lit_review {paper.included_in_lit_review!r}.",
+                    identifier=paper.paper_id,
+                    suggestion="Use true/false, yes/no, or leave blank.",
+                )
+            )
+        if included is False and not paper.exclude_reason:
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="excluded_without_reason",
+                    message=f"{paper.paper_id} is excluded from the literature review without an exclude_reason.",
+                    identifier=paper.paper_id,
+                    suggestion="Add exclude_reason so future audits understand the decision.",
+                )
+            )
+        if included is True and claims is not None and not claims_by_paper.get(paper.paper_id):
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="included_without_claims",
+                    message=f"{paper.paper_id} is included in the literature review but has no extracted claims.",
+                    identifier=paper.paper_id,
+                    suggestion="Add structured claims before using this paper as support.",
+                )
+            )
+        if paper.reading_status in READ_STATUSES_WITH_NOTES and not paper.notes_path:
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="read_paper_missing_notes_path",
+                    message=f"{paper.paper_id} is marked {paper.reading_status} but has no notes_path.",
+                    identifier=paper.paper_id,
+                    suggestion="Add notes_path or generate a note template.",
+                )
+            )
         if not paper.bibtex_key:
             findings.append(
                 ValidationFinding(
@@ -320,14 +458,46 @@ def validate_registry(papers: list[Paper]) -> list[ValidationFinding]:
                     suggestion="Add bibtex_key once a citation entry is available.",
                 )
             )
-        if paper.local_pdf_path and Path(paper.local_pdf_path).is_absolute():
+        if looks_like_malformed_doi(paper.doi):
             findings.append(
                 ValidationFinding(
                     severity="warning",
-                    code="absolute_pdf_path",
-                    message=f"{paper.paper_id} uses an absolute local_pdf_path.",
+                    code="malformed_doi",
+                    message=f"{paper.paper_id} has DOI-like value {paper.doi!r} that does not match a common DOI pattern.",
                     identifier=paper.paper_id,
-                    suggestion="Prefer workspace-relative paths for portability.",
+                    suggestion="Verify the DOI locally; do not guess or auto-correct.",
+                )
+            )
+        if paper.local_pdf_path:
+            pdf_path = Path(paper.local_pdf_path)
+            if pdf_path.is_absolute():
+                findings.append(
+                    ValidationFinding(
+                        severity="warning",
+                        code="absolute_pdf_path",
+                        message=f"{paper.paper_id} uses an absolute local_pdf_path.",
+                        identifier=paper.paper_id,
+                        suggestion="Prefer workspace-relative paths for portability.",
+                    )
+                )
+            elif root_path is not None and not (root_path / pdf_path).exists():
+                findings.append(
+                    ValidationFinding(
+                        severity="warning",
+                        code="missing_local_pdf_path",
+                        message=f"{paper.paper_id} local_pdf_path does not exist: {paper.local_pdf_path}.",
+                        identifier=paper.paper_id,
+                        suggestion="Fix the path or leave local_pdf_path blank; do not download copyrighted PDFs.",
+                    )
+                )
+        if root_path is not None and paper.notes_path and not (root_path / paper.notes_path).exists() and not Path(paper.notes_path).exists():
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="notes_path_missing_file",
+                    message=f"{paper.paper_id} notes_path does not exist: {paper.notes_path}.",
+                    identifier=paper.paper_id,
+                    suggestion="Generate the note file or correct notes_path.",
                 )
             )
     for doi, paper_ids in detect_duplicate_doi(papers).items():
@@ -361,6 +531,27 @@ def validate_registry(papers: list[Paper]) -> list[ValidationFinding]:
             )
         )
     return findings
+
+
+def _duplicate_groups(pairs: list[tuple[str, str]], skip_empty: bool = True) -> dict[str, list[str]]:
+    grouped: dict[str, list[str]] = defaultdict(list)
+    for identifier, value in pairs:
+        if skip_empty and not value:
+            continue
+        grouped[value].append(identifier)
+    return {value: ids for value, ids in grouped.items() if len(ids) > 1}
+
+
+def detect_duplicate_doi(papers: list[Paper]) -> dict[str, list[str]]:
+    return _duplicate_groups([(paper.paper_id, normalize_doi(paper.doi)) for paper in papers])
+
+
+def detect_duplicate_title(papers: list[Paper]) -> dict[str, list[str]]:
+    return _duplicate_groups([(paper.paper_id, normalize_title(paper.title)) for paper in papers])
+
+
+def detect_duplicate_bibtex_keys(papers: list[Paper]) -> dict[str, list[str]]:
+    return _duplicate_groups([(paper.paper_id, paper.bibtex_key.strip()) for paper in papers])
 
 
 def registry_to_json(papers: list[Paper]) -> str:

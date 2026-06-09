@@ -1,0 +1,12 @@
+{
+  "themes": [
+    {
+      "theme_id": "ml-methodology",
+      "name": "ML methodology",
+      "tags": ["ml methodology", "machine learning"],
+      "min_claims": 1,
+      "min_papers": 1,
+      "description": "Synthetic evidence about ML evaluation methods."
+    }
+  ]
+}

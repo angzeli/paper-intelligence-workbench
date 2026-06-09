@@ -1,0 +1,2 @@
+paper_id,title,authors,year,journal,doi,url,local_pdf_path,bibtex_key,tags,reading_status,notes_path,added_date,last_reviewed_date,priority,project,source_type,relevance_score,reading_priority,included_in_lit_review,exclude_reason,user_comment
+ml_eval_2025,Synthetic Evaluation Protocols for Local ML Studies,Quinn Local,2025,Synthetic ML Methods,10.0000/ml.eval.2025,https://example.local/ml_eval_2025,,mlEval2025,ml methodology,read,notes/ml_eval_2025.md,2026-06-09,2026-06-09,medium,ml_methods,conference_paper,3.9,medium,true,,ML methods profile synthetic example

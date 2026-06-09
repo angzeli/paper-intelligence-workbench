@@ -76,6 +76,7 @@ def load_themes(path: str | Path) -> list[ProjectTheme]:
                 name=row.get("name", row.get("theme_id", "")),
                 tags=parse_tags(row.get("tags", [])),
                 min_claims=int(row.get("min_claims", 2) or 2),
+                min_papers=int(row.get("min_papers", 1) or 1),
                 description=row.get("description", ""),
             )
         )

@@ -20,8 +20,22 @@ VENUE_BY_TYPE = {
     "proceedings": ("title", "publisher"),
     "book": ("publisher",),
     "inbook": ("publisher",),
+    "thesis": ("school", "institution"),
     "phdthesis": ("school",),
     "mastersthesis": ("school",),
+    "unpublished": ("note",),
+    "misc": ("howpublished", "url", "note"),
+}
+REQUIRED_FIELDS_BY_TYPE = {
+    "article": ("title", "author", "year", "journal"),
+    "book": ("title", "author", "year", "publisher"),
+    "inproceedings": ("title", "author", "year", "booktitle"),
+    "conference": ("title", "author", "year", "booktitle"),
+    "thesis": ("title", "author", "year"),
+    "phdthesis": ("title", "author", "year", "school"),
+    "mastersthesis": ("title", "author", "year", "school"),
+    "unpublished": ("title", "author", "year", "note"),
+    "misc": ("title",),
 }
 INCONSISTENT_FIELD_SUGGESTIONS = {
     "journaltitle": "journal",
@@ -162,9 +176,25 @@ def parse_bibtex(text: str, source_path: str = "") -> list[BibTeXEntry]:
         body_start = match.end()
         body_end = _find_entry_end(text, match.end() - 1, open_char)
         if body_end == -1:
+            entries.append(
+                BibTeXEntry(
+                    entry_type=entry_type,
+                    key="",
+                    source_path=source_path,
+                    parse_warnings=[f"Could not find closing delimiter for @{entry_type} entry."],
+                )
+            )
             break
         raw_body = text[body_start:body_end]
         if "," not in raw_body:
+            entries.append(
+                BibTeXEntry(
+                    entry_type=entry_type,
+                    key=raw_body.strip(),
+                    source_path=source_path,
+                    parse_warnings=[f"Could not parse fields for @{entry_type} entry."],
+                )
+            )
             position = body_end + 1
             continue
         key, fields_body = raw_body.split(",", 1)
@@ -182,6 +212,7 @@ def parse_bibtex(text: str, source_path: str = "") -> list[BibTeXEntry]:
                 url=fields.get("url", ""),
                 raw_fields=fields,
                 source_path=source_path,
+                parse_warnings=[],
             )
         )
         position = body_end + 1
@@ -233,16 +264,31 @@ def validate_bibtex(entries: list[BibTeXEntry], registry_papers: list[Paper] | N
             )
         )
     for entry in entries:
+        for warning in entry.parse_warnings:
+            findings.append(
+                ValidationFinding(
+                    severity="warning",
+                    code="bibtex_parse_warning",
+                    message=warning,
+                    source=entry.source_path,
+                    identifier=entry.key,
+                    suggestion="Review the surrounding BibTeX manually; the parser is conservative.",
+                )
+            )
         if not entry.key:
             findings.append(
                 ValidationFinding("error", "missing_key", "A BibTeX entry is missing its key.", entry.source_path)
             )
-        required = {
-            "title": entry.title,
-            "author": " and ".join(author.display() for author in entry.authors),
-            "year": entry.year,
-        }
-        for field, value in required.items():
+        required_fields = REQUIRED_FIELDS_BY_TYPE.get(entry.entry_type, ("title", "author", "year"))
+        for field in required_fields:
+            if field == "author":
+                value = " and ".join(author.display() for author in entry.authors)
+            elif field == "title":
+                value = entry.title
+            elif field == "year":
+                value = entry.year
+            else:
+                value = entry.raw_fields.get(field, "")
             if not str(value).strip():
                 findings.append(
                     ValidationFinding(

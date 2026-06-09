@@ -75,6 +75,8 @@ def render_note_template(paper: Paper) -> str:
 
 ## Follow-up actions
 
+## Personal reading notes
+
 """
 
 
@@ -178,12 +180,14 @@ def parse_note(markdown: str, source_path: str = "") -> PaperNote:
         citation_key=citation_key,
         reading_status=_normalize_status(metadata.get("reading status", ""), warnings),
         one_sentence_summary=_plain_section(sections, "one-sentence summary"),
+        why_it_matters=_plain_section(sections, "why this paper matters"),
         research_question=_plain_section(sections, "research question or problem"),
         methods=_plain_section(sections, "method / approach"),
         key_findings=_plain_section(sections, "key findings"),
         limitations=_plain_section(sections, "limitations"),
         useful_for=_plain_section(sections, "useful for my literature review"),
         not_useful_for=_plain_section(sections, "not useful for"),
+        personal_reading_notes=_plain_section(sections, "personal reading notes"),
         tags=parse_tags(metadata.get("tags", "")),
         user_questions=_list_section(sections, "open questions"),
         follow_up_actions=_list_section(sections, "follow-up actions"),
@@ -200,13 +204,16 @@ def parse_note_file(path: str | Path) -> PaperNote:
 
 
 def _parse_claims(markdown: str, note: PaperNote, warnings: list[str]) -> list[Claim]:
-    claim_heading_re = re.compile(r"^###\s+Claim\s+([A-Za-z0-9_-]+).*?$", re.MULTILINE)
+    claim_heading_re = re.compile(r"^###\s+(?:Claim|Evidence claim|Evidence)\s*([A-Za-z0-9_-]+)?\b.*?$", re.IGNORECASE | re.MULTILINE)
+    any_heading_re = re.compile(r"^#{2,3}\s+.+?$", re.MULTILINE)
     matches = list(claim_heading_re.finditer(markdown))
+    headings = list(any_heading_re.finditer(markdown))
     claims: list[Claim] = []
     for index, match in enumerate(matches):
-        ordinal = match.group(1)
+        ordinal = match.group(1) or str(index + 1)
         start = match.end()
-        end = matches[index + 1].start() if index + 1 < len(matches) else len(markdown)
+        later_headings = [heading.start() for heading in headings if heading.start() > match.start()]
+        end = later_headings[0] if later_headings else len(markdown)
         block = markdown[start:end]
         fields = _parse_bullet_fields(block)
         claim_text = fields.get("claim", "").strip()

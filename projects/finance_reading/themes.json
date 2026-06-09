@@ -1,0 +1,12 @@
+{
+  "themes": [
+    {
+      "theme_id": "finance-valuation",
+      "name": "finance valuation",
+      "tags": ["finance valuation"],
+      "min_claims": 1,
+      "min_papers": 1,
+      "description": "Synthetic valuation-method evidence."
+    }
+  ]
+}

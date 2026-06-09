@@ -1,0 +1,20 @@
+{
+  "themes": [
+    {
+      "theme_id": "charge-separation",
+      "name": "charge separation",
+      "tags": ["charge separation"],
+      "min_claims": 1,
+      "min_papers": 1,
+      "description": "Synthetic evidence about charge transfer and separation."
+    },
+    {
+      "theme_id": "photocorrosion",
+      "name": "photocorrosion",
+      "tags": ["photocorrosion", "catalyst stability"],
+      "min_claims": 2,
+      "min_papers": 2,
+      "description": "Synthetic evidence about catalyst degradation."
+    }
+  ]
+}

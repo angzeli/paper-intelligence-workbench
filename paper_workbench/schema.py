@@ -34,6 +34,18 @@ class EvidenceType(str, Enum):
     UNCLEAR = "unclear"
 
 
+class SourceType(str, Enum):
+    JOURNAL_ARTICLE = "journal_article"
+    CONFERENCE_PAPER = "conference_paper"
+    BOOK = "book"
+    THESIS = "thesis"
+    PREPRINT = "preprint"
+    REPORT = "report"
+    REVIEW = "review"
+    DATASET = "dataset"
+    OTHER = "other"
+
+
 @dataclass(slots=True)
 class Author:
     given: str = ""
@@ -81,6 +93,12 @@ class Paper:
     added_date: str = ""
     last_reviewed_date: str = ""
     priority: str = ""
+    project: str = ""
+    source_type: str = ""
+    relevance_score: str = ""
+    reading_priority: str = ""
+    included_in_lit_review: str = ""
+    exclude_reason: str = ""
     user_comment: str = ""
 
 
@@ -96,6 +114,7 @@ class BibTeXEntry:
     url: str = ""
     raw_fields: dict[str, str] = field(default_factory=dict)
     source_path: str = ""
+    parse_warnings: list[str] = field(default_factory=list)
 
     def venue(self) -> str:
         for name in ("journal", "booktitle", "publisher", "venue"):
@@ -145,6 +164,8 @@ class PaperNote:
     limitations: str = ""
     useful_for: str = ""
     not_useful_for: str = ""
+    why_it_matters: str = ""
+    personal_reading_notes: str = ""
     claims: list[Claim] = field(default_factory=list)
     tags: list[str] = field(default_factory=list)
     user_questions: list[str] = field(default_factory=list)
@@ -165,7 +186,21 @@ class ProjectTheme:
     name: str
     tags: list[str] = field(default_factory=list)
     min_claims: int = 2
+    min_papers: int = 1
     description: str = ""
+
+
+@dataclass(slots=True)
+class ProjectProfile:
+    name: str
+    root: str
+    registry_path: str
+    bibtex_path: str
+    notes_dir: str
+    themes_path: str
+    reports_dir: str
+    description: str = ""
+    is_default: bool = False
 
 
 @dataclass(slots=True)

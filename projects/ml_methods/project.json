@@ -1,0 +1,10 @@
+{
+  "name": "ml_methods",
+  "description": "Synthetic ML methods literature-review profile.",
+  "is_default": false,
+  "registry_path": "registry.csv",
+  "bibtex_path": "bibtex/library.bib",
+  "notes_dir": "notes",
+  "themes_path": "themes.json",
+  "reports_dir": "reports"
+}

@@ -12,6 +12,8 @@ DEFAULT_DIRS = [
     "data/notes",
     "data/bibtex",
     "data/registries",
+    "data/processed",
+    "projects",
     "reports",
     "docs",
     "notebooks",
@@ -52,3 +54,11 @@ def default_reports_dir(root: str | Path = ".") -> Path:
 
 def default_notes_dir(root: str | Path = ".") -> Path:
     return project_root(root) / "data" / "notes"
+
+
+def default_projects_dir(root: str | Path = ".") -> Path:
+    return project_root(root) / "projects"
+
+
+def default_processed_dir(root: str | Path = ".") -> Path:
+    return project_root(root) / "data" / "processed"
