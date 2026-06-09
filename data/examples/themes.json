@@ -1,0 +1,53 @@
+{
+  "themes": [
+    {
+      "theme_id": "charge-separation",
+      "name": "charge separation",
+      "tags": ["charge separation", "thin-film fabrication"],
+      "min_claims": 2,
+      "description": "Evidence about separating or transporting charge carriers."
+    },
+    {
+      "theme_id": "photocorrosion",
+      "name": "photocorrosion",
+      "tags": ["photocorrosion", "catalyst stability"],
+      "min_claims": 2,
+      "description": "Evidence about degradation or stability under illumination."
+    },
+    {
+      "theme_id": "thin-film-fabrication",
+      "name": "thin-film fabrication",
+      "tags": ["thin-film fabrication"],
+      "min_claims": 1,
+      "description": "Evidence about local film preparation and morphology."
+    },
+    {
+      "theme_id": "catalyst-stability",
+      "name": "catalyst stability",
+      "tags": ["catalyst stability", "photocorrosion"],
+      "min_claims": 2,
+      "description": "Evidence about durability and degradation."
+    },
+    {
+      "theme_id": "co2-adsorption",
+      "name": "CO2 adsorption",
+      "tags": ["CO2 adsorption"],
+      "min_claims": 1,
+      "description": "Evidence about adsorption behavior in synthetic examples."
+    },
+    {
+      "theme_id": "finance-valuation",
+      "name": "finance valuation",
+      "tags": ["finance valuation"],
+      "min_claims": 2,
+      "description": "Evidence about valuation methods in finance reading notes."
+    },
+    {
+      "theme_id": "ml-methodology",
+      "name": "ML methodology",
+      "tags": ["ML methodology", "machine learning"],
+      "min_claims": 1,
+      "description": "Evidence about model or evaluation methodology."
+    }
+  ]
+}
