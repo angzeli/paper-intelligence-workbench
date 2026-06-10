@@ -357,6 +357,7 @@ def export_bundle(
     notes_dir: str | Path,
     themes_path: str | Path,
     reports_dir: str | Path,
+    text_dir: str | Path | None = None,
     out: str | Path,
     project: str = "",
     include_pdfs: bool = False,
@@ -380,6 +381,10 @@ def export_bundle(
             copied.append(str(target.relative_to(bundle)))
     if Path(notes_dir).exists():
         _copy_tree_contents(Path(notes_dir), data_dir / "notes", copied, bundle)
+    sidecars_copied: list[str] = []
+    resolved_text_dir = _bundle_text_dir(text_dir=text_dir, notes_dir=notes_dir, root=root)
+    if resolved_text_dir.exists():
+        _copy_text_sidecars(resolved_text_dir, data_dir / "text", copied, sidecars_copied, bundle)
     if Path(reports_dir).exists():
         _copy_tree_contents(Path(reports_dir), bundle / "reports", copied, bundle)
     pdfs_copied: list[str] = []
@@ -404,11 +409,33 @@ def export_bundle(
         "tool_version": __version__,
         "include_pdfs": include_pdfs,
         "pdfs_copied": pdfs_copied,
+        "text_sidecars_copied": sorted(sidecars_copied),
         "files_copied": sorted(copied),
     }
     write_json(bundle / "manifest.json", manifest, force=True)
     write_text(bundle / "bundle_summary.md", bundle_export_summary(manifest, bundle), force=True)
     return bundle
+
+
+def _bundle_text_dir(*, text_dir: str | Path | None, notes_dir: str | Path, root: str | Path) -> Path:
+    if text_dir is not None:
+        return Path(text_dir)
+    sibling_text_dir = Path(notes_dir).parent / "text"
+    if sibling_text_dir.exists():
+        return sibling_text_dir
+    return Path(root) / "data" / "text"
+
+
+def _copy_text_sidecars(source_dir: Path, target_dir: Path, copied: list[str], sidecars_copied: list[str], bundle: Path) -> None:
+    for source in sorted(path for path in source_dir.rglob("*.txt") if path.is_file()):
+        if any(part.startswith(".") for part in source.relative_to(source_dir).parts):
+            continue
+        target = target_dir / source.relative_to(source_dir)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+        relative = str(target.relative_to(bundle))
+        copied.append(relative)
+        sidecars_copied.append(relative)
 
 
 def _copy_tree_contents(source_dir: Path, target_dir: Path, copied: list[str], bundle: Path) -> None:
@@ -427,6 +454,7 @@ def bundle_export_summary(manifest: dict, out: str | Path) -> str:
         f"- Tool version: {manifest.get('tool_version')}\n"
         f"- Include PDFs: {str(manifest.get('include_pdfs')).lower()}\n"
         f"- Files copied: {len(manifest.get('files_copied', []))}\n"
+        f"- Text sidecars copied: {len(manifest.get('text_sidecars_copied', []))}\n"
         f"- PDFs copied: {len(manifest.get('pdfs_copied', []))}\n"
     )
 

@@ -14,10 +14,13 @@ The bundle includes:
 - BibTeX file
 - notes
 - themes
+- user-provided `.txt` text sidecars from the project/default `text/` folder
 - generated reports
 - `manifest.json`
 - `bundle_summary.md`
 
-The manifest records export timestamp, tool version, files copied, project name, and whether PDFs were included.
+The manifest records export timestamp, tool version, files copied, text sidecars copied, project name, and whether PDFs were included.
 
 PDFs are not copied by default. Use `--include-pdfs` only when the local files exist and you have the right to copy them.
+
+SQLite cache files under `.paperwb/` are not authoritative project data and should not be included in backup bundles.

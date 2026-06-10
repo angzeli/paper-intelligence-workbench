@@ -31,7 +31,7 @@ paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
 paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
 ```
 
-Backup bundles do not include PDFs by default. Use `--include-pdfs` only for local files you have the right to copy.
+Backup bundles include registry, BibTeX, notes, themes, generated reports, and user-provided `.txt` sidecars. They do not include PDFs by default. Use `--include-pdfs` only for local files you have the right to copy.
 
 Vault and bundle exports require a new or empty output directory. They do not merge into or clean a non-empty directory, even with `--force`.
 

@@ -29,6 +29,7 @@ from .index import (
     build_index_records,
     clear_index,
     default_index_path,
+    display_path,
     index_status,
     index_status_markdown,
     rebuild_index,
@@ -163,6 +164,16 @@ def _index_records_from_args(args: argparse.Namespace, paths: dict[str, Path | N
         text_dir=_text_dir_from_args(args, paths),
         include_text=getattr(args, "include_text", False),
     )
+
+
+def _index_rebuild_hint(args: argparse.Namespace) -> str:
+    parts = ["paperwb", "index", "rebuild"]
+    project = getattr(args, "project", "")
+    if project:
+        parts.extend(["--project", project])
+    if getattr(args, "text", False):
+        parts.append("--include-text")
+    return " ".join(parts)
 
 
 def _print_findings(findings) -> None:
@@ -302,15 +313,18 @@ def cmd_search(args: argparse.Namespace) -> int:
             source_types.add("note")
         if args.text:
             source_types.add("text")
-        results = search_index(
-            _index_path_from_args(args, paths),
-            args.query,
-            project_id=_project_id_from_paths(paths),
-            source_types=source_types or None,
-            exact=args.exact,
-            limit=args.limit,
-        )
-        markdown = indexed_results_markdown(results, args.query)
+        try:
+            results = search_index(
+                _index_path_from_args(args, paths),
+                args.query,
+                project_id=_project_id_from_paths(paths),
+                source_types=source_types or None,
+                exact=args.exact,
+                limit=args.limit,
+            )
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(f"{exc}. Run `{_index_rebuild_hint(args)}` before using indexed search.") from exc
+        markdown = indexed_results_markdown(results, args.query, base_path=paths["root"])
         if args.out:
             path = write_text(args.out, markdown, force=args.force)
             print(f"Wrote {path}")
@@ -319,7 +333,7 @@ def cmd_search(args: argparse.Namespace) -> int:
             print(markdown, end="")
             return 0
         for result in results:
-            path = f"\t{result.path}" if result.path else ""
+            path = f"\t{display_path(result.path, base_path=paths['root'])}" if result.path else ""
             print(f"{result.source_type}\t{result.paper_id}\t{result.score}\t{result.title}{path}")
         if not results:
             print("No matches.")
@@ -363,14 +377,14 @@ def cmd_index_rebuild(args: argparse.Namespace) -> int:
     records = _index_records_from_args(args, paths)
     status = rebuild_index(_index_path_from_args(args, paths), records, project_id=_project_id_from_paths(paths))
     counts = source_counts(records)
-    print(f"Rebuilt index at {status.index_path}")
+    print(f"Rebuilt index at {display_path(status.index_path, base_path=paths['root'])}")
     print(f"Project: {status.project_id}")
     print(f"Records: {len(records)}")
     print(f"FTS5 enabled: {str(status.fts_enabled).lower()}")
     for source_type, count in sorted(counts.items()):
         print(f"  {source_type}: {count}")
     if args.out:
-        path = write_text(args.out, index_status_markdown(status), force=args.force)
+        path = write_text(args.out, index_status_markdown(status, base_path=paths["root"]), force=args.force)
         print(f"Wrote {path}")
     return 0
 
@@ -380,7 +394,7 @@ def cmd_index_status(args: argparse.Namespace) -> int:
     paths = _paths_from_args(args)
     current_records = _index_records_from_args(args, paths) if args.check_files else None
     status = index_status(_index_path_from_args(args, paths), project_id=_project_id_from_paths(paths), current_records=current_records)
-    markdown = index_status_markdown(status)
+    markdown = index_status_markdown(status, base_path=paths["root"])
     if args.out:
         path = write_text(args.out, markdown, force=args.force)
         print(f"Wrote {path}")
@@ -579,6 +593,7 @@ def cmd_export(args: argparse.Namespace) -> int:
             notes_dir=paths["notes_dir"],
             themes_path=paths["themes"],
             reports_dir=paths["reports_dir"],
+            text_dir=_default_text_dir(paths),
             out=args.out,
             project=paths["profile"].name if paths["profile"] else "",
             include_pdfs=args.include_pdfs,

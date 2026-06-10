@@ -6,6 +6,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hashlib
+import os
 from pathlib import Path
 import re
 import sqlite3
@@ -70,6 +71,8 @@ class IndexStatus:
     counts: dict[str, int] = field(default_factory=dict)
     changed_record_ids: list[str] = field(default_factory=list)
     missing_record_ids: list[str] = field(default_factory=list)
+    orphaned_record_ids: list[str] = field(default_factory=list)
+    orphaned_record_paths: dict[str, str] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
 
@@ -460,21 +463,30 @@ def index_status(index_path: str | Path, *, project_id: str, current_records: li
         }
         changed: list[str] = []
         missing: list[str] = []
+        orphaned: list[str] = []
+        orphaned_paths: dict[str, str] = {}
         warnings: list[str] = []
         if current_records is not None:
             stored = {
-                row["record_id"]: row["content_hash"]
-                for row in connection.execute("SELECT record_id, content_hash FROM records WHERE project_id = ?", (project_id,))
+                row["record_id"]: {"content_hash": row["content_hash"], "source_path": row["source_path"]}
+                for row in connection.execute("SELECT record_id, content_hash, source_path FROM records WHERE project_id = ?", (project_id,))
             }
+            current_ids = {record.record_id for record in current_records}
             for record in current_records:
                 if record.record_id not in stored:
                     missing.append(record.record_id)
-                elif stored[record.record_id] != record.content_hash:
+                elif stored[record.record_id]["content_hash"] != record.content_hash:
                     changed.append(record.record_id)
+            for record_id, stored_record in stored.items():
+                if record_id not in current_ids:
+                    orphaned.append(record_id)
+                    orphaned_paths[record_id] = stored_record["source_path"]
             if changed:
                 warnings.append(f"{len(changed)} indexed record(s) differ from local files.")
             if missing:
                 warnings.append(f"{len(missing)} local record(s) are missing from the index.")
+            if orphaned:
+                warnings.append(f"{len(orphaned)} indexed record(s) are no longer present in local files.")
         return IndexStatus(
             index_path=str(target),
             project_id=project_id,
@@ -485,6 +497,8 @@ def index_status(index_path: str | Path, *, project_id: str, current_records: li
             counts=counts,
             changed_record_ids=changed,
             missing_record_ids=missing,
+            orphaned_record_ids=orphaned,
+            orphaned_record_paths=orphaned_paths,
             warnings=warnings,
         )
 
@@ -510,8 +524,11 @@ def search_index(
         raise FileNotFoundError(f"Index not found: {target}")
     with _connect(target) as connection:
         rows = _search_with_fts(connection, query, project_id=project_id, source_types=source_types, exact=exact)
+        like_rows = _search_with_like(connection, query, project_id=project_id, source_types=source_types, exact=exact)
         if rows is None:
-            rows = _search_with_like(connection, query, project_id=project_id, source_types=source_types, exact=exact)
+            rows = like_rows
+        else:
+            rows = _merge_rows(rows, like_rows)
     results = [_row_to_result(row, query, exact=exact) for row in rows]
     results = [result for result in results if result.score > 0]
     results.sort(key=lambda result: (-result.score, result.source_type, result.paper_id, result.record_id))
@@ -566,6 +583,18 @@ def _search_with_like(
     params.extend(source_params)
     rows = list(connection.execute(f"SELECT * FROM records {project_sql}{source_sql}", params))
     return [row for row in rows if _matches_record(row, query, exact=exact)]
+
+
+def _merge_rows(primary: list[sqlite3.Row], secondary: list[sqlite3.Row]) -> list[sqlite3.Row]:
+    seen: set[str] = set()
+    merged: list[sqlite3.Row] = []
+    for row in [*primary, *secondary]:
+        record_id = row["record_id"]
+        if record_id in seen:
+            continue
+        seen.add(record_id)
+        merged.append(row)
+    return merged
 
 
 def _fts_query(query: str, *, exact: bool) -> str:
@@ -653,7 +682,23 @@ def _snippet(text: str, query: str, *, width: int = 180) -> str:
     return snippet
 
 
-def search_results_markdown(results: list[SearchResult], query: str) -> str:
+def display_path(path: str | Path, *, base_path: str | Path | None = None) -> str:
+    if not path:
+        return ""
+    target = Path(path)
+    base = Path(base_path) if base_path is not None else Path.cwd()
+    try:
+        if target.is_absolute():
+            return Path(target).relative_to(base.resolve()).as_posix()
+    except ValueError:
+        pass
+    try:
+        return Path(os.path.relpath(target, start=base)).as_posix()
+    except (OSError, ValueError):
+        return target.as_posix()
+
+
+def search_results_markdown(results: list[SearchResult], query: str, *, base_path: str | Path | None = None) -> str:
     lines = [
         f"# Indexed Search Results: {query}",
         "",
@@ -671,18 +716,18 @@ def search_results_markdown(results: list[SearchResult], query: str) -> str:
                 field=_escape(result.matched_field),
                 score=result.score,
                 snippet=_escape(result.snippet),
-                path=_escape(result.path),
+                path=_escape(display_path(result.path, base_path=base_path)),
             )
         )
     return "\n".join(lines).rstrip() + "\n"
 
 
-def index_status_markdown(status: IndexStatus) -> str:
+def index_status_markdown(status: IndexStatus, *, base_path: str | Path | None = None) -> str:
     lines = [
         "# Local Search Index Status",
         "",
         f"- Project: {status.project_id}",
-        f"- Index path: {status.index_path}",
+        f"- Index path: {display_path(status.index_path, base_path=base_path)}",
         f"- Index exists: {str(status.exists).lower()}",
         f"- FTS5 enabled: {str(status.fts_enabled).lower()}",
         f"- Last rebuild: {status.last_rebuild or 'never'}",
@@ -708,6 +753,12 @@ def index_status_markdown(status: IndexStatus) -> str:
     if status.missing_record_ids:
         lines.extend(["", "### Missing Records", ""])
         lines.extend(f"- {record_id}" for record_id in status.missing_record_ids[:50])
+    if status.orphaned_record_ids:
+        lines.extend(["", "### Orphaned Indexed Records", ""])
+        for record_id in status.orphaned_record_ids[:50]:
+            source_path = display_path(status.orphaned_record_paths.get(record_id, ""), base_path=base_path)
+            suffix = f" ({source_path})" if source_path else ""
+            lines.append(f"- {record_id}{suffix}")
     return "\n".join(lines).rstrip() + "\n"
 
 

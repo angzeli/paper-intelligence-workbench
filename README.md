@@ -8,7 +8,7 @@ v0.3 adds deterministic synthetic stress projects, report-regression snapshots, 
 
 v0.4 adds local import/export interoperability for Zotero-style CSV, generic CSV mappings, BibTeX, RIS, Obsidian-friendly Markdown vaults, backup bundles, richer reading lists, project summaries, and report indexes.
 
-v0.5 adds an optional local SQLite search index, FTS5-backed search when available, fallback substring search, index diagnostics, and synthetic full-text sidecar fixtures.
+v0.5 adds an optional local SQLite search index, FTS5-backed search when available, substring fallback behavior, index diagnostics, and synthetic full-text sidecar fixtures.
 
 ## What It Does
 
@@ -264,7 +264,7 @@ paperwb checklist --theme photocorrosion
 
 - BibTeX parsing targets common local entries, not every BibTeX edge case.
 - Markdown note parsing expects the provided template headings.
-- Default search is substring-based; indexed search is opt-in and uses local SQLite with FTS5 fallback behavior.
+- Default search is substring-based; indexed search is opt-in and uses local SQLite with FTS5 plus substring fallback behavior.
 - Theme mapping is tag-based only.
 - SQLite indexing is a rebuildable cache, not an authoritative database.
 - Citation audit checks completeness of user notes, not scientific correctness.

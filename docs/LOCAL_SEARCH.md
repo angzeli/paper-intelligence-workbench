@@ -15,6 +15,8 @@ paperwb search "charge separation" --project zis_photocatalysis --indexed
 
 The index is local and rebuildable. It stores derived text from registry rows, BibTeX entries, structured notes, claims, themes, tags, and optional user-provided text sidecars.
 
+Indexed search uses SQLite FTS when available and also keeps the default substring matching behavior, so a query such as `corrosion` can still match `photocorrosion`.
+
 ## Indexed Result Fields
 
 Indexed search prints:
@@ -40,4 +42,3 @@ paperwb search "photocorrosion" --project zis_photocatalysis --indexed --text
 ```
 
 The `--text` filter searches only sidecar records in the SQLite index. It does not parse PDFs.
-

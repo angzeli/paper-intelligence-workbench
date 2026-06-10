@@ -77,12 +77,60 @@ def test_index_status_detects_changed_local_records(tmp_path):
     assert any("differ" in warning for warning in status.warnings)
 
 
+def test_index_status_detects_orphaned_indexed_records(tmp_path):
+    index_path = tmp_path / "index.sqlite"
+    records = _zis_records(include_text=True)
+    rebuild_index(index_path, records, project_id="zis_photocatalysis")
+
+    current_records = [
+        record
+        for record in records
+        if not (
+            (record.source_type == "text" and record.paper_id == "zis_stability_2024")
+            or (record.source_type == "note" and record.paper_id == "zis_charge_2025")
+            or (record.source_type == "paper" and record.paper_id == "zis_charge_2025")
+            or (record.source_type == "bibtex" and record.paper_id == "zis_charge_2025")
+        )
+    ]
+    status = index_status(index_path, project_id="zis_photocatalysis", current_records=current_records)
+    assert any(record_id.endswith(":text:zis_stability_2024") for record_id in status.orphaned_record_ids)
+    assert any(record_id.endswith(":note:zis_charge_2025") for record_id in status.orphaned_record_ids)
+    assert any(record_id.endswith(":paper:zis_charge_2025") for record_id in status.orphaned_record_ids)
+    assert any(record_id.endswith(":bibtex:zisCharge2025") for record_id in status.orphaned_record_ids)
+    assert any("no longer present" in warning for warning in status.warnings)
+
+
+def test_index_status_strict_fails_when_text_sidecars_were_omitted_from_check(tmp_path):
+    index_path = tmp_path / "index.sqlite"
+    rebuild_index(index_path, _zis_records(include_text=True), project_id="zis_photocatalysis")
+    result = run_cli(
+        "index",
+        "status",
+        "--project",
+        "zis_photocatalysis",
+        "--check-files",
+        "--strict",
+        "--index",
+        str(index_path),
+    )
+    assert result.returncode == 1
+    assert "no longer present" in result.stdout
+    assert "Orphaned Indexed Records" in result.stdout
+
+
 def test_search_falls_back_when_fts_table_is_absent(tmp_path):
     index_path = tmp_path / "index.sqlite"
     rebuild_index(index_path, _zis_records(), project_id="zis_photocatalysis")
     with sqlite3.connect(index_path) as connection:
         connection.execute("DROP TABLE IF EXISTS records_fts")
     results = search_index(index_path, "photocorrosion", project_id="zis_photocatalysis")
+    assert any(result.paper_id == "zis_stability_2024" for result in results)
+
+
+def test_indexed_search_preserves_substring_matches_when_fts_is_present(tmp_path):
+    index_path = tmp_path / "index.sqlite"
+    rebuild_index(index_path, _zis_records(), project_id="zis_photocatalysis")
+    results = search_index(index_path, "corrosion", project_id="zis_photocatalysis")
     assert any(result.paper_id == "zis_stability_2024" for result in results)
 
 
@@ -125,12 +173,21 @@ def test_cli_index_rebuild_status_search_and_clear(tmp_path):
     out = tmp_path / "search.md"
     exported = run_cli("search", "charge separation", "--project", "zis_photocatalysis", "--indexed", "--index", str(index_path), "--out", str(out))
     assert exported.returncode == 0, exported.stderr
-    assert "Indexed Search Results" in out.read_text(encoding="utf-8")
+    exported_report = out.read_text(encoding="utf-8")
+    assert "Indexed Search Results" in exported_report
+    assert str(ROOT) not in exported_report
 
     cleared = run_cli("index", "clear", "--project", "zis_photocatalysis", "--index", str(index_path))
     assert cleared.returncode == 0, cleared.stderr
     after = run_cli("index", "status", "--project", "zis_photocatalysis", "--index", str(index_path))
     assert "Total records: 0" in after.stdout
+
+
+def test_cli_indexed_search_missing_index_suggests_rebuild(tmp_path):
+    missing_index = tmp_path / "missing.sqlite"
+    result = run_cli("search", "charge", "--project", "zis_photocatalysis", "--indexed", "--index", str(missing_index))
+    assert result.returncode == 2
+    assert "paperwb index rebuild --project zis_photocatalysis" in result.stderr
 
 
 def test_old_substring_search_backward_compatibility():
@@ -139,3 +196,17 @@ def test_old_substring_search_backward_compatibility():
     result = run_cli("search", "photocorrosion", "--registry", str(EXAMPLE_REGISTRY), "--notes-dir", str(ROOT / "data" / "notes"))
     assert result.returncode == 0
     assert "synth_photo_2023" in result.stdout
+
+
+def test_v0_5_generated_reports_have_stable_sections_and_relative_paths():
+    reports = {
+        ROOT / "reports" / "search_demo_v0_5.md": ["# Indexed Search Results", "| Source | Paper ID |"],
+        ROOT / "reports" / "index_status_v0_5.md": ["# Local Search Index Status", "## Records by Source Type", "| text | 2 |"],
+        ROOT / "reports" / "full_text_sidecar_demo_v0_5.md": ["# Indexed Search Results", "Text sidecar"],
+        ROOT / "reports" / "release_readiness_v0_5.md": ["# Release Readiness v0.5", "## Sidecar Text Boundary"],
+    }
+    for path, expected_fragments in reports.items():
+        content = path.read_text(encoding="utf-8")
+        assert str(ROOT) not in content
+        for fragment in expected_fragments:
+            assert fragment in content

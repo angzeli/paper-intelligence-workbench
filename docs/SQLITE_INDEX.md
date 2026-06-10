@@ -33,7 +33,6 @@ paperwb index rebuild --project zis_photocatalysis --include-text
 
 ## FTS5 and Fallback
 
-When SQLite FTS5 is available, the backend creates a `records_fts` virtual table and attempts FTS search first. If FTS5 is unavailable or a query cannot run through FTS, the tool falls back to a normal SQLite table scan with transparent substring matching.
+When SQLite FTS5 is available, the backend creates a `records_fts` virtual table and attempts FTS search first. It also merges in the normal table-scan substring matches so indexed search preserves the default substring behavior. If FTS5 is unavailable or a query cannot run through FTS, the table-scan path still handles the search.
 
 The ranking step is the same after either retrieval path.
-

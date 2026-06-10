@@ -46,17 +46,21 @@ def main() -> None:
         include_text=True,
     )
     status = rebuild_index(INDEX_PATH, records, project_id=PROJECT)
-    print(index_status_markdown(status))
+    print(index_status_markdown(status, base_path=Path(".")))
 
     results = search_index(INDEX_PATH, "charge separation", project_id=PROJECT)
-    write_text("reports/search_demo_v0_5.md", search_results_markdown(results, "charge separation"), force=True)
+    write_text("reports/search_demo_v0_5.md", search_results_markdown(results, "charge separation", base_path=Path(".")), force=True)
 
     sidecar_query = "observations"
     sidecar_results = search_index(INDEX_PATH, sidecar_query, project_id=PROJECT, source_types={"text"})
-    write_text("reports/full_text_sidecar_demo_v0_5.md", search_results_markdown(sidecar_results, sidecar_query), force=True)
+    write_text(
+        "reports/full_text_sidecar_demo_v0_5.md",
+        search_results_markdown(sidecar_results, sidecar_query, base_path=Path(".")),
+        force=True,
+    )
 
     checked_status = index_status(INDEX_PATH, project_id=PROJECT, current_records=records)
-    write_text("reports/index_status_v0_5.md", index_status_markdown(checked_status), force=True)
+    write_text("reports/index_status_v0_5.md", index_status_markdown(checked_status, base_path=Path(".")), force=True)
     print("Key takeaways:")
     print("- Indexed search is local and rebuildable.")
     print("- Sidecars are optional user-provided plain text.")

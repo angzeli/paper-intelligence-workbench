@@ -141,8 +141,12 @@ def test_bundle_export_contains_manifest_without_pdfs_by_default(tmp_path):
     )
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["include_pdfs"] is False
+    assert manifest["text_sidecars_copied"]
     assert (bundle / "data" / "registry.csv").exists()
     assert (bundle / "data" / "notes" / "zis_charge_2025.md").exists()
+    assert (bundle / "data" / "text" / "zis_charge_2025.txt").exists()
+    assert (bundle / "data" / "text" / "zis_stability_2024.txt").exists()
+    assert not any(".paperwb" in path.parts for path in bundle.rglob("*"))
 
 
 def test_reading_list_theme_and_csv_exports(tmp_path):

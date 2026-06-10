@@ -4,7 +4,7 @@
 - Index path: .paperwb/index.sqlite
 - Index exists: true
 - FTS5 enabled: true
-- Last rebuild: 2026-06-10T19:03:00.551895+00:00
+- Last rebuild: 2026-06-10T19:15:25.204285+00:00
 - Total records: 15
 
 ## Records by Source Type
