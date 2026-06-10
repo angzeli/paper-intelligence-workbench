@@ -1,0 +1,2021 @@
+[
+  {
+    "claim_id": "orphan_synthetic_note:c1",
+    "paper_id": "orphan_synthetic_note",
+    "claim_text": "This orphan synthetic note intentionally has no matching registry entry.",
+    "evidence_type": "unclear",
+    "section": "",
+    "page": "",
+    "confidence": "low",
+    "tags": [
+      "orphan"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only.",
+    "user_comment": "Expected workspace-health warning.",
+    "supports_theme": "undefined orphan theme",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/orphan_synthetic_note.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_001:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_001",
+    "claim_text": "Synthetic claim 1 for stress_zis_photocatalysis_synthetic_001 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 3",
+    "page": "3",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_001.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_001:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_001",
+    "claim_text": "Synthetic claim 41 for stress_zis_photocatalysis_synthetic_001 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 43",
+    "page": "43",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_001.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_001:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_001",
+    "claim_text": "Synthetic claim 81 for stress_zis_photocatalysis_synthetic_001 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "",
+    "page": "",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_001.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_002:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_002",
+    "claim_text": "Synthetic claim 2 for stress_zis_photocatalysis_synthetic_002 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 4",
+    "page": "4",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_002.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_002:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_002",
+    "claim_text": "Synthetic claim 42 for stress_zis_photocatalysis_synthetic_002 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 44",
+    "page": "44",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_002.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_002:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_002",
+    "claim_text": "Synthetic claim 82 for stress_zis_photocatalysis_synthetic_002 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 84",
+    "page": "84",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_002.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_003:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_003",
+    "claim_text": "Synthetic claim 3 for stress_zis_photocatalysis_synthetic_003 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "Section 4 p. 5",
+    "page": "5",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_003.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_003:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_003",
+    "claim_text": "Synthetic claim 43 for stress_zis_photocatalysis_synthetic_003 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 45",
+    "page": "45",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_003.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_003:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_003",
+    "claim_text": "Synthetic claim 83 for stress_zis_photocatalysis_synthetic_003 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 85",
+    "page": "85",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_003.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_004:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_004",
+    "claim_text": "Synthetic claim 4 for stress_zis_photocatalysis_synthetic_004 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 6",
+    "page": "6",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_004.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_004:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_004",
+    "claim_text": "Synthetic claim 44 for stress_zis_photocatalysis_synthetic_004 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 46",
+    "page": "46",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_004.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_004:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_004",
+    "claim_text": "Synthetic claim 84 for stress_zis_photocatalysis_synthetic_004 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 86",
+    "page": "86",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_004.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_005:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_005",
+    "claim_text": "Synthetic claim 5 for stress_zis_photocatalysis_synthetic_005 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 7",
+    "page": "7",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_005.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_005:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_005",
+    "claim_text": "Synthetic claim 45 for stress_zis_photocatalysis_synthetic_005 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "",
+    "page": "",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_005.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_005:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_005",
+    "claim_text": "Synthetic claim 85 for stress_zis_photocatalysis_synthetic_005 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 87",
+    "page": "87",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_005.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_006:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_006",
+    "claim_text": "Synthetic claim 6 for stress_zis_photocatalysis_synthetic_006 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 8",
+    "page": "8",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_006.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_006:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_006",
+    "claim_text": "Synthetic claim 46 for stress_zis_photocatalysis_synthetic_006 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 48",
+    "page": "48",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_006.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_006:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_006",
+    "claim_text": "Synthetic claim 86 for stress_zis_photocatalysis_synthetic_006 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 88",
+    "page": "88",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_006.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_007:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_007",
+    "claim_text": "Synthetic claim 7 for stress_zis_photocatalysis_synthetic_007 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 9",
+    "page": "9",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_007.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_007:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_007",
+    "claim_text": "Synthetic claim 47 for stress_zis_photocatalysis_synthetic_007 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 49",
+    "page": "49",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_007.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_007:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_007",
+    "claim_text": "Synthetic claim 87 for stress_zis_photocatalysis_synthetic_007 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "Section 4 p. 89",
+    "page": "89",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_007.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_009:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_009",
+    "claim_text": "Synthetic claim 8 for stress_zis_photocatalysis_synthetic_009 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 10",
+    "page": "10",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_009.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_009:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_009",
+    "claim_text": "Synthetic claim 48 for stress_zis_photocatalysis_synthetic_009 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 50",
+    "page": "50",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_009.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_009:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_009",
+    "claim_text": "Synthetic claim 88 for stress_zis_photocatalysis_synthetic_009 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 90",
+    "page": "90",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_009.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_010:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_010",
+    "claim_text": "Synthetic claim 9 for stress_zis_photocatalysis_synthetic_010 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "",
+    "page": "",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_010.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_010:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_010",
+    "claim_text": "Synthetic claim 49 for stress_zis_photocatalysis_synthetic_010 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 51",
+    "page": "51",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_010.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_010:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_010",
+    "claim_text": "Synthetic claim 89 for stress_zis_photocatalysis_synthetic_010 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 91",
+    "page": "91",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_010.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_011:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_011",
+    "claim_text": "Synthetic claim 10 for stress_zis_photocatalysis_synthetic_011 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 12",
+    "page": "12",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_011.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_011:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_011",
+    "claim_text": "Synthetic claim 50 for stress_zis_photocatalysis_synthetic_011 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 52",
+    "page": "52",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_011.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_011:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_011",
+    "claim_text": "Synthetic claim 90 for stress_zis_photocatalysis_synthetic_011 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "",
+    "page": "",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_011.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_012:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_012",
+    "claim_text": "Synthetic claim 11 for stress_zis_photocatalysis_synthetic_012 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 13",
+    "page": "13",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_012.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_012:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_012",
+    "claim_text": "Synthetic claim 51 for stress_zis_photocatalysis_synthetic_012 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "Section 4 p. 53",
+    "page": "53",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_012.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_012:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_012",
+    "claim_text": "Synthetic claim 91 for stress_zis_photocatalysis_synthetic_012 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 93",
+    "page": "93",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_012.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_013:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_013",
+    "claim_text": "Synthetic claim 12 for stress_zis_photocatalysis_synthetic_013 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 14",
+    "page": "14",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_013.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_013:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_013",
+    "claim_text": "Synthetic claim 52 for stress_zis_photocatalysis_synthetic_013 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 54",
+    "page": "54",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_013.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_013:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_013",
+    "claim_text": "Synthetic claim 92 for stress_zis_photocatalysis_synthetic_013 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 94",
+    "page": "94",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_013.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_014:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_014",
+    "claim_text": "Synthetic claim 13 for stress_zis_photocatalysis_synthetic_014 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 15",
+    "page": "15",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_014.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_014:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_014",
+    "claim_text": "Synthetic claim 53 for stress_zis_photocatalysis_synthetic_014 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 55",
+    "page": "55",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_014.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_014:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_014",
+    "claim_text": "Synthetic claim 93 for stress_zis_photocatalysis_synthetic_014 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 4 p. 95",
+    "page": "95",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_014.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_015:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_015",
+    "claim_text": "Synthetic claim 14 for stress_zis_photocatalysis_synthetic_015 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 16",
+    "page": "16",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_015.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_015:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_015",
+    "claim_text": "Synthetic claim 54 for stress_zis_photocatalysis_synthetic_015 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "",
+    "page": "",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_015.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_015:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_015",
+    "claim_text": "Synthetic claim 94 for stress_zis_photocatalysis_synthetic_015 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 96",
+    "page": "96",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_015.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_017:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_017",
+    "claim_text": "Synthetic claim 15 for stress_zis_photocatalysis_synthetic_017 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "Section 4 p. 17",
+    "page": "17",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_017.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_017:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_017",
+    "claim_text": "Synthetic claim 55 for stress_zis_photocatalysis_synthetic_017 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 57",
+    "page": "57",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_017.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_017:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_017",
+    "claim_text": "Synthetic claim 95 for stress_zis_photocatalysis_synthetic_017 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 97",
+    "page": "97",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_017.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_018:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_018",
+    "claim_text": "Synthetic claim 16 for stress_zis_photocatalysis_synthetic_018 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 18",
+    "page": "18",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_018.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_018:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_018",
+    "claim_text": "Synthetic claim 56 for stress_zis_photocatalysis_synthetic_018 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 58",
+    "page": "58",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_018.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_018:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_018",
+    "claim_text": "Synthetic claim 96 for stress_zis_photocatalysis_synthetic_018 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 98",
+    "page": "98",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_018.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_019:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_019",
+    "claim_text": "Synthetic claim 17 for stress_zis_photocatalysis_synthetic_019 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 19",
+    "page": "19",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_019.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_019:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_019",
+    "claim_text": "Synthetic claim 57 for stress_zis_photocatalysis_synthetic_019 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 4 p. 59",
+    "page": "59",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_019.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_019:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_019",
+    "claim_text": "Synthetic claim 97 for stress_zis_photocatalysis_synthetic_019 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 99",
+    "page": "99",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_019.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_020:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_020",
+    "claim_text": "Synthetic claim 18 for stress_zis_photocatalysis_synthetic_020 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "",
+    "page": "",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_020.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_020:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_020",
+    "claim_text": "Synthetic claim 58 for stress_zis_photocatalysis_synthetic_020 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 60",
+    "page": "60",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_020.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_020:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_020",
+    "claim_text": "Synthetic claim 98 for stress_zis_photocatalysis_synthetic_020 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 100",
+    "page": "100",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_020.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_021:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_021",
+    "claim_text": "Synthetic claim 19 for stress_zis_photocatalysis_synthetic_021 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 21",
+    "page": "21",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_021.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_021:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_021",
+    "claim_text": "Synthetic claim 59 for stress_zis_photocatalysis_synthetic_021 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 61",
+    "page": "61",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_021.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_021:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_021",
+    "claim_text": "Synthetic claim 99 for stress_zis_photocatalysis_synthetic_021 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "",
+    "page": "",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_021.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_022:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_022",
+    "claim_text": "Synthetic claim 20 for stress_zis_photocatalysis_synthetic_022 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 22",
+    "page": "22",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_022.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_022:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_022",
+    "claim_text": "Synthetic claim 60 for stress_zis_photocatalysis_synthetic_022 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 62",
+    "page": "62",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_022.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_022:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_022",
+    "claim_text": "Synthetic claim 100 for stress_zis_photocatalysis_synthetic_022 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 102",
+    "page": "102",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_022.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_023:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_023",
+    "claim_text": "Synthetic claim 21 for stress_zis_photocatalysis_synthetic_023 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 4 p. 23",
+    "page": "23",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_023.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_023:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_023",
+    "claim_text": "Synthetic claim 61 for stress_zis_photocatalysis_synthetic_023 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 63",
+    "page": "63",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_023.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_023:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_023",
+    "claim_text": "Synthetic claim 101 for stress_zis_photocatalysis_synthetic_023 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 103",
+    "page": "103",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_023.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_025:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_025",
+    "claim_text": "Synthetic claim 22 for stress_zis_photocatalysis_synthetic_025 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 24",
+    "page": "24",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_025.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_025:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_025",
+    "claim_text": "Synthetic claim 62 for stress_zis_photocatalysis_synthetic_025 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 64",
+    "page": "64",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_025.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_025:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_025",
+    "claim_text": "Synthetic claim 102 for stress_zis_photocatalysis_synthetic_025 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 104",
+    "page": "104",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_025.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_026:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_026",
+    "claim_text": "Synthetic claim 23 for stress_zis_photocatalysis_synthetic_026 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 25",
+    "page": "25",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_026.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_026:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_026",
+    "claim_text": "Synthetic claim 63 for stress_zis_photocatalysis_synthetic_026 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "",
+    "page": "",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_026.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_026:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_026",
+    "claim_text": "Synthetic claim 103 for stress_zis_photocatalysis_synthetic_026 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 105",
+    "page": "105",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_026.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_027:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_027",
+    "claim_text": "Synthetic claim 24 for stress_zis_photocatalysis_synthetic_027 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 26",
+    "page": "26",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_027.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_027:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_027",
+    "claim_text": "Synthetic claim 64 for stress_zis_photocatalysis_synthetic_027 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 66",
+    "page": "66",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_027.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_027:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_027",
+    "claim_text": "Synthetic claim 104 for stress_zis_photocatalysis_synthetic_027 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 106",
+    "page": "106",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_027.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_028:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_028",
+    "claim_text": "Synthetic claim 25 for stress_zis_photocatalysis_synthetic_028 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 27",
+    "page": "27",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_028.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_028:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_028",
+    "claim_text": "Synthetic claim 65 for stress_zis_photocatalysis_synthetic_028 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 67",
+    "page": "67",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_028.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_028:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_028",
+    "claim_text": "Synthetic claim 105 for stress_zis_photocatalysis_synthetic_028 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 4 p. 107",
+    "page": "107",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_028.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_029:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_029",
+    "claim_text": "Synthetic claim 26 for stress_zis_photocatalysis_synthetic_029 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 28",
+    "page": "28",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_029.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_029:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_029",
+    "claim_text": "Synthetic claim 66 for stress_zis_photocatalysis_synthetic_029 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 68",
+    "page": "68",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_029.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_029:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_029",
+    "claim_text": "Synthetic claim 106 for stress_zis_photocatalysis_synthetic_029 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 108",
+    "page": "108",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_029.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_030:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_030",
+    "claim_text": "Synthetic claim 27 for stress_zis_photocatalysis_synthetic_030 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "",
+    "page": "",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_030.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_030:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_030",
+    "claim_text": "Synthetic claim 67 for stress_zis_photocatalysis_synthetic_030 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 69",
+    "page": "69",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_030.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_030:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_030",
+    "claim_text": "Synthetic claim 107 for stress_zis_photocatalysis_synthetic_030 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 109",
+    "page": "109",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_030.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_031:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_031",
+    "claim_text": "Synthetic claim 28 for stress_zis_photocatalysis_synthetic_031 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 30",
+    "page": "30",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_031.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_031:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_031",
+    "claim_text": "Synthetic claim 68 for stress_zis_photocatalysis_synthetic_031 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 70",
+    "page": "70",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_031.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_031:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_031",
+    "claim_text": "Synthetic claim 108 for stress_zis_photocatalysis_synthetic_031 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "",
+    "page": "",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_031.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_033:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_033",
+    "claim_text": "Synthetic claim 29 for stress_zis_photocatalysis_synthetic_033 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 31",
+    "page": "31",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_033.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_033:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_033",
+    "claim_text": "Synthetic claim 69 for stress_zis_photocatalysis_synthetic_033 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 4 p. 71",
+    "page": "71",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_033.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_033:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_033",
+    "claim_text": "Synthetic claim 109 for stress_zis_photocatalysis_synthetic_033 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 111",
+    "page": "111",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_033.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_034:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_034",
+    "claim_text": "Synthetic claim 30 for stress_zis_photocatalysis_synthetic_034 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 32",
+    "page": "32",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_034.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_034:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_034",
+    "claim_text": "Synthetic claim 70 for stress_zis_photocatalysis_synthetic_034 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 72",
+    "page": "72",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_034.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_034:c3",
+    "paper_id": "stress_zis_photocatalysis_synthetic_034",
+    "claim_text": "Synthetic claim 110 for stress_zis_photocatalysis_synthetic_034 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 112",
+    "page": "112",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_034.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_035:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_035",
+    "claim_text": "Synthetic claim 31 for stress_zis_photocatalysis_synthetic_035 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 33",
+    "page": "33",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_035.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_035:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_035",
+    "claim_text": "Synthetic claim 71 for stress_zis_photocatalysis_synthetic_035 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 73",
+    "page": "73",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_035.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_036:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_036",
+    "claim_text": "Synthetic claim 32 for stress_zis_photocatalysis_synthetic_036 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 34",
+    "page": "34",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_036.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_036:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_036",
+    "claim_text": "Synthetic claim 72 for stress_zis_photocatalysis_synthetic_036 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "",
+    "page": "",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_036.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_037:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_037",
+    "claim_text": "Synthetic claim 33 for stress_zis_photocatalysis_synthetic_037 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 4 p. 35",
+    "page": "35",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_037.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_037:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_037",
+    "claim_text": "Synthetic claim 73 for stress_zis_photocatalysis_synthetic_037 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 75",
+    "page": "75",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_037.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_038:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_038",
+    "claim_text": "Synthetic claim 34 for stress_zis_photocatalysis_synthetic_038 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 36",
+    "page": "36",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_038.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_038:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_038",
+    "claim_text": "Synthetic claim 74 for stress_zis_photocatalysis_synthetic_038 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 76",
+    "page": "76",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "undefined synthetic stress theme",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_038.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_039:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_039",
+    "claim_text": "Synthetic claim 35 for stress_zis_photocatalysis_synthetic_039 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "opinion_or_interpretation",
+    "section": "Section 6 p. 37",
+    "page": "37",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_039.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_039:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_039",
+    "claim_text": "Synthetic claim 75 for stress_zis_photocatalysis_synthetic_039 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "Section 4 p. 77",
+    "page": "77",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_039.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_041:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_041",
+    "claim_text": "Synthetic claim 36 for stress_zis_photocatalysis_synthetic_041 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "experimental_result",
+    "section": "",
+    "page": "",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_041.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_041:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_041",
+    "claim_text": "Synthetic claim 76 for stress_zis_photocatalysis_synthetic_041 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 78",
+    "page": "78",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_041.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_042:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_042",
+    "claim_text": "Synthetic claim 37 for stress_zis_photocatalysis_synthetic_042 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 2 p. 39",
+    "page": "39",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "undefined synthetic stress theme",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_042.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_042:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_042",
+    "claim_text": "Synthetic claim 77 for stress_zis_photocatalysis_synthetic_042 records user-tracked evidence about charge separation.",
+    "evidence_type": "review_statement",
+    "section": "Section 6 p. 79",
+    "page": "79",
+    "confidence": "medium",
+    "tags": [
+      "charge-separation",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "charge separation",
+    "strength": "moderate",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_042.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_043:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_043",
+    "claim_text": "Synthetic claim 38 for stress_zis_photocatalysis_synthetic_043 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 40",
+    "page": "40",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_043.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_043:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_043",
+    "claim_text": "Synthetic claim 78 for stress_zis_photocatalysis_synthetic_043 records user-tracked evidence about photocorrosion.",
+    "evidence_type": "experimental_result",
+    "section": "Section 1 p. 80",
+    "page": "80",
+    "confidence": "low",
+    "tags": [
+      "photocorrosion",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "photocorrosion",
+    "strength": "weak",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_043.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_044:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_044",
+    "claim_text": "Synthetic claim 39 for stress_zis_photocatalysis_synthetic_044 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "limitation",
+    "section": "Section 4 p. 41",
+    "page": "41",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_044.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_044:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_044",
+    "claim_text": "Synthetic claim 79 for stress_zis_photocatalysis_synthetic_044 records user-tracked evidence about thin-film fabrication.",
+    "evidence_type": "method_description",
+    "section": "Section 2 p. 81",
+    "page": "81",
+    "confidence": "",
+    "tags": [
+      "thin-film-fabrication",
+      "zis-stress"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "thin-film fabrication",
+    "strength": "speculative",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_044.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_045:c1",
+    "paper_id": "stress_zis_photocatalysis_synthetic_045",
+    "claim_text": "Synthetic claim 40 for stress_zis_photocatalysis_synthetic_045 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "background_context",
+    "section": "Section 5 p. 42",
+    "page": "42",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_045.md"
+  },
+  {
+    "claim_id": "stress_zis_photocatalysis_synthetic_045:c2",
+    "paper_id": "stress_zis_photocatalysis_synthetic_045",
+    "claim_text": "Synthetic claim 80 for stress_zis_photocatalysis_synthetic_045 records user-tracked evidence about catalyst stability.",
+    "evidence_type": "theory_or_mechanism",
+    "section": "Section 3 p. 82",
+    "page": "82",
+    "confidence": "high",
+    "tags": [
+      "catalyst-stability",
+      "zis-stress",
+      "cross-theme"
+    ],
+    "quote_or_paraphrase": "Synthetic paraphrase only; no real paper quote is represented.",
+    "user_comment": "Generated for local stress testing; verify real claims manually.",
+    "supports_theme": "catalyst stability",
+    "strength": "strong",
+    "note_file": "projects/stress_zis_photocatalysis/notes/stress_zis_photocatalysis_synthetic_045.md"
+  }
+]

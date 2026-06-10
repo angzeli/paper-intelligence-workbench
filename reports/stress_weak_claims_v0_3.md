@@ -1,0 +1,60 @@
+# Weak Claims Report
+
+Weak or low-confidence claims: 56
+
+- **orphan_synthetic_note:c1** (weak, low; missing location): This orphan synthetic note intentionally has no matching registry entry.
+- **stress_zis_photocatalysis_synthetic_002:c1** (weak, low; Section 3 p. 4): Synthetic claim 2 for stress_zis_photocatalysis_synthetic_002 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_002:c2** (weak, low; Section 1 p. 44): Synthetic claim 42 for stress_zis_photocatalysis_synthetic_002 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_002:c3** (weak, low; Section 5 p. 84): Synthetic claim 82 for stress_zis_photocatalysis_synthetic_002 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_003:c1** (speculative, no confidence; Section 4 p. 5): Synthetic claim 3 for stress_zis_photocatalysis_synthetic_003 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_003:c2** (speculative, no confidence; Section 2 p. 45): Synthetic claim 43 for stress_zis_photocatalysis_synthetic_003 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_003:c3** (speculative, no confidence; Section 6 p. 85): Synthetic claim 83 for stress_zis_photocatalysis_synthetic_003 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_006:c1** (weak, low; Section 1 p. 8): Synthetic claim 6 for stress_zis_photocatalysis_synthetic_006 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_006:c2** (weak, low; Section 5 p. 48): Synthetic claim 46 for stress_zis_photocatalysis_synthetic_006 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_006:c3** (weak, low; Section 3 p. 88): Synthetic claim 86 for stress_zis_photocatalysis_synthetic_006 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_007:c1** (speculative, no confidence; Section 2 p. 9): Synthetic claim 7 for stress_zis_photocatalysis_synthetic_007 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_007:c2** (speculative, no confidence; Section 6 p. 49): Synthetic claim 47 for stress_zis_photocatalysis_synthetic_007 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_007:c3** (speculative, no confidence; Section 4 p. 89): Synthetic claim 87 for stress_zis_photocatalysis_synthetic_007 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_011:c1** (weak, low; Section 5 p. 12): Synthetic claim 10 for stress_zis_photocatalysis_synthetic_011 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_011:c2** (weak, low; Section 3 p. 52): Synthetic claim 50 for stress_zis_photocatalysis_synthetic_011 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_011:c3** (weak, low; missing location): Synthetic claim 90 for stress_zis_photocatalysis_synthetic_011 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_012:c1** (speculative, no confidence; Section 6 p. 13): Synthetic claim 11 for stress_zis_photocatalysis_synthetic_012 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_012:c2** (speculative, no confidence; Section 4 p. 53): Synthetic claim 51 for stress_zis_photocatalysis_synthetic_012 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_012:c3** (speculative, no confidence; Section 2 p. 93): Synthetic claim 91 for stress_zis_photocatalysis_synthetic_012 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_015:c1** (weak, low; Section 3 p. 16): Synthetic claim 14 for stress_zis_photocatalysis_synthetic_015 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_015:c2** (weak, low; missing location): Synthetic claim 54 for stress_zis_photocatalysis_synthetic_015 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_015:c3** (weak, low; Section 5 p. 96): Synthetic claim 94 for stress_zis_photocatalysis_synthetic_015 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_017:c1** (speculative, no confidence; Section 4 p. 17): Synthetic claim 15 for stress_zis_photocatalysis_synthetic_017 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_017:c2** (speculative, no confidence; Section 2 p. 57): Synthetic claim 55 for stress_zis_photocatalysis_synthetic_017 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_017:c3** (speculative, no confidence; Section 6 p. 97): Synthetic claim 95 for stress_zis_photocatalysis_synthetic_017 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_020:c1** (weak, low; missing location): Synthetic claim 18 for stress_zis_photocatalysis_synthetic_020 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_020:c2** (weak, low; Section 5 p. 60): Synthetic claim 58 for stress_zis_photocatalysis_synthetic_020 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_020:c3** (weak, low; Section 3 p. 100): Synthetic claim 98 for stress_zis_photocatalysis_synthetic_020 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_021:c1** (speculative, no confidence; Section 2 p. 21): Synthetic claim 19 for stress_zis_photocatalysis_synthetic_021 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_021:c2** (speculative, no confidence; Section 6 p. 61): Synthetic claim 59 for stress_zis_photocatalysis_synthetic_021 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_021:c3** (speculative, no confidence; missing location): Synthetic claim 99 for stress_zis_photocatalysis_synthetic_021 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_025:c1** (weak, low; Section 5 p. 24): Synthetic claim 22 for stress_zis_photocatalysis_synthetic_025 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_025:c2** (weak, low; Section 3 p. 64): Synthetic claim 62 for stress_zis_photocatalysis_synthetic_025 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_025:c3** (weak, low; Section 1 p. 104): Synthetic claim 102 for stress_zis_photocatalysis_synthetic_025 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_026:c1** (speculative, no confidence; Section 6 p. 25): Synthetic claim 23 for stress_zis_photocatalysis_synthetic_026 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_026:c2** (speculative, no confidence; missing location): Synthetic claim 63 for stress_zis_photocatalysis_synthetic_026 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_026:c3** (speculative, no confidence; Section 2 p. 105): Synthetic claim 103 for stress_zis_photocatalysis_synthetic_026 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_029:c1** (weak, low; Section 3 p. 28): Synthetic claim 26 for stress_zis_photocatalysis_synthetic_029 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_029:c2** (weak, low; Section 1 p. 68): Synthetic claim 66 for stress_zis_photocatalysis_synthetic_029 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_029:c3** (weak, low; Section 5 p. 108): Synthetic claim 106 for stress_zis_photocatalysis_synthetic_029 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_030:c1** (speculative, no confidence; missing location): Synthetic claim 27 for stress_zis_photocatalysis_synthetic_030 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_030:c2** (speculative, no confidence; Section 2 p. 69): Synthetic claim 67 for stress_zis_photocatalysis_synthetic_030 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_030:c3** (speculative, no confidence; Section 6 p. 109): Synthetic claim 107 for stress_zis_photocatalysis_synthetic_030 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_034:c1** (weak, low; Section 1 p. 32): Synthetic claim 30 for stress_zis_photocatalysis_synthetic_034 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_034:c2** (weak, low; Section 5 p. 72): Synthetic claim 70 for stress_zis_photocatalysis_synthetic_034 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_034:c3** (weak, low; Section 3 p. 112): Synthetic claim 110 for stress_zis_photocatalysis_synthetic_034 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_035:c1** (speculative, no confidence; Section 2 p. 33): Synthetic claim 31 for stress_zis_photocatalysis_synthetic_035 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_035:c2** (speculative, no confidence; Section 6 p. 73): Synthetic claim 71 for stress_zis_photocatalysis_synthetic_035 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_038:c1** (weak, low; Section 5 p. 36): Synthetic claim 34 for stress_zis_photocatalysis_synthetic_038 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_038:c2** (weak, low; Section 3 p. 76): Synthetic claim 74 for stress_zis_photocatalysis_synthetic_038 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_039:c1** (speculative, no confidence; Section 6 p. 37): Synthetic claim 35 for stress_zis_photocatalysis_synthetic_039 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_039:c2** (speculative, no confidence; Section 4 p. 77): Synthetic claim 75 for stress_zis_photocatalysis_synthetic_039 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_043:c1** (weak, low; Section 3 p. 40): Synthetic claim 38 for stress_zis_photocatalysis_synthetic_043 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_043:c2** (weak, low; Section 1 p. 80): Synthetic claim 78 for stress_zis_photocatalysis_synthetic_043 records user-tracked evidence about photocorrosion.
+- **stress_zis_photocatalysis_synthetic_044:c1** (speculative, no confidence; Section 4 p. 41): Synthetic claim 39 for stress_zis_photocatalysis_synthetic_044 records user-tracked evidence about thin-film fabrication.
+- **stress_zis_photocatalysis_synthetic_044:c2** (speculative, no confidence; Section 2 p. 81): Synthetic claim 79 for stress_zis_photocatalysis_synthetic_044 records user-tracked evidence about thin-film fabrication.
