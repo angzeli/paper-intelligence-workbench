@@ -1,0 +1,64 @@
+{
+  "themes": [
+    {
+      "theme_id": "finance-valuation",
+      "name": "finance valuation",
+      "tags": [
+        "finance-valuation",
+        "finance-valuation-evidence",
+        "finance-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for finance valuation."
+    },
+    {
+      "theme_id": "risk-modeling",
+      "name": "risk modeling",
+      "tags": [
+        "risk-modeling",
+        "risk-modeling-evidence",
+        "finance-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for risk modeling."
+    },
+    {
+      "theme_id": "market-microstructure",
+      "name": "market microstructure",
+      "tags": [
+        "market-microstructure",
+        "market-microstructure-evidence",
+        "finance-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for market microstructure."
+    },
+    {
+      "theme_id": "disclosure-quality",
+      "name": "disclosure quality",
+      "tags": [
+        "disclosure-quality",
+        "disclosure-quality-evidence",
+        "finance-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for disclosure quality."
+    },
+    {
+      "theme_id": "portfolio-construction",
+      "name": "portfolio construction",
+      "tags": [
+        "portfolio-construction",
+        "portfolio-construction-evidence",
+        "finance-stress"
+      ],
+      "min_claims": 8,
+      "min_papers": 4,
+      "description": "Synthetic stress-test theme for portfolio construction."
+    }
+  ]
+}

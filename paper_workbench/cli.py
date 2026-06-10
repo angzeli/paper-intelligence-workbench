@@ -34,6 +34,7 @@ from .reporting import (
     write_report,
 )
 from .search import results_markdown, search_claims, search_note_files, search_papers
+from .synthetic import generate_synthetic_project
 from .tags import load_themes, normalize_tag
 
 
@@ -74,6 +75,15 @@ def _reject_project_path_overrides(args: argparse.Namespace, fields: tuple[str, 
 def _theme_exists(theme_query: str, themes) -> bool:
     wanted = normalize_tag(theme_query)
     return any(theme.theme_id == wanted or normalize_tag(theme.name) == wanted for theme in themes)
+
+
+def _registry_validation_root(path: str | Path) -> Path:
+    target = Path(path)
+    if target.name == "registry.csv" and target.parent.parent.name == "projects":
+        return target.parent
+    if target.parent.name == "registries" and target.parent.parent.name == "data":
+        return target.parent.parent.parent
+    return Path(".")
 
 
 def _paths_from_args(args: argparse.Namespace) -> dict[str, Path | None]:
@@ -124,7 +134,7 @@ def cmd_init(args: argparse.Namespace) -> int:
 
 def cmd_validate_registry(args: argparse.Namespace) -> int:
     papers = load_registry(args.registry)
-    findings = validate_registry(papers, root=Path(args.registry).parent.parent.parent if "data/registries" in str(args.registry) else Path("."))
+    findings = validate_registry(papers, root=_registry_validation_root(args.registry))
     _print_findings(findings)
     if args.json:
         save_registry_json(papers, args.json)
@@ -415,6 +425,26 @@ def cmd_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_synthetic_generate(args: argparse.Namespace) -> int:
+    summary = generate_synthetic_project(
+        name=args.project,
+        root=args.root,
+        papers=args.papers,
+        claims=args.claims,
+        themes=args.themes,
+        domain=args.domain,
+        force=args.force,
+    )
+    print(f"Generated synthetic project {summary.project}")
+    print(f"  root: {summary.root}")
+    print(f"  papers: {summary.papers}")
+    print(f"  notes: {summary.notes}")
+    print(f"  claims: {summary.claims}")
+    print(f"  themes: {summary.themes}")
+    print(f"  bibtex entries: {summary.bibtex_entries}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="paperwb", description="Local-first academic paper registry, notes, claims, BibTeX, and audit workbench.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -581,6 +611,18 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument("--theme", default="", help="Theme for theme-claims export.")
     export_parser.add_argument("--force", action="store_true", help="Overwrite an existing export file.")
     export_parser.set_defaults(func=cmd_export)
+
+    synthetic_parser = subparsers.add_parser("synthetic", help="Generate deterministic synthetic stress corpora.")
+    synthetic_sub = synthetic_parser.add_subparsers(dest="synthetic_command", required=True)
+    synthetic_generate = synthetic_sub.add_parser("generate", help="Create a synthetic project profile for stress testing.")
+    synthetic_generate.add_argument("--project", required=True, help="Synthetic project profile name to create.")
+    synthetic_generate.add_argument("--root", default=".", help="Workspace root.")
+    synthetic_generate.add_argument("--papers", type=int, default=40, help="Number of synthetic papers.")
+    synthetic_generate.add_argument("--claims", type=int, default=80, help="Number of synthetic claims across generated notes.")
+    synthetic_generate.add_argument("--themes", type=int, default=5, help="Number of synthetic themes.")
+    synthetic_generate.add_argument("--domain", default="zis", choices=["zis", "finance", "ml"], help="Synthetic domain vocabulary.")
+    synthetic_generate.add_argument("--force", action="store_true", help="Overwrite an existing synthetic project profile.")
+    synthetic_generate.set_defaults(func=cmd_synthetic_generate)
 
     return parser
 

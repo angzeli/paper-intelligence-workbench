@@ -1,0 +1,64 @@
+{
+  "themes": [
+    {
+      "theme_id": "ml-methodology",
+      "name": "ML methodology",
+      "tags": [
+        "ml-methodology",
+        "ml-methodology-evidence",
+        "ml-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for ML methodology."
+    },
+    {
+      "theme_id": "robustness",
+      "name": "robustness",
+      "tags": [
+        "robustness",
+        "robustness-evidence",
+        "ml-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for robustness."
+    },
+    {
+      "theme_id": "benchmark-leakage",
+      "name": "benchmark leakage",
+      "tags": [
+        "benchmark-leakage",
+        "benchmark-leakage-evidence",
+        "ml-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for benchmark leakage."
+    },
+    {
+      "theme_id": "dataset-shift",
+      "name": "dataset shift",
+      "tags": [
+        "dataset-shift",
+        "dataset-shift-evidence",
+        "ml-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for dataset shift."
+    },
+    {
+      "theme_id": "interpretability",
+      "name": "interpretability",
+      "tags": [
+        "interpretability",
+        "interpretability-evidence",
+        "ml-stress"
+      ],
+      "min_claims": 8,
+      "min_papers": 4,
+      "description": "Synthetic stress-test theme for interpretability."
+    }
+  ]
+}

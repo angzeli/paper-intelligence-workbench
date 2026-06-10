@@ -1,0 +1,64 @@
+{
+  "themes": [
+    {
+      "theme_id": "charge-separation",
+      "name": "charge separation",
+      "tags": [
+        "charge-separation",
+        "charge-separation-evidence",
+        "zis-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for charge separation."
+    },
+    {
+      "theme_id": "photocorrosion",
+      "name": "photocorrosion",
+      "tags": [
+        "photocorrosion",
+        "photocorrosion-evidence",
+        "zis-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for photocorrosion."
+    },
+    {
+      "theme_id": "thin-film-fabrication",
+      "name": "thin-film fabrication",
+      "tags": [
+        "thin-film-fabrication",
+        "thin-film-fabrication-evidence",
+        "zis-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for thin-film fabrication."
+    },
+    {
+      "theme_id": "catalyst-stability",
+      "name": "catalyst stability",
+      "tags": [
+        "catalyst-stability",
+        "catalyst-stability-evidence",
+        "zis-stress"
+      ],
+      "min_claims": 5,
+      "min_papers": 3,
+      "description": "Synthetic stress-test theme for catalyst stability."
+    },
+    {
+      "theme_id": "band-alignment",
+      "name": "band alignment",
+      "tags": [
+        "band-alignment",
+        "band-alignment-evidence",
+        "zis-stress"
+      ],
+      "min_claims": 8,
+      "min_papers": 4,
+      "description": "Synthetic stress-test theme for band alignment."
+    }
+  ]
+}

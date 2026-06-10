@@ -1,0 +1,10 @@
+{
+  "name": "stress_zis_photocatalysis",
+  "description": "Synthetic stress corpus generated locally.",
+  "is_default": false,
+  "registry_path": "registry.csv",
+  "bibtex_path": "bibtex/library.bib",
+  "notes_dir": "notes",
+  "themes_path": "themes.json",
+  "reports_dir": "reports"
+}

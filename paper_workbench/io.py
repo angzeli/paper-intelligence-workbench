@@ -40,7 +40,7 @@ def write_csv_rows(path: str | Path, rows: Iterable[dict[str, str]], fields: lis
         raise FileExistsError(f"{target} already exists")
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for row in rows:
             writer.writerow({field: row.get(field, "") for field in fields})
