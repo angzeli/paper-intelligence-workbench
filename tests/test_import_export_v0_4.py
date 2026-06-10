@@ -192,3 +192,24 @@ def test_cli_import_and_export_smoke(tmp_path):
     bundle_result = run_cli("export", "bundle", "--registry", str(registry), "--reports-dir", str(reports), "--out", str(bundle), "--force")
     assert bundle_result.returncode == 0, bundle_result.stderr
     assert (bundle / "manifest.json").exists()
+
+
+def test_cli_import_dry_run_allows_missing_registry(tmp_path):
+    registry = tmp_path / "new_registry.csv"
+    reports = tmp_path / "reports"
+    result = run_cli(
+        "import",
+        "csv",
+        str(EXAMPLE_GENERIC_CSV),
+        "--mapping",
+        str(EXAMPLE_GENERIC_MAPPING),
+        "--registry",
+        str(registry),
+        "--reports-dir",
+        str(reports),
+        "--dry-run",
+        "--force",
+    )
+    assert result.returncode == 0, result.stderr
+    assert not registry.exists()
+    assert (reports / "import_generic_csv.md").exists()

@@ -496,9 +496,15 @@ def _import_paths(args: argparse.Namespace) -> dict[str, Path | None]:
     return paths
 
 
+def _load_import_registry(path: Path, *, dry_run: bool) -> list:
+    if dry_run and not path.exists():
+        return []
+    return _load_registry(path, create_if_missing=not dry_run)
+
+
 def cmd_import_zotero_csv(args: argparse.Namespace) -> int:
     paths = _import_paths(args)
-    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    papers = _load_import_registry(paths["registry"], dry_run=args.dry_run)
     result = import_zotero_csv(
         args.source,
         papers,
@@ -512,7 +518,7 @@ def cmd_import_zotero_csv(args: argparse.Namespace) -> int:
 
 def cmd_import_generic_csv(args: argparse.Namespace) -> int:
     paths = _import_paths(args)
-    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    papers = _load_import_registry(paths["registry"], dry_run=args.dry_run)
     result = import_generic_csv(
         args.source,
         args.mapping,
@@ -527,7 +533,7 @@ def cmd_import_generic_csv(args: argparse.Namespace) -> int:
 
 def cmd_import_bibtex(args: argparse.Namespace) -> int:
     paths = _import_paths(args)
-    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    papers = _load_import_registry(paths["registry"], dry_run=args.dry_run)
     result = import_bibtex(
         args.source,
         papers,
@@ -541,7 +547,7 @@ def cmd_import_bibtex(args: argparse.Namespace) -> int:
 
 def cmd_import_ris(args: argparse.Namespace) -> int:
     paths = _import_paths(args)
-    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    papers = _load_import_registry(paths["registry"], dry_run=args.dry_run)
     result = import_ris(
         args.source,
         papers,
