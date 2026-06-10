@@ -1,0 +1,22 @@
+TY  - JOUR
+TI  - Synthetic RIS Imported Charge Separation Fixture
+AU  - Synthetic, Avery
+AU  - Fixture, Blair
+PY  - 2026
+JO  - Synthetic RIS Journal
+DO  - 10.9700/synthetic.ris.001
+UR  - https://example.local/import/ris-1
+KW  - charge separation
+KW  - imported-ris
+ER  -
+
+TY  - RPRT
+TI  - Synthetic RIS Imported Audit Fixture
+AU  - Local, Casey
+PY  - 2025
+JO  - Synthetic RIS Reports
+DO  - 10.9700/synthetic.ris.002
+UR  - https://example.local/import/ris-2
+KW  - citation audit
+N1  - Synthetic unmapped RIS note.
+ER  -

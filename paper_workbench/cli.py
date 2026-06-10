@@ -10,7 +10,19 @@ from .audit import citation_audit
 from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_claims, collect_notes, save_claims_csv
 from .doctor import workspace_health
-from .exports import export_claims_csv, export_claims_json, export_reading_list, export_registry_csv, export_registry_json, export_theme_claims
+from .exports import (
+    export_bundle,
+    export_claims_csv,
+    export_claims_json,
+    export_obsidian_vault,
+    export_project_summary,
+    export_reading_list,
+    export_registry_csv,
+    export_registry_json,
+    export_report_index,
+    export_theme_claims,
+)
+from .importers import import_bibtex, import_generic_csv, import_report, import_ris, import_zotero_csv, write_import_report
 from .init import init_workspace
 from .io import write_text
 from .notes import write_note_template
@@ -410,19 +422,135 @@ def cmd_export(args: argparse.Namespace) -> int:
     elif args.export_type == "claims-json":
         path = export_claims_json(claims, args.out, force=args.force)
     elif args.export_type == "reading-list":
-        path = export_reading_list(papers, args.out, tag=args.tag or "", status=args.status or "", force=args.force)
+        if args.included and args.excluded:
+            raise ValueError("--included and --excluded cannot be combined")
+        path = export_reading_list(
+            papers,
+            args.out,
+            tag=args.tag or "",
+            status=args.status or "",
+            theme=args.theme or "",
+            themes=themes,
+            included=True if args.included else None,
+            excluded=args.excluded,
+            high_priority=args.high_priority,
+            missing_notes=args.missing_notes,
+            notes=notes,
+            output_format=args.format,
+            force=args.force,
+        )
     elif args.export_type == "unread":
-        path = export_reading_list(papers, args.out, status="unread", force=args.force)
+        path = export_reading_list(papers, args.out, status="unread", output_format=args.format, force=args.force)
     elif args.export_type == "theme-claims":
         if not args.theme:
             print("--theme is required for theme-claims", file=sys.stderr)
             return 2
         path = export_theme_claims(claims, args.out, theme=args.theme, force=args.force)
+    elif args.export_type == "obsidian":
+        path = export_obsidian_vault(papers, notes, claims, themes, args.out, force=args.force)
+    elif args.export_type == "bundle":
+        path = export_bundle(
+            registry_path=paths["registry"],
+            bibtex_path=paths["bibtex"],
+            notes_dir=paths["notes_dir"],
+            themes_path=paths["themes"],
+            reports_dir=paths["reports_dir"],
+            out=args.out,
+            project=paths["profile"].name if paths["profile"] else "",
+            include_pdfs=args.include_pdfs,
+            papers=papers,
+            root=paths["root"],
+            force=args.force,
+        )
+    elif args.export_type == "project-summary":
+        path = export_project_summary(papers, claims, themes, args.out, force=args.force)
+    elif args.export_type == "report-index":
+        path = export_report_index(paths["reports_dir"], args.out, force=args.force)
     else:
         print(f"Unknown export type: {args.export_type}", file=sys.stderr)
         return 2
     print(f"Wrote {path}")
     return 0
+
+
+def _default_import_report(paths: dict[str, Path | None], import_type: str) -> Path:
+    return Path(paths["reports_dir"]) / f"import_{import_type.replace('-', '_')}.md"
+
+
+def _finish_import(args: argparse.Namespace, result, paths: dict[str, Path | None], import_type: str) -> int:
+    if not result.dry_run:
+        save_registry(result.registry_papers, paths["registry"])
+        print(f"Wrote registry to {paths['registry']}")
+    report_path = Path(args.report) if args.report else _default_import_report(paths, import_type)
+    write_import_report(result, report_path, force=args.force)
+    print(f"Wrote import report to {report_path}")
+    print(f"Rows read: {result.rows_read}; imported: {result.imported}; updated: {result.updated}; skipped: {result.skipped}; dry-run: {result.dry_run}")
+    return 0
+
+
+def _import_paths(args: argparse.Namespace) -> dict[str, Path | None]:
+    _reject_project_path_overrides(args, ("registry", "reports_dir"))
+    paths = _paths_from_args(args)
+    paths["registry"] = Path(paths["registry"])
+    paths["reports_dir"] = Path(paths["reports_dir"])
+    return paths
+
+
+def cmd_import_zotero_csv(args: argparse.Namespace) -> int:
+    paths = _import_paths(args)
+    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    result = import_zotero_csv(
+        args.source,
+        papers,
+        registry_path=paths["registry"],
+        project=args.project or "",
+        dry_run=args.dry_run,
+        fill_missing=args.fill_missing,
+    )
+    return _finish_import(args, result, paths, "zotero_csv")
+
+
+def cmd_import_generic_csv(args: argparse.Namespace) -> int:
+    paths = _import_paths(args)
+    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    result = import_generic_csv(
+        args.source,
+        args.mapping,
+        papers,
+        registry_path=paths["registry"],
+        project=args.project or "",
+        dry_run=args.dry_run,
+        fill_missing=args.fill_missing,
+    )
+    return _finish_import(args, result, paths, "generic_csv")
+
+
+def cmd_import_bibtex(args: argparse.Namespace) -> int:
+    paths = _import_paths(args)
+    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    result = import_bibtex(
+        args.source,
+        papers,
+        registry_path=paths["registry"],
+        project=args.project or "",
+        dry_run=args.dry_run,
+        fill_missing=args.fill_missing,
+    )
+    return _finish_import(args, result, paths, "bibtex")
+
+
+def cmd_import_ris(args: argparse.Namespace) -> int:
+    paths = _import_paths(args)
+    papers = _load_registry(paths["registry"], create_if_missing=not args.dry_run)
+    result = import_ris(
+        args.source,
+        papers,
+        registry_path=paths["registry"],
+        project=args.project or "",
+        dry_run=args.dry_run,
+        fill_missing=args.fill_missing,
+    )
+    return _finish_import(args, result, paths, "ris")
 
 
 def cmd_synthetic_generate(args: argparse.Namespace) -> int:
@@ -480,6 +608,36 @@ def build_parser() -> argparse.ArgumentParser:
     validate_bib_parser.add_argument("--force", action="store_true", help="Overwrite an existing report path.")
     validate_bib_parser.add_argument("--strict", action="store_true", help="Return non-zero when errors are found.")
     validate_bib_parser.set_defaults(func=cmd_validate_bib)
+
+    import_parser = subparsers.add_parser("import", help="Import local bibliography data into a registry.")
+    import_sub = import_parser.add_subparsers(dest="import_type", required=True)
+
+    def add_import_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("source", help="Input file to import.")
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--report", default="", help="Optional exact Markdown import report path.")
+        command_parser.add_argument("--dry-run", action="store_true", help="Report what would be imported without writing the registry.")
+        command_parser.add_argument("--fill-missing", action="store_true", help="Fill only blank fields on matched registry rows.")
+        command_parser.add_argument("--force", action="store_true", help="Overwrite an existing import report path.")
+
+    zotero_import = import_sub.add_parser("zotero-csv", help="Import a Zotero-style CSV export.")
+    add_import_common(zotero_import)
+    zotero_import.set_defaults(func=cmd_import_zotero_csv)
+
+    csv_import = import_sub.add_parser("csv", help="Import a generic CSV using a JSON column mapping.")
+    add_import_common(csv_import)
+    csv_import.add_argument("--mapping", required=True, help="JSON mapping from input columns to registry fields.")
+    csv_import.set_defaults(func=cmd_import_generic_csv)
+
+    bibtex_import_parser = import_sub.add_parser("bibtex", help="Import registry rows from a local BibTeX library.")
+    add_import_common(bibtex_import_parser)
+    bibtex_import_parser.set_defaults(func=cmd_import_bibtex)
+
+    ris_import = import_sub.add_parser("ris", help="Import registry rows from a conservative local RIS parser.")
+    add_import_common(ris_import)
+    ris_import.set_defaults(func=cmd_import_ris)
 
     add_parser = subparsers.add_parser("add-paper", help="Add a paper row to the registry.")
     add_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
@@ -597,7 +755,19 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser = subparsers.add_parser("export", help="Export local data to CSV, JSON, or Markdown.")
     export_parser.add_argument(
         "export_type",
-        choices=["registry-csv", "registry-json", "claims", "claims-json", "reading-list", "unread", "theme-claims"],
+        choices=[
+            "registry-csv",
+            "registry-json",
+            "claims",
+            "claims-json",
+            "reading-list",
+            "unread",
+            "theme-claims",
+            "obsidian",
+            "bundle",
+            "project-summary",
+            "report-index",
+        ],
     )
     export_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
     export_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
@@ -609,6 +779,12 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument("--tag", default="", help="Optional tag filter for reading-list.")
     export_parser.add_argument("--status", default="", help="Optional reading-status filter for reading-list.")
     export_parser.add_argument("--theme", default="", help="Theme for theme-claims export.")
+    export_parser.add_argument("--format", choices=["markdown", "csv"], default="markdown", help="Reading-list output format.")
+    export_parser.add_argument("--included", action="store_true", help="Filter reading-list to papers included in the literature review.")
+    export_parser.add_argument("--excluded", action="store_true", help="Filter reading-list to excluded papers and include exclude reasons.")
+    export_parser.add_argument("--high-priority", action="store_true", help="Filter reading-list to high or critical priority papers.")
+    export_parser.add_argument("--missing-notes", action="store_true", help="Filter reading-list to papers without parsed notes.")
+    export_parser.add_argument("--include-pdfs", action="store_true", help="For bundle export only: copy existing local PDFs. Default is false.")
     export_parser.add_argument("--force", action="store_true", help="Overwrite an existing export file.")
     export_parser.set_defaults(func=cmd_export)
 

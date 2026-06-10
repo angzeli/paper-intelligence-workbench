@@ -1,0 +1,4 @@
+Paper Title,People,Pub Year,Venue,Identifier,Link,Keywords,Priority,Included,Notes
+Synthetic Generic CSV Evidence Weights,"Morgan Example; Riley Local",2026,Synthetic Generic Methods,10.9500/synthetic.generic.001,https://example.local/import/generic-1,finance valuation; imported,high,true,Synthetic generic import row.
+Synthetic Generic CSV Robustness Fixture,Quinn Fixture,2025,Synthetic Generic Proceedings,10.9500/synthetic.generic.002,https://example.local/import/generic-2,ML methodology; robustness,medium,true,Synthetic generic import row.
+Synthetic Generic CSV Evidence Weights,Morgan Example,2026,Synthetic Duplicate Methods,10.9500/synthetic.generic.001,https://example.local/import/generic-duplicate,duplicate,low,false,Intentional duplicate import row.

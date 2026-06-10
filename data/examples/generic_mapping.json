@@ -1,0 +1,14 @@
+{
+  "columns": {
+    "Paper Title": "title",
+    "People": "authors",
+    "Pub Year": "year",
+    "Venue": "journal",
+    "Identifier": "doi",
+    "Link": "url",
+    "Keywords": "tags",
+    "Priority": "priority",
+    "Included": "included_in_lit_review",
+    "Notes": "user_comment"
+  }
+}

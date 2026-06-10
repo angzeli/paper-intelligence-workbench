@@ -1,0 +1,6 @@
+Title,Author,Publication Year,Publication Title,DOI,Url,Item Type,Date Added,Tags,Manual Tags,Abstract Note,Extra Local Column
+Synthetic Imported Charge Transport Note,"Avery Synthetic; Blair Fixture",2026,Synthetic Import Journal,10.9400/synthetic.import.001,https://example.local/import/zotero-1,Journal Article,2026-06-10,charge separation; imported,zotero; v0.4,Synthetic abstract note for import testing only.,unmapped value
+Synthetic Imported Photocorrosion Memo,Casey Local,2025,Synthetic Import Reports,10.9400/synthetic.import.002,https://example.local/import/zotero-2,Report,2026-06-10,photocorrosion,zotero,Synthetic abstract note for import testing only.,
+Synthetic Imported Charge Transport Note,Avery Synthetic,2026,Synthetic Duplicate Venue,10.9400/synthetic.import.001,https://example.local/import/zotero-duplicate,Journal Article,2026-06-10,duplicate,zotero,Intentional duplicate DOI and title.,
+Missing Author Synthetic Import,,2024,Synthetic Import Journal,10.9400/synthetic.import.003,https://example.local/import/zotero-3,Web Page,2026-06-10,missing-author,zotero,Synthetic missing author warning.,
+,No Title Person,2023,Synthetic Import Journal,10.9400/synthetic.import.004,https://example.local/import/zotero-4,Journal Article,2026-06-10,missing-title,zotero,Synthetic missing title warning.,
