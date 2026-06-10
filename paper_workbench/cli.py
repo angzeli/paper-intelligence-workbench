@@ -25,6 +25,17 @@ from .exports import (
     export_theme_claims,
 )
 from .importers import import_bibtex, import_generic_csv, import_report, import_ris, import_zotero_csv
+from .index import (
+    build_index_records,
+    clear_index,
+    default_index_path,
+    index_status,
+    index_status_markdown,
+    rebuild_index,
+    search_index,
+    search_results_markdown as indexed_results_markdown,
+    source_counts,
+)
 from .init import init_workspace
 from .io import write_text
 from .notes import write_note_template
@@ -121,6 +132,37 @@ def _paths_from_args(args: argparse.Namespace) -> dict[str, Path | None]:
         "themes": Path(getattr(args, "themes", default_themes_path())),
         "reports_dir": Path(getattr(args, "reports_dir", default_reports_dir())),
     }
+
+
+def _project_id_from_paths(paths: dict[str, Path | None]) -> str:
+    profile = paths.get("profile")
+    return profile.name if profile else "default"
+
+
+def _default_text_dir(paths: dict[str, Path | None]) -> Path:
+    if paths.get("profile"):
+        return Path(paths["root"]) / "text"
+    return Path(paths["root"]) / "data" / "text"
+
+
+def _index_path_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
+    return Path(args.index) if getattr(args, "index", "") else default_index_path(paths["root"])
+
+
+def _text_dir_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
+    return Path(args.text_dir) if getattr(args, "text_dir", "") else _default_text_dir(paths)
+
+
+def _index_records_from_args(args: argparse.Namespace, paths: dict[str, Path | None]):
+    return build_index_records(
+        project_id=_project_id_from_paths(paths),
+        registry_path=paths["registry"],
+        bibtex_path=paths["bibtex"],
+        notes_dir=paths["notes_dir"],
+        themes_path=paths["themes"],
+        text_dir=_text_dir_from_args(args, paths),
+        include_text=getattr(args, "include_text", False),
+    )
 
 
 def _print_findings(findings) -> None:
@@ -252,6 +294,36 @@ def cmd_claims(args: argparse.Namespace) -> int:
 def cmd_search(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "notes_dir"))
     paths = _paths_from_args(args)
+    if args.indexed:
+        source_types: set[str] = set()
+        if args.claims:
+            source_types.add("claim")
+        if args.notes:
+            source_types.add("note")
+        if args.text:
+            source_types.add("text")
+        results = search_index(
+            _index_path_from_args(args, paths),
+            args.query,
+            project_id=_project_id_from_paths(paths),
+            source_types=source_types or None,
+            exact=args.exact,
+            limit=args.limit,
+        )
+        markdown = indexed_results_markdown(results, args.query)
+        if args.out:
+            path = write_text(args.out, markdown, force=args.force)
+            print(f"Wrote {path}")
+            return 0
+        if args.markdown:
+            print(markdown, end="")
+            return 0
+        for result in results:
+            path = f"\t{result.path}" if result.path else ""
+            print(f"{result.source_type}\t{result.paper_id}\t{result.score}\t{result.title}{path}")
+        if not results:
+            print("No matches.")
+        return 0
     selected = args.claims or args.notes
     results = []
     if not selected:
@@ -266,13 +338,63 @@ def cmd_search(args: argparse.Namespace) -> int:
         if args.claims:
             results.extend(search_claims(collect_claims(paths["notes_dir"]), args.query, exact=args.exact))
     if args.markdown:
-        print(results_markdown(results, args.query), end="")
+        markdown = results_markdown(results, args.query)
+        if args.out:
+            path = write_text(args.out, markdown, force=args.force)
+            print(f"Wrote {path}")
+        else:
+            print(markdown, end="")
+        return 0
+    if args.out:
+        path = write_text(args.out, results_markdown(results, args.query), force=args.force)
+        print(f"Wrote {path}")
         return 0
     for result in results:
         path = f"\t{result['path']}" if result.get("path") else ""
         print(f"{result['kind']}\t{result['id']}\t{result['title']}{path}")
     if not results:
         print("No matches.")
+    return 0
+
+
+def cmd_index_rebuild(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes"))
+    paths = _paths_from_args(args)
+    records = _index_records_from_args(args, paths)
+    status = rebuild_index(_index_path_from_args(args, paths), records, project_id=_project_id_from_paths(paths))
+    counts = source_counts(records)
+    print(f"Rebuilt index at {status.index_path}")
+    print(f"Project: {status.project_id}")
+    print(f"Records: {len(records)}")
+    print(f"FTS5 enabled: {str(status.fts_enabled).lower()}")
+    for source_type, count in sorted(counts.items()):
+        print(f"  {source_type}: {count}")
+    if args.out:
+        path = write_text(args.out, index_status_markdown(status), force=args.force)
+        print(f"Wrote {path}")
+    return 0
+
+
+def cmd_index_status(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes"))
+    paths = _paths_from_args(args)
+    current_records = _index_records_from_args(args, paths) if args.check_files else None
+    status = index_status(_index_path_from_args(args, paths), project_id=_project_id_from_paths(paths), current_records=current_records)
+    markdown = index_status_markdown(status)
+    if args.out:
+        path = write_text(args.out, markdown, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(markdown, end="")
+    return 1 if args.strict and status.warnings else 0
+
+
+def cmd_index_clear(args: argparse.Namespace) -> int:
+    paths = _paths_from_args(args)
+    index_path = _index_path_from_args(args, paths)
+    project_id = _project_id_from_paths(paths)
+    clear_index(index_path, project_id=project_id)
+    print(f"Cleared index records for {project_id} at {index_path}")
     return 0
 
 
@@ -732,16 +854,55 @@ def build_parser() -> argparse.ArgumentParser:
     claims_parser.add_argument("--output", help="Optional output CSV path.")
     claims_parser.set_defaults(func=cmd_claims)
 
-    search_parser = subparsers.add_parser("search", help="Search registry, notes, or claims with simple substring matching.")
+    search_parser = subparsers.add_parser("search", help="Search registry, notes, claims, or the local SQLite index.")
     search_parser.add_argument("query", help="Search query.")
     search_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
     search_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
     search_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+    search_parser.add_argument("--index", default="", help="SQLite index path for --indexed search. Defaults to .paperwb/index.sqlite under the selected workspace root.")
     search_parser.add_argument("--claims", action="store_true", help="Search extracted claims only.")
     search_parser.add_argument("--notes", action="store_true", help="Search note bodies only.")
+    search_parser.add_argument("--text", action="store_true", help="With --indexed, search text sidecar records only.")
+    search_parser.add_argument("--indexed", action="store_true", help="Use the local SQLite search index instead of live substring search.")
     search_parser.add_argument("--exact", action="store_true", help="Require the exact phrase instead of matching all query terms.")
     search_parser.add_argument("--markdown", action="store_true", help="Print Markdown table output.")
+    search_parser.add_argument("--out", default="", help="Optional Markdown output path for search results.")
+    search_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out path.")
+    search_parser.add_argument("--limit", type=int, default=25, help="Maximum indexed search results.")
     search_parser.set_defaults(func=cmd_search)
+
+    index_parser = subparsers.add_parser("index", help="Build, inspect, or clear the local SQLite search index.")
+    index_sub = index_parser.add_subparsers(dest="index_command", required=True)
+
+    def add_index_source_args(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--text-dir", default="", help="Optional text sidecar directory. Defaults to project/text or data/text.")
+        command_parser.add_argument("--index", default="", help="SQLite index path. Defaults to .paperwb/index.sqlite under the selected workspace root.")
+
+    index_rebuild = index_sub.add_parser("rebuild", help="Rebuild local search index records from registry, BibTeX, notes, claims, themes, tags, and optional text sidecars.")
+    add_index_source_args(index_rebuild)
+    index_rebuild.add_argument("--include-text", action="store_true", help="Index user-provided plain-text sidecars from --text-dir.")
+    index_rebuild.add_argument("--out", default="", help="Optional Markdown index-status report path after rebuild.")
+    index_rebuild.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    index_rebuild.set_defaults(func=cmd_index_rebuild)
+
+    index_status_parser = index_sub.add_parser("status", help="Report local search index status and optional stale-index diagnostics.")
+    add_index_source_args(index_status_parser)
+    index_status_parser.add_argument("--include-text", action="store_true", help="Include text sidecars when checking local files for staleness.")
+    index_status_parser.add_argument("--check-files", action="store_true", help="Compare current local file-derived records with indexed content hashes.")
+    index_status_parser.add_argument("--out", default="", help="Optional Markdown status report path.")
+    index_status_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    index_status_parser.add_argument("--strict", action="store_true", help="Return non-zero when stale-index warnings are found.")
+    index_status_parser.set_defaults(func=cmd_index_status)
+
+    index_clear = index_sub.add_parser("clear", help="Clear indexed records for the selected project/default workflow.")
+    index_clear.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+    index_clear.add_argument("--index", default="", help="SQLite index path. Defaults to .paperwb/index.sqlite under the selected workspace root.")
+    index_clear.set_defaults(func=cmd_index_clear)
 
     report_parser = subparsers.add_parser("report", help="Generate Markdown reports.")
     report_parser.add_argument(

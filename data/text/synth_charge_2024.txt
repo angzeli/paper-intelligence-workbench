@@ -1,0 +1,4 @@
+Synthetic full-text sidecar for synth_charge_2024.
+
+This locally authored fixture mentions charge separation, thin-film fabrication, and catalyst stability. It exists only to test indexing behavior and does not represent a real paper.
+

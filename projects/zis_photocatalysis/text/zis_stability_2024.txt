@@ -1,0 +1,4 @@
+Synthetic sidecar text for zis_stability_2024.
+
+The local fixture describes photocorrosion observations, stability follow-up actions, and evidence gaps for a synthetic ZIS screening memo. It contains no real paper text.
+
