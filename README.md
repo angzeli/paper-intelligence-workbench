@@ -193,6 +193,10 @@ paperwb checklist --theme photocorrosion
 
 ## More Documentation
 
+- [docs/QUICKSTART_EXTERNAL_USER.md](docs/QUICKSTART_EXTERNAL_USER.md)
+- [docs/EXAMPLE_LITERATURE_REVIEW_WORKFLOW.md](docs/EXAMPLE_LITERATURE_REVIEW_WORKFLOW.md)
+- [docs/REPORT_GALLERY.md](docs/REPORT_GALLERY.md)
+- [docs/CLI_WALKTHROUGH.md](docs/CLI_WALKTHROUGH.md)
 - [docs/PROJECT_PROFILES.md](docs/PROJECT_PROFILES.md)
 - [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
 - [docs/EVIDENCE_MAPS.md](docs/EVIDENCE_MAPS.md)
