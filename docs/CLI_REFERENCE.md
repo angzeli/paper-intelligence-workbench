@@ -17,6 +17,17 @@ paperwb search "charge separation" --claims
 paperwb doctor --out reports/workspace_health.md
 ```
 
+Imports:
+
+```bash
+paperwb import zotero-csv data/examples/zotero_export.csv --dry-run
+paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run
+paperwb import bibtex data/examples/library_import.bib --dry-run
+paperwb import ris data/examples/library.ris --dry-run
+```
+
+Import commands preserve existing registry rows. `--fill-missing` fills only blank fields on matched rows. Import reports are written to the selected reports directory unless `--report` is provided.
+
 Report types:
 
 ```bash
@@ -48,6 +59,12 @@ paperwb export claims-json --out data/processed/claims.json
 paperwb export reading-list --tag photocorrosion --out reports/reading_list.md
 paperwb export unread --out reports/unread.md
 paperwb export theme-claims --theme photocorrosion --out data/processed/photocorrosion_claims.json
+paperwb export reading-list --theme photocorrosion --out reports/photocorrosion.md
+paperwb export reading-list --high-priority --format csv --out reports/high_priority.csv
+paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
+paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
+paperwb export project-summary --project zis_photocatalysis --out reports/project_summary.md
+paperwb export report-index --project zis_photocatalysis --out reports/index.md
 ```
 
 Export commands refuse to overwrite an existing output file unless `--force` is provided.

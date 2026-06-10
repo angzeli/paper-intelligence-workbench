@@ -23,3 +23,7 @@ Instructions for future agents working in this repository:
 - Update golden report tests only when report behavior intentionally changes.
 - Avoid brittle tests that depend on timestamps, absolute paths, local machines, or unordered sets.
 - Run stress-focused tests before a release when stress fixtures or report generation change.
+- Never overwrite non-empty user registry fields during imports without an explicit future overwrite option.
+- Prefer `--dry-run` for risky imports and keep import mappings transparent.
+- Do not include PDFs in backup bundles by default.
+- Add or update tests for every importer, exporter, and mapping rule.

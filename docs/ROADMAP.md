@@ -10,7 +10,16 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Golden report snapshots for stress reports.
 - CLI stress tests and performance sanity reporting.
 
-## Near-Term Patches for v0.4
+## v0.4 Completed
+
+- Local import subsystem for Zotero-style CSV, generic CSV mapping, BibTeX, and RIS.
+- Import reports with duplicate, warning, dry-run, and unmapped-field summaries.
+- Obsidian-friendly Markdown vault export.
+- Local backup bundle export with manifest and no PDFs by default.
+- Richer reading-list filters and CSV output.
+- Round-trip import/export tests.
+
+## Near-Term Patches for v0.5
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -20,6 +29,7 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add richer report filters for specific tags, statuses, and themes.
 - Add note repair diagnostics for malformed claim blocks.
 - Add non-destructive workspace migration reports for moving legacy `data/` work into profiles.
+- Add import preview tables and conflict-resolution commands for ambiguous matches.
 
 ## Project Profiles
 

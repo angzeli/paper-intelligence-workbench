@@ -6,6 +6,8 @@ The MVP is designed for projects with roughly 10 to 100 papers where a student o
 
 v0.3 adds deterministic synthetic stress projects, report-regression snapshots, parser edge fixtures, CLI stress tests, and performance sanity reporting to make the repository easier to evaluate before using it on a real 100-paper review.
 
+v0.4 adds local import/export interoperability for Zotero-style CSV, generic CSV mappings, BibTeX, RIS, Obsidian-friendly Markdown vaults, backup bundles, richer reading lists, project summaries, and report indexes.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -19,6 +21,8 @@ v0.3 adds deterministic synthetic stress projects, report-regression snapshots, 
 - Runs workspace health diagnostics with `paperwb doctor`.
 - Exports claims, registries, reading lists, and theme-specific claim data.
 - Generates clearly synthetic stress corpora for local regression testing.
+- Imports local Zotero-style CSV, generic CSV, BibTeX, and RIS files into registries with duplicate reports.
+- Exports Obsidian-friendly Markdown vaults and local backup bundles.
 
 ## What It Does Not Do
 
@@ -123,6 +127,27 @@ python scripts/performance_sanity.py --force
 
 The checked-in stress projects under `projects/stress_*` are synthetic fixtures only. They intentionally include duplicate metadata, weak claims, missing evidence locations, orphan notes, and unlinked BibTeX entries so validation and reports can be regression-tested.
 
+## v0.4 Import / Export Workflow
+
+Run a dry-run import before writing to a registry:
+
+```bash
+paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --force
+paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run --force
+paperwb import bibtex data/examples/library_import.bib --dry-run --force
+paperwb import ris data/examples/library.ris --dry-run --force
+```
+
+Export local writing and backup artifacts:
+
+```bash
+paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis --force
+paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle --force
+paperwb export reading-list --theme photocorrosion --project zis_photocatalysis --out reports/reading_list_photocorrosion.md --force
+```
+
+Imports preserve existing registry rows. `--fill-missing` fills only blank fields on matched records; it does not overwrite non-empty user fields.
+
 ## Data Folder Convention
 
 ```text
@@ -198,6 +223,8 @@ paperwb report reading-status
 paperwb report section-outline --theme photocorrosion
 paperwb doctor
 paperwb export claims --out data/processed/claims.csv
+paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
+paperwb import zotero-csv data/examples/zotero_export.csv --dry-run
 paperwb project list
 paperwb synthetic generate --project stress_demo --papers 100 --claims 220
 paperwb checklist --theme photocorrosion
@@ -222,6 +249,12 @@ paperwb checklist --theme photocorrosion
 - [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
 - [docs/EVIDENCE_MAPS.md](docs/EVIDENCE_MAPS.md)
 - [docs/WORKFLOW_EXAMPLES.md](docs/WORKFLOW_EXAMPLES.md)
+- [docs/IMPORTS.md](docs/IMPORTS.md)
+- [docs/EXPORTS.md](docs/EXPORTS.md)
+- [docs/ZOTERO_WORKFLOW.md](docs/ZOTERO_WORKFLOW.md)
+- [docs/OBSIDIAN_EXPORT.md](docs/OBSIDIAN_EXPORT.md)
+- [docs/BACKUP_BUNDLES.md](docs/BACKUP_BUNDLES.md)
+- [docs/ROUND_TRIP_TESTING.md](docs/ROUND_TRIP_TESTING.md)
 - [docs/SYNTHETIC_CORPUS.md](docs/SYNTHETIC_CORPUS.md)
 - [docs/STRESS_TESTING.md](docs/STRESS_TESTING.md)
 - [docs/GOLDEN_REPORTS.md](docs/GOLDEN_REPORTS.md)
