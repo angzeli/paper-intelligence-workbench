@@ -75,17 +75,17 @@ paperwb claims data/notes --output reports/example_claims.csv
 Generate reports:
 
 ```bash
-paperwb report inventory --registry data/registries/example_papers.csv
-paperwb report bibtex-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib
-paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json
-paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json
+paperwb report inventory --registry data/registries/example_papers.csv --force
+paperwb report bibtex-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --force
+paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --force
+paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --force
 ```
 
 Run v0.2 diagnostics and a section outline:
 
 ```bash
-paperwb doctor --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/workspace_health.md
-paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/photocorrosion_section_outline.md
+paperwb doctor --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/workspace_health.md --force
+paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/photocorrosion_section_outline.md --force
 ```
 
 ## Project Profile Workflow
@@ -97,8 +97,8 @@ paperwb project list
 paperwb project init demo_review
 paperwb project validate zis_photocatalysis
 paperwb search photocorrosion --project zis_photocatalysis
-paperwb report evidence-map --project zis_photocatalysis
-paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json
+paperwb report evidence-map --project zis_photocatalysis --force
+paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json --force
 ```
 
 The legacy `data/` workflow remains supported.
@@ -142,7 +142,7 @@ Claims come from structured note blocks. Each claim can include evidence type, s
 
 ## Report Examples
 
-Reports are Markdown files written to `reports/` by default:
+Reports are Markdown files written to `reports/` by default for the legacy `data/` workflow, or to the selected project profile's `reports/` directory when `--project` is used. Existing report and export files are not overwritten unless `--force` is provided.
 
 - `inventory.md`
 - `reading_status.md`

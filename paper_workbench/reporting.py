@@ -13,9 +13,9 @@ from .schema import BibTeXEntry, CitationAuditFinding, Claim, EvidenceType, Pape
 from .tags import count_paper_tags, group_claims_by_theme, normalize_tag, theme_by_tag
 
 
-def write_report(name: str, content: str, reports_dir: str | Path = "reports") -> Path:
+def write_report(name: str, content: str, reports_dir: str | Path = "reports", force: bool = True) -> Path:
     target = Path(reports_dir) / f"{name}.md"
-    return write_text(target, content)
+    return write_text(target, content, force=force)
 
 
 def _finding_rows(findings: list[ValidationFinding] | list[CitationAuditFinding]) -> str:
@@ -245,6 +245,12 @@ def evidence_map_report(papers: list[Paper], claims: list[Claim], themes, notes:
     if unmapped:
         lines.extend(["## Unmapped Claims", ""])
         for claim in unmapped:
+            lines.append(f"- {claim.claim_id}: {claim.claim_text}")
+    defined_theme_ids = {theme.theme_id for theme in themes}
+    undefined_theme_ids = sorted(theme_id for theme_id in grouped if theme_id not in defined_theme_ids and theme_id != "unmapped")
+    for theme_id in undefined_theme_ids:
+        lines.extend(["", f"## Undefined Theme: {theme_id}", "", "Claims below reference a theme that is not defined in the theme file.", ""])
+        for claim in grouped[theme_id]:
             lines.append(f"- {claim.claim_id}: {claim.claim_text}")
     return "\n".join(lines).rstrip() + "\n"
 

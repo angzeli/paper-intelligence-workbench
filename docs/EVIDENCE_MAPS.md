@@ -5,7 +5,7 @@ Evidence maps group user-entered claims by theme. They are designed to help prep
 Generate one:
 
 ```bash
-paperwb report evidence-map --project zis_photocatalysis
+paperwb report evidence-map --project zis_photocatalysis --force
 ```
 
 v0.2 evidence maps include:
@@ -22,7 +22,7 @@ v0.2 evidence maps include:
 - missing notes
 - suggested follow-up actions
 
-Evidence-type weighting is transparent:
+Evidence-type categorization is transparent:
 
 - `experimental_result` is treated as stronger direct evidence.
 - `method_description` is contextual evidence.

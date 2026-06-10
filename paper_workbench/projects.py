@@ -126,8 +126,18 @@ def resolve_project_profile(name: str | None, root: str | Path = ".") -> Project
     return None
 
 
+def _display_path(path: str) -> str:
+    value = Path(path)
+    if value.is_absolute():
+        try:
+            return str(value.relative_to(Path.cwd()))
+        except ValueError:
+            return value.name
+    return str(value)
+
+
 def profile_summary(profile: ProjectProfile) -> str:
     return (
-        f"{profile.name}\tregistry={profile.registry_path}\t"
-        f"notes={profile.notes_dir}\treports={profile.reports_dir}"
+        f"{profile.name}\tregistry={_display_path(profile.registry_path)}\t"
+        f"notes={_display_path(profile.notes_dir)}\treports={_display_path(profile.reports_dir)}"
     )

@@ -5,7 +5,7 @@ Citation audit checks whether the user's own registry, notes, claims, evidence l
 Run:
 
 ```bash
-paperwb report citation-audit --registry data/registries/papers.csv --bibtex data/bibtex/library.bib --notes-dir data/notes --themes data/examples/themes.json
+paperwb report citation-audit --registry data/registries/papers.csv --bibtex data/bibtex/library.bib --notes-dir data/notes --themes data/examples/themes.json --force
 ```
 
 ## Findings

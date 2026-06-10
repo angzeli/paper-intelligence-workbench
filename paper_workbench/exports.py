@@ -22,20 +22,20 @@ def _relativize_note_file(row: dict) -> dict:
     return row
 
 
-def export_registry_csv(papers: list[Paper], out: str | Path) -> Path:
-    return save_registry(papers, out)
+def export_registry_csv(papers: list[Paper], out: str | Path, force: bool = True) -> Path:
+    return save_registry(papers, out) if force else save_registry_no_overwrite(papers, out)
 
 
-def export_registry_json(papers: list[Paper], out: str | Path) -> Path:
-    return save_registry_json(papers, out)
+def export_registry_json(papers: list[Paper], out: str | Path, force: bool = True) -> Path:
+    return save_registry_json(papers, out) if force else _write_registry_json_no_overwrite(papers, out)
 
 
-def export_claims_csv(claims: list[Claim], out: str | Path) -> Path:
-    return save_claims_csv(claims, out)
+def export_claims_csv(claims: list[Claim], out: str | Path, force: bool = True) -> Path:
+    return save_claims_csv(claims, out, force=force)
 
 
-def export_claims_json(claims: list[Claim], out: str | Path) -> Path:
-    return write_json(out, [_relativize_note_file(dataclass_to_plain(claim)) for claim in claims])
+def export_claims_json(claims: list[Claim], out: str | Path, force: bool = True) -> Path:
+    return write_json(out, [_relativize_note_file(dataclass_to_plain(claim)) for claim in claims], force=force)
 
 
 def reading_list_markdown(papers: list[Paper], *, tag: str = "", status: str = "") -> str:
@@ -52,11 +52,11 @@ def reading_list_markdown(papers: list[Paper], *, tag: str = "", status: str = "
     return "\n".join(lines).rstrip() + "\n"
 
 
-def export_reading_list(papers: list[Paper], out: str | Path, *, tag: str = "", status: str = "") -> Path:
-    return write_text(out, reading_list_markdown(papers, tag=tag, status=status))
+def export_reading_list(papers: list[Paper], out: str | Path, *, tag: str = "", status: str = "", force: bool = True) -> Path:
+    return write_text(out, reading_list_markdown(papers, tag=tag, status=status), force=force)
 
 
-def export_theme_claims(claims: list[Claim], out: str | Path, *, theme: str) -> Path:
+def export_theme_claims(claims: list[Claim], out: str | Path, *, theme: str, force: bool = True) -> Path:
     wanted = theme.strip().lower().replace(" ", "-").replace("_", "-")
     selected = [
         claim
@@ -64,4 +64,15 @@ def export_theme_claims(claims: list[Claim], out: str | Path, *, theme: str) -> 
         if wanted == claim.supports_theme.strip().lower().replace(" ", "-").replace("_", "-")
         or wanted in claim.tags
     ]
-    return write_json(out, [claim_to_row(claim) for claim in selected])
+    return write_json(out, [_relativize_note_file(claim_to_row(claim)) for claim in selected], force=force)
+
+
+def save_registry_no_overwrite(papers: list[Paper], out: str | Path) -> Path:
+    from .registry import REGISTRY_FIELDS, paper_to_row
+    from .io import write_csv_rows
+
+    return write_csv_rows(out, (paper_to_row(paper) for paper in papers), REGISTRY_FIELDS, force=False)
+
+
+def _write_registry_json_no_overwrite(papers: list[Paper], out: str | Path) -> Path:
+    return write_json(out, [dataclass_to_plain(paper) for paper in papers], force=False)

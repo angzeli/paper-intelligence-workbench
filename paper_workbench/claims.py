@@ -59,8 +59,8 @@ def collect_claims(path: str | Path) -> list[Claim]:
     return claims
 
 
-def save_claims_csv(claims: list[Claim], path: str | Path) -> Path:
-    return write_csv_rows(path, (claim_to_row(claim) for claim in claims), CLAIM_FIELDS)
+def save_claims_csv(claims: list[Claim], path: str | Path, force: bool = True) -> Path:
+    return write_csv_rows(path, (claim_to_row(claim) for claim in claims), CLAIM_FIELDS, force=force)
 
 
 def evidence_links_from_claims(claims: list[Claim]) -> list[EvidenceLink]:

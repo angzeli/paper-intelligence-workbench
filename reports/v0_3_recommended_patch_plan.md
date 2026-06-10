@@ -3,7 +3,6 @@
 ## High Priority
 
 - Add a non-destructive workspace migration report for moving legacy `data/` files into project profiles.
-- Improve BibTeX macro/string handling while keeping warnings conservative.
 - Add citation-key suggestions using `FirstAuthorYearShortTitle`, with no automatic changes.
 - Add note diagnostics that point to malformed claim fields and missing required metadata.
 
@@ -13,6 +12,7 @@
 - Add filters to reports for tags, reading status, priority, and inclusion status.
 - Add project-level summary output with unread papers, missing notes, weak claims, and next actions.
 - Add a report index generator that links all reports in a profile or legacy workspace.
+- Add deeper BibTeX edge-case handling beyond simple `@string` macros and concatenated values.
 
 ## Low Priority
 

@@ -26,10 +26,10 @@ Use a profile with commands:
 ```bash
 paperwb search photocorrosion --project zis_photocatalysis
 paperwb claims --project zis_photocatalysis --output data/processed/zis_claims.csv
-paperwb report evidence-map --project zis_photocatalysis
+paperwb report evidence-map --project zis_photocatalysis --force
 paperwb doctor --project zis_photocatalysis
 ```
 
-When `--project` is provided, profile paths override legacy path flags for registry, notes, BibTeX, themes, and reports. Without `--project`, the existing `data/` workflow remains unchanged.
+When `--project` is provided, profile paths are used for registry, notes, BibTeX, themes, and reports. Explicit legacy path flags such as `--registry`, `--notes-dir`, or `--reports-dir` are rejected with a user-facing error instead of being silently ignored. Without `--project`, the existing `data/` workflow remains unchanged.
 
 Profiles are local JSON plus folders only. There is no database and no cloud synchronization.

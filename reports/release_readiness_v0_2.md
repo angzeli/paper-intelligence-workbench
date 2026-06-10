@@ -1,6 +1,6 @@
 # Release Readiness Report v0.2
 
-Date: 2026-06-09
+Date: 2026-06-10
 
 ## Implemented Features
 
@@ -16,6 +16,15 @@ Date: 2026-06-09
 - Added exports for registry CSV/JSON, claims CSV/JSON, reading lists, unread lists, and theme claims.
 - Added synthetic project profiles for `zis_photocatalysis`, `finance_reading`, and `ml_methods`.
 - Added an end-to-end synthetic workflow script at `examples/end_to_end_workflow.py`.
+- Hardened release-blocking CLI trust boundaries after hostile review:
+  - common input failures now return concise `error:` messages instead of tracebacks
+  - read/report commands no longer create missing registries
+  - reports and exports refuse existing output files unless `--force` is provided
+  - project path override flags are rejected when `--project` is used
+  - unknown section-outline themes return a non-zero CLI error without writing a report
+  - `theme-claims` exports use portable relative note paths
+  - evidence maps show undefined theme buckets instead of dropping typoed theme claims
+  - the lightweight BibTeX parser ignores `@comment`/`@preamble`, resolves simple `@string` macros, and keeps simple concatenated values
 
 ## Files Changed
 
@@ -41,11 +50,12 @@ Date: 2026-06-09
 - `paperwb doctor`
 - `paperwb export registry-json`
 - `paperwb export claims`
+- Negative smoke paths for missing files, duplicate projects, invalid enum values, overwrite refusal, project path conflicts, and unknown section-outline themes
 
 ## Tests Run
 
 - `pytest`
-- Result: `31 passed`
+- Result: `41 passed`
 
 ## Reports Generated
 
@@ -59,6 +69,7 @@ Date: 2026-06-09
 - `reports/missing_evidence.md`
 - `reports/photocorrosion_section_outline.md`
 - `reports/workspace_health.md`
+- canonical root reports without `_v0_2` suffix refreshed to match current v0.2 output
 - project-specific reports under each synthetic project profile
 
 ## Documentation Updated
@@ -77,19 +88,19 @@ Date: 2026-06-09
 
 ## Backward Compatibility
 
-The legacy `data/` workflow still works. Existing commands remain available, and old registry CSVs remain readable because new v0.2 fields default to blank values when missing. Project profiles are opt-in through `--project`.
+The legacy `data/` workflow still works. Existing commands remain available, and old registry CSVs remain readable because new v0.2 fields default to blank values when missing. Project profiles are opt-in through `--project`. Generated report and export commands now require `--force` before overwriting existing files; this is an intentional safety hardening.
 
 ## Known Limitations
 
-- BibTeX parsing remains lightweight and does not interpret every macro or LaTeX construct.
-- Note parsing is still template-oriented and conservative.
+- BibTeX parsing remains lightweight and does not interpret every LaTeX construct.
+- Note parsing is still template-oriented and conservative; additional field-label aliases remain future work.
 - Search is still local substring matching, not semantic search.
 - Project profiles are folder-based only; there is no migration command yet.
 - Evidence maps and outlines organize user-tracked evidence but do not judge scientific truth.
 
 ## Risks
 
-- Users with highly customized BibTeX libraries may need parser-specific fixes.
+- Users with highly customized BibTeX libraries may still need parser-specific fixes.
 - Large projects may need indexing or optional SQLite in a future release.
 - Generated diagnostics can be noisy when synthetic fixtures intentionally include validation problems.
 - Profile paths are intentionally local and should not be treated as cloud-sync state.
@@ -102,6 +113,13 @@ The legacy `data/` workflow still works. Existing commands remain available, and
 - Add richer note-format diagnostics with precise malformed field locations.
 - Add optional fielded search and SQLite FTS for larger projects.
 
+## Deferred Hostile-Review Items
+
+- More flexible note field aliases such as `Evidence location`.
+- A clean green-path starter dataset separate from intentionally broken audit fixtures.
+- Less noisy workspace-health summaries for onboarding.
+- Explicit public Python API boundaries.
+
 ## Usability Assessment
 
-The repository is usable for a real small literature-review project if the user supplies verified metadata, notes, BibTeX entries, claims, and evidence locations. It remains local-first and does not fabricate research content.
+The repository is usable for a real small literature-review project if the user supplies verified metadata, notes, BibTeX entries, claims, and evidence locations. The release-blocking hostile-review issues have been addressed, and the tool remains local-first and does not fabricate research content.

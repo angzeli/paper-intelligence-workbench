@@ -11,7 +11,7 @@ paperwb validate-bib data/bibtex/library.bib --registry data/registries/papers.c
 Generate a report:
 
 ```bash
-paperwb report bibtex-audit --registry data/registries/papers.csv --bibtex data/bibtex/library.bib
+paperwb report bibtex-audit --registry data/registries/papers.csv --bibtex data/bibtex/library.bib --force
 ```
 
 ## Checks

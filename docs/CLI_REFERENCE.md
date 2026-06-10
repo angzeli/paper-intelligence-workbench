@@ -36,6 +36,8 @@ paperwb report section-outline --theme photocorrosion
 paperwb report all
 ```
 
+Report commands refuse to overwrite an existing output file unless `--force` is provided. The same no-overwrite behavior applies to `doctor --out` and `validate-bib --report`.
+
 Exports:
 
 ```bash
@@ -48,4 +50,6 @@ paperwb export unread --out reports/unread.md
 paperwb export theme-claims --theme photocorrosion --out data/processed/photocorrosion_claims.json
 ```
 
-Most workflow commands accept `--project NAME` to use profile paths.
+Export commands refuse to overwrite an existing output file unless `--force` is provided.
+
+Most workflow commands accept `--project NAME` to use profile paths. When `--project` is used, registry, notes, BibTeX, themes, and reports path flags are rejected to avoid silently ignoring user input. Use `--out` for an explicit single report or export destination.

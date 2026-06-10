@@ -6,8 +6,8 @@
 paperwb validate-registry data/registries/example_papers.csv
 paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv
 paperwb claims data/notes --output reports/example_claims.csv
-paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json
-paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json
+paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --force
+paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --force
 ```
 
 ## Project Profile Workflow
@@ -16,9 +16,9 @@ paperwb report citation-audit --registry data/registries/example_papers.csv --bi
 paperwb project list
 paperwb project validate zis_photocatalysis
 paperwb search photocorrosion --project zis_photocatalysis
-paperwb report evidence-map --project zis_photocatalysis
-paperwb report section-outline --project zis_photocatalysis --theme photocorrosion --out projects/zis_photocatalysis/reports/photocorrosion_section_outline.md
-paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json
+paperwb report evidence-map --project zis_photocatalysis --force
+paperwb report section-outline --project zis_photocatalysis --theme photocorrosion --out projects/zis_photocatalysis/reports/photocorrosion_section_outline.md --force
+paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json --force
 ```
 
 ## End-to-End Script

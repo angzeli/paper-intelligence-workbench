@@ -6,6 +6,7 @@ from paper_workbench.claims import collect_claims, collect_notes
 from paper_workbench.registry import load_registry
 from paper_workbench.reporting import evidence_map_report, inventory_report, weak_claims_report
 from paper_workbench.search import search_claims, search_note_files, search_papers
+from paper_workbench.schema import Claim, ProjectTheme
 from paper_workbench.tags import count_claim_tags, group_claims_by_theme, load_themes, normalize_tag
 
 from conftest import EXAMPLE_BIBTEX, EXAMPLE_NOTES, EXAMPLE_REGISTRY, EXAMPLE_THEMES
@@ -37,6 +38,19 @@ def test_report_generation_contains_expected_sections():
     assert "Literature Review Evidence Map" in evidence_map
     assert "charge separation" in evidence_map
     assert "Weak Claims Report" in weak_claims_report(claims)
+
+
+def test_evidence_map_shows_undefined_theme_claims():
+    claim = Claim(
+        claim_id="synthetic:c1",
+        paper_id="synthetic",
+        claim_text="Synthetic claim with a typoed theme.",
+        supports_theme="Typo Theme",
+    )
+    theme = ProjectTheme(theme_id="known-theme", name="Known Theme")
+    report = evidence_map_report([], [claim], [theme])
+    assert "Undefined Theme: typo-theme" in report
+    assert "Synthetic claim with a typoed theme." in report
 
 
 def test_citation_audit_finds_expected_gaps():

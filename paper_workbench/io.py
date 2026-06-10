@@ -34,8 +34,10 @@ def read_csv_rows(path: str | Path) -> list[dict[str, str]]:
         return [dict(row) for row in csv.DictReader(handle)]
 
 
-def write_csv_rows(path: str | Path, rows: Iterable[dict[str, str]], fields: list[str]) -> Path:
+def write_csv_rows(path: str | Path, rows: Iterable[dict[str, str]], fields: list[str], force: bool = True) -> Path:
     target = Path(path)
+    if target.exists() and not force:
+        raise FileExistsError(f"{target} already exists")
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)

@@ -13,6 +13,7 @@ from .schema import Author, BibTeXEntry, Paper, ValidationFinding
 
 ENTRY_RE = re.compile(r"@([A-Za-z]+)\s*([({])", re.MULTILINE)
 FIELD_NAME_RE = re.compile(r"[A-Za-z][A-Za-z0-9_-]*")
+IGNORED_ENTRY_TYPES = {"comment", "preamble", "string"}
 VENUE_BY_TYPE = {
     "article": ("journal",),
     "inproceedings": ("booktitle",),
@@ -54,6 +55,14 @@ def clean_bibtex_value(value: str) -> str:
     text = text.replace("\\&", "&")
     text = re.sub(r"\s+", " ", text)
     return text
+
+
+def _clean_or_resolve_macro(value: str, macros: dict[str, str] | None = None) -> str:
+    cleaned = clean_bibtex_value(value)
+    stripped = value.strip()
+    if macros and stripped and stripped[0] not in '{"' and cleaned.lower() in macros:
+        return macros[cleaned.lower()]
+    return cleaned
 
 
 def _matching_close(open_char: str) -> str:
@@ -138,7 +147,7 @@ def _find_balanced_brace(text: str, start: int) -> int:
     return -1
 
 
-def _parse_fields(body: str) -> dict[str, str]:
+def _parse_fields(body: str, macros: dict[str, str] | None = None) -> dict[str, str]:
     fields: dict[str, str] = {}
     index = 0
     while index < len(body):
@@ -156,7 +165,16 @@ def _parse_fields(body: str) -> dict[str, str]:
             continue
         index += 1
         value, index = _parse_value(body, index)
-        fields[name] = clean_bibtex_value(value)
+        parts = [_clean_or_resolve_macro(value, macros)]
+        while True:
+            while index < len(body) and body[index].isspace():
+                index += 1
+            if index >= len(body) or body[index] != "#":
+                break
+            index += 1
+            value, index = _parse_value(body, index)
+            parts.append(_clean_or_resolve_macro(value, macros))
+        fields[name] = " ".join(part for part in parts if part)
         while index < len(body) and body[index] != ",":
             index += 1
         if index < len(body) and body[index] == ",":
@@ -166,6 +184,7 @@ def _parse_fields(body: str) -> dict[str, str]:
 
 def parse_bibtex(text: str, source_path: str = "") -> list[BibTeXEntry]:
     entries: list[BibTeXEntry] = []
+    macros: dict[str, str] = {}
     position = 0
     while True:
         match = ENTRY_RE.search(text, position)
@@ -186,6 +205,13 @@ def parse_bibtex(text: str, source_path: str = "") -> list[BibTeXEntry]:
             )
             break
         raw_body = text[body_start:body_end]
+        if entry_type == "string":
+            macros.update({name.lower(): value for name, value in _parse_fields(raw_body, macros).items()})
+            position = body_end + 1
+            continue
+        if entry_type in IGNORED_ENTRY_TYPES:
+            position = body_end + 1
+            continue
         if "," not in raw_body:
             entries.append(
                 BibTeXEntry(
@@ -198,7 +224,7 @@ def parse_bibtex(text: str, source_path: str = "") -> list[BibTeXEntry]:
             position = body_end + 1
             continue
         key, fields_body = raw_body.split(",", 1)
-        fields = _parse_fields(fields_body)
+        fields = _parse_fields(fields_body, macros)
         authors = [Author.from_string(part) for part in re.split(r"\s+and\s+", fields.get("author", "")) if part.strip()]
         entries.append(
             BibTeXEntry(

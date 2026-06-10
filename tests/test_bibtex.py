@@ -27,3 +27,23 @@ def test_bibtex_validation_reports_expected_issues():
     assert "missing_author" in codes
     assert "invalid_year" in codes
     assert "bibtex_not_linked_to_registry" in codes
+
+
+def test_bibtex_parser_ignores_directives_and_keeps_concatenated_values():
+    entries = parse_bibtex(
+        """
+        @string{synthetic_journal = "Synthetic Journal"}
+        @comment{This is not a citation entry.}
+        @preamble{"Synthetic bibliography"}
+        @article{concatKey,
+          title = {A Local} # { Synthetic Title},
+          author = {Doe, Jane},
+          year = {2024},
+          journal = synthetic_journal
+        }
+        """
+    )
+    assert len(entries) == 1
+    assert entries[0].key == "concatKey"
+    assert entries[0].title == "A Local Synthetic Title"
+    assert entries[0].journal == "Synthetic Journal"

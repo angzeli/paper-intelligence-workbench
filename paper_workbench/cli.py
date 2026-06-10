@@ -34,18 +34,46 @@ from .reporting import (
     write_report,
 )
 from .search import results_markdown, search_claims, search_note_files, search_papers
-from .tags import load_themes
+from .tags import load_themes, normalize_tag
 
 
 def _path(value: str | Path) -> Path:
     return Path(value).expanduser()
 
 
-def _load_registry(path: str | Path) -> list:
+def _load_registry(path: str | Path, *, create_if_missing: bool = False) -> list:
     target = _path(path)
     if not target.exists():
+        if not create_if_missing:
+            raise FileNotFoundError(f"Registry not found: {target}")
         create_empty_registry(target)
     return load_registry(target)
+
+
+PATH_DEFAULTS = {
+    "registry": str(default_registry_path()),
+    "bibtex": str(default_bibtex_path()),
+    "notes_dir": str(default_notes_dir()),
+    "themes": str(default_themes_path()),
+    "reports_dir": str(default_reports_dir()),
+}
+
+
+def _reject_project_path_overrides(args: argparse.Namespace, fields: tuple[str, ...]) -> None:
+    if not getattr(args, "project", ""):
+        return
+    for field in fields:
+        if not hasattr(args, field):
+            continue
+        value = getattr(args, field)
+        if value and str(value) != PATH_DEFAULTS[field]:
+            option = f"--{field.replace('_', '-')}"
+            raise ValueError(f"--project cannot be combined with {option}; project profile paths are used instead.")
+
+
+def _theme_exists(theme_query: str, themes) -> bool:
+    wanted = normalize_tag(theme_query)
+    return any(theme.theme_id == wanted or normalize_tag(theme.name) == wanted for theme in themes)
 
 
 def _paths_from_args(args: argparse.Namespace) -> dict[str, Path | None]:
@@ -110,17 +138,16 @@ def cmd_validate_bib(args: argparse.Namespace) -> int:
     findings = validate_bibtex(entries, papers)
     _print_findings(findings)
     if args.report:
-        path = write_report("bibtex_audit", bibtex_audit_report(entries, findings), Path(args.report).parent)
-        if path != Path(args.report):
-            Path(args.report).write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
-        print(f"Wrote report to {args.report}")
+        path = write_text(args.report, bibtex_audit_report(entries, findings), force=args.force)
+        print(f"Wrote report to {path}")
     return 1 if args.strict and any(finding.severity == "error" for finding in findings) else 0
 
 
 def cmd_add_paper(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry",))
     paths = _paths_from_args(args)
     registry_path = _path(paths["registry"])
-    papers = _load_registry(registry_path)
+    papers = _load_registry(registry_path, create_if_missing=True)
     paper = add_paper(
         papers,
         title=args.title,
@@ -150,6 +177,7 @@ def cmd_add_paper(args: argparse.Namespace) -> int:
 
 
 def cmd_list(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry",))
     paths = _paths_from_args(args)
     papers = _load_registry(paths["registry"])
     papers = filter_papers(
@@ -170,6 +198,7 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 
 def cmd_note_template(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "notes_dir"))
     paths = _paths_from_args(args)
     papers = _load_registry(paths["registry"])
     paper = next((item for item in papers if item.paper_id == args.paper_id), None)
@@ -182,6 +211,8 @@ def cmd_note_template(args: argparse.Namespace) -> int:
 
 
 def cmd_claims(args: argparse.Namespace) -> int:
+    if getattr(args, "project", "") and args.notes_path:
+        raise ValueError("--project cannot be combined with notes_path; project profile notes are used instead.")
     paths = _paths_from_args(args)
     notes_path = Path(args.notes_path) if args.notes_path else paths["notes_dir"]
     claims = collect_claims(notes_path)
@@ -195,6 +226,7 @@ def cmd_claims(args: argparse.Namespace) -> int:
 
 
 def cmd_search(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "notes_dir"))
     paths = _paths_from_args(args)
     selected = args.claims or args.notes
     results = []
@@ -233,6 +265,7 @@ def _report_inputs(args: argparse.Namespace):
 
 
 def cmd_report(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     papers, notes, claims, entries, themes, paths = _report_inputs(args)
     reports_dir = _path(paths["reports_dir"])
     bib_findings = validate_bibtex(entries, papers) if entries else []
@@ -266,16 +299,20 @@ def cmd_report(args: argparse.Namespace) -> int:
         if name == "section-outline" and not args.theme:
             print("--theme is required for section-outline", file=sys.stderr)
             return 2
+        if name == "section-outline" and not _theme_exists(args.theme, themes):
+            print(f"Unknown theme: {args.theme}", file=sys.stderr)
+            return 2
         content = builders[name]()
         if args.out and len(selected) == 1:
-            path = write_text(args.out, content)
+            path = write_text(args.out, content, force=args.force)
         else:
-            path = write_report(name.replace("-", "_"), content, reports_dir)
+            path = write_report(name.replace("-", "_"), content, reports_dir, force=args.force)
         print(f"Wrote {path}")
     return 0
 
 
 def cmd_checklist(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes"))
     papers, notes, claims, entries, themes, paths = _report_inputs(args)
     theme_id = args.theme.lower().replace(" ", "-").replace("_", "-")
     relevant = [theme for theme in themes if theme.theme_id == theme_id or theme.name.lower() == args.theme.lower()]
@@ -330,6 +367,7 @@ def cmd_project_validate(args: argparse.Namespace) -> int:
 
 
 def cmd_doctor(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     paths = _paths_from_args(args)
     findings = workspace_health(
         root=paths["root"],
@@ -342,33 +380,34 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     )
     _print_findings(findings)
     if args.out:
-        path = write_text(args.out, workspace_health_report(findings))
+        path = write_text(args.out, workspace_health_report(findings), force=args.force)
         print(f"Wrote {path}")
     return 1 if args.strict and any(finding.severity == "error" for finding in findings) else 0
 
 
 def cmd_export(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     papers, notes, claims, entries, themes, paths = _report_inputs(args)
     if not args.out:
         print("--out is required for export", file=sys.stderr)
         return 2
     if args.export_type == "registry-csv":
-        path = export_registry_csv(papers, args.out)
+        path = export_registry_csv(papers, args.out, force=args.force)
     elif args.export_type == "registry-json":
-        path = export_registry_json(papers, args.out)
+        path = export_registry_json(papers, args.out, force=args.force)
     elif args.export_type == "claims":
-        path = export_claims_csv(claims, args.out)
+        path = export_claims_csv(claims, args.out, force=args.force)
     elif args.export_type == "claims-json":
-        path = export_claims_json(claims, args.out)
+        path = export_claims_json(claims, args.out, force=args.force)
     elif args.export_type == "reading-list":
-        path = export_reading_list(papers, args.out, tag=args.tag or "", status=args.status or "")
+        path = export_reading_list(papers, args.out, tag=args.tag or "", status=args.status or "", force=args.force)
     elif args.export_type == "unread":
-        path = export_reading_list(papers, args.out, status="unread")
+        path = export_reading_list(papers, args.out, status="unread", force=args.force)
     elif args.export_type == "theme-claims":
         if not args.theme:
             print("--theme is required for theme-claims", file=sys.stderr)
             return 2
-        path = export_theme_claims(claims, args.out, theme=args.theme)
+        path = export_theme_claims(claims, args.out, theme=args.theme, force=args.force)
     else:
         print(f"Unknown export type: {args.export_type}", file=sys.stderr)
         return 2
@@ -408,6 +447,7 @@ def build_parser() -> argparse.ArgumentParser:
     validate_bib_parser.add_argument("bibtex", help="BibTeX file path.")
     validate_bib_parser.add_argument("--registry", default="", help="Optional registry CSV path for link checks.")
     validate_bib_parser.add_argument("--report", help="Optional Markdown report path.")
+    validate_bib_parser.add_argument("--force", action="store_true", help="Overwrite an existing report path.")
     validate_bib_parser.add_argument("--strict", action="store_true", help="Return non-zero when errors are found.")
     validate_bib_parser.set_defaults(func=cmd_validate_bib)
 
@@ -500,6 +540,7 @@ def build_parser() -> argparse.ArgumentParser:
     report_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
     report_parser.add_argument("--theme", default="", help="Theme name or ID for theme-specific reports.")
     report_parser.add_argument("--out", help="Write a single report to this exact output path.")
+    report_parser.add_argument("--force", action="store_true", help="Overwrite an existing report file.")
     report_parser.set_defaults(func=cmd_report)
 
     checklist_parser = subparsers.add_parser("checklist", help="Generate a theme review checklist.")
@@ -519,6 +560,7 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
     doctor_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
     doctor_parser.add_argument("--out", help="Optional Markdown workspace-health report path.")
+    doctor_parser.add_argument("--force", action="store_true", help="Overwrite an existing workspace-health report path.")
     doctor_parser.add_argument("--strict", action="store_true", help="Return non-zero when errors are found.")
     doctor_parser.set_defaults(func=cmd_doctor)
 
@@ -537,6 +579,7 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument("--tag", default="", help="Optional tag filter for reading-list.")
     export_parser.add_argument("--status", default="", help="Optional reading-status filter for reading-list.")
     export_parser.add_argument("--theme", default="", help="Theme for theme-claims export.")
+    export_parser.add_argument("--force", action="store_true", help="Overwrite an existing export file.")
     export_parser.set_defaults(func=cmd_export)
 
     return parser
@@ -545,7 +588,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        return args.func(args)
+    except (FileNotFoundError, FileExistsError, IsADirectoryError, NotADirectoryError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":
