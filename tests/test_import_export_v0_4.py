@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 
 import pytest
 
 from paper_workbench.claims import collect_claims, collect_notes
-from paper_workbench.exports import export_bundle, export_obsidian_vault, export_reading_list
+from paper_workbench.exports import export_bundle, export_obsidian_vault, export_reading_list, export_report_index
 from paper_workbench.importers import import_bibtex, import_generic_csv, import_report, import_ris, import_zotero_csv
 from paper_workbench.registry import create_empty_registry, load_registry, save_registry, validate_registry
+from paper_workbench.schema import SourceType
 from paper_workbench.tags import load_themes
 
 from conftest import (
@@ -194,6 +196,75 @@ def test_cli_import_and_export_smoke(tmp_path):
     assert (bundle / "manifest.json").exists()
 
 
+def test_cli_import_report_collision_does_not_create_registry(tmp_path):
+    registry = tmp_path / "papers.csv"
+    report = tmp_path / "blocked.md"
+    report.write_text("keep me\n", encoding="utf-8")
+    result = run_cli(
+        "import",
+        "zotero-csv",
+        str(EXAMPLE_ZOTERO_CSV),
+        "--registry",
+        str(registry),
+        "--report",
+        str(report),
+    )
+    assert result.returncode == 2
+    assert not registry.exists()
+    assert report.read_text(encoding="utf-8") == "keep me\n"
+    assert "already exists" in result.stderr
+
+
+def test_cli_repeated_import_default_report_collision_does_not_modify_registry(tmp_path):
+    registry = tmp_path / "papers.csv"
+    reports = tmp_path / "reports"
+    first = run_cli(
+        "import",
+        "zotero-csv",
+        str(EXAMPLE_ZOTERO_CSV),
+        "--registry",
+        str(registry),
+        "--reports-dir",
+        str(reports),
+        "--force",
+    )
+    assert first.returncode == 0, first.stderr
+    original_registry = registry.read_text(encoding="utf-8")
+    original_report = (reports / "import_zotero_csv.md").read_text(encoding="utf-8")
+
+    second = run_cli(
+        "import",
+        "zotero-csv",
+        str(EXAMPLE_ZOTERO_CSV),
+        "--registry",
+        str(registry),
+        "--reports-dir",
+        str(reports),
+    )
+    assert second.returncode == 2
+    assert registry.read_text(encoding="utf-8") == original_registry
+    assert (reports / "import_zotero_csv.md").read_text(encoding="utf-8") == original_report
+
+
+def test_cli_import_dry_run_report_collision_has_no_side_effects(tmp_path):
+    registry = tmp_path / "new_registry.csv"
+    report = tmp_path / "dry_run.md"
+    report.write_text("keep me\n", encoding="utf-8")
+    result = run_cli(
+        "import",
+        "bibtex",
+        str(EXAMPLE_IMPORT_BIBTEX),
+        "--registry",
+        str(registry),
+        "--report",
+        str(report),
+        "--dry-run",
+    )
+    assert result.returncode == 2
+    assert not registry.exists()
+    assert report.read_text(encoding="utf-8") == "keep me\n"
+
+
 def test_cli_import_dry_run_allows_missing_registry(tmp_path):
     registry = tmp_path / "new_registry.csv"
     reports = tmp_path / "reports"
@@ -213,3 +284,74 @@ def test_cli_import_dry_run_allows_missing_registry(tmp_path):
     assert result.returncode == 0, result.stderr
     assert not registry.exists()
     assert (reports / "import_generic_csv.md").exists()
+
+
+def test_directory_exports_refuse_non_empty_targets_even_with_force(tmp_path):
+    papers = load_registry(ZIS_PROJECT / "registry.csv")
+    notes = collect_notes(ZIS_PROJECT / "notes")
+    claims = collect_claims(ZIS_PROJECT / "notes")
+    themes = load_themes(ZIS_PROJECT / "themes.json")
+
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "stale.md").write_text("keep me\n", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+        export_obsidian_vault(papers, notes, claims, themes, vault, force=True)
+    assert (vault / "stale.md").read_text(encoding="utf-8") == "keep me\n"
+
+    bundle = tmp_path / "bundle"
+    bundle.mkdir()
+    (bundle / "stale.txt").write_text("keep me\n", encoding="utf-8")
+    with pytest.raises(FileExistsError):
+        export_bundle(
+            registry_path=ZIS_PROJECT / "registry.csv",
+            bibtex_path=ZIS_PROJECT / "bibtex" / "library.bib",
+            notes_dir=ZIS_PROJECT / "notes",
+            themes_path=ZIS_PROJECT / "themes.json",
+            reports_dir=ZIS_PROJECT / "reports",
+            out=bundle,
+            project="zis_photocatalysis",
+            papers=papers,
+            force=True,
+        )
+    assert (bundle / "stale.txt").read_text(encoding="utf-8") == "keep me\n"
+
+
+def test_report_index_links_resolve_from_output_location(tmp_path):
+    source_reports = tmp_path / "project" / "reports"
+    source_reports.mkdir(parents=True)
+    report = source_reports / "evidence_map.md"
+    report.write_text("# Evidence\n", encoding="utf-8")
+    out = tmp_path / "root_reports" / "report_index.md"
+    export_report_index(source_reports, out, force=True)
+    content = out.read_text(encoding="utf-8")
+    match = re.search(r"\[evidence_map\.md\]\(([^)]+)\)", content)
+    assert match is not None
+    assert not match.group(1).startswith("/")
+    assert (out.parent / match.group(1)).resolve() == report.resolve()
+
+
+def test_bibtex_import_maps_common_entry_types(tmp_path):
+    bibtex = tmp_path / "library.bib"
+    bibtex.write_text(
+        """
+        @inproceedings{confKey,
+          title = {Synthetic Conference Paper},
+          author = {Doe, Jane},
+          year = {2025},
+          booktitle = {Synthetic Proceedings}
+        }
+        @phdthesis{thesisKey,
+          title = {Synthetic Thesis},
+          author = {Roe, Sam},
+          year = {2024},
+          school = {Synthetic University}
+        }
+        """,
+        encoding="utf-8",
+    )
+    result = import_bibtex(bibtex, [], registry_path=tmp_path / "papers.csv")
+    by_key = {paper.bibtex_key: paper for paper in result.registry_papers}
+    assert by_key["confKey"].source_type == SourceType.CONFERENCE_PAPER.value
+    assert by_key["thesisKey"].source_type == SourceType.THESIS.value
+    assert "unsupported_item_type" not in {warning.code for warning in result.warnings}

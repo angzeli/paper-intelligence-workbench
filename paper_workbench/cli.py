@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 import sys
+import tempfile
 
 from .audit import citation_audit
 from .bibtex import parse_bibtex_file, validate_bibtex
@@ -22,7 +24,7 @@ from .exports import (
     export_report_index,
     export_theme_claims,
 )
-from .importers import import_bibtex, import_generic_csv, import_report, import_ris, import_zotero_csv, write_import_report
+from .importers import import_bibtex, import_generic_csv, import_report, import_ris, import_zotero_csv
 from .init import init_workspace
 from .io import write_text
 from .notes import write_note_template
@@ -302,7 +304,7 @@ def cmd_report(args: argparse.Namespace) -> int:
         profile=paths["profile"],
     )
     builders = {
-        "inventory": lambda: inventory_report(papers),
+        "inventory": lambda: inventory_report(papers, root=paths["root"], claims=claims),
         "reading-status": lambda: reading_status_report(papers),
         "papers-by-tag": lambda: papers_by_tag_report(papers),
         "bibtex-audit": lambda: bibtex_audit_report(entries, bib_findings),
@@ -477,12 +479,47 @@ def _default_import_report(paths: dict[str, Path | None], import_type: str) -> P
     return Path(paths["reports_dir"]) / f"import_{import_type.replace('-', '_')}.md"
 
 
+def _preflight_file_output(path: Path, *, force: bool) -> Path:
+    if path.exists() and path.is_dir():
+        raise IsADirectoryError(path)
+    if path.exists() and not force:
+        raise FileExistsError(f"{path} already exists")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def _reserve_temp_path(target: Path) -> Path:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(prefix=f".{target.name}.", suffix=".tmp", dir=target.parent, delete=False) as handle:
+        return Path(handle.name)
+
+
+def _cleanup_temp_paths(paths: list[Path]) -> None:
+    for path in paths:
+        try:
+            if path.exists():
+                path.unlink()
+        except OSError:
+            pass
+
+
 def _finish_import(args: argparse.Namespace, result, paths: dict[str, Path | None], import_type: str) -> int:
-    if not result.dry_run:
-        save_registry(result.registry_papers, paths["registry"])
-        print(f"Wrote registry to {paths['registry']}")
-    report_path = Path(args.report) if args.report else _default_import_report(paths, import_type)
-    write_import_report(result, report_path, force=args.force)
+    report_path = _preflight_file_output(Path(args.report) if args.report else _default_import_report(paths, import_type), force=args.force)
+    report_tmp = _reserve_temp_path(report_path)
+    registry_tmp: Path | None = None
+    try:
+        write_text(report_tmp, import_report(result), force=True)
+        if not result.dry_run:
+            registry_path = _preflight_file_output(Path(paths["registry"]), force=True)
+            registry_tmp = _reserve_temp_path(registry_path)
+            save_registry(result.registry_papers, registry_tmp)
+            os.replace(report_tmp, report_path)
+            os.replace(registry_tmp, registry_path)
+            print(f"Wrote registry to {registry_path}")
+        else:
+            os.replace(report_tmp, report_path)
+    finally:
+        _cleanup_temp_paths([path for path in (report_tmp, registry_tmp) if path is not None])
     print(f"Wrote import report to {report_path}")
     print(f"Rows read: {result.rows_read}; imported: {result.imported}; updated: {result.updated}; skipped: {result.skipped}; dry-run: {result.dry_run}")
     return 0
@@ -497,9 +534,9 @@ def _import_paths(args: argparse.Namespace) -> dict[str, Path | None]:
 
 
 def _load_import_registry(path: Path, *, dry_run: bool) -> list:
-    if dry_run and not path.exists():
+    if not path.exists():
         return []
-    return _load_registry(path, create_if_missing=not dry_run)
+    return _load_registry(path, create_if_missing=False)
 
 
 def cmd_import_zotero_csv(args: argparse.Namespace) -> int:
@@ -791,7 +828,7 @@ def build_parser() -> argparse.ArgumentParser:
     export_parser.add_argument("--high-priority", action="store_true", help="Filter reading-list to high or critical priority papers.")
     export_parser.add_argument("--missing-notes", action="store_true", help="Filter reading-list to papers without parsed notes.")
     export_parser.add_argument("--include-pdfs", action="store_true", help="For bundle export only: copy existing local PDFs. Default is false.")
-    export_parser.add_argument("--force", action="store_true", help="Overwrite an existing export file.")
+    export_parser.add_argument("--force", action="store_true", help="Overwrite an existing export file. Directory exports still require an empty output directory.")
     export_parser.set_defaults(func=cmd_export)
 
     synthetic_parser = subparsers.add_parser("synthetic", help="Generate deterministic synthetic stress corpora.")

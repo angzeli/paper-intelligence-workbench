@@ -27,11 +27,13 @@ paperwb export reading-list --excluded --out reports/excluded.md
 ## Vaults and Bundles
 
 ```bash
-paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis --force
-paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle --force
+paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
+paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
 ```
 
 Backup bundles do not include PDFs by default. Use `--include-pdfs` only for local files you have the right to copy.
+
+Vault and bundle exports require a new or empty output directory. They do not merge into or clean a non-empty directory, even with `--force`.
 
 ## Report Index and Summary
 

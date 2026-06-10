@@ -19,6 +19,7 @@ Each importer writes a Markdown import report with rows read, records imported, 
 - Non-empty user fields are not overwritten.
 - `--dry-run` reports what would happen without writing the registry.
 - Import reports are not overwritten unless `--force` is passed.
+- If the import report path is unavailable, the command fails before writing the registry.
 
 ## Examples
 

@@ -40,7 +40,7 @@ def _escape(value: str) -> str:
     return str(value).replace("|", "\\|").replace("\n", " ")
 
 
-def inventory_report(papers: list[Paper]) -> str:
+def inventory_report(papers: list[Paper], *, root: str | Path | None = None, claims: list[Claim] | None = None) -> str:
     lines = [
         "# Paper Inventory Report",
         "",
@@ -53,7 +53,7 @@ def inventory_report(papers: list[Paper]) -> str:
         lines.append(
             f"| {_escape(paper.paper_id)} | {_escape(paper.title)} | {_escape(display_authors(paper.authors))} | {_escape(paper.year)} | {_escape(paper.reading_status)} | {_escape('; '.join(paper.tags))} |"
         )
-    findings = validate_registry(papers)
+    findings = validate_registry(papers, root=root, claims=claims)
     lines.extend(["", "## Registry Findings", "", _finding_rows(findings)])
     return "\n".join(lines).rstrip() + "\n"
 

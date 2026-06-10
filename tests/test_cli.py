@@ -5,6 +5,8 @@ import subprocess
 import sys
 
 from conftest import EXAMPLE_BIBTEX, EXAMPLE_NOTES, EXAMPLE_REGISTRY, EXAMPLE_THEMES, ROOT
+from paper_workbench.registry import save_registry
+from paper_workbench.schema import Author, Paper
 
 
 def run_cli(*args: str):
@@ -48,6 +50,35 @@ def test_cli_report_smoke(tmp_path):
     )
     assert result.returncode == 0
     assert (tmp_path / "citation_audit.md").exists()
+
+
+def test_cli_inventory_report_uses_registry_validation_context(tmp_path):
+    registry = tmp_path / "papers.csv"
+    notes_dir = tmp_path / "notes"
+    notes_dir.mkdir()
+    save_registry(
+        [
+            Paper(
+                paper_id="context_probe",
+                title="Synthetic Context Probe",
+                authors=[Author(given="Test", family="Author", raw_name="Test Author")],
+                year="2026",
+                local_pdf_path="missing/context_probe.pdf",
+                bibtex_key="contextProbe2026",
+                reading_status="read",
+                notes_path=str(tmp_path / "missing_note.md"),
+                included_in_lit_review="true",
+            )
+        ],
+        registry,
+    )
+    out = tmp_path / "inventory.md"
+    result = run_cli("report", "inventory", "--registry", str(registry), "--notes-dir", str(notes_dir), "--out", str(out), "--force")
+    assert result.returncode == 0, result.stderr
+    content = out.read_text(encoding="utf-8")
+    assert "missing_local_pdf_path" in content
+    assert "notes_path_missing_file" in content
+    assert "included_without_claims" in content
 
 
 def test_cli_init_smoke(tmp_path):

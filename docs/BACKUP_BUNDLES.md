@@ -3,8 +3,10 @@
 Backup bundles collect local project data into a portable folder.
 
 ```bash
-paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle --force
+paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
 ```
+
+Choose a new or empty output directory. Bundle export refuses non-empty directories so stale files cannot be mistaken for current backup contents.
 
 The bundle includes:
 

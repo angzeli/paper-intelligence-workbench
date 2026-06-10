@@ -68,10 +68,20 @@ Backup bundles do not include PDFs by default.
 ## Data Safety Assessment
 
 - Imports do not overwrite non-empty registry fields.
+- Import commands preflight the import report path before writing the registry, so report-path collisions fail without registry mutation.
 - Duplicate DOI, title, or BibTeX-key matches are skipped by default.
 - Dry-run mode is available for every importer.
 - Backup bundles omit PDFs unless `--include-pdfs` is explicitly provided.
+- Bundle and Obsidian directory exports refuse non-empty output directories instead of merging stale files into current exports.
 - Import mappings are explicit JSON files for generic CSV.
+
+## Post-review Hardening
+
+- Fixed import report collision behavior so failed report writes do not partially apply registry changes.
+- Fixed bundle and Obsidian export semantics to preserve non-empty output directories.
+- Fixed report-index links to resolve from the generated index location without hardcoded absolute paths.
+- Fixed inventory reports to use registry validation context when root paths and parsed claims are available.
+- Added BibTeX import source-type mappings for common conference and thesis entry types.
 
 ## Known Limitations
 

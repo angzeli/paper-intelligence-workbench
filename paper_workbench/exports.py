@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+import os
 from pathlib import Path
 import re
 import shutil
@@ -206,8 +207,8 @@ def _safe_name(value: str) -> str:
 
 def _ensure_export_dir(path: str | Path, *, force: bool) -> Path:
     target = Path(path)
-    if target.exists() and any(target.iterdir()) and not force:
-        raise FileExistsError(f"{target} already exists and is not empty")
+    if target.exists() and any(target.iterdir()):
+        raise FileExistsError(f"{target} already exists and is not empty; choose an empty output directory")
     target.mkdir(parents=True, exist_ok=True)
     return target
 
@@ -453,14 +454,23 @@ def export_project_summary(papers: list[Paper], claims: list[Claim], themes: lis
     return write_text(out, project_summary_markdown(papers, claims, themes), force=force)
 
 
-def report_index_markdown(reports_dir: str | Path) -> str:
+def _display_path(path: Path, *, base: Path | None = None) -> str:
+    start = base if base is not None else Path.cwd()
+    try:
+        return Path(os.path.relpath(path, start=start)).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | None = None) -> str:
     root = Path(reports_dir)
     reports = sorted(path for path in root.glob("*.md") if path.is_file())
-    lines = ["# Report Index", "", f"Reports directory: {root}", "", f"Markdown reports: {len(reports)}", ""]
+    link_base = Path(output_path).parent if output_path is not None else root
+    lines = ["# Report Index", "", f"Reports directory: {_display_path(root, base=link_base)}", "", f"Markdown reports: {len(reports)}", ""]
     for report in reports:
-        lines.append(f"- [{report.name}]({report.name})")
+        lines.append(f"- [{report.name}]({_display_path(report, base=link_base)})")
     return "\n".join(lines).rstrip() + "\n"
 
 
 def export_report_index(reports_dir: str | Path, out: str | Path, *, force: bool = True) -> Path:
-    return write_text(out, report_index_markdown(reports_dir), force=force)
+    return write_text(out, report_index_markdown(reports_dir, output_path=out), force=force)

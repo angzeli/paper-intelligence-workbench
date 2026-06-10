@@ -3,8 +3,10 @@
 The Obsidian export writes normal Markdown files. It does not require Obsidian and does not create a web app.
 
 ```bash
-paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis --force
+paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
 ```
+
+Choose a new or empty output directory. The export refuses non-empty directories so old Markdown pages are not mixed with current output.
 
 The export creates:
 

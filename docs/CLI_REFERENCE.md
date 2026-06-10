@@ -26,7 +26,7 @@ paperwb import bibtex data/examples/library_import.bib --dry-run
 paperwb import ris data/examples/library.ris --dry-run
 ```
 
-Import commands preserve existing registry rows. `--fill-missing` fills only blank fields on matched rows. Import reports are written to the selected reports directory unless `--report` is provided.
+Import commands preserve existing registry rows. `--fill-missing` fills only blank fields on matched rows. Import reports are written to the selected reports directory unless `--report` is provided. If the report path already exists and `--force` is not provided, the command fails before writing the registry.
 
 Report types:
 
@@ -67,6 +67,6 @@ paperwb export project-summary --project zis_photocatalysis --out reports/projec
 paperwb export report-index --project zis_photocatalysis --out reports/index.md
 ```
 
-Export commands refuse to overwrite an existing output file unless `--force` is provided.
+Export commands refuse to overwrite an existing output file unless `--force` is provided. Directory exports such as `obsidian` and `bundle` require a new or empty output directory; they do not merge into or clean non-empty directories.
 
 Most workflow commands accept `--project NAME` to use profile paths. When `--project` is used, registry, notes, BibTeX, themes, and reports path flags are rejected to avoid silently ignoring user input. Use `--out` for an explicit single report or export destination.
