@@ -199,7 +199,7 @@ def citation_audit(
             )
     for paper in papers:
         mapped_themes = {tag_theme_map[tag].theme_id for tag in parse_tags(paper.tags) if tag in tag_theme_map}
-        for theme_id in mapped_themes:
+        for theme_id in sorted(mapped_themes):
             has_theme_claim = any(
                 normalize_tag(claim.supports_theme) == theme_id
                 or theme_id in {tag_theme_map[tag].theme_id for tag in parse_tags(claim.tags) if tag in tag_theme_map}

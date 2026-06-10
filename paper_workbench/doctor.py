@@ -185,7 +185,7 @@ def workspace_health(
                     "Add a matching theme tag or revise the claim tags.",
                 )
             )
-    for paper_id in registry_ids - claim_paper_ids:
+    for paper_id in sorted(registry_ids - claim_paper_ids):
         matching = [paper for paper in papers if paper.paper_id == paper_id]
         if matching and matching[0].reading_status in {"read", "deeply_read"}:
             findings.append(
