@@ -18,3 +18,8 @@ Instructions for future agents working in this repository:
 - Keep parsing conservative and transparent; warnings are better than guessed fixes.
 - Preserve project-profile files under `projects/` unless explicitly asked to migrate or remove them.
 - Do not run destructive workspace migrations. Generate migration reports instead.
+- Keep synthetic stress data clearly labelled as synthetic.
+- Do not replace synthetic fixtures with real paper metadata or real claims.
+- Update golden report tests only when report behavior intentionally changes.
+- Avoid brittle tests that depend on timestamps, absolute paths, local machines, or unordered sets.
+- Run stress-focused tests before a release when stress fixtures or report generation change.

@@ -4,6 +4,8 @@
 
 The MVP is designed for projects with roughly 10 to 100 papers where a student or researcher wants to know which papers are read, which claims are supported, which citations are incomplete, and which literature-review themes still need stronger evidence.
 
+v0.3 adds deterministic synthetic stress projects, report-regression snapshots, parser edge fixtures, CLI stress tests, and performance sanity reporting to make the repository easier to evaluate before using it on a real 100-paper review.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -16,6 +18,7 @@ The MVP is designed for projects with roughly 10 to 100 papers where a student o
 - Manages multiple project profiles under `projects/`.
 - Runs workspace health diagnostics with `paperwb doctor`.
 - Exports claims, registries, reading lists, and theme-specific claim data.
+- Generates clearly synthetic stress corpora for local regression testing.
 
 ## What It Does Not Do
 
@@ -103,6 +106,23 @@ paperwb export claims-json --project zis_photocatalysis --out data/processed/zis
 
 The legacy `data/` workflow remains supported.
 
+## v0.3 Stress Workflow
+
+Generate a deterministic synthetic stress project:
+
+```bash
+paperwb synthetic generate --project stress_demo --papers 100 --claims 220 --themes 6 --domain zis
+```
+
+Run the checked-in stress tests and performance sanity report:
+
+```bash
+python -m pytest tests/test_synthetic_stress.py tests/test_cli_stress.py tests/test_golden_reports.py
+python scripts/performance_sanity.py --force
+```
+
+The checked-in stress projects under `projects/stress_*` are synthetic fixtures only. They intentionally include duplicate metadata, weak claims, missing evidence locations, orphan notes, and unlinked BibTeX entries so validation and reports can be regression-tested.
+
 ## Data Folder Convention
 
 ```text
@@ -179,6 +199,7 @@ paperwb report section-outline --theme photocorrosion
 paperwb doctor
 paperwb export claims --out data/processed/claims.csv
 paperwb project list
+paperwb synthetic generate --project stress_demo --papers 100 --claims 220
 paperwb checklist --theme photocorrosion
 ```
 
@@ -201,6 +222,11 @@ paperwb checklist --theme photocorrosion
 - [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
 - [docs/EVIDENCE_MAPS.md](docs/EVIDENCE_MAPS.md)
 - [docs/WORKFLOW_EXAMPLES.md](docs/WORKFLOW_EXAMPLES.md)
+- [docs/SYNTHETIC_CORPUS.md](docs/SYNTHETIC_CORPUS.md)
+- [docs/STRESS_TESTING.md](docs/STRESS_TESTING.md)
+- [docs/GOLDEN_REPORTS.md](docs/GOLDEN_REPORTS.md)
+- [docs/REPORT_REGRESSION_TESTING.md](docs/REPORT_REGRESSION_TESTING.md)
+- [docs/CLI_STRESS_WORKFLOWS.md](docs/CLI_STRESS_WORKFLOWS.md)
 
 ## Roadmap
 

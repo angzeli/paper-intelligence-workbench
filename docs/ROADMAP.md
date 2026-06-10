@@ -2,8 +2,18 @@
 
 The MVP is intentionally CLI-first, dependency-light, and local-only.
 
-## Near-Term Patches for v0.3
+## v0.3 Completed
 
+- Deterministic synthetic corpus generation.
+- Checked-in multi-project stress workspace fixtures.
+- Parser edge-case fixtures for structured notes and BibTeX.
+- Golden report snapshots for stress reports.
+- CLI stress tests and performance sanity reporting.
+
+## Near-Term Patches for v0.4
+
+- Add report diff tooling that explains golden snapshot changes.
+- Add optional fixture-size profiles such as small, medium, and large.
 - Add more robust BibTeX string and macro handling.
 - Add optional HTML export for Markdown reports.
 - Add safer citation-key suggestions such as `FirstAuthorYearShortTitle`.
