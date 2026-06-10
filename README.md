@@ -1,12 +1,14 @@
 # paper-intelligence-workbench
 
-`paper-intelligence-workbench` is a local-first CLI tool for small academic literature-review projects. It manages paper metadata, structured Markdown notes, user-recorded claims, evidence links, BibTeX validation, project profiles, theme coverage, and citation-audit reports without cloud services, publisher scraping, databases, or LLM APIs.
+`paper-intelligence-workbench` is a local-first CLI tool for small academic literature-review projects. It manages paper metadata, structured Markdown notes, user-recorded claims, evidence links, BibTeX validation, project profiles, theme coverage, citation-audit reports, and an optional SQLite search cache without cloud services, publisher scraping, or LLM APIs.
 
 The MVP is designed for projects with roughly 10 to 100 papers where a student or researcher wants to know which papers are read, which claims are supported, which citations are incomplete, and which literature-review themes still need stronger evidence.
 
 v0.3 adds deterministic synthetic stress projects, report-regression snapshots, parser edge fixtures, CLI stress tests, and performance sanity reporting to make the repository easier to evaluate before using it on a real 100-paper review.
 
 v0.4 adds local import/export interoperability for Zotero-style CSV, generic CSV mappings, BibTeX, RIS, Obsidian-friendly Markdown vaults, backup bundles, richer reading lists, project summaries, and report indexes.
+
+v0.5 adds an optional local SQLite search index, FTS5-backed search when available, fallback substring search, index diagnostics, and synthetic full-text sidecar fixtures.
 
 ## What It Does
 
@@ -16,6 +18,8 @@ v0.4 adds local import/export interoperability for Zotero-style CSV, generic CSV
 - Validates registry records and BibTeX entries.
 - Maps tags to review themes.
 - Searches registry rows, note bodies, and claims.
+- Builds a local project-aware SQLite index for larger workspaces.
+- Indexes optional user-provided plain-text sidecars without parsing PDFs.
 - Generates Markdown reports for inventory, reading status, BibTeX audit, evidence maps, citation audits, missing notes, and weak claims.
 - Manages multiple project profiles under `projects/`.
 - Runs workspace health diagnostics with `paperwb doctor`.
@@ -104,6 +108,8 @@ paperwb project list
 paperwb project init demo_review
 paperwb project validate zis_photocatalysis
 paperwb search photocorrosion --project zis_photocatalysis
+paperwb index rebuild --project zis_photocatalysis --include-text
+paperwb search photocorrosion --project zis_photocatalysis --indexed
 paperwb report evidence-map --project zis_photocatalysis --force
 paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json --force
 ```
@@ -141,12 +147,31 @@ paperwb import ris data/examples/library.ris --dry-run --force
 Export local writing and backup artifacts:
 
 ```bash
-paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis --force
-paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle --force
+paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
+paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
 paperwb export reading-list --theme photocorrosion --project zis_photocatalysis --out reports/reading_list_photocorrosion.md --force
 ```
 
 Imports preserve existing registry rows. `--fill-missing` fills only blank fields on matched records; it does not overwrite non-empty user fields.
+
+## v0.5 Indexed Search Workflow
+
+Build a rebuildable local index:
+
+```bash
+paperwb index rebuild --project zis_photocatalysis --include-text
+paperwb index status --project zis_photocatalysis --include-text --check-files
+```
+
+Search indexed registry, BibTeX, note, claim, theme, tag, and sidecar records:
+
+```bash
+paperwb search "charge separation" --project zis_photocatalysis --indexed
+paperwb search photocorrosion --project zis_photocatalysis --indexed --text
+paperwb search "charge separation" --project zis_photocatalysis --indexed --out reports/search_charge_separation.md --force
+```
+
+The index is a local cache under `.paperwb/` and is ignored by git. Full-text sidecars are plain `.txt` files supplied by the user, such as `projects/zis_photocatalysis/text/PAPER_ID.txt`; the tool does not parse PDFs by default.
 
 ## Data Folder Convention
 
@@ -161,6 +186,7 @@ reports/        # generated Markdown reports
 notebooks/      # lightweight workflow notebooks
 docs/           # workflow documentation
 projects/       # optional independent review profiles
+.paperwb/       # local ignored SQLite cache when indexed search is used
 ```
 
 ## Registry Schema
@@ -213,6 +239,10 @@ paperwb list --status unread
 paperwb note-template PAPER_ID
 paperwb claims data/notes/
 paperwb search QUERY
+paperwb search QUERY --indexed
+paperwb index rebuild --project zis_photocatalysis --include-text
+paperwb index status --project zis_photocatalysis --check-files
+paperwb index clear --project zis_photocatalysis
 paperwb search QUERY --claims
 paperwb search QUERY --notes
 paperwb report inventory
@@ -234,9 +264,9 @@ paperwb checklist --theme photocorrosion
 
 - BibTeX parsing targets common local entries, not every BibTeX edge case.
 - Markdown note parsing expects the provided template headings.
-- Search is substring-based only.
+- Default search is substring-based; indexed search is opt-in and uses local SQLite with FTS5 fallback behavior.
 - Theme mapping is tag-based only.
-- No SQLite backend is included in v0.2.
+- SQLite indexing is a rebuildable cache, not an authoritative database.
 - Citation audit checks completeness of user notes, not scientific correctness.
 
 ## More Documentation
@@ -255,6 +285,11 @@ paperwb checklist --theme photocorrosion
 - [docs/OBSIDIAN_EXPORT.md](docs/OBSIDIAN_EXPORT.md)
 - [docs/BACKUP_BUNDLES.md](docs/BACKUP_BUNDLES.md)
 - [docs/ROUND_TRIP_TESTING.md](docs/ROUND_TRIP_TESTING.md)
+- [docs/LOCAL_SEARCH.md](docs/LOCAL_SEARCH.md)
+- [docs/SQLITE_INDEX.md](docs/SQLITE_INDEX.md)
+- [docs/FULL_TEXT_SIDECARS.md](docs/FULL_TEXT_SIDECARS.md)
+- [docs/SEARCH_RANKING.md](docs/SEARCH_RANKING.md)
+- [docs/INDEX_MAINTENANCE.md](docs/INDEX_MAINTENANCE.md)
 - [docs/SYNTHETIC_CORPUS.md](docs/SYNTHETIC_CORPUS.md)
 - [docs/STRESS_TESTING.md](docs/STRESS_TESTING.md)
 - [docs/GOLDEN_REPORTS.md](docs/GOLDEN_REPORTS.md)

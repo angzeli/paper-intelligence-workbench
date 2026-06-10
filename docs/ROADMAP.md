@@ -19,7 +19,16 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Richer reading-list filters and CSV output.
 - Round-trip import/export tests.
 
-## Near-Term Patches for v0.5
+## v0.5 Completed
+
+- Optional local SQLite search index.
+- FTS5-backed retrieval when available, with table-scan fallback.
+- Project-aware indexed search.
+- Registry, BibTeX, note, claim, theme, tag, and sidecar indexing.
+- Stale-index diagnostics using content hashes.
+- Synthetic full-text sidecar fixtures.
+
+## Near-Term Patches for v0.6
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -45,11 +54,11 @@ Each profile keeps separate registries, notes, themes, BibTeX files, and reports
 
 ## Storage
 
-CSV, JSON, Markdown, and BibTeX are enough for v1. A lightweight SQLite backend could be useful later for larger projects, but should remain optional and locally reproducible.
+CSV, JSON, Markdown, and BibTeX remain the authoritative source files. The v0.5 SQLite index is a rebuildable cache for larger-project search, not an authoritative database.
 
 ## Search
 
-Search is substring-based in v1. Future local-only improvements could include fielded search, trigram matching, or SQLite FTS. Embeddings and remote semantic APIs are out of scope for this project boundary.
+Default search remains substring-based. Indexed search is opt-in and local-only. Future local-only improvements could include richer field filters, better snippet highlighting, and report diff search. Embeddings and remote semantic APIs are out of scope for this project boundary.
 
 ## Review Workflows
 

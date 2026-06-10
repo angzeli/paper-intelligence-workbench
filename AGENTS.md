@@ -27,3 +27,8 @@ Instructions for future agents working in this repository:
 - Prefer `--dry-run` for risky imports and keep import mappings transparent.
 - Do not include PDFs in backup bundles by default.
 - Add or update tests for every importer, exporter, and mapping rule.
+- Do not commit `.paperwb/` cache databases or generated SQLite index files.
+- Do not add copyrighted text sidecars; sidecars in examples must be clearly synthetic.
+- Keep search ranking transparent and explain any ranking changes in docs.
+- Preserve old substring search behavior when adding indexed search features.
+- Test both indexed and non-indexed search paths before release.

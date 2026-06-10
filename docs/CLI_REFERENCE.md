@@ -14,6 +14,9 @@ paperwb list --tag photocorrosion
 paperwb note-template PAPER_ID
 paperwb claims data/notes --output reports/claims.csv
 paperwb search "charge separation" --claims
+paperwb index rebuild --project zis_photocatalysis --include-text
+paperwb index status --project zis_photocatalysis --check-files
+paperwb search "charge separation" --project zis_photocatalysis --indexed
 paperwb doctor --out reports/workspace_health.md
 ```
 
@@ -68,5 +71,18 @@ paperwb export report-index --project zis_photocatalysis --out reports/index.md
 ```
 
 Export commands refuse to overwrite an existing output file unless `--force` is provided. Directory exports such as `obsidian` and `bundle` require a new or empty output directory; they do not merge into or clean non-empty directories.
+
+Indexed search:
+
+```bash
+paperwb index rebuild --project zis_photocatalysis --include-text
+paperwb index status --project zis_photocatalysis --include-text --check-files --out reports/index_status.md --force
+paperwb index clear --project zis_photocatalysis
+paperwb search photocorrosion --project zis_photocatalysis --indexed
+paperwb search photocorrosion --project zis_photocatalysis --indexed --text
+paperwb search "charge separation" --project zis_photocatalysis --indexed --out reports/search_charge_separation.md --force
+```
+
+The original substring search remains the default unless `--indexed` is provided. Cache databases live under `.paperwb/` and should not be committed.
 
 Most workflow commands accept `--project NAME` to use profile paths. When `--project` is used, registry, notes, BibTeX, themes, and reports path flags are rejected to avoid silently ignoring user input. Use `--out` for an explicit single report or export destination.
