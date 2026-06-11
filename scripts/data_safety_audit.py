@@ -16,7 +16,7 @@ from paper_workbench.safety import audit_data_safety, safety_audit_markdown
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Audit tracked repository files for local-first data-safety risks.")
     parser.add_argument("--root", default=".", help="Repository root. Defaults to the current directory.")
-    parser.add_argument("--out", default="reports/data_safety_audit_v0_8.md", help="Optional Markdown report path.")
+    parser.add_argument("--out", default="reports/data_safety_audit_v0_10.md", help="Optional Markdown report path.")
     parser.add_argument("--max-file-bytes", type=int, default=1_000_000, help="Warn on tracked files larger than this size.")
     parser.add_argument("--strict", action="store_true", help="Return non-zero when error-severity findings exist.")
     args = parser.parse_args(argv)

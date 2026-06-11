@@ -187,10 +187,18 @@ def test_cli_failure_paths_do_not_traceback(tmp_path):
 
     missing_project = run_cli("project", "validate", "does_not_exist")
     assert missing_project.returncode == 2
-    assert "project profile not found" in missing_project.stderr
+    assert "Project profile not found" in missing_project.stderr
+    assert "Next step:" in missing_project.stderr
     assert "Traceback" not in missing_project.stderr
 
     restore = run_cli("backup", "restore", "missing_backup", "--dry-run")
     assert restore.returncode == 2
-    assert "backup not found" in restore.stderr
+    assert "Backup not found" in restore.stderr
+    assert "Next step:" in restore.stderr
     assert "Traceback" not in restore.stderr
+
+    indexed = run_cli("search", "synthetic", "--indexed", "--index", str(tmp_path / "missing.sqlite"))
+    assert indexed.returncode == 2
+    assert "Search index not found" in indexed.stderr
+    assert "Next step:" in indexed.stderr
+    assert "Traceback" not in indexed.stderr

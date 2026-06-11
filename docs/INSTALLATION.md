@@ -36,7 +36,7 @@ paperwb --help
 python -m pytest -q
 ```
 
-Expected package version for this release stage: `0.8.0`.
+The printed package version should match the `version` value in `pyproject.toml`.
 
 ## Local-Only Boundary
 

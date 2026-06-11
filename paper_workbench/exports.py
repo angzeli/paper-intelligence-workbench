@@ -36,8 +36,8 @@ def export_registry_json(papers: list[Paper], out: str | Path, force: bool = Tru
     return save_registry_json(papers, out) if force else _write_registry_json_no_overwrite(papers, out)
 
 
-def export_claims_csv(claims: list[Claim], out: str | Path, force: bool = True) -> Path:
-    return save_claims_csv(claims, out, force=force)
+def export_claims_csv(claims: list[Claim], out: str | Path, force: bool = True, *, root: str | Path | None = None) -> Path:
+    return save_claims_csv(claims, out, force=force, root=root)
 
 
 def export_claims_json(claims: list[Claim], out: str | Path, force: bool = True) -> Path:

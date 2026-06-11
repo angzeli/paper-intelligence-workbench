@@ -156,6 +156,71 @@ def test_backup_create_list_plan_and_restore_force(tmp_path):
     assert paths["registry"].read_text(encoding="utf-8") == original
 
 
+def test_cli_restore_report_collision_preflights_before_mutating_workspace(tmp_path):
+    paths = make_legacy_workspace(tmp_path)
+    manifest, _backup_path = create_backup(
+        root=tmp_path,
+        registry_path=paths["registry"],
+        bibtex_path=paths["bibtex"],
+        notes_dir=paths["notes"],
+        themes_path=paths["themes"],
+        reports_dir=paths["reports"],
+        backups_dir=tmp_path / "backups",
+    )
+    broken_registry = "broken\n"
+    paths["registry"].write_text(broken_registry, encoding="utf-8")
+    restore_report = tmp_path / "restore.md"
+    restore_report.write_text("keep report\n", encoding="utf-8")
+
+    restore = run_cli(
+        "backup",
+        "restore",
+        manifest.backup_id,
+        "--backups-dir",
+        str(tmp_path / "backups"),
+        "--registry",
+        str(paths["registry"]),
+        "--bibtex",
+        str(paths["bibtex"]),
+        "--notes-dir",
+        str(paths["notes"]),
+        "--themes",
+        str(paths["themes"]),
+        "--reports-dir",
+        str(paths["reports"]),
+        "--force",
+        "--out",
+        str(restore_report),
+    )
+
+    assert restore.returncode == 2
+    assert paths["registry"].read_text(encoding="utf-8") == broken_registry
+    assert restore_report.read_text(encoding="utf-8") == "keep report\n"
+    assert [item.name for item in (tmp_path / "backups").iterdir() if item.is_dir()] == [manifest.backup_id]
+
+
+def test_restore_validates_backup_before_creating_pre_restore_backup(tmp_path):
+    paths = make_legacy_workspace(tmp_path)
+    backup = tmp_path / "backups" / "broken"
+    backup.mkdir(parents=True)
+    (backup / "manifest.json").write_text("{bad json\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Backup manifest is not valid JSON"):
+        restore_backup(
+            root=tmp_path,
+            backup_id="broken",
+            registry_path=paths["registry"],
+            bibtex_path=paths["bibtex"],
+            notes_dir=paths["notes"],
+            themes_path=paths["themes"],
+            reports_dir=paths["reports"],
+            backups_dir=tmp_path / "backups",
+            force=True,
+        )
+
+    assert [item.name for item in (tmp_path / "backups").iterdir() if item.is_dir()] == ["broken"]
+
+
 def test_migration_plan_and_force_copy_are_non_destructive(tmp_path):
     paths = make_legacy_workspace(tmp_path)
     plan = plan_legacy_migration(root=tmp_path, to_project="migrated_review")
@@ -174,6 +239,28 @@ def test_migration_plan_and_force_copy_are_non_destructive(tmp_path):
     assert paths["registry"].exists()
     conflict_plan = plan_legacy_migration(root=tmp_path, to_project="migrated_review")
     assert conflict_plan.conflicts
+
+
+def test_cli_migration_report_collision_preflights_before_copying(tmp_path):
+    make_legacy_workspace(tmp_path)
+    migration_report = tmp_path / "migration.md"
+    migration_report.write_text("keep report\n", encoding="utf-8")
+
+    migration = run_cli(
+        "migrate",
+        "run",
+        "--root",
+        str(tmp_path),
+        "--to-project",
+        "blocked_migration",
+        "--force",
+        "--out",
+        str(migration_report),
+    )
+
+    assert migration.returncode == 2
+    assert migration_report.read_text(encoding="utf-8") == "keep report\n"
+    assert not (tmp_path / "projects" / "blocked_migration").exists()
 
 
 def test_cli_integrity_backup_migration_and_audit_log_smoke(tmp_path):

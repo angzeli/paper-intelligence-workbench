@@ -6,7 +6,7 @@ from paper_workbench.claims import collect_claims, save_claims_csv
 from paper_workbench.notes import parse_note_file, write_note_template
 from paper_workbench.registry import load_registry
 
-from conftest import EXAMPLE_NOTES, EXAMPLE_REGISTRY
+from conftest import EXAMPLE_NOTES, EXAMPLE_REGISTRY, ROOT
 
 
 def test_note_parser_extracts_metadata_and_claim():
@@ -37,4 +37,7 @@ def test_claim_extraction_and_csv_output(tmp_path):
     assert len(claims) == 3
     target = tmp_path / "claims.csv"
     save_claims_csv(claims, target)
-    assert "claim_id" in target.read_text(encoding="utf-8")
+    content = target.read_text(encoding="utf-8")
+    assert "claim_id" in content
+    assert "data/notes/example_note_1.md" in content
+    assert str(ROOT) not in content

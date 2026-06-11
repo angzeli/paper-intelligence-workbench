@@ -51,6 +51,13 @@ def test_release_docs_site_and_matrices_exist():
         assert path.read_text(encoding="utf-8").startswith("#")
 
 
+def test_installation_docs_do_not_pin_stale_release_version():
+    content = (ROOT / "docs" / "INSTALLATION.md").read_text(encoding="utf-8")
+
+    assert "0.8.0" not in content
+    assert "pyproject.toml" in content
+
+
 def test_check_notebooks_script_reports_titles():
     result = run_script("scripts/check_notebooks.py")
 
@@ -76,7 +83,7 @@ def test_data_safety_audit_script_generates_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "Data Safety Audit v0.8" in content
+    assert "Data Safety Audit v0.10" in content
     assert "Errors: 0" in content
 
 
@@ -86,7 +93,7 @@ def test_data_safety_audit_module_flags_forbidden_artifacts_without_failing_on_w
 
     assert result.files_checked > 0
     assert not result.errors
-    assert "Data Safety Audit v0.8" in markdown
+    assert "Data Safety Audit v0.10" in markdown
 
 
 def test_ci_runs_v0_8_release_checks():

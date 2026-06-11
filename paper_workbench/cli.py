@@ -79,6 +79,7 @@ from .index import (
     search_results_markdown as indexed_results_markdown,
     source_counts,
 )
+from .errors import format_error_message
 from .init import init_workspace
 from .integrity import check_workspace_integrity, workspace_integrity_report
 from .io import write_text
@@ -116,7 +117,14 @@ def _load_registry(path: str | Path, *, create_if_missing: bool = False) -> list
     target = _path(path)
     if not target.exists():
         if not create_if_missing:
-            raise FileNotFoundError(f"Registry not found: {target}")
+            raise FileNotFoundError(
+                format_error_message(
+                    what="Registry not found.",
+                    where=str(target),
+                    why="This command needs a registry CSV before it can load papers or generate reports.",
+                    next_step="Run `paperwb init`, pass --registry with an existing CSV, or use --project for a configured project.",
+                )
+            )
         create_empty_registry(target)
     return load_registry(target)
 
@@ -389,7 +397,7 @@ def cmd_claims(args: argparse.Namespace) -> int:
     notes_path = Path(args.notes_path) if args.notes_path else paths["notes_dir"]
     claims = collect_claims(notes_path)
     if args.output:
-        save_claims_csv(claims, args.output)
+        save_claims_csv(claims, args.output, root=paths["root"])
         _record_audit_event(paths, command="claims", action="export_claims_csv", affected_paths=[args.output], summary=f"Exported {len(claims)} claims")
         print(f"Wrote {len(claims)} claims to {args.output}")
     else:
@@ -419,7 +427,14 @@ def cmd_search(args: argparse.Namespace) -> int:
                 limit=args.limit,
             )
         except FileNotFoundError as exc:
-            raise FileNotFoundError(f"{exc}. Run `{_index_rebuild_hint(args)}` before using indexed search.") from exc
+            raise FileNotFoundError(
+                format_error_message(
+                    what="Search index not found.",
+                    where=str(_index_path_from_args(args, paths)),
+                    why="Indexed search reads a local SQLite cache that has not been built yet.",
+                    next_step=f"Run `{_index_rebuild_hint(args)}` before using indexed search.",
+                )
+            ) from exc
         markdown = indexed_results_markdown(results, args.query, base_path=paths["root"])
         if args.out:
             path = write_text(args.out, markdown, force=args.force)
@@ -841,7 +856,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     elif args.export_type == "registry-json":
         path = export_registry_json(papers, args.out, force=args.force)
     elif args.export_type == "claims":
-        path = export_claims_csv(claims, args.out, force=args.force)
+        path = export_claims_csv(claims, args.out, force=args.force, root=paths["root"])
     elif args.export_type == "claims-json":
         path = export_claims_json(claims, args.out, force=args.force)
     elif args.export_type == "reading-list":
@@ -1188,6 +1203,8 @@ def cmd_backup_plan_restore(args: argparse.Namespace) -> int:
 def cmd_backup_restore(args: argparse.Namespace) -> int:
     paths = _backup_paths(args)
     dry_run = args.dry_run or not args.force
+    if args.out:
+        _preflight_output_paths([args.out], force=args.force_report)
     if dry_run:
         plan = plan_restore(
             root=paths["root"],
@@ -1247,6 +1264,8 @@ def cmd_migrate_run(args: argparse.Namespace) -> int:
     if args.from_workflow != "legacy":
         raise ValueError("only --from legacy is supported")
     dry_run = args.dry_run or not args.force
+    if args.out:
+        _preflight_output_paths([args.out], force=args.force_report)
     plan, backup = run_legacy_migration(root=args.root, to_project=args.to_project, dry_run=dry_run, force=args.force)
     content = migration_plan_report(plan)
     if args.out:

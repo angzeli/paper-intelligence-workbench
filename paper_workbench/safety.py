@@ -114,7 +114,7 @@ def audit_data_safety(root: str | Path = ".", *, max_file_bytes: int = 1_000_000
 def safety_audit_markdown(result: SafetyAuditResult, *, max_findings_per_code: int = 20) -> str:
     counts = Counter(finding.code for finding in result.findings)
     lines = [
-        "# Data Safety Audit v0.8",
+        "# Data Safety Audit v0.10",
         "",
         "This audit checks tracked and unignored repository files. It does not inspect ignored user caches, local PDFs, or ignored private files.",
         "",

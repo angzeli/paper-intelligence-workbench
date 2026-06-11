@@ -176,14 +176,28 @@ def create_empty_registry(path: str | Path) -> Path:
 def load_registry(path: str | Path) -> list[Paper]:
     target = Path(path)
     if not target.exists():
-        raise FileNotFoundError(target)
+        raise FileNotFoundError(
+            format_error_message(
+                what="Registry CSV not found.",
+                where=str(target),
+                why="The registry loader cannot validate or report papers without a CSV file.",
+                next_step="Run `paperwb init`, pass an existing --registry path, or use --project for a configured project.",
+            )
+        )
     return [paper_from_row(row) for row in read_csv_rows(target)]
 
 
 def validate_registry_headers(path: str | Path) -> list[ValidationFinding]:
     target = Path(path)
     if not target.exists():
-        raise FileNotFoundError(target)
+        raise FileNotFoundError(
+            format_error_message(
+                what="Registry CSV not found.",
+                where=str(target),
+                why="Header validation needs an existing CSV file.",
+                next_step="Run `paperwb init`, pass an existing registry path, or create a CSV with the documented headers.",
+            )
+        )
     first_line = target.read_text(encoding="utf-8").splitlines()
     if not first_line:
         return [

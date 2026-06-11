@@ -203,7 +203,14 @@ def find_backup(root: str | Path, backup_id: str, *, backups_dir: str | Path | N
     base = Path(backups_dir) if backups_dir else default_backups_dir(root)
     target = base / backup_id
     if not (target / "manifest.json").exists():
-        raise FileNotFoundError(f"backup not found: {backup_id}")
+        raise FileNotFoundError(
+            format_error_message(
+                what="Backup not found.",
+                where=str(target),
+                why="Restore and inspection commands need a local backup manifest before they can proceed.",
+                next_step="Run `paperwb backup list` with the same --project/--backups-dir options, or create a backup first.",
+            )
+        )
     return target
 
 
@@ -219,7 +226,14 @@ def plan_restore(
     backup_path = find_backup(root_path, backup_id, backups_dir=backups_dir)
     manifest = load_backup_manifest(backup_path)
     if project and manifest.project and project != manifest.project:
-        raise ValueError(f"backup {backup_id} is for project {manifest.project}, not {project}")
+        raise ValueError(
+            format_error_message(
+                what="Backup project does not match the requested project.",
+                where=str(backup_path),
+                why=f"Backup {backup_id} belongs to {manifest.project}, but the command requested {project}.",
+                next_step="Use the matching --project value, omit --project for a default-workflow backup, or choose a different backup ID.",
+            )
+        )
     missing: list[str] = []
     overwrites: list[str] = []
     files: list[BackupFile] = []
@@ -260,6 +274,16 @@ def restore_backup(
     if not force:
         return plan_restore(root=root, backup_id=backup_id, backups_dir=backups_dir, project=profile.name if profile else "", dry_run=True)
     root_path = Path(root).resolve(strict=False)
+    plan = plan_restore(root=root_path, backup_id=backup_id, backups_dir=backups_dir, project=profile.name if profile else "", dry_run=False)
+    if plan.missing_backup_files:
+        raise FileNotFoundError(
+            format_error_message(
+                what="Backup is missing files listed in its manifest.",
+                where=str(find_backup(root_path, backup_id, backups_dir=backups_dir)),
+                why="Restore is blocked because applying an incomplete backup could leave the workspace partially restored.",
+                next_step=f"Inspect or recreate the backup. Missing files: {', '.join(plan.missing_backup_files)}.",
+            )
+        )
     pre_restore_backup_id = ""
     if create_pre_restore_backup:
         manifest, _ = create_backup(
@@ -274,10 +298,7 @@ def restore_backup(
             notes=f"Pre-restore backup before restoring {backup_id}",
         )
         pre_restore_backup_id = manifest.backup_id
-    plan = plan_restore(root=root_path, backup_id=backup_id, backups_dir=backups_dir, project=profile.name if profile else "", dry_run=False)
     backup_path = find_backup(root_path, backup_id, backups_dir=backups_dir)
-    if plan.missing_backup_files:
-        raise FileNotFoundError(f"backup is missing files: {', '.join(plan.missing_backup_files)}")
     for item in plan.files_to_restore:
         source = backup_path / item.backup_path
         target = root_path / item.source_path

@@ -9,6 +9,7 @@ from .io import load_json, write_json
 from .paths import default_projects_dir, project_root
 from .registry import create_empty_registry
 from .schema import ProjectProfile
+from .errors import format_error_message
 
 
 PROJECT_CONFIG = "project.json"
@@ -94,7 +95,14 @@ def load_project_profile(name: str, root: str | Path = ".") -> ProjectProfile:
     if not config_path.exists():
         if project_path.exists():
             return _profile_from_root(project_path)
-        raise FileNotFoundError(f"project profile not found: {name}")
+        raise FileNotFoundError(
+            format_error_message(
+                what="Project profile not found.",
+                where=str(project_path),
+                why="The command was asked to use a project profile, but no matching project folder or project.json exists.",
+                next_step="Run `paperwb project list` to see available profiles, or create one with `paperwb project init NAME`.",
+            )
+        )
     return _profile_from_root(project_path, load_json(config_path))
 
 

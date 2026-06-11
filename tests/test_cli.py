@@ -33,6 +33,15 @@ def test_cli_claims_output(tmp_path):
     assert "Wrote 3 claims" in result.stdout
 
 
+def test_cli_project_claims_output_uses_portable_note_paths(tmp_path):
+    target = tmp_path / "project_claims.csv"
+    result = run_cli("claims", "--project", "zis_photocatalysis", "--output", str(target))
+    assert result.returncode == 0, result.stderr
+    content = target.read_text(encoding="utf-8")
+    assert "notes/zis_charge_2025.md" in content
+    assert str(ROOT) not in content
+
+
 def test_cli_report_smoke(tmp_path):
     result = run_cli(
         "report",
@@ -119,6 +128,7 @@ def test_cli_missing_inputs_return_user_facing_errors(tmp_path):
     result = run_cli("validate-registry", str(missing_registry))
     assert result.returncode == 2
     assert "error:" in result.stderr
+    assert "Next step:" in result.stderr
     assert "Traceback" not in result.stderr
 
     bad_status = run_cli("add-paper", "--registry", str(tmp_path / "papers.csv"), "--title", "Synthetic", "--status", "invalid_status")
@@ -222,6 +232,15 @@ def test_theme_claims_export_uses_portable_note_paths(tmp_path):
     assert data
     assert "projects/zis_photocatalysis/notes" in data[0]["note_file"]
     assert str(ROOT) not in data[0]["note_file"]
+
+
+def test_claims_csv_export_uses_portable_note_paths(tmp_path):
+    out = tmp_path / "claims.csv"
+    result = run_cli("export", "claims", "--project", "zis_photocatalysis", "--out", str(out))
+    assert result.returncode == 0, result.stderr
+    content = out.read_text(encoding="utf-8")
+    assert "notes/zis_charge_2025.md" in content
+    assert str(ROOT) not in content
 
 
 def test_root_evidence_map_report_matches_current_examples():

@@ -27,7 +27,23 @@ CLAIM_FIELDS = [
 ]
 
 
-def claim_to_row(claim: Claim) -> dict[str, str]:
+def portable_note_path(value: str, *, root: str | Path | None = None) -> str:
+    if not value:
+        return ""
+    path = Path(value)
+    if not path.is_absolute():
+        return path.as_posix()
+    bases = [Path(root)] if root is not None else []
+    bases.append(Path.cwd())
+    for base in bases:
+        try:
+            return path.resolve(strict=False).relative_to(base.resolve(strict=False)).as_posix()
+        except ValueError:
+            continue
+    return path.name
+
+
+def claim_to_row(claim: Claim, *, root: str | Path | None = None) -> dict[str, str]:
     return {
         "claim_id": claim.claim_id,
         "paper_id": claim.paper_id,
@@ -41,7 +57,7 @@ def claim_to_row(claim: Claim) -> dict[str, str]:
         "user_comment": claim.user_comment,
         "supports_theme": claim.supports_theme,
         "strength": claim.strength,
-        "note_file": claim.note_file,
+        "note_file": portable_note_path(claim.note_file, root=root),
     }
 
 
@@ -59,8 +75,8 @@ def collect_claims(path: str | Path) -> list[Claim]:
     return claims
 
 
-def save_claims_csv(claims: list[Claim], path: str | Path, force: bool = True) -> Path:
-    return write_csv_rows(path, (claim_to_row(claim) for claim in claims), CLAIM_FIELDS, force=force)
+def save_claims_csv(claims: list[Claim], path: str | Path, force: bool = True, *, root: str | Path | None = None) -> Path:
+    return write_csv_rows(path, (claim_to_row(claim, root=root) for claim in claims), CLAIM_FIELDS, force=force)
 
 
 def evidence_links_from_claims(claims: list[Claim]) -> list[EvidenceLink]:
