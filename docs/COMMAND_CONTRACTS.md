@@ -1,6 +1,6 @@
-# Command Contracts v1.1
+# Command Contracts v1.2
 
-This page defines the v1.1 behavior expected by tests and external
+This page defines the v1.2 behavior expected by tests and external
 users. The contract is intentionally practical: it describes command behavior,
 not internal implementation details.
 
@@ -36,6 +36,8 @@ not internal implementation details.
 | `report` | yes | inventory/evidence/citation/authoring reports | missing theme, invalid `report all --out`, or overwrite refusal | no overwrite without `--force`; `report all` preflights every output before writing |
 | `writing-packet` | yes | synthetic theme packet | unknown theme | planning aid only |
 | `draft` | yes | parse/audit/checklist synthetic drafts | unknown citations or overwrite refusal | no draft rewrite; reports only |
+| `reading` | yes | temp queue/start/finish/status/review | invalid status or missing session | existing notes preserved unless `--force-note` |
+| `followups` | yes | list/export/done temp actions | missing state path tolerated | source notes preserved; completion state stored separately |
 | `doctor` | yes | workspace-health report | missing inputs | read-only unless `--out` |
 | `integrity` | yes | project integrity check | unsafe path/missing project | read-only unless `--out` |
 | `audit-log` | yes | show ignored logs | clear without force | clear requires `--force` |
@@ -68,6 +70,7 @@ Representative contract tests live in:
 - `tests/test_adversarial_v0_10.py`
 - `tests/test_v1_0_rc_command_contracts.py`
 - `tests/test_drafts_v1_1.py`
+- `tests/test_reading_v1_2.py`
 
 Release scripts used by the contract:
 

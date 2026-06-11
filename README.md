@@ -24,6 +24,8 @@ v1.0-rc added release-candidate hardening: API and CLI surface inventories, comm
 
 v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown literature-review drafts. It extracts citation keys, checks local BibTeX/registry/note/claim coverage, flags weak or review-only support, and generates revision checklists without rewriting prose or inventing evidence.
 
+v1.2 adds a reading-session workflow loop: transparent reading queues, local session logs, session checklists, safe reading-status updates, follow-up action exports, and weekly reading reviews. It helps plan and track reading; it does not read papers automatically or fabricate notes.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -47,6 +49,7 @@ v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown 
 - Stress-tests malformed local data with synthetic adversarial fixtures and clear error-message expectations.
 - Documents the v1.1 API and CLI surface so external users can see what is stable, experimental, and internal.
 - Audits Markdown drafts against local citation keys, structured notes, extracted claims, and theme evidence.
+- Manages local reading queues, session records, follow-up actions, and weekly reading-review reports.
 
 ## What It Does Not Do
 
@@ -60,6 +63,7 @@ v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown 
 - It does not write polished literature-review prose as if it were user-authored.
 - It does not silently migrate, restore, or overwrite user data without explicit force flags.
 - It does not rewrite user drafts or generate final manuscript prose.
+- It does not mark papers as read, create session outcomes, or add follow-up actions unless the user runs the relevant local command.
 
 ## Installation
 
@@ -278,6 +282,23 @@ The audit uses transparent local keyword, tag, theme, and citation-key overlap.
 It reports possible gaps for manual revision; it does not judge scientific truth
 or write polished prose.
 - [docs/CLI_FAILURE_MODES.md](docs/CLI_FAILURE_MODES.md)
+
+## v1.2 Reading Workflow
+
+Generate a local reading queue, start a session, finish it with user-provided
+outcomes, and review follow-up actions:
+
+```bash
+paperwb reading queue --project zis_photocatalysis
+paperwb reading start zis_charge_2025 --project zis_photocatalysis --goal "Check evidence locations"
+paperwb reading finish SESSION_ID --project zis_photocatalysis --status deeply_read --duration-minutes 45 --follow-up "Add missing section/page evidence"
+paperwb followups list --project zis_photocatalysis
+paperwb reading review --project zis_photocatalysis --out scratch/weekly_reading_review.md --force
+```
+
+Reading sessions are stored locally under `.paperwb/` by default and are ignored
+by git. Existing notes are preserved unless `reading start --force-note` is
+explicitly used. See [docs/READING_SESSIONS.md](docs/READING_SESSIONS.md).
 
 ## Data Folder Convention
 

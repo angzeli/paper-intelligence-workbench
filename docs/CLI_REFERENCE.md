@@ -1,6 +1,6 @@
 # CLI Reference
 
-For the v1.1 stability inventory, see [CLI Surface](CLI_SURFACE.md) and
+For the v1.2 stability inventory, see [CLI Surface](CLI_SURFACE.md) and
 [Command Contracts](COMMAND_CONTRACTS.md). The CLI is the stable external
 interface; direct Python imports are documented separately in
 [API Surface](API_SURFACE.md).
@@ -25,6 +25,9 @@ paperwb search "charge separation" --project zis_photocatalysis --indexed
 paperwb files scan --project zis_photocatalysis
 paperwb files audit --project zis_photocatalysis --reports-dir scratch/file_reports --force
 paperwb doctor --out scratch/workspace_health.md
+paperwb reading queue --project zis_photocatalysis
+paperwb reading start PAPER_ID --project zis_photocatalysis
+paperwb followups list --project zis_photocatalysis
 ```
 
 Imports:
@@ -90,6 +93,25 @@ paperwb draft evidence-matrix drafts/synthetic_photocorrosion_section.md --proje
 
 Draft commands audit user-written Markdown against local citations, notes, and
 claims. They do not rewrite final prose or infer unsupported claims.
+
+Reading sessions and follow-ups:
+
+```bash
+paperwb reading queue --project zis_photocatalysis
+paperwb reading queue --project zis_photocatalysis --theme photocorrosion --limit 10 --out scratch/reading_queue.md --force
+paperwb reading start zis_charge_2025 --project zis_photocatalysis --goal "Check evidence locations"
+paperwb reading finish SESSION_ID --project zis_photocatalysis --status deeply_read --duration-minutes 45 --claims-added 1 --follow-up "Add missing section/page evidence"
+paperwb reading status --project zis_photocatalysis
+paperwb reading review --project zis_photocatalysis --out scratch/weekly_reading_review.md --force
+paperwb followups list --project zis_photocatalysis
+paperwb followups export --project zis_photocatalysis --out scratch/followups.md --force
+paperwb followups done note:zis_charge_2025:1 --project zis_photocatalysis
+```
+
+Reading commands do not read papers automatically or fabricate notes. `reading
+start` preserves an existing note by default and requires `--force-note` to
+overwrite it. Session logs and follow-up completion state default to ignored
+local `.paperwb/` files.
 
 Exports:
 

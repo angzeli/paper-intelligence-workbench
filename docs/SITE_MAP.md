@@ -13,6 +13,10 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/local-search.md`
 - `docs/import-export.md`
 - `docs/authoring-workbench.md`
+- `docs/READING_SESSIONS.md`
+- `docs/READING_QUEUE.md`
+- `docs/FOLLOW_UP_ACTIONS.md`
+- `docs/WEEKLY_READING_REVIEW.md`
 - `docs/local-files.md`
 - `docs/safety-and-boundaries.md`
 
@@ -28,6 +32,10 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/IMPORTS.md`
 - `docs/EXPORTS.md`
 - `docs/AUTHORING_WORKBENCH.md`
+- `docs/READING_SESSIONS.md`
+- `docs/READING_QUEUE.md`
+- `docs/FOLLOW_UP_ACTIONS.md`
+- `docs/WEEKLY_READING_REVIEW.md`
 - `docs/LOCAL_FILES.md`
 
 ## Release Engineering

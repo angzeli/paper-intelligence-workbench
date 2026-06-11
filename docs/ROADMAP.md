@@ -81,7 +81,22 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - External-user simulation and data-safety reports.
 - Final release-readiness and known-limitations reports.
 
-## Near-Term Patches for v1.0.0
+## v1.1 Completed
+
+- Markdown draft citation parsing and citation coverage audits.
+- Paragraph-level heuristic evidence matching against local notes and claims.
+- Draft revision checklists and paragraph evidence matrices.
+- Synthetic draft corpus and draft-audit workflow documentation.
+
+## v1.2 Completed
+
+- Local reading queue generation using transparent registry/note/theme gaps.
+- Reading session start/finish/status commands with ignored JSONL session logs.
+- Safe note-template integration that preserves existing notes unless `--force-note` is explicit.
+- Follow-up action listing, Markdown export, and completion state outside source notes.
+- Weekly reading review reports summarizing sessions, claims added, weak themes, follow-ups, and next reading candidates.
+
+## Near-Term Patches for v1.3
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -96,6 +111,8 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add import preview tables and conflict-resolution commands for ambiguous matches.
 - Add writer-facing filters for authoring reports, such as minimum claim strength and evidence type.
 - Add optional advisory PDF metadata extraction if a lightweight dependency is justified.
+- Add reading-session conflict handling for interrupted/duplicate active sessions.
+- Add optional calendar-style session summaries while keeping all state local.
 
 ## Project Profiles
 
@@ -127,9 +144,9 @@ Possible future commands:
 - unresolved question summaries
 - safer BibTeX key normalization commands
 
-## v1.2 Candidate Scope
+## v1.3 Candidate Scope
 
-- Tighten draft-audit false-positive controls after real user feedback.
-- Add optional report diffs for draft-audit changes between revisions.
+- Harden reading-session edge cases after real user feedback.
+- Add richer follow-up filters by status, age, and linked theme.
+- Add report diffs for draft audits and weekly reading reviews.
 - Improve citation-pattern fixtures without becoming a full citation processor.
-- Keep draft tooling limited to audit reports, matrices, and revision checklists.

@@ -22,6 +22,10 @@ Use these docs as static Markdown source. No site generator is required for v0.8
 - [Authoring Workbench](authoring-workbench.md)
 - [Draft Citation Audit](DRAFT_CITATION_AUDIT.md)
 - [Manuscript Evidence Checker](MANUSCRIPT_EVIDENCE_CHECKER.md)
+- [Reading Sessions](READING_SESSIONS.md)
+- [Reading Queue](READING_QUEUE.md)
+- [Follow-up Actions](FOLLOW_UP_ACTIONS.md)
+- [Weekly Reading Review](WEEKLY_READING_REVIEW.md)
 - [Local Files](local-files.md)
 - [Safety and Boundaries](safety-and-boundaries.md)
 

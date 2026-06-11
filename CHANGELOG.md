@@ -2,6 +2,19 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.2.0 - Reading Session Workflow
+
+- Added local reading queue generation based on registry priority, reading status, notes, claims, and theme gaps.
+- Added `paperwb reading start/finish/status/review` for local session logs, safe note-template integration, status updates, and weekly reading reviews.
+- Added `paperwb followups list/export/done` for note and session follow-up actions without editing source notes.
+- Added v1.2 reading workflow docs, tests, synthetic session fixture, reports, and release-readiness planning.
+
+## v1.1.0 - Draft Citation Auditor
+
+- Added Markdown draft parsing and citation-key extraction.
+- Added draft citation coverage, paragraph evidence matching, revision checklist, and paragraph evidence matrix reports.
+- Kept draft workflows audit-only: no citation fabrication, claim fabrication, or final-prose rewriting.
+
 ## v1.0-rc - Release Candidate Hardening
 
 - Added API and CLI surface inventories that mark stable, experimental, and internal surfaces.

@@ -1,6 +1,6 @@
-# CLI Surface v1.1
+# CLI Surface v1.2
 
-The stable external interface for Paper Intelligence Workbench v1.1 is the
+The stable external interface for Paper Intelligence Workbench v1.2 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -23,6 +23,8 @@ release line unless a release note explicitly says otherwise.
 | `paperwb writing-packet` | stable | Generate a theme-specific writing planning packet, not final prose |
 | `paperwb checklist` | stable | Generate a theme review checklist |
 | `paperwb draft parse/citations/audit/checklist/evidence-matrix` | stable | Audit Markdown drafts against local citations and tracked evidence without rewriting prose |
+| `paperwb reading queue/start/finish/status/review` | stable | Manage local reading queues and session records without reading papers or fabricating notes |
+| `paperwb followups list/export/done` | stable | Collect follow-up actions from notes/sessions and track completion outside source notes |
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
 | `paperwb project init/list/validate` | stable | Manage local project profiles under `projects/` |
 | `paperwb import zotero-csv/csv/bibtex/ris` | stable | Import local bibliography data with dry-run and no silent field overwrite |
@@ -42,7 +44,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.1.
+No commands are deprecated in v1.2.
 
 ## Write Safety Contract
 
@@ -53,6 +55,9 @@ No commands are deprecated in v1.1.
   documented fill behavior.
 - Restore and migration workflows default to planning or dry-run behavior unless
   `--force` is passed.
+- `paperwb reading start` preserves existing notes by default and requires
+  `--force-note` to overwrite a note template.
+- Follow-up completion state is stored separately from source notes.
 - File workflows do not delete, move, copy, download, OCR, or summarize user
   documents.
 - Project-profile commands keep `data/` workflow compatibility.
