@@ -204,6 +204,21 @@ class ProjectProfile:
 
 
 @dataclass(slots=True)
+class LocalFileRecord:
+    paper_id: str = ""
+    file_id: str = ""
+    relative_path: str = ""
+    file_type: str = ""
+    size_bytes: int = 0
+    sha256: str = ""
+    added_date: str = ""
+    linked_registry_status: str = ""
+    notes: str = ""
+    text_sidecar_path: str = ""
+    extracted_metadata_status: str = "not_attempted"
+
+
+@dataclass(slots=True)
 class CitationAuditFinding:
     severity: str
     code: str

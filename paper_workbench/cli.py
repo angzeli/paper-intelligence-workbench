@@ -39,6 +39,21 @@ from .exports import (
     export_report_index,
     export_theme_claims,
 )
+from .files import (
+    DEFAULT_WORKSPACE_SCAN_DIRS,
+    SCAN_DIRS,
+    default_file_registry_path,
+    duplicate_files_report,
+    link_file_to_paper,
+    load_file_registry,
+    local_files_audit_report,
+    missing_files_report,
+    save_file_registry,
+    scan_local_files,
+    sha256_file,
+    text_sidecars_report,
+    unlink_file_from_paper,
+)
 from .importers import import_bibtex, import_generic_csv, import_report, import_ris, import_zotero_csv
 from .index import (
     build_index_records,
@@ -142,11 +157,11 @@ def _paths_from_args(args: argparse.Namespace) -> dict[str, Path | None]:
     return {
         "profile": None,
         "root": Path("."),
-        "registry": Path(getattr(args, "registry", default_registry_path())),
-        "bibtex": Path(getattr(args, "bibtex", default_bibtex_path())),
-        "notes_dir": Path(getattr(args, "notes_dir", default_notes_dir())),
-        "themes": Path(getattr(args, "themes", default_themes_path())),
-        "reports_dir": Path(getattr(args, "reports_dir", default_reports_dir())),
+        "registry": Path(getattr(args, "registry", "") or default_registry_path()),
+        "bibtex": Path(getattr(args, "bibtex", "") or default_bibtex_path()),
+        "notes_dir": Path(getattr(args, "notes_dir", "") or default_notes_dir()),
+        "themes": Path(getattr(args, "themes", "") or default_themes_path()),
+        "reports_dir": Path(getattr(args, "reports_dir", "") or default_reports_dir()),
     }
 
 
@@ -180,6 +195,12 @@ def _index_path_from_args(args: argparse.Namespace, paths: dict[str, Path | None
 
 def _text_dir_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
     return Path(args.text_dir) if getattr(args, "text_dir", "") else _default_text_dir(paths)
+
+
+def _file_registry_path_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
+    if getattr(args, "file_registry", ""):
+        return Path(args.file_registry)
+    return default_file_registry_path(paths["root"], project=bool(paths.get("profile")))
 
 
 def _index_records_from_args(args: argparse.Namespace, paths: dict[str, Path | None]):
@@ -437,6 +458,116 @@ def cmd_index_clear(args: argparse.Namespace) -> int:
     project_id = _project_id_from_paths(paths)
     clear_index(index_path, project_id=project_id)
     print(f"Cleared index records for {project_id} at {index_path}")
+    return 0
+
+
+def _file_scan_from_args(args: argparse.Namespace):
+    _reject_project_path_overrides(args, ("registry",))
+    paths = _paths_from_args(args)
+    default_scan_dirs = SCAN_DIRS if paths.get("profile") else DEFAULT_WORKSPACE_SCAN_DIRS
+    scan_dirs = tuple(args.scan_dir) if getattr(args, "scan_dir", None) else default_scan_dirs
+    result = scan_local_files(
+        root=paths["root"],
+        registry_path=paths["registry"],
+        file_registry_path=_file_registry_path_from_args(args, paths),
+        scan_dirs=scan_dirs,
+        large_file_bytes=args.large_file_bytes,
+    )
+    return result, paths
+
+
+def cmd_files_scan(args: argparse.Namespace) -> int:
+    result, _paths = _file_scan_from_args(args)
+    if args.write_registry:
+        path = save_file_registry(result.records, result.file_registry_path, force=args.force)
+        print(f"Wrote file registry to {path}")
+    for record in result.records:
+        print(f"{record.paper_id or '[unlinked]'}\t{record.file_type}\t{record.size_bytes}\t{record.linked_registry_status}\t{record.relative_path}")
+    if not result.records:
+        print("No supported local files found.")
+    return 0
+
+
+def cmd_files_status(args: argparse.Namespace) -> int:
+    result, _paths = _file_scan_from_args(args)
+    registry_records = load_file_registry(result.file_registry_path)
+    print(f"Root: {result.root}")
+    print(f"File registry: {result.file_registry_path}")
+    print(f"File registry records: {len(registry_records)}")
+    print(f"Files found: {len(result.records)}")
+    print(f"Unlinked files: {len(result.unlinked_files)}")
+    print(f"Missing registry file references: {len(result.missing_registry_files)}")
+    print(f"Duplicate file hashes: {len(result.duplicate_hashes)}")
+    print(f"Text sidecars: {len(result.sidecars)}")
+    print(f"Warnings: {len(result.warnings)}")
+    return 0
+
+
+def cmd_files_audit(args: argparse.Namespace) -> int:
+    result, paths = _file_scan_from_args(args)
+    reports_dir = Path(args.reports_dir) if args.reports_dir else Path(paths["reports_dir"])
+    outputs = {
+        "local_files_audit_v0_7.md": local_files_audit_report(result),
+        "duplicate_files_v0_7.md": duplicate_files_report(result),
+        "missing_files_v0_7.md": missing_files_report(result),
+        "text_sidecars_v0_7.md": text_sidecars_report(result),
+    }
+    written: list[Path] = []
+    for filename, content in outputs.items():
+        path = write_text(reports_dir / filename, content, force=args.force)
+        written.append(path)
+    for path in written:
+        print(f"Wrote {path}")
+    return 0
+
+
+def cmd_files_link(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry",))
+    paths = _paths_from_args(args)
+    record = link_file_to_paper(
+        paper_id=args.paper_id,
+        file_path=args.path,
+        root=paths["root"],
+        registry_path=paths["registry"],
+        file_registry_path=_file_registry_path_from_args(args, paths),
+        force=args.force,
+        notes=args.notes,
+    )
+    print(f"Linked {record.paper_id} to {record.relative_path} ({record.file_type}, sha256={record.sha256[:12]})")
+    return 0
+
+
+def cmd_files_unlink(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry",))
+    paths = _paths_from_args(args)
+    removed = unlink_file_from_paper(
+        paper_id=args.paper_id,
+        root=paths["root"],
+        registry_path=paths["registry"],
+        file_registry_path=_file_registry_path_from_args(args, paths),
+        clear_pdf=not args.keep_pdf_path,
+    )
+    print(f"Unlinked {removed} file registry record(s) for {args.paper_id}")
+    return 0
+
+
+def cmd_files_hash(args: argparse.Namespace) -> int:
+    path = Path(args.path)
+    digest = sha256_file(path)
+    print(f"{digest}\t{path.stat().st_size}\t{path}")
+    return 0
+
+
+def cmd_files_sidecars(args: argparse.Namespace) -> int:
+    result, _paths = _file_scan_from_args(args)
+    if args.out:
+        path = write_text(args.out, text_sidecars_report(result), force=args.force)
+        print(f"Wrote {path}")
+        return 0
+    for record in result.sidecars:
+        print(f"{record.paper_id or '[unmatched]'}\t{record.linked_registry_status}\t{record.size_bytes}\t{record.relative_path}")
+    if not result.sidecars:
+        print("No text sidecars found.")
     return 0
 
 
@@ -992,6 +1123,60 @@ def build_parser() -> argparse.ArgumentParser:
     index_clear.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
     index_clear.add_argument("--index", default="", help="SQLite index path. Defaults to .paperwb/index.sqlite under the selected workspace root.")
     index_clear.set_defaults(func=cmd_index_clear)
+
+    files_parser = subparsers.add_parser("files", help="Scan, link, hash, and audit local user-provided files.")
+    files_sub = files_parser.add_subparsers(dest="files_command", required=True)
+
+    def add_files_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--file-registry", default="", help="Local file registry CSV path. Defaults to project/files.csv or data/registries/local_files.csv.")
+        command_parser.add_argument("--scan-dir", action="append", default=[], help="Directory under the selected root to scan. Repeatable. Defaults to project papers/text/notes/bibtex or legacy data/papers/data/text/data/notes/data/bibtex.")
+        command_parser.add_argument("--large-file-bytes", type=int, default=50 * 1024 * 1024, help="Warn when files exceed this size.")
+
+    files_scan = files_sub.add_parser("scan", help="Scan configured local folders for supported files without modifying them.")
+    add_files_common(files_scan)
+    files_scan.add_argument("--write-registry", action="store_true", help="Write the scan result to the local file registry CSV.")
+    files_scan.add_argument("--force", action="store_true", help="Overwrite an existing local file registry when --write-registry is used.")
+    files_scan.set_defaults(func=cmd_files_scan)
+
+    files_status = files_sub.add_parser("status", help="Print local file registry and scan summary.")
+    add_files_common(files_status)
+    files_status.set_defaults(func=cmd_files_status)
+
+    files_link = files_sub.add_parser("link", help="Link a local file to a paper ID without copying or deleting files.")
+    files_link.add_argument("paper_id", help="Paper ID from the registry.")
+    files_link.add_argument("path", help="Local file path to link.")
+    files_link.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+    files_link.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+    files_link.add_argument("--file-registry", default="", help="Local file registry CSV path. Defaults to project/files.csv or data/registries/local_files.csv.")
+    files_link.add_argument("--notes", default="", help="Optional note for the local file registry record.")
+    files_link.add_argument("--force", action="store_true", help="Allow replacing an existing registry local_pdf_path for PDF links.")
+    files_link.set_defaults(func=cmd_files_link)
+
+    files_unlink = files_sub.add_parser("unlink", help="Unlink file registry records for a paper ID without deleting files.")
+    files_unlink.add_argument("paper_id", help="Paper ID to unlink.")
+    files_unlink.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+    files_unlink.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+    files_unlink.add_argument("--file-registry", default="", help="Local file registry CSV path. Defaults to project/files.csv or data/registries/local_files.csv.")
+    files_unlink.add_argument("--keep-pdf-path", action="store_true", help="Do not clear registry local_pdf_path metadata.")
+    files_unlink.set_defaults(func=cmd_files_unlink)
+
+    files_audit = files_sub.add_parser("audit", help="Generate v0.7 local-file audit reports.")
+    add_files_common(files_audit)
+    files_audit.add_argument("--reports-dir", default="", help="Output reports directory. Defaults to the selected project/default reports directory.")
+    files_audit.add_argument("--force", action="store_true", help="Overwrite existing local-file audit reports.")
+    files_audit.set_defaults(func=cmd_files_audit)
+
+    files_hash = files_sub.add_parser("hash", help="Compute SHA256 for a local file.")
+    files_hash.add_argument("path", help="Local file path.")
+    files_hash.set_defaults(func=cmd_files_hash)
+
+    files_sidecars = files_sub.add_parser("sidecars", help="List or report user-provided top-level text sidecars.")
+    add_files_common(files_sidecars)
+    files_sidecars.add_argument("--out", default="", help="Optional Markdown sidecar report path.")
+    files_sidecars.add_argument("--force", action="store_true", help="Overwrite an existing --out path.")
+    files_sidecars.set_defaults(func=cmd_files_sidecars)
 
     report_parser = subparsers.add_parser("report", help="Generate Markdown reports.")
     report_parser.add_argument(

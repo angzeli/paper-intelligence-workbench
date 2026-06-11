@@ -73,6 +73,8 @@ def create_project_profile(
         raise FileExistsError(f"project {name!r} already exists")
     (project_path / "notes").mkdir(parents=True, exist_ok=True)
     (project_path / "bibtex").mkdir(parents=True, exist_ok=True)
+    (project_path / "papers").mkdir(parents=True, exist_ok=True)
+    (project_path / "text").mkdir(parents=True, exist_ok=True)
     (project_path / "reports").mkdir(parents=True, exist_ok=True)
     profile = _profile_from_root(project_path, {"name": validate_project_name(name), "description": description})
     create_empty_registry(profile.registry_path)

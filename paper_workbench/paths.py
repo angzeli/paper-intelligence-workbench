@@ -9,6 +9,7 @@ DEFAULT_DIRS = [
     "paper_workbench",
     "data/examples",
     "data/papers",
+    "data/text",
     "data/notes",
     "data/bibtex",
     "data/registries",
