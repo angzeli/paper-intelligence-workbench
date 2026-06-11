@@ -1,0 +1,32 @@
+# Paper Intelligence Workbench Docs
+
+Paper Intelligence Workbench is a local-first command-line workbench for academic paper registries, structured notes, user-entered claims, citation audits, evidence maps, local search, import/export workflows, and writing preparation.
+
+Use these docs as static Markdown source. No site generator is required for v0.8.
+
+## Start Here
+
+- [Getting Started](getting-started.md)
+- [External User Quickstart](EXTERNAL_USER_QUICKSTART.md)
+- [Installation](INSTALLATION.md)
+- [Workflows](workflows.md)
+- [CLI Reference](cli-reference.md)
+
+## Core Areas
+
+- [Project Profiles](project-profiles.md)
+- [Reports](reports.md)
+- [Report Gallery](REPORT_GALLERY.md)
+- [Local Search](local-search.md)
+- [Import / Export](import-export.md)
+- [Authoring Workbench](authoring-workbench.md)
+- [Local Files](local-files.md)
+- [Safety and Boundaries](safety-and-boundaries.md)
+
+## Release Engineering
+
+- [Test Matrix](TEST_MATRIX.md)
+- [CLI Behavior Matrix](CLI_BEHAVIOR_MATRIX.md)
+- [Report Matrix](REPORT_MATRIX.md)
+- [Data Safety Matrix](DATA_SAFETY_MATRIX.md)
+- [Site Map](SITE_MAP.md)

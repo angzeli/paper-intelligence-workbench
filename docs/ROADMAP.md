@@ -47,7 +47,16 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Local-file audit reports.
 - Clear PDF metadata boundary: no scraping, no OCR, no full-text parsing, and no authoritative metadata replacement.
 
-## Near-Term Patches for v0.8
+## v0.8 Completed
+
+- Package metadata hardening for an external-user-quality local release.
+- Installation, contribution, changelog, and docs-site source pages.
+- Release scripts for CLI smoke workflows, notebook checking, and tracked-file data-safety auditing.
+- Test, CLI behavior, report, and data-safety matrices.
+- v0.8 release notes, release-readiness, external-user simulation, and v0.9 patch-plan reports.
+- CI release gates for tests, package import, CLI smoke paths, notebook checks, and data-safety checks.
+
+## Near-Term Patches for v0.9
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.

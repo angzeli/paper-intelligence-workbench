@@ -14,6 +14,8 @@ v0.6 adds a literature-review authoring workbench with evidence matrices, claim 
 
 v0.7 adds local document ingestion and metadata reconciliation: file scans, SHA256 hashes, PDF path linking, duplicate-file detection, missing-file reports, and text-sidecar audits. It does not download, scrape, OCR, or summarize documents.
 
+v0.8 adds release-engineering and onboarding hardening: package metadata, install docs, CI smoke checks, notebook checks, data-safety audits, docs-site Markdown pages, test/report matrices, and external-user quickstart reports.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -66,6 +68,8 @@ python -m paper_workbench.cli --help
 ```
 
 In offline or restricted-network environments, `pip` may be unable to fetch build dependencies for editable install. In that case, use the no-install `python -m paper_workbench.cli ...` form from the repository root, or install after local build dependencies such as `setuptools` and `pytest` are available.
+
+See [docs/INSTALLATION.md](docs/INSTALLATION.md) for release-check commands and troubleshooting.
 
 ## Quickstart
 
@@ -311,6 +315,9 @@ paperwb checklist --theme photocorrosion
 
 ## More Documentation
 
+- [docs/index.md](docs/index.md)
+- [docs/EXTERNAL_USER_QUICKSTART.md](docs/EXTERNAL_USER_QUICKSTART.md)
+- [docs/INSTALLATION.md](docs/INSTALLATION.md)
 - [docs/QUICKSTART_EXTERNAL_USER.md](docs/QUICKSTART_EXTERNAL_USER.md)
 - [docs/EXAMPLE_LITERATURE_REVIEW_WORKFLOW.md](docs/EXAMPLE_LITERATURE_REVIEW_WORKFLOW.md)
 - [docs/REPORT_GALLERY.md](docs/REPORT_GALLERY.md)
@@ -335,6 +342,10 @@ paperwb checklist --theme photocorrosion
 - [docs/GOLDEN_REPORTS.md](docs/GOLDEN_REPORTS.md)
 - [docs/REPORT_REGRESSION_TESTING.md](docs/REPORT_REGRESSION_TESTING.md)
 - [docs/CLI_STRESS_WORKFLOWS.md](docs/CLI_STRESS_WORKFLOWS.md)
+- [docs/TEST_MATRIX.md](docs/TEST_MATRIX.md)
+- [docs/CLI_BEHAVIOR_MATRIX.md](docs/CLI_BEHAVIOR_MATRIX.md)
+- [docs/REPORT_MATRIX.md](docs/REPORT_MATRIX.md)
+- [docs/DATA_SAFETY_MATRIX.md](docs/DATA_SAFETY_MATRIX.md)
 
 ## Roadmap
 

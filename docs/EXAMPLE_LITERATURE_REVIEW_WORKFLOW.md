@@ -56,7 +56,7 @@ Treat warnings as review prompts, not automatic corrections. The parser is inten
 Generate a note template before reading a paper:
 
 ```bash
-paperwb note-template synth_charge_2024 --registry data/registries/example_papers.csv --output /private/tmp/synth_charge_2024_note.md
+paperwb note-template synth_charge_2024 --registry data/registries/example_papers.csv --output scratch/synth_charge_2024_note.md
 ```
 
 Fill in claims only when you have read and verified the evidence. Claims should include evidence type, section/page location, confidence, strength, tags, and theme support.
@@ -64,7 +64,7 @@ Fill in claims only when you have read and verified the evidence. Claims should 
 ## Step 5. Extract Claims
 
 ```bash
-paperwb claims data/notes --output /private/tmp/paperwb_claims.csv
+paperwb claims data/notes --output scratch/paperwb_claims.csv
 ```
 
 Claim extraction is conservative. If a note does not follow the template, the parser returns warnings instead of guessing.
@@ -74,8 +74,8 @@ Claim extraction is conservative. If a note does not follow the template, the pa
 Themes live in JSON files and map tags to literature-review topics.
 
 ```bash
-paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out /private/tmp/paperwb_evidence_map.md --force
-paperwb report theme-dashboard --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out /private/tmp/paperwb_theme_dashboard.md --force
+paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_evidence_map.md --force
+paperwb report theme-dashboard --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_theme_dashboard.md --force
 ```
 
 Use these reports before writing a subsection. They show strong claims, weak claims, missing evidence locations, missing notes, and themes that need more papers.
@@ -83,7 +83,7 @@ Use these reports before writing a subsection. They show strong claims, weak cla
 ## Step 7. Audit Citations Before Drafting
 
 ```bash
-paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out /private/tmp/paperwb_citation_audit.md --force
+paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_citation_audit.md --force
 ```
 
 Review every finding that says a paper lacks notes, a claim lacks evidence location, a theme is under-supported, or a BibTeX key is missing.
@@ -91,7 +91,7 @@ Review every finding that says a paper lacks notes, a claim lacks evidence locat
 ## Step 8. Build an Evidence-Based Outline
 
 ```bash
-paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out /private/tmp/paperwb_photocorrosion_outline.md --force
+paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_photocorrosion_outline.md --force
 ```
 
 The outline is not a drafted literature review. It lists candidate papers, tracked claims, weak claims, unresolved questions, and missing evidence that should be addressed before writing prose.
@@ -99,8 +99,8 @@ The outline is not a drafted literature review. It lists candidate papers, track
 ## Step 9. Export Local Artifacts
 
 ```bash
-paperwb export claims-json --project zis_photocatalysis --out /private/tmp/paperwb_zis_claims.json --force
-paperwb export theme-claims --project zis_photocatalysis --theme photocorrosion --out /private/tmp/paperwb_photocorrosion_claims.json --force
+paperwb export claims-json --project zis_photocatalysis --out scratch/paperwb_zis_claims.json --force
+paperwb export theme-claims --project zis_photocatalysis --theme photocorrosion --out scratch/paperwb_photocorrosion_claims.json --force
 ```
 
 Exports are local files. They should not contain absolute maintainer paths.

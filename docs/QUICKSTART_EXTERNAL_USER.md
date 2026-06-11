@@ -40,19 +40,19 @@ paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/
 Extract claims from structured notes:
 
 ```bash
-paperwb claims data/notes --output /private/tmp/paperwb_example_claims.csv
+paperwb claims data/notes --output scratch/paperwb_example_claims.csv
 ```
 
 Generate a temporary evidence map:
 
 ```bash
-paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out /private/tmp/paperwb_evidence_map.md --force
+paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_evidence_map.md --force
 ```
 
 Generate a temporary citation audit:
 
 ```bash
-paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out /private/tmp/paperwb_citation_audit.md --force
+paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_citation_audit.md --force
 ```
 
 The `--force` flag is required only when replacing an existing report or export file.
@@ -65,7 +65,7 @@ Project profiles keep independent literature-review projects under `projects/`.
 paperwb project list
 paperwb project validate zis_photocatalysis
 paperwb search photocorrosion --project zis_photocatalysis
-paperwb report section-outline --project zis_photocatalysis --theme photocorrosion --out /private/tmp/paperwb_photocorrosion_outline.md --force
+paperwb report section-outline --project zis_photocatalysis --theme photocorrosion --out scratch/paperwb_photocorrosion_outline.md --force
 ```
 
 When `--project` is used, the profile supplies registry, notes, BibTeX, themes, and report paths. Do not combine `--project` with path override flags such as `--registry` or `--reports-dir`.
