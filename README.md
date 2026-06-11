@@ -12,6 +12,8 @@ v0.5 adds an optional local SQLite search index, FTS5-backed search when availab
 
 v0.6 adds a literature-review authoring workbench with evidence matrices, claim banks, citation banks, paragraph plans, subsection readiness scoring, and writing packets. These are planning aids only; the tool still does not write final prose or invent evidence.
 
+v0.7 adds local document ingestion and metadata reconciliation: file scans, SHA256 hashes, PDF path linking, duplicate-file detection, missing-file reports, and text-sidecar audits. It does not download, scrape, OCR, or summarize documents.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -22,6 +24,7 @@ v0.6 adds a literature-review authoring workbench with evidence matrices, claim 
 - Searches registry rows, note bodies, and claims.
 - Builds a local project-aware SQLite index for larger workspaces.
 - Indexes optional user-provided plain-text sidecars without parsing PDFs.
+- Scans and audits local user-provided files, hashes, missing file references, duplicate files, and text sidecars.
 - Generates Markdown reports for inventory, reading status, BibTeX audit, evidence maps, citation audits, missing notes, and weak claims.
 - Manages multiple project profiles under `projects/`.
 - Runs workspace health diagnostics with `paperwb doctor`.
@@ -35,6 +38,7 @@ v0.6 adds a literature-review authoring workbench with evidence matrices, claim 
 
 - It does not scrape publishers.
 - It does not download or include copyrighted PDFs.
+- It does not copy, move, delete, OCR, or summarize user documents.
 - It does not replace Zotero or CSL formatting tools.
 - It does not fabricate paper metadata, quotes, claims, summaries, or conclusions.
 - It does not use cloud services, LLM APIs, or embeddings.
@@ -116,6 +120,8 @@ paperwb project validate zis_photocatalysis
 paperwb search photocorrosion --project zis_photocatalysis
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb search photocorrosion --project zis_photocatalysis --indexed
+paperwb files scan --project zis_photocatalysis
+paperwb files audit --project zis_photocatalysis --force
 paperwb report evidence-map --project zis_photocatalysis --force
 paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json --force
 ```

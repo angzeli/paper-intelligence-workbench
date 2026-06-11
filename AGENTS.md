@@ -35,3 +35,7 @@ Instructions for future agents working in this repository:
 - Do not write final literature-review prose as if it were user-authored.
 - Authoring reports must remain planning aids: outlines, matrices, citation banks, paragraph plans, readiness reports, and checklists.
 - Do not fabricate citations or infer claims from papers without user-entered notes.
+- Do not commit real PDFs or copied paper full text.
+- Local file workflows must store paths relatively where possible.
+- Do not delete, move, or copy user files in local-file commands unless the user explicitly asks for that behavior.
+- Treat PDF metadata as advisory only; do not use it as authoritative paper metadata.

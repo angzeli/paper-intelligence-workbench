@@ -17,6 +17,8 @@ paperwb search "charge separation" --claims
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb index status --project zis_photocatalysis --check-files
 paperwb search "charge separation" --project zis_photocatalysis --indexed
+paperwb files scan --project zis_photocatalysis
+paperwb files audit --project zis_photocatalysis --force
 paperwb doctor --out reports/workspace_health.md
 ```
 
@@ -103,5 +105,20 @@ paperwb search "charge separation" --project zis_photocatalysis --indexed --out 
 ```
 
 The original substring search remains the default unless `--indexed` is provided. Cache databases live under `.paperwb/` and should not be committed.
+
+Local files:
+
+```bash
+paperwb files scan --project zis_photocatalysis
+paperwb files scan --project zis_photocatalysis --write-registry
+paperwb files status --project zis_photocatalysis
+paperwb files audit --project zis_photocatalysis --force
+paperwb files link PAPER_ID projects/zis_photocatalysis/papers/PAPER_ID.pdf --project zis_photocatalysis
+paperwb files unlink PAPER_ID --project zis_photocatalysis
+paperwb files hash projects/zis_photocatalysis/text/PAPER_ID.txt
+paperwb files sidecars --project zis_photocatalysis
+```
+
+Local-file commands do not download, scrape, OCR, copy, move, or delete documents. PDF links update `local_pdf_path`; existing values require `--force` to replace.
 
 Most workflow commands accept `--project NAME` to use profile paths. When `--project` is used, registry, notes, BibTeX, themes, and reports path flags are rejected to avoid silently ignoring user input. Use `--out` for an explicit single report or export destination.

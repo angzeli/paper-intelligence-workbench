@@ -38,7 +38,16 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Subsection readiness reports with a transparent local completeness score.
 - Writing packets that combine authoring artifacts for one theme.
 
-## Near-Term Patches for v0.7
+## v0.7 Completed
+
+- Local file scanner for user-provided PDFs, text sidecars, notes, BibTeX, RIS, and CSV files.
+- Local file registry CSV with paper IDs, relative paths, file types, sizes, SHA256 hashes, and advisory metadata status.
+- Non-destructive file linking and unlinking commands.
+- Duplicate-file, missing-file, unsupported-file, and sidecar diagnostics.
+- Local-file audit reports.
+- Clear PDF metadata boundary: no scraping, no OCR, no full-text parsing, and no authoritative metadata replacement.
+
+## Near-Term Patches for v0.8
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -50,6 +59,7 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add non-destructive workspace migration reports for moving legacy `data/` work into profiles.
 - Add import preview tables and conflict-resolution commands for ambiguous matches.
 - Add writer-facing filters for authoring reports, such as minimum claim strength and evidence type.
+- Add optional advisory PDF metadata extraction if a lightweight dependency is justified.
 
 ## Project Profiles
 
