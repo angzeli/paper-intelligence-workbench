@@ -61,3 +61,7 @@ Instructions for future agents working in this repository:
 - Do not mark papers as read unless a user command explicitly requests that status update.
 - Preserve reading session logs and follow-up completion state; do not overwrite them outside explicit force or clear commands.
 - `paperwb reading start` must preserve existing notes unless `--force-note` is explicitly used.
+- Never silently overwrite user data during sync.
+- Sync workflows should produce a dry-run plan before applying changes.
+- Forced sync applies should create a backup by default when practical.
+- Do not auto-merge note or Obsidian round-trip conflicts; preserve user notes and report conflicts for manual review.

@@ -86,6 +86,10 @@ def test_active_generated_reports_do_not_leak_maintainer_absolute_paths():
         "reports/import_bibtex_v0_4.md",
         "reports/import_ris_v0_4.md",
         "reports/stress_workspace_health_v0_3.md",
+        "reports/sync_plan_v1_3.md",
+        "reports/sync_conflicts_v1_3.md",
+        "reports/sync_apply_dry_run_v1_3.md",
+        "reports/obsidian_roundtrip_v1_3.md",
     ]
 
     for relative in checked_reports:

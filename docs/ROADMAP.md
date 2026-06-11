@@ -96,7 +96,15 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Follow-up action listing, Markdown export, and completion state outside source notes.
 - Weekly reading review reports summarizing sessions, claims added, weak themes, follow-ups, and next reading candidates.
 
-## Near-Term Patches for v1.3
+## v1.3 Completed
+
+- Local sync plans for Zotero-style CSV, generic CSV mappings, BibTeX, and RIS.
+- JSON sync plans and Markdown sync/conflict/apply reports.
+- Safe registry apply for creates and blank-field fills only.
+- Backup-before-force behavior for sync apply.
+- Conservative note and Obsidian round-trip conflict detection.
+
+## Near-Term Patches for v1.4
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -108,7 +116,7 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add checksum verification after forced restores.
 - Add optional compressed backup archives while keeping manifests inspectable.
 - Add project-to-project migration plans for profile restructuring.
-- Add import preview tables and conflict-resolution commands for ambiguous matches.
+- Add richer interactive conflict-resolution commands for ambiguous sync matches.
 - Add writer-facing filters for authoring reports, such as minimum claim strength and evidence type.
 - Add optional advisory PDF metadata extraction if a lightweight dependency is justified.
 - Add reading-session conflict handling for interrupted/duplicate active sessions.
@@ -144,9 +152,10 @@ Possible future commands:
 - unresolved question summaries
 - safer BibTeX key normalization commands
 
-## v1.3 Candidate Scope
+## v1.4 Candidate Scope
 
 - Harden reading-session edge cases after real user feedback.
 - Add richer follow-up filters by status, age, and linked theme.
 - Add report diffs for draft audits and weekly reading reviews.
 - Improve citation-pattern fixtures without becoming a full citation processor.
+- Add opt-in sync field patch files for manually approved non-empty metadata changes.

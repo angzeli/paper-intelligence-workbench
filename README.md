@@ -26,6 +26,8 @@ v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown 
 
 v1.2 adds a reading-session workflow loop: transparent reading queues, local session logs, session checklists, safe reading-status updates, follow-up action exports, and weekly reading reviews. It helps plan and track reading; it does not read papers automatically or fabricate notes.
 
+v1.3 adds two-way sync planning and conflict detection for local import/export workflows. It compares registry data with Zotero-style CSV, BibTeX, RIS, generic CSV, and Obsidian-style Markdown exports, then writes dry-run plans and conflict reports before any safe registry apply.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -47,9 +49,10 @@ v1.2 adds a reading-session workflow loop: transparent reading queues, local ses
 - Generates theme-specific writing aids from tracked local claims and citations.
 - Checks workspace integrity, writes local audit events, creates local backup snapshots, plans safe restores, and plans/copies non-destructive legacy-to-project migrations.
 - Stress-tests malformed local data with synthetic adversarial fixtures and clear error-message expectations.
-- Documents the v1.1 API and CLI surface so external users can see what is stable, experimental, and internal.
+- Documents the current API and CLI surface so external users can see what is stable, experimental, and internal.
 - Audits Markdown drafts against local citation keys, structured notes, extracted claims, and theme evidence.
 - Manages local reading queues, session records, follow-up actions, and weekly reading-review reports.
+- Plans local sync and conflict-resolution workflows before writing registry changes.
 
 ## What It Does Not Do
 
@@ -64,6 +67,7 @@ v1.2 adds a reading-session workflow loop: transparent reading queues, local ses
 - It does not silently migrate, restore, or overwrite user data without explicit force flags.
 - It does not rewrite user drafts or generate final manuscript prose.
 - It does not mark papers as read, create session outcomes, or add follow-up actions unless the user runs the relevant local command.
+- It does not sync with cloud services or overwrite non-empty user data during sync.
 
 ## Installation
 
@@ -299,6 +303,26 @@ paperwb reading review --project zis_photocatalysis --out scratch/weekly_reading
 Reading sessions are stored locally under `.paperwb/` by default and are ignored
 by git. Existing notes are preserved unless `reading start --force-note` is
 explicitly used. See [docs/READING_SESSIONS.md](docs/READING_SESSIONS.md).
+
+## v1.3 Sync Workflow
+
+Generate a local sync plan before applying import/export changes:
+
+```bash
+paperwb sync plan --project zis_photocatalysis \
+  --source data/examples/zotero_export.csv \
+  --source-type zotero-csv \
+  --out scratch/sync_plan.md \
+  --json-out scratch/sync_plan.json \
+  --force
+
+paperwb sync conflicts scratch/sync_plan.json --out scratch/sync_conflicts.md --force
+paperwb sync apply scratch/sync_plan.json --dry-run --out scratch/sync_apply_dry_run.md --force-report
+```
+
+Forced sync applies create a local backup by default and only create missing
+registry rows or fill blank fields. Note and metadata conflicts are reported
+for manual review. See [docs/SYNC.md](docs/SYNC.md).
 
 ## Data Folder Convention
 

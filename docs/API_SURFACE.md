@@ -1,7 +1,7 @@
-# API Surface v1.2
+# API Surface v1.3
 
 Paper Intelligence Workbench is a local-first command-line project. The Python
-package is usable by tests and scripts, but v1.2 does not promise a broad
+package is usable by tests and scripts, but v1.3 does not promise a broad
 stable library API. The stable user interface is the `paperwb` CLI plus the
 documented local file formats.
 
@@ -9,9 +9,9 @@ The package does not use cloud APIs, LLM APIs, publisher scraping, or remote
 metadata lookup. API helpers operate on user-provided local CSV, JSON,
 Markdown, BibTeX, RIS, text sidecar, and project-profile files.
 
-## Stable For v1.2
+## Stable For v1.3
 
-The stable external API for v1.2 is the CLI plus documented file formats.
+The stable external API for v1.3 is the CLI plus documented file formats.
 For Python callers, only these small entry points are treated as stable enough
 for local automation:
 
@@ -26,6 +26,7 @@ for local automation:
 | `paper_workbench.projects` | `create_project_profile`, `list_project_profiles`, `resolve_project_profile` | Project-profile path resolution |
 | `paper_workbench.safety` | `audit_data_safety`, `safety_audit_markdown` | Tracked-file data-safety audit |
 | `paper_workbench.reading` | `build_reading_queue`, `start_reading_session`, `finish_reading_session`, `collect_followups`, `build_weekly_review` | Local reading-session workflow helpers |
+| `paper_workbench.sync` | `build_registry_sync_plan`, `apply_registry_sync_plan`, `build_obsidian_roundtrip_plan` | Local sync planning, safe registry apply, and conflict detection |
 
 ## Stable Data Models
 
@@ -43,7 +44,7 @@ The dataclasses in `paper_workbench.schema` are stable enough for local scripts:
 - `ValidationFinding`
 - enum-like constants for reading status, claim strength, and evidence type
 
-Fields may grow in future releases, but v1.2 aims to preserve existing field
+Fields may grow in future releases, but v1.3 aims to preserve existing field
 names and meanings.
 
 ## Semi-Stable And Experimental Modules
@@ -89,7 +90,7 @@ They can be imported by tests, but they are not a stable extension API.
 
 ## Compatibility Notes
 
-- v1.2 keeps the legacy `data/` workflow and the `projects/` workflow.
+- v1.3 keeps the legacy `data/` workflow and the `projects/` workflow.
 - CSV, JSON, Markdown notes, BibTeX, RIS, and theme JSON remain authoritative
   inputs.
 - SQLite indexes, audit logs, caches, backups, and generated reports are

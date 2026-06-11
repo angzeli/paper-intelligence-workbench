@@ -1,6 +1,6 @@
-# CLI Surface v1.2
+# CLI Surface v1.3
 
-The stable external interface for Paper Intelligence Workbench v1.2 is the
+The stable external interface for Paper Intelligence Workbench v1.3 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -28,6 +28,7 @@ release line unless a release note explicitly says otherwise.
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
 | `paperwb project init/list/validate` | stable | Manage local project profiles under `projects/` |
 | `paperwb import zotero-csv/csv/bibtex/ris` | stable | Import local bibliography data with dry-run and no silent field overwrite |
+| `paperwb sync plan/apply/conflicts/plan-obsidian` | stable | Plan and dry-run local sync changes before safe registry apply |
 | `paperwb export` | stable | Export registries, claims, reading lists, Obsidian vaults, bundles, summaries, and report indexes |
 | `paperwb index rebuild/status/clear` | stable | Manage a rebuildable local SQLite search cache |
 | `paperwb files scan/status/link/unlink/audit/hash/sidecars` | stable | Inspect and link local user-provided files without deleting or scraping |
@@ -44,7 +45,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.2.
+No commands are deprecated in v1.3.
 
 ## Write Safety Contract
 
@@ -53,6 +54,8 @@ No commands are deprecated in v1.2.
 - Directory exports require a new or empty destination.
 - Imports preserve existing non-empty registry fields unless the user asks for a
   documented fill behavior.
+- Sync apply is dry-run by default. Forced sync applies create a backup by
+  default and do not overwrite non-empty registry fields or auto-merge notes.
 - Restore and migration workflows default to planning or dry-run behavior unless
   `--force` is passed.
 - `paperwb reading start` preserves existing notes by default and requires

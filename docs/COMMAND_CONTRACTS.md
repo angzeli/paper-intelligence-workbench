@@ -1,6 +1,6 @@
-# Command Contracts v1.2
+# Command Contracts v1.3
 
-This page defines the v1.2 behavior expected by tests and external
+This page defines the v1.3 behavior expected by tests and external
 users. The contract is intentionally practical: it describes command behavior,
 not internal implementation details.
 
@@ -26,6 +26,7 @@ not internal implementation details.
 | `validate-registry` | yes | example registry | missing/malformed registry | JSON export refuses overwrite without `--force` |
 | `validate-bib` | yes | example BibTeX | broken/missing BibTeX | report preflight |
 | `import` | yes | dry-run Zotero/generic/BibTeX/RIS | bad mapping/missing columns | registry unchanged on dry-run |
+| `sync` | yes | plan/apply dry-run/conflicts/Obsidian plan | high-risk conflict or overwrite refusal | dry-run by default; no note auto-merge |
 | `add-paper` | yes | synthetic row append in temp tests | invalid reading status | appends only to selected registry |
 | `list` | yes | filtered example listings | missing registry | read-only |
 | `note-template` | yes | temp note output | missing paper or overwrite refusal | no overwrite without `--force` |
@@ -71,6 +72,7 @@ Representative contract tests live in:
 - `tests/test_v1_0_rc_command_contracts.py`
 - `tests/test_drafts_v1_1.py`
 - `tests/test_reading_v1_2.py`
+- `tests/test_sync_v1_3.py`
 
 Release scripts used by the contract:
 

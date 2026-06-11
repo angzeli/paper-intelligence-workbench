@@ -403,8 +403,8 @@ def sync_plan_report(plan: SyncPlan) -> str:
         "",
         f"- Plan ID: {plan.plan_id}",
         f"- Project: {plan.project or 'default'}",
-        f"- Source: {plan.source.source_type} ({plan.source.path})",
-        f"- Target: {plan.target.target_type} ({plan.target.path})",
+        f"- Source: {plan.source.source_type} ({_display_path(plan.source.path)})",
+        f"- Target: {plan.target.target_type} ({_display_path(plan.target.path)})",
         f"- Dry run: {str(plan.dry_run).lower()}",
         f"- Actions: {len(plan.actions)}",
         f"- Conflicts: {len(plan.conflicts)}",
@@ -470,7 +470,7 @@ def sync_apply_report(plan: SyncPlan, result: SyncApplyResult) -> str:
         "",
         f"- Plan ID: {plan.plan_id}",
         f"- Dry run: {str(result.dry_run).lower()}",
-        f"- Registry path: {result.registry_path}",
+        f"- Registry path: {_display_path(result.registry_path)}",
         f"- Backup ID: {result.backup_id or 'none'}",
         f"- Applied actions: {len(result.applied_actions)}",
         f"- Skipped actions: {len(result.skipped_actions)}",
@@ -631,3 +631,13 @@ def _note_comparisons(local: PaperNote, exported: PaperNote) -> list[tuple[str, 
 
 def _esc(value: object) -> str:
     return str(value or "").replace("|", "\\|").replace("\n", " ").strip()
+
+
+def _display_path(value: str) -> str:
+    path = Path(value)
+    if path.is_absolute():
+        try:
+            return path.resolve(strict=False).relative_to(Path.cwd().resolve(strict=False)).as_posix()
+        except ValueError:
+            return path.name
+    return path.as_posix()

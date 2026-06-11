@@ -10,6 +10,7 @@
 | Project profiles | Project paths resolve without breaking legacy `data/` workflow | `tests/test_projects_doctor_exports.py` | `docs/project-profiles.md` | No destructive migration workflow |
 | Reports | Markdown reports render from local inputs | report tests, golden report tests | `docs/reports.md`, `docs/REPORT_GALLERY.md` | Historical reports are not all golden-snapshotted |
 | Import/export | Local imports are non-destructive and exports are reproducible | `tests/test_import_export_v0_4.py` | `docs/import-export.md` | Ambiguous import conflict UI is basic |
+| Sync planning | Local sources produce dry-run plans, conflict reports, and safe registry applies | `tests/test_sync_v1_3.py` | `docs/SYNC.md`, `docs/SAFE_SYNC_WORKFLOW.md` | Non-empty metadata conflict resolution is manual |
 | Indexed search | SQLite cache rebuilds and search falls back where needed | `tests/test_index_v0_5.py` | `docs/local-search.md` | No concurrent index update tests |
 | Authoring workbench | Generates planning aids without final prose | `tests/test_authoring_workbench.py` | `docs/authoring-workbench.md` | Readiness scoring remains heuristic |
 | Local files | Scans, hashes, links, audits, and preserves user files | `tests/test_local_files_v0_7.py` | `docs/local-files.md` | Optional PDF metadata extraction is future work |

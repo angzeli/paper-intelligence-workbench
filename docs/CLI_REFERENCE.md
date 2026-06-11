@@ -41,6 +41,20 @@ paperwb import ris data/examples/library.ris --dry-run
 
 Import commands preserve existing registry rows. `--fill-missing` fills only blank fields on matched rows. Import reports are written to the selected reports directory unless `--report` is provided. If the report path already exists and `--force` is not provided, the command fails before writing the registry.
 
+Sync planning:
+
+```bash
+paperwb sync plan --project zis_photocatalysis --source data/examples/zotero_export.csv --source-type zotero-csv --out scratch/sync_plan.md --json-out scratch/sync_plan.json --force
+paperwb sync conflicts scratch/sync_plan.json --out scratch/sync_conflicts.md --force
+paperwb sync apply scratch/sync_plan.json --dry-run --out scratch/sync_apply_dry_run.md --force-report
+paperwb sync plan-obsidian --project zis_photocatalysis --vault scratch/obsidian_zis --out scratch/obsidian_roundtrip.md --json-out scratch/obsidian_roundtrip.json --force
+```
+
+Sync commands compare local files only. `sync apply` is dry-run by default and
+forced applies create a backup unless `--no-backup` is explicitly supplied.
+v1.3 applies safe registry creates and blank-field fills only; conflicts and
+note differences are manual-review items.
+
 Report types:
 
 ```bash
