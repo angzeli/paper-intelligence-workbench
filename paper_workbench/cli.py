@@ -136,6 +136,20 @@ from .reporting import (
 )
 from .search import results_markdown, search_claims, search_note_files, search_papers
 from .synthetic import generate_synthetic_project
+from .sync import (
+    SyncSource,
+    SyncTarget,
+    apply_registry_sync_plan,
+    build_obsidian_roundtrip_plan,
+    build_registry_sync_plan,
+    conflict_report,
+    load_source_papers,
+    load_sync_plan_json,
+    save_sync_plan_json,
+    sync_apply_report,
+    sync_plan_report,
+    write_registry_apply_result,
+)
 from .tags import load_themes, normalize_tag
 
 
@@ -1407,6 +1421,130 @@ def cmd_import_ris(args: argparse.Namespace) -> int:
     return _finish_import(args, result, paths, "ris")
 
 
+def _sync_paths(args: argparse.Namespace) -> dict[str, Path | None]:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    return _paths_from_args(args)
+
+
+def _default_sync_report(paths: dict[str, Path | None], filename: str) -> Path:
+    return Path(paths["reports_dir"]) / filename
+
+
+def cmd_sync_plan(args: argparse.Namespace) -> int:
+    paths = _sync_paths(args)
+    project_id = _project_id_from_paths(paths)
+    registry_path = Path(paths["registry"])
+    papers = _load_registry(registry_path, create_if_missing=False)
+    source_papers, warnings = load_source_papers(args.source, args.source_type, project=project_id if args.project else "", mapping_path=args.mapping or None)
+    source = SyncSource(source_type=args.source_type, path=str(args.source), label=args.source_type)
+    target = SyncTarget(target_type="registry", path=str(registry_path), project=project_id)
+    plan = build_registry_sync_plan(existing_papers=papers, source_papers=source_papers, source=source, target=target, project=project_id, warnings=warnings)
+    markdown_path = Path(args.out) if args.out else _default_sync_report(paths, "sync_plan.md")
+    json_path = Path(args.json_out) if args.json_out else _default_sync_report(paths, "sync_plan.json")
+    _preflight_output_paths([markdown_path, json_path], force=args.force)
+    write_text(markdown_path, sync_plan_report(plan), force=True)
+    save_sync_plan_json(plan, json_path, force=True)
+    _record_audit_event(
+        paths,
+        command="sync plan",
+        action="write_sync_plan",
+        affected_paths=[markdown_path, json_path],
+        dry_run=True,
+        warnings=plan.warnings,
+        summary=f"Planned sync actions={len(plan.actions)} conflicts={len(plan.conflicts)} from {args.source_type}",
+    )
+    print(f"Wrote sync plan report to {markdown_path}")
+    print(f"Wrote sync plan JSON to {json_path}")
+    print(f"Actions: {len(plan.actions)}; conflicts: {len(plan.conflicts)}")
+    return 1 if args.strict and plan.conflicts else 0
+
+
+def cmd_sync_conflicts(args: argparse.Namespace) -> int:
+    plan = load_sync_plan_json(args.plan)
+    content = conflict_report(plan)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 1 if args.strict and plan.conflicts else 0
+
+
+def cmd_sync_apply(args: argparse.Namespace) -> int:
+    plan = load_sync_plan_json(args.plan)
+    paths = _sync_paths(args)
+    if not args.project and not args.registry:
+        paths["registry"] = Path(plan.target.path)
+    registry_path = Path(paths["registry"])
+    dry_run = args.dry_run or not args.force
+    if args.out:
+        _preflight_output_paths([args.out], force=args.force_report)
+    papers = _load_registry(registry_path, create_if_missing=False)
+    backup_id = ""
+    backup_path = None
+    if not dry_run and not args.no_backup:
+        manifest, backup_path = create_backup(
+            root=paths["root"],
+            registry_path=registry_path,
+            bibtex_path=paths["bibtex"],
+            notes_dir=paths["notes_dir"],
+            themes_path=paths["themes"],
+            reports_dir=paths["reports_dir"],
+            profile=paths["profile"],
+            notes=f"Pre-sync backup for {plan.plan_id}",
+        )
+        backup_id = manifest.backup_id
+    updated, result = apply_registry_sync_plan(plan, papers, dry_run=dry_run, force=args.force)
+    result.backup_id = backup_id
+    result.registry_path = str(registry_path)
+    if not dry_run:
+        write_registry_apply_result(updated, registry_path)
+    content = sync_apply_report(plan, result)
+    if args.out:
+        path = write_text(args.out, content, force=args.force_report)
+        print(f"Wrote {path}")
+        affected = [path, registry_path]
+    else:
+        print(content, end="")
+        affected = [registry_path]
+    if backup_path is not None:
+        affected.append(backup_path)
+    _record_audit_event(
+        paths,
+        command="sync apply",
+        action="sync_apply_dry_run" if dry_run else "sync_apply_registry",
+        affected_paths=affected,
+        dry_run=dry_run,
+        warnings=result.warnings,
+        summary=f"Sync {'dry-run' if dry_run else 'applied'} for {plan.plan_id}; actions={len(result.applied_actions)}",
+    )
+    return 0
+
+
+def cmd_sync_plan_obsidian(args: argparse.Namespace) -> int:
+    paths = _sync_paths(args)
+    project_id = _project_id_from_paths(paths)
+    plan = build_obsidian_roundtrip_plan(local_notes_dir=paths["notes_dir"], vault=args.vault, project=project_id)
+    markdown_path = Path(args.out) if args.out else _default_sync_report(paths, "obsidian_roundtrip.md")
+    json_path = Path(args.json_out) if args.json_out else _default_sync_report(paths, "obsidian_roundtrip.json")
+    _preflight_output_paths([markdown_path, json_path], force=args.force)
+    write_text(markdown_path, sync_plan_report(plan), force=True)
+    save_sync_plan_json(plan, json_path, force=True)
+    _record_audit_event(
+        paths,
+        command="sync plan-obsidian",
+        action="write_obsidian_roundtrip_plan",
+        affected_paths=[markdown_path, json_path],
+        dry_run=True,
+        warnings=plan.warnings,
+        summary=f"Planned Obsidian round-trip conflicts={len(plan.conflicts)}",
+    )
+    print(f"Wrote Obsidian round-trip report to {markdown_path}")
+    print(f"Wrote Obsidian round-trip JSON to {json_path}")
+    print(f"Conflicts: {len(plan.conflicts)}")
+    return 1 if args.strict and plan.conflicts else 0
+
+
 def cmd_synthetic_generate(args: argparse.Namespace) -> int:
     summary = generate_synthetic_project(
         name=args.project,
@@ -1717,6 +1855,59 @@ def build_parser() -> argparse.ArgumentParser:
     ris_import = import_sub.add_parser("ris", help="Import registry rows from a conservative local RIS parser.")
     add_import_common(ris_import)
     ris_import.set_defaults(func=cmd_import_ris)
+
+    sync_parser = subparsers.add_parser("sync", help="Plan and apply local, non-destructive sync operations.")
+    sync_sub = sync_parser.add_subparsers(dest="sync_command", required=True)
+
+    def add_sync_context(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX path used for pre-sync backups.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path used for backups and note context.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+
+    sync_plan = sync_sub.add_parser("plan", help="Create a dry-run sync plan from a local import source to the registry.")
+    sync_plan.add_argument("--source", required=True, help="Input source file such as Zotero CSV or BibTeX.")
+    sync_plan.add_argument("--source-type", required=True, choices=["zotero-csv", "bibtex", "generic-csv", "ris"], help="Local source format to compare.")
+    sync_plan.add_argument("--mapping", default="", help="Generic CSV mapping JSON path when --source-type generic-csv is used.")
+    add_sync_context(sync_plan)
+    sync_plan.add_argument("--out", default="", help="Markdown sync-plan report path. Defaults to reports/sync_plan.md.")
+    sync_plan.add_argument("--json-out", default="", help="JSON sync-plan path. Defaults to reports/sync_plan.json.")
+    sync_plan.add_argument("--force", action="store_true", help="Overwrite existing sync plan outputs.")
+    sync_plan.add_argument("--strict", action="store_true", help="Return non-zero when conflicts are detected.")
+    sync_plan.set_defaults(func=cmd_sync_plan)
+
+    sync_apply = sync_sub.add_parser("apply", help="Apply or dry-run a JSON sync plan against a registry.")
+    sync_apply.add_argument("plan", help="Sync plan JSON path.")
+    sync_apply.add_argument("--project", default="", help="Use a project profile instead of the plan target registry.")
+    sync_apply.add_argument("--registry", default="", help="Registry CSV override. Defaults to the plan target when no project is supplied.")
+    sync_apply.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX path used for pre-sync backups.")
+    sync_apply.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory used for pre-sync backups.")
+    sync_apply.add_argument("--themes", default=str(default_themes_path()), help="Themes path used for pre-sync backups.")
+    sync_apply.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports directory used for pre-sync backups.")
+    sync_apply.add_argument("--dry-run", action="store_true", help="Plan apply behavior without writing. This is also the default unless --force is supplied.")
+    sync_apply.add_argument("--force", action="store_true", help="Actually apply safe registry creates and blank-field fills.")
+    sync_apply.add_argument("--no-backup", action="store_true", help="Skip the pre-sync backup when --force is used.")
+    sync_apply.add_argument("--out", default="", help="Optional Markdown apply report path.")
+    sync_apply.add_argument("--force-report", action="store_true", help="Overwrite an existing --out report.")
+    sync_apply.set_defaults(func=cmd_sync_apply)
+
+    sync_conflicts = sync_sub.add_parser("conflicts", help="Render a conflict report from a JSON sync plan.")
+    sync_conflicts.add_argument("plan", help="Sync plan JSON path.")
+    sync_conflicts.add_argument("--out", default="", help="Optional Markdown conflict report path.")
+    sync_conflicts.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    sync_conflicts.add_argument("--strict", action="store_true", help="Return non-zero when conflicts are present.")
+    sync_conflicts.set_defaults(func=cmd_sync_conflicts)
+
+    sync_obsidian = sync_sub.add_parser("plan-obsidian", help="Compare local notes with an Obsidian-style exported vault without merging.")
+    sync_obsidian.add_argument("--vault", required=True, help="Obsidian-style vault directory generated by export obsidian.")
+    add_sync_context(sync_obsidian)
+    sync_obsidian.add_argument("--out", default="", help="Markdown round-trip report path. Defaults to reports/obsidian_roundtrip.md.")
+    sync_obsidian.add_argument("--json-out", default="", help="JSON round-trip plan path. Defaults to reports/obsidian_roundtrip.json.")
+    sync_obsidian.add_argument("--force", action="store_true", help="Overwrite existing round-trip outputs.")
+    sync_obsidian.add_argument("--strict", action="store_true", help="Return non-zero when conflicts are detected.")
+    sync_obsidian.set_defaults(func=cmd_sync_plan_obsidian)
 
     add_parser = subparsers.add_parser("add-paper", help="Add a paper row to the registry.")
     add_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")

@@ -25,6 +25,8 @@ def test_major_cli_help_contracts_are_available():
         (("claims", "--help"), "--force"),
         (("import", "--help"), "{zotero-csv,csv,bibtex,ris}"),
         (("import", "csv", "--help"), "--mapping"),
+        (("sync", "--help"), "{plan,apply,conflicts,plan-obsidian}"),
+        (("sync", "plan", "--help"), "--source-type"),
         (("export", "--help"), "{registry-csv,registry-json"),
         (("index", "--help"), "{rebuild,status,clear}"),
         (("files", "--help"), "{scan,status,link"),

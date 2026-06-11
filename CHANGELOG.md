@@ -2,6 +2,13 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.3.0 - Sync Planning and Conflict Resolution
+
+- Added local `paperwb sync` planning for Zotero-style CSV, generic CSV, BibTeX, and RIS sources.
+- Added JSON sync plans, conflict reports, dry-run apply reports, and safe registry applies for creates and blank-field fills.
+- Added conservative note and Obsidian vault round-trip conflict detection without auto-merging user notes.
+- Kept sync local-first: no cloud APIs, no scraping, no silent overwrites, and forced applies create backups by default.
+
 ## v1.2.0 - Reading Session Workflow
 
 - Added local reading queue generation based on registry priority, reading status, notes, claims, and theme gaps.
