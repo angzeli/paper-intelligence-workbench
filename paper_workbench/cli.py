@@ -38,6 +38,7 @@ from .backups import (
 )
 from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_claims, collect_notes, save_claims_csv
+from .dashboard import dashboard_markdown, dashboard_terminal, next_actions_markdown, project_health_summary_markdown, build_dashboard
 from .doctor import workspace_health
 from .drafts import (
     audit_draft,
@@ -158,6 +159,7 @@ from .rules import (
     validate_rule_set,
 )
 from .search import results_markdown, search_claims, search_note_files, search_papers
+from .schema import ValidationFinding
 from .synthetic import generate_synthetic_project
 from .sync import (
     SyncSource,
@@ -972,6 +974,87 @@ def cmd_rules_explain(args: argparse.Namespace) -> int:
     paths = _paths_from_args(args)
     rule_set = _load_rule_set_from_args(args, paths)
     print(explain_rule(args.rule_id, rule_set), end="")
+    return 0
+
+
+def cmd_dashboard(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    papers, notes, claims, entries, themes, paths = _report_inputs(args)
+    bib_findings = validate_bibtex(entries, papers) if entries else []
+    audit_findings = citation_audit(papers, notes, claims, entries, themes, root=paths["root"])
+    health_findings = workspace_health(
+        root=paths["root"],
+        registry_path=paths["registry"],
+        bibtex_path=paths["bibtex"],
+        notes_dir=paths["notes_dir"],
+        themes_path=paths["themes"],
+        reports_dir=paths["reports_dir"],
+        profile=paths["profile"],
+    )
+    context = _rule_context_from_args(args)
+    rule_findings = []
+    if not args.no_rules:
+        rule_set = _load_rule_set_from_args(args, paths)
+        rule_findings = run_rule_set(rule_set, context, include_builtins=not args.no_builtins).findings
+    sessions_path = _reading_sessions_path_from_args(args, paths)
+    sessions, session_warnings = load_reading_sessions_with_warnings(sessions_path)
+    state, state_warnings = load_followup_state_with_warnings(_followups_state_path_from_args(args, paths))
+    followups = filter_followups(
+        collect_followups(
+            project=_project_id_from_paths(paths),
+            papers=papers,
+            notes=notes,
+            sessions=sessions,
+            themes=themes,
+            state=state,
+        )
+    )
+    if session_warnings or state_warnings:
+        health_findings.extend(
+            [
+                ValidationFinding(
+                    "warning",
+                    "dashboard_state_warning",
+                    warning,
+                    suggestion="Review ignored local state files.",
+                )
+                for warning in [*session_warnings, *state_warnings]
+            ]
+        )
+    reports_dir = Path(paths["reports_dir"])
+    report_paths = [display_path(path, base_path=paths["root"]) for path in sorted(reports_dir.glob("*.md"))] if reports_dir.exists() else []
+    audit_events = load_audit_events(default_audit_log_path(paths["root"]))[-args.limit :]
+    dashboard = build_dashboard(
+        project=_project_id_from_paths(paths),
+        root=display_path(paths["root"], base_path=Path(".")),
+        papers=papers,
+        notes=notes,
+        claims=claims,
+        bibtex_entries=entries,
+        themes=themes,
+        project_profiles=list_project_profiles(),
+        bibtex_findings=bib_findings,
+        citation_findings=audit_findings,
+        health_findings=health_findings,
+        rule_findings=rule_findings,
+        manuscript_findings=context.manuscript_audit.findings if context.manuscript_audit else [],
+        reading_queue=build_reading_queue(papers, notes, claims, themes, limit=args.limit),
+        followups=followups,
+        audit_events=audit_events,
+        report_paths=report_paths,
+        limit=args.limit,
+    )
+    if args.out:
+        if args.view == "next-actions":
+            content = next_actions_markdown(dashboard.next_actions, title="Next Actions v1.6")
+        elif args.view == "health":
+            content = project_health_summary_markdown(dashboard, title="Project Health Summary v1.6")
+        else:
+            content = dashboard_markdown(dashboard, title="Terminal Dashboard v1.6")
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+        return 0
+    print(dashboard_terminal(dashboard, view=args.view, limit=args.limit), end="")
     return 0
 
 
@@ -2326,6 +2409,25 @@ def build_parser() -> argparse.ArgumentParser:
     report_parser.add_argument("--json-out", default="", help="Optional JSON export path for evidence-matrix reports.")
     report_parser.add_argument("--force", action="store_true", help="Overwrite an existing report file.")
     report_parser.set_defaults(func=cmd_report)
+
+    dashboard_parser = subparsers.add_parser("dashboard", help="Show a read-only terminal dashboard with project health and next actions.")
+    dashboard_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+    dashboard_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+    dashboard_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+    dashboard_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+    dashboard_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+    dashboard_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+    dashboard_parser.add_argument("--sessions", default="", help="Reading-session JSONL path. Defaults to .paperwb/reading_sessions.jsonl.")
+    dashboard_parser.add_argument("--state", default="", help="Follow-up completion state JSON path. Defaults to .paperwb/followups_state.json.")
+    dashboard_parser.add_argument("--rules-file", default="", help="Rules JSON path. Defaults to rules.json in the selected project root when present.")
+    dashboard_parser.add_argument("--manuscript", default="", help="Optional manuscript draft path for manuscript QA warnings.")
+    dashboard_parser.add_argument("--view", choices=["full", "next-actions", "health"], default="full", help="Terminal/report view to render.")
+    dashboard_parser.add_argument("--limit", type=int, default=10, help="Maximum items to show in each dashboard section.")
+    dashboard_parser.add_argument("--no-rules", action="store_true", help="Skip rule engine findings in the dashboard.")
+    dashboard_parser.add_argument("--no-builtins", action="store_true", help="When rules run, skip built-in validation adapters.")
+    dashboard_parser.add_argument("--out", default="", help="Optional Markdown dashboard report path.")
+    dashboard_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out path.")
+    dashboard_parser.set_defaults(func=cmd_dashboard)
 
     rules_parser = subparsers.add_parser("rules", help="Run local declarative validation rules.")
     rules_sub = rules_parser.add_subparsers(dest="rules_command", required=True)
