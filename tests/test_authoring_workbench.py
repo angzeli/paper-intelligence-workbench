@@ -125,9 +125,62 @@ def test_cli_authoring_reports_and_matrix_exports(tmp_path):
     assert "Writing Packet" in packet.read_text(encoding="utf-8")
 
 
+def test_cli_evidence_matrix_preflights_multi_output_paths(tmp_path):
+    matrix_md = tmp_path / "matrix.md"
+    matrix_csv = tmp_path / "matrix.csv"
+    matrix_json = tmp_path / "matrix.json"
+    matrix_csv.write_text("existing csv\n", encoding="utf-8")
+
+    result = run_cli(
+        "report",
+        "evidence-matrix",
+        "--project",
+        "zis_photocatalysis",
+        "--theme",
+        "charge separation",
+        "--out",
+        str(matrix_md),
+        "--csv-out",
+        str(matrix_csv),
+        "--json-out",
+        str(matrix_json),
+    )
+
+    assert result.returncode == 2
+    assert f"{matrix_csv} already exists" in result.stderr
+    assert not matrix_md.exists()
+    assert matrix_csv.read_text(encoding="utf-8") == "existing csv\n"
+    assert not matrix_json.exists()
+
+
 def test_cli_authoring_reports_require_known_theme(tmp_path):
     out = tmp_path / "missing.md"
     result = run_cli("report", "claim-bank", "--project", "zis_photocatalysis", "--theme", "unknown", "--out", str(out))
     assert result.returncode == 2
     assert "Unknown theme" in result.stderr
     assert not out.exists()
+
+
+def test_authoring_reports_have_stable_strong_weak_and_missing_evidence_sections():
+    papers, notes, claims, entries, themes = load_zis_inputs()
+
+    strong_matrix = evidence_matrix_report(
+        build_evidence_matrix("charge separation", papers, claims, themes, notes, project="zis_photocatalysis")
+    )
+    assert "# Evidence Matrix: charge-separation" in strong_matrix
+    assert "Claims: 1" in strong_matrix
+    assert "zis_charge_2025:c1" in strong_matrix
+    assert "| experimental_result | strong | high | Results p. 3 |" in strong_matrix
+
+    weak_bank = claim_bank_report(build_claim_bank("photocorrosion", claims, themes, project="zis_photocatalysis"))
+    assert "## Weak or Speculative Claims" in weak_bank
+    assert "zis_stability_2024:c1" in weak_bank
+    assert "review_statement" in weak_bank
+    assert "## Claims Missing Evidence Location" in weak_bank
+
+    missing_readiness = subsection_readiness_report(
+        build_subsection_readiness("photocorrosion", papers, notes, claims, entries, themes, project="zis_photocatalysis")
+    )
+    assert "Status: needs_targeted_follow_up" in missing_readiness
+    assert "+0/10: 1 claim(s) missing evidence locations" in missing_readiness
+    assert "Score: 50/100" in missing_readiness

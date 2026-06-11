@@ -8,3 +8,4 @@ __pycache__/
 .idea/
 .paperwb/
 **/.paperwb/
+reports/hostile_review_v0_*.md

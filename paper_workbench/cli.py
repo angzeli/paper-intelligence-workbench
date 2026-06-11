@@ -155,6 +155,19 @@ def _project_id_from_paths(paths: dict[str, Path | None]) -> str:
     return profile.name if profile else "default"
 
 
+def _preflight_output_paths(paths: list[str | Path], *, force: bool) -> None:
+    """Fail before writing when any requested output would be unsafe."""
+    seen: dict[Path, Path] = {}
+    for raw_path in paths:
+        path = Path(raw_path)
+        resolved = path.resolve(strict=False)
+        if resolved in seen:
+            raise FileExistsError(f"multiple outputs target the same path: {path}")
+        seen[resolved] = path
+        if path.exists() and not force:
+            raise FileExistsError(f"{path} already exists")
+
+
 def _default_text_dir(paths: dict[str, Path | None]) -> Path:
     if paths.get("profile"):
         return Path(paths["root"]) / "text"
@@ -493,6 +506,15 @@ def cmd_report(args: argparse.Namespace) -> int:
         if name != "evidence-matrix" and (getattr(args, "csv_out", "") or getattr(args, "json_out", "")):
             print("--csv-out and --json-out are only supported for evidence-matrix", file=sys.stderr)
             return 2
+        if name == "evidence-matrix":
+            matrix_output_paths: list[str | Path] = [
+                args.out if args.out and len(selected) == 1 else reports_dir / "evidence_matrix.md"
+            ]
+            if args.csv_out:
+                matrix_output_paths.append(args.csv_out)
+            if args.json_out:
+                matrix_output_paths.append(args.json_out)
+            _preflight_output_paths(matrix_output_paths, force=args.force)
         content = builders[name]()
         if args.out and len(selected) == 1:
             path = write_text(args.out, content, force=args.force)

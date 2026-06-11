@@ -490,13 +490,67 @@ def _display_path(path: Path, *, base: Path | None = None) -> str:
         return path.as_posix()
 
 
+def _report_version(path: Path) -> int | None:
+    match = re.search(r"(?:^|_)v0_(\d+)", path.stem)
+    return int(match.group(1)) if match else None
+
+
+def _latest_release_version(reports: list[Path]) -> int | None:
+    versions = [
+        version
+        for report in reports
+        if "recommended_patch_plan" not in report.name
+        for version in [_report_version(report)]
+        if version is not None
+    ]
+    return max(versions) if versions else None
+
+
 def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | None = None) -> str:
     root = Path(reports_dir)
-    reports = sorted(path for path in root.glob("*.md") if path.is_file())
+    reports = sorted(
+        path
+        for path in root.glob("*.md")
+        if path.is_file() and not re.fullmatch(r"hostile_review_v0_\d+\.md", path.name)
+    )
     link_base = Path(output_path).parent if output_path is not None else root
-    lines = ["# Report Index", "", f"Reports directory: {_display_path(root, base=link_base)}", "", f"Markdown reports: {len(reports)}", ""]
+    latest_release = _latest_release_version(reports)
+    current: list[Path] = []
+    next_plans: list[Path] = []
+    historical: list[Path] = []
+    legacy: list[Path] = []
     for report in reports:
-        lines.append(f"- [{report.name}]({_display_path(report, base=link_base)})")
+        version = _report_version(report)
+        if report.name == "hostile_review_latest.md" or (latest_release is not None and version == latest_release and "recommended_patch_plan" not in report.name):
+            current.append(report)
+        elif latest_release is not None and "recommended_patch_plan" in report.name and version is not None and version > latest_release:
+            next_plans.append(report)
+        elif version is not None:
+            historical.append(report)
+        else:
+            legacy.append(report)
+
+    lines = [
+        "# Report Index",
+        "",
+        f"Reports directory: {_display_path(root, base=link_base)}",
+        "",
+        f"Markdown reports indexed: {len(reports)}",
+        "",
+        "Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.",
+    ]
+    sections = [
+        (f"Current v0.{latest_release} Release Reports" if latest_release is not None else "Current Reports", current),
+        ("Next Patch Plan", next_plans),
+        ("Historical Versioned Reports", historical),
+        ("Legacy Unversioned Reports", legacy),
+    ]
+    for heading, grouped_reports in sections:
+        if not grouped_reports:
+            continue
+        lines.extend(["", f"## {heading}", ""])
+        for report in grouped_reports:
+            lines.append(f"- [{report.name}]({_display_path(report, base=link_base)})")
     return "\n".join(lines).rstrip() + "\n"
 
 

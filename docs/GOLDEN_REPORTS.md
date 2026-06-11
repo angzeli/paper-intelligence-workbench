@@ -1,6 +1,6 @@
 # Golden Reports
 
-v0.3 adds golden Markdown snapshots for representative stress reports. These tests are meant to catch accidental report-format or report-order changes.
+Golden and stable report regression tests catch accidental report-format, report-order, and report-section changes.
 
 ## Location
 
@@ -23,6 +23,8 @@ Current snapshots cover:
 - workspace health
 - section outline
 
+v0.6 authoring reports are covered by stable section/count assertions rather than full-file snapshots. These assertions pin representative strong-claim, weak-claim, and missing-evidence cases without making the tests brittle to harmless wording changes.
+
 ## Running
 
 ```bash
@@ -33,7 +35,7 @@ The snapshots are generated from the checked-in `stress_zis_photocatalysis` proj
 
 ## Updating Intentionally
 
-Only update golden snapshots when report behavior intentionally changes. Before updating, inspect the diff and confirm it reflects a desired user-facing change.
+Only update golden snapshots or stable authoring assertions when report behavior intentionally changes. Before updating, inspect the diff and confirm it reflects a desired user-facing change.
 
 Avoid snapshot content that depends on:
 
@@ -42,5 +44,4 @@ Avoid snapshot content that depends on:
 - random ordering
 - local machine details
 
-The v0.3 snapshot helper normalizes the repository root path before comparison.
-
+The snapshot helper normalizes the repository root path before comparison.

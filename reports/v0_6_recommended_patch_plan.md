@@ -1,4 +1,6 @@
-# v0.6 Recommended Patch Plan
+# Historical v0.6 Recommended Patch Plan
+
+This report is retained as a historical v0.5 search/indexing follow-up plan. It is not the current next-step plan for the v0.6 authoring-workbench release. See `v0_7_recommended_patch_plan.md` for the active recommended patch plan.
 
 ## High Priority
 
@@ -35,4 +37,3 @@
 - Turning the rebuildable cache into an authoritative database would make user data recovery harder.
 - Adding background file watchers would increase complexity without clear v0.6 value.
 - Sophisticated ranking can become misleading unless it remains explainable.
-

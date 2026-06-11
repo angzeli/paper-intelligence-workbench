@@ -41,3 +41,5 @@ Vault and bundle exports require a new or empty output directory. They do not me
 paperwb export project-summary --project zis_photocatalysis --out reports/project_summary.md --force
 paperwb export report-index --project zis_photocatalysis --out reports/index.md --force
 ```
+
+The report index groups current release reports, next patch plans, historical versioned reports, and legacy unversioned reports. Versioned hostile-review drafts are omitted in favor of `hostile_review_latest.md`.
