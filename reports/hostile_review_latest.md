@@ -1,256 +1,237 @@
-# Hostile Maintainer Review: v1.5 Current Repository
+# Hostile Maintainer Review: v1.6 Current Repository
 
 Date: 2026-06-11
 
+Scope: standalone release review of the current repository as if it were about
+to be handed to external users. I inspected package metadata, CLI behavior,
+project profiles, registry/BibTeX/note/claim workflows, reports, authoring and
+manuscript tooling, import/export, sync, local files, indexed search, rules,
+dashboard, tests, notebooks, docs, generated reports, synthetic data, CI, and
+repo hygiene. No implementation files were modified during inspection.
+
 ## Release Verdict
 
-Do not cut a broad external v1.5 release until the high-priority rule-engine defects below are fixed.
+Do not tag this exact tree as a polished external v1.6 release. The core test
+suite passes and I did not find an immediate data-loss or cloud/LLM boundary
+violation, but the new terminal dashboard has release-quality defects:
+non-positive limits succeed, top next actions duplicate the same underlying
+problem, and the checked-in dashboard report depends on ignored local audit-log
+state. These are not catastrophic, but they are visible to a new user and weaken
+the release claim that reports are reproducible from local checked-in inputs.
 
-I did not find a release-blocking data-loss issue, unsafe overwrite path, tracked copyrighted content, tracked cache database, tracked backup archive, or cloud/LLM dependency. The package imports, the CLI is discoverable, the full test suite passes, notebook JSON validation passes, and the data-safety audit reports no errors.
+Verdict: **hold external release until the high-priority dashboard fixes below
+land**. Internal/local use remains acceptable.
 
-The current risk is narrower but still important: the new v1.5 custom rule system can certify invalid rule configs, silently miss natural JSON boolean filters, and double-count manuscript unknown-citation findings. Because v1.5 is specifically about custom validation, those are high-priority release issues even though they fail non-destructively.
+## Validation Performed
 
-## Review Scope
-
-Inspected:
-
-- package metadata and package layout
-- CLI command surface, including `paperwb rules`
-- project profiles and synthetic projects
-- registry, BibTeX, note parsing, claim extraction, evidence maps, citation audits, authoring reports, draft/manuscript audit, local search/indexing, local files, imports/exports, sync, backups, migrations, reading sessions, safety utilities, and rule-engine integration
-- tests, CI workflow, smoke scripts, and notebook checkers
-- README, docs-site pages, detailed docs, generated reports, and release-readiness notes
-- synthetic data and tracked-file hygiene
-
-Validation and probes run:
-
-- `git status --short --branch --ignored=matching`
-- `python -m pytest -q`
-- `python -m pytest --collect-only -q`
-- `python scripts/validate_notebooks.py`
-- `python scripts/check_notebooks.py`
-- `python scripts/data_safety_audit.py --out <scratch>/paperwb_hostile_data_safety.md --strict`
-- `python -m paper_workbench.cli --help`
-- `python -m paper_workbench.cli rules --help`
-- `python -m paper_workbench.cli rules validate-config --help`
-- `python -m paper_workbench.cli rules run --help`
-- `python -m paper_workbench.cli rules list --project zis_photocatalysis --builtins`
-- `python -m paper_workbench.cli rules validate-config --project zis_photocatalysis --strict`
-- `python -m paper_workbench.cli rules run --project zis_photocatalysis --no-builtins`
-- `python -m paper_workbench.cli rules report --project zis_photocatalysis --out <scratch>/rules_report.md --force`
-- rule-engine probes with invalid numeric thresholds, JSON boolean `where_equals`, and manuscript unknown-citation rules
-- overwrite refusal probes for rule reports
-- missing-project failure probes
-- tracked-file hygiene probes with `git ls-files`
-
-Observed validation results:
-
-- Full pytest passed.
-- Pytest collection found 216 tests.
-- Notebook structural validation passed for 8 notebooks.
-- Data-safety audit checked 540 repository files with 0 errors and 7 existing absolute-path warnings in historical reports/tests.
-- No tracked PDFs, SQLite/cache databases, `.paperwb` directories, Python caches, backup archives, audit logs, or obvious secrets were found by tracked-file probes.
+- `python -m pytest -q`: passed, 221 tests.
+- `python -m pytest --collect-only -q`: collected 221 tests.
+- `python -m paper_workbench.cli --help`: passed; `dashboard` is exposed.
+- `python -m paper_workbench.cli dashboard --help`: passed.
+- `python -c "import paper_workbench; print(paper_workbench.__version__)"`:
+  reported `1.6.0`.
+- `python scripts/validate_notebooks.py`: validated 8 notebooks.
+- `python scripts/check_notebooks.py`: checked 8 notebooks, no absolute-path
+  failures reported.
+- `python scripts/data_safety_audit.py --out /private/tmp/paperwb_hostile_v1_6_data_safety.md --strict`:
+  passed with 0 errors and 7 historical absolute-path warnings.
+- `git ls-files | rg '(\\.pdf$|\\.sqlite$|\\.db$|\\.paperwb/|__pycache__|\\.pytest_cache|^scratch/|^build/|^dist/|\\.egg-info/)'`:
+  no tracked forbidden artifacts found.
+- Dashboard probes:
+  - `paperwb dashboard --project zis_photocatalysis --limit 3`: passed but
+    top three actions all point to the same missing-evidence problem through
+    different subsystems.
+  - `paperwb dashboard --project zis_photocatalysis --limit 0`: passed and
+    showed no next actions, queue items, or follow-ups despite known issues.
+  - `paperwb dashboard --project zis_photocatalysis --limit -1`: passed and
+    emitted a long, sliced result set instead of rejecting invalid input.
+  - `paperwb dashboard --project missing_project`: failed cleanly with a useful
+    user-facing error and next step.
 
 ## Release Blockers
 
-No immediate release-blocking data-loss, destructive migration, unsafe restore, or tracked copyrighted-content issue was found.
-
-This is not a clean v1.5 release verdict. The high-priority issues below should be fixed before advertising custom rules as reliable external-user functionality.
+None found that would destroy user data, require network/cloud services, commit
+copyrighted content, or make the package unimportable. The current blockers are
+release-quality rather than safety-critical.
 
 ## High-Priority Issues
 
-### 1. `rules validate-config` accepts numeric thresholds that later crash at runtime
+1. **Dashboard `--limit` accepts invalid values and silently produces misleading output.**
 
-Evidence:
+   Evidence: `paperwb dashboard --project zis_photocatalysis --limit 0` exits
+   `0` and prints "No next actions generated" even though the same project has
+   missing evidence, weak claims, and follow-ups. `--limit -1` also exits `0`
+   and Python slicing returns all-but-last style output. The parser only sets
+   `type=int` (`paper_workbench/cli.py`, dashboard parser around lines
+   2413-2430), and `cmd_dashboard` forwards the value into audit-log slicing,
+   reading queue generation, and dashboard rendering without validation
+   (`paper_workbench/cli.py`, lines 1026 and 1041-1057). This is a public CLI
+   contract bug. Reject non-positive limits with a clear error, and add tests
+   for `0`, negative, and valid positive limits.
 
-- A JSON rule with `theme_min_papers` and `"min_papers": "abc"` was accepted by `paperwb rules validate-config ... --strict` as valid.
-- Running the same rule with `paperwb rules run ... --no-builtins` failed with the raw Python message `invalid literal for int() with base 10: 'abc'`.
-- `paper_workbench/rules.py:466-514` validates required fields, regex shape, and strength thresholds, but not integer fields.
-- `paper_workbench/rules.py:593-600`, `paper_workbench/rules.py:649-655`, and `paper_workbench/rules.py:659-665` cast rule values with `int(...)` during execution.
+2. **Top next actions are not semantically deduplicated, so the dashboard can waste the first screen on one underlying defect.**
 
-Why this matters:
+   Evidence: `paperwb dashboard --project zis_photocatalysis --limit 3` prints
+   three separate high-priority actions for `zis_stability_2024:c1` missing an
+   evidence location: workspace health, citation audit, and built-in rule
+   findings. `build_next_actions` aggregates health, rule, missing-evidence,
+   citation, weak-claim, manuscript, follow-up, and reading items independently
+   (`paper_workbench/dashboard.py`, lines 115-242). `_dedupe_actions` only
+   deduplicates identical action IDs (`paper_workbench/dashboard.py`, lines
+   505-513), so cross-subsystem duplicates survive. This directly weakens the
+   v1.6 "next actions" value proposition. Add a semantic dedupe/grouping key
+   such as `(related, issue-family)` or collapse duplicate evidence-location
+   findings into one action with multiple sources.
 
-- v1.5 promises safe declarative rules and explicit config validation.
-- A config validator that certifies invalid configs undermines the main v1.5 feature.
-- The runtime failure is non-destructive, but the error quality is poor and not actionable.
+3. **Checked-in dashboard reports depend on ignored, mutable audit-log state.**
 
-Required fix:
+   Evidence: `cmd_dashboard` always loads recent audit events from
+   `.paperwb/audit_log.jsonl` under the selected root (`paper_workbench/cli.py`,
+   line 1026). `dashboard_markdown` always renders the "Recent Audit Events"
+   section (`paper_workbench/dashboard.py`, lines 294-338, 446-459). The
+   committed `reports/dashboard_v1_6.md` contains timestamped local audit-log
+   rows from previous maintainer commands, including manuscript and index runs
+   with 2026-06-11 timestamps. Because `.paperwb/` is ignored, this report is
+   not reproducible from tracked inputs and can drift whenever local commands
+   are run. Add a deterministic option such as `--no-audit-log` or
+   `--audit-events 0`, use it for release reports, and test that generated
+   report snapshots do not depend on ignored local state.
 
-- Validate integer fields for `min_count`, `max_count`, `theme_min_papers`, and `theme_min_strong_claims`.
-- Return structured rule config findings with suggested actions instead of allowing `ValueError` from `int(...)`.
-- Add tests for invalid numeric values in both `validate-config` and `rules run`.
+4. **v1.6 dashboard coverage is missing from release-surface docs and smoke scripts.**
 
-### 2. JSON boolean filters silently fail to match registry fields
-
-Evidence:
-
-- A rule using `"where_field": "included_in_lit_review"` and `"where_equals": true` returned `No rule findings.`
-- The same rule using `"where_equals": "true"` returned the expected findings.
-- `paper_workbench/rules.py:690-699` compares `str(field_value) == str(expected)`, so registry string values like `true` do not match JSON boolean values like `True`.
-
-Why this matters:
-
-- Rule files are JSON. Users will naturally write booleans as `true` and `false`.
-- Silent false negatives are more dangerous than visible validation errors because users can trust a clean report that missed real problems.
-- This affects project-specific registry, note, claim, and workspace filters anywhere `where_equals` is used.
-
-Required fix:
-
-- Normalize comparison values consistently for booleans, numbers, strings, and empty values.
-- Document the comparison behavior.
-- Add regression tests proving JSON `true` and string `"true"` match the same registry data.
-
-### 3. Manuscript unknown-citation rule double-counts the same missing citation key
-
-Evidence:
-
-- Running the ZIS project rule set against `drafts/synthetic_unknown_citations.md` reported each missing citation key twice.
-- The duplicate rows come from separate manuscript findings for `citation_key_not_in_bibtex` and `citation_key_not_in_registry`.
-- `paper_workbench/rules.py:669-687` maps both finding codes directly into configured rule findings without deduplicating by citation key and paragraph.
-
-Why this matters:
-
-- Unknown citations are exactly the kind of manuscript issue users will want project rules to catch.
-- Duplicated findings inflate error counts and make rule reports look worse than the underlying manuscript audit.
-- This also makes `--strict` output noisier and less trustworthy.
-
-Required fix:
-
-- Deduplicate configured manuscript unknown-citation findings by `(citation_key, paragraph_id)`.
-- Keep a message that explains the key may be missing from BibTeX, registry, or both.
-- Add tests for a draft with unknown citations proving one configured-rule finding per key/paragraph.
+   `docs/CLI_SURFACE.md` and `docs/COMMAND_CONTRACTS.md` are still labelled
+   v1.5 and do not list `paperwb dashboard`. `docs/REPORT_MATRIX.md` and
+   `docs/REPORT_GALLERY.md` cover the older theme dashboard but not the v1.6
+   terminal dashboard, next-actions report, or project-health summary. The CI
+   workflow runs `paperwb --help` and the generic smoke script, but
+   `scripts/smoke_cli_workflow.py` does not exercise `paperwb dashboard`. Tests
+   exist in `tests/test_dashboard_v1_6.py`, but the external command contract
+   and smoke path lag behind the feature. Update the docs and add the dashboard
+   to the smoke workflow after fixing the limit behavior.
 
 ## Medium-Priority Issues
 
-### 1. `import_export` is accepted as a rule target but has no real context records
+1. **Dashboard issue counts double-count findings from adapters.** The v1.6
+   dashboard shows workspace health, citation audit, and rule findings as
+   separate counts. Built-in rule adapters intentionally wrap some of the same
+   findings, so "Rule findings: 8 errors, 16 warnings" can look much worse than
+   the underlying project state. This should be explained in the dashboard or
+   grouped by source/unique issue.
 
-Evidence:
+2. **Default dashboard can look nonsensical in the legacy workspace.** The
+   default `paperwb dashboard --limit 3` can show `Papers: 0` while still
+   showing notes and claims from legacy example paths. That reflects an empty
+   default registry plus checked-in notes, but a new user will read it as
+   inconsistent. Add a warning when notes/claims exist but no registry rows are
+   loaded.
 
-- `RuleCategory.IMPORT_EXPORT = "import_export"` is present in `paper_workbench/rules.py:40-50`.
-- `RULE_TARGETS` therefore accepts `import_export` configs.
-- `_items_for_target` in `paper_workbench/rules.py:546-558` never returns import/export records.
-- `docs/CUSTOM_RULES.md:33-43` omits `import_export` from the supported-target list.
+3. **Report reproducibility is uneven across historical reports.** The
+   data-safety audit still reports seven absolute-path warnings in historical
+   reports/tests. They are warnings, not errors, but the release story would be
+   cleaner if machine-local paths were scrubbed from release-facing reports.
 
-Why this matters:
+4. **The CLI module remains very large.** `paper_workbench/cli.py` centralizes
+   many command groups and now includes dashboard, rules, sync, files, reading,
+   backup, manuscript, and import/export wiring. This is still working, but it
+   increases the risk that future patches accidentally couple unrelated
+   behaviors. Splitting command groups into small parser/handler modules should
+   be a post-release maintainability task.
 
-- The v1.5 product scope said imports/exports should be configurable rule targets.
-- Current behavior is ambiguous: the target is accepted internally but not documented, and most item-level rules operate on an empty target set.
-
-Recommendation:
-
-- Either implement import/export context records or remove the target from `RULE_TARGETS`.
-- If it remains experimental, document that clearly and make `validate-config` warn when item-level rule types target `import_export`.
-
-### 2. `rules validate-config` uses a different explicit-file interface than other rule commands
-
-Evidence:
-
-- `rules list`, `rules run`, `rules report`, and `rules explain` accept `--rules-file`.
-- `rules validate-config` only accepts a positional `[rules_file]`.
-- `paperwb rules validate-config --project zis_photocatalysis --rules-file ...` fails with `unrecognized arguments: --rules-file`.
-- Docs say to pass `--rules-file` for explicit rule configs, which is not true for validation.
-
-Why this matters:
-
-- Users will validate a rule file before running it. The command that should be safest is the one with the least consistent interface.
-- This is not a data-safety issue, but it is a CLI contract mismatch.
-
-Recommendation:
-
-- Add `--rules-file` to `rules validate-config` as an alias while preserving the positional argument.
-- Add a CLI contract test for both forms.
-
-### 3. Rule reports can still be noisy because built-in adapters overlap
-
-Evidence:
-
-- Built-in rule findings adapt registry validation, citation audit, evidence-map coverage, workspace health, and optional manuscript QA.
-- These layers can report related conditions with different IDs, even after basic finding deduplication.
-
-Why this matters:
-
-- Rule reports should help users prioritize work.
-- Overlapping built-ins can make one underlying problem appear as several independent issues.
-
-Recommendation:
-
-- Add optional category/severity filters or a summary grouped by paper/theme/claim.
-- Keep raw rows available, but make the first report section less noisy.
-
-### 4. Historical data-safety warnings remain in release artifacts
-
-Evidence:
-
-- The strict data-safety audit reported 0 errors and 7 warnings for absolute local paths in historical reports/tests.
-- Those are not tracked-file blockers, but they are release-hygiene debt.
-
-Recommendation:
-
-- Redact or archive historical reports that contain machine-specific paths.
-- Keep tests that intentionally mention local path patterns, but ensure report-facing artifacts do not leak real machine paths.
-
-### 5. Notebook coverage no longer reflects the full feature set
-
-The notebook checker validates 8 notebooks, but the repo now includes draft/manuscript QA, reading sessions, sync, local files, backups, and rules. Some of those workflows are covered by scripts and tests, but a new external user may expect notebook walkthroughs to cover current headline features.
-
-Recommendation:
-
-- Either label notebooks as historical examples or add current notebooks selectively for manuscript QA and custom rules.
-- Avoid adding notebooks for every feature if scripts are a better maintenance surface.
+5. **Notebook coverage trails feature growth.** Notebook validation is passing,
+   but notebooks stop at v1.0-style authoring/readiness workflows. There is no
+   notebook or script specifically demonstrating rules, v1.6 dashboard triage,
+   sync, or local-file ingestion end to end. This is not a blocker, but it
+   undercuts external onboarding for later features.
 
 ## Low-Priority Polish
 
-- `default_rule_file(root, project="")` currently returns `rules.json` in both branches; the unused `project` argument is confusing.
-- `paper_workbench/cli.py` remains very large, and `paper_workbench/rules.py` is now another large module. Both are manageable today, but future feature work should split command handlers and rule evaluators.
-- The reports directory contains many historical stage reports. This is useful audit history but overwhelming for external users.
-- Docs have both lowercase docs-site pages and uppercase detailed pages, which is workable but not always obviously canonical.
-- `rules explain` is useful for configured rules and built-ins, but it does not explain rule type schemas such as required condition fields.
+- Generated dashboard tables use raw boolean strings such as `True` in audit
+  event rows; lower-case normalized booleans would read better in Markdown.
+- The v1.6 dashboard is plain text only. That is acceptable and dependency-safe,
+  but docs should avoid implying it is an interactive TUI.
+- Stale ignored build artifacts (`dist/`, `build/`, egg-info) exist locally.
+  They are ignored and not tracked, but release maintainers should clean them
+  before packaging demonstrations.
+- Historical report files make it hard to identify the current release snapshot.
+  `reports/index.md` helps, but a future cleanup should archive or prune stale
+  release reports before public launch.
 
 ## Missing Tests
 
-- Invalid numeric rule config tests for `min_count`, `max_count`, `theme_min_papers`, and `theme_min_strong_claims`.
-- CLI failure-path tests proving invalid numeric rule configs return structured config findings rather than raw Python conversion errors.
-- JSON boolean `where_equals` tests for registry fields such as `included_in_lit_review`.
-- Manuscript unknown-citation rule deduplication tests.
-- `rules validate-config --rules-file ...` alias tests if that interface is added.
-- Tests clarifying whether `import_export` is supported, rejected, or experimental.
-- Rule report regression assertions for configured manuscript rules and project-specific rule sets.
+- `paperwb dashboard --limit 0` and negative-limit failure tests.
+- Dashboard semantic next-action dedupe tests for the same claim/finding
+  surfaced through health, citation audit, and rules.
+- Dashboard Markdown determinism test that proves ignored audit logs do not
+  affect checked-in release reports.
+- Command-contract tests documenting `paperwb dashboard` help, happy path,
+  invalid-limit failure path, overwrite refusal, and project-specific behavior.
+- Smoke workflow coverage for `paperwb dashboard --project ... --view
+  next-actions`.
+- Report-matrix or release-hygiene test ensuring v1.6 dashboard reports are
+  listed in report docs.
 
 ## Documentation Mismatches
 
-- `docs/CUSTOM_RULES.md` omits the accepted `import_export` target, while code accepts it.
-- `docs/CLI_REFERENCE.md` and related rule docs imply explicit rule files use `--rules-file`, but `rules validate-config` does not support that flag.
-- Rule docs do not describe type coercion for `where_equals`, which is currently important because JSON booleans and CSV strings behave differently.
-- Rule docs list rule types but do not provide a concise field schema per type.
-- Release-readiness reports say v1.5 rule configs validate, but they do not mention the numeric-validation blind spot found here.
+- `docs/CLI_SURFACE.md` says v1.5 and omits `paperwb dashboard`.
+- `docs/COMMAND_CONTRACTS.md` says v1.5 and omits dashboard command
+  expectations.
+- `docs/REPORT_MATRIX.md` omits `reports/dashboard_v1_6.md`,
+  `reports/next_actions_v1_6.md`, and
+  `reports/project_health_summary_v1_6.md`.
+- `docs/REPORT_GALLERY.md` documents theme dashboard only, not the v1.6
+  terminal dashboard report family.
+- `scripts/smoke_cli_workflow.py` still titles its report "CLI Smoke Workflow
+  v0.8" and does not include dashboard smoke steps.
 
 ## CLI Usability Problems
 
-- Invalid numeric rule configs fail at runtime with a Python conversion message instead of a rule-specific diagnostic.
-- `rules validate-config` has an inconsistent explicit-file interface compared with the rest of the `rules` group.
-- `rules run --strict` can return duplicated configured manuscript findings for one unknown citation.
-- `rules report` overwrite protection works correctly, but the default report name can be easy to overwrite intentionally with `--force`; keep that behavior but ensure reports say exactly which rule file was used.
+- Invalid dashboard limits succeed instead of returning a user-facing error.
+- Top next actions can repeat the same fix several times, crowding out useful
+  follow-up actions and reading recommendations.
+- There is no CLI option to suppress audit-log rows in dashboard Markdown even
+  though audit logs are local ignored state and often irrelevant for a release
+  report.
+- Dashboard rule counts are hard to interpret because built-in rule adapters can
+  re-label existing workspace and citation findings.
 
 ## Data-Safety Risks
 
-- No tracked PDFs, SQLite/cache databases, `.paperwb` directories, Python caches, backup archives, audit logs, or obvious secrets were found in tracked files.
-- The strict data-safety audit reported 0 errors and 7 warnings for absolute local paths in historical reports/tests.
-- Rule config execution is data-only and does not execute arbitrary Python code. That boundary appears intact.
-- The main current data-safety risk is indirect: users may trust a clean rule report that missed issues because of JSON boolean filter false negatives.
+- No tracked PDFs, SQLite caches, `.paperwb` logs, Python caches, build outputs,
+  or IDE folders were found.
+- No cloud, LLM, publisher-scraping, or copyrighted-content dependency risk was
+  found in the inspected commands.
+- The main data-safety concern is privacy/reproducibility: `reports/dashboard_v1_6.md`
+  includes local audit-log timestamps and command summaries sourced from ignored
+  state. That is not a secret leak in the current synthetic repo, but it is a
+  bad default for reports a user may commit or share.
 
 ## Overengineering Risks
 
-- The project has many feature surfaces for a zero-dependency local CLI. v1.5 adds another cross-cutting abstraction on top of already broad validators.
-- The rule engine should stay declarative. Do not add expression evaluation or arbitrary plugin code.
-- Built-in rule adapters should not become a second, divergent validation system. Keep them thin or route existing validators through structured findings.
-- Adding every possible target before context records exist will make the rule surface look broader than it is.
+- Dashboard aggregation now spans registry, notes, claims, BibTeX, citation
+  audit, workspace health, rules, manuscript QA, reading sessions, follow-ups,
+  audit logs, and reports. Without semantic issue grouping it produces more
+  noise than signal.
+- Built-in rule adapters are useful, but using them inside the dashboard by
+  default duplicates other issue sources. The dashboard needs a clearer
+  distinction between raw source findings and unique user actions.
+- The project has accumulated many generated reports and docs. The release
+  should favor a few maintained "current" entry points rather than expecting
+  users to browse every historical report.
 
 ## Recommended Fix Sequence
 
-1. Add rule-config numeric validation and convert runtime numeric parsing failures into structured config findings.
-2. Normalize `where_equals` comparisons so JSON booleans match equivalent CSV/string values.
-3. Deduplicate `manuscript_no_unknown_citations` findings by citation key and paragraph.
-4. Decide whether `import_export` is supported in v1.5; either implement context records or reject/warn in config validation.
-5. Add `--rules-file` as a non-breaking alias for `rules validate-config`, then update CLI contract tests.
-6. Update rule docs with target support, condition schemas, and comparison semantics.
-7. Regenerate affected v1.5 reports after the fixes and keep historical path warnings out of current release-facing reports.
+1. Validate `paperwb dashboard --limit` as a positive integer and add CLI tests
+   for invalid values.
+2. Add semantic deduplication/grouping for next actions, then update
+   `tests/test_dashboard_v1_6.py` with a regression fixture for repeated
+   missing-evidence findings.
+3. Add dashboard audit-log control (`--no-audit-log` or equivalent), regenerate
+   v1.6 dashboard reports using deterministic tracked inputs, and add a
+   determinism test.
+4. Update `docs/CLI_SURFACE.md`, `docs/COMMAND_CONTRACTS.md`,
+   `docs/REPORT_MATRIX.md`, `docs/REPORT_GALLERY.md`, and
+   `scripts/smoke_cli_workflow.py` for v1.6 dashboard behavior.
+5. Add dashboard smoke steps to CI through the existing smoke script.
+6. After the focused dashboard patch, rerun pytest, notebook checks,
+   data-safety audit, `paperwb dashboard` smoke tests, and regenerate the
+   release-facing dashboard reports.
