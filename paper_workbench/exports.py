@@ -510,6 +510,21 @@ def _latest_release_version(reports: list[Path]) -> tuple[int, int] | None:
     return max(versions) if versions else None
 
 
+CURRENT_UNVERSIONED_REPORTS_BY_RELEASE: dict[tuple[int, int], set[str]] = {
+    (1, 7): {
+        "template_finance_overview.md",
+        "template_ml_methods_overview.md",
+        "template_photocatalysis_overview.md",
+    },
+}
+
+
+def _is_current_unversioned_report(report: Path, latest_release: tuple[int, int] | None) -> bool:
+    if latest_release is None:
+        return False
+    return report.name in CURRENT_UNVERSIONED_REPORTS_BY_RELEASE.get(latest_release, set())
+
+
 def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | None = None) -> str:
     root = Path(reports_dir)
     reports = sorted(
@@ -525,7 +540,11 @@ def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | 
     legacy: list[Path] = []
     for report in reports:
         version = _report_version(report)
-        if report.name == "hostile_review_latest.md" or (latest_release is not None and version == latest_release and "recommended_patch_plan" not in report.name):
+        if (
+            report.name == "hostile_review_latest.md"
+            or _is_current_unversioned_report(report, latest_release)
+            or (latest_release is not None and version == latest_release and "recommended_patch_plan" not in report.name)
+        ):
             current.append(report)
         elif latest_release is not None and "recommended_patch_plan" in report.name and version is not None and version > latest_release:
             next_plans.append(report)

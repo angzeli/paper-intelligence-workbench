@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from conftest import ROOT
+from paper_workbench import __version__
 from paper_workbench.exports import report_index_markdown
 
 
@@ -93,6 +94,32 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     assert "[release_readiness_v1_7.md]" in content
     assert "## Next Patch Plan" in content
     assert "[v1_8_recommended_patch_plan.md]" in content
+    current_section = content.split("## Current v1.7 Release Reports", 1)[1].split("## Next Patch Plan", 1)[0]
+    legacy_section = content.split("## Legacy Unversioned Reports", 1)[1]
+    for report in (
+        "template_photocatalysis_overview.md",
+        "template_finance_overview.md",
+        "template_ml_methods_overview.md",
+    ):
+        assert f"[{report}]" in current_section
+        assert f"[{report}]" not in legacy_section
+
+
+def test_local_build_artifacts_do_not_claim_stale_versions():
+    dist = ROOT / "dist"
+    if dist.exists():
+        stale_dist = [
+            path.name
+            for path in dist.iterdir()
+            if path.is_file()
+            and path.name.startswith("paper_intelligence_workbench-")
+            and __version__ not in path.name
+        ]
+        assert not stale_dist
+
+    pkg_info = ROOT / "paper_intelligence_workbench.egg-info" / "PKG-INFO"
+    if pkg_info.exists():
+        assert f"Version: {__version__}" in pkg_info.read_text(encoding="utf-8")
 
 
 def test_v1_4_manuscript_docs_are_wired_into_release_docs():

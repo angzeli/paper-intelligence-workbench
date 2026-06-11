@@ -259,18 +259,21 @@ def _manuscript_unknown_citation_rule() -> dict[str, Any]:
 
 
 def _theme_min_paper_rules(template_key: str, themes: list[dict[str, Any]], minimum: int) -> list[dict[str, Any]]:
-    return [
-        {
-            "rule_id": f"{template_key}.{theme['theme_id']}.min_papers",
-            "name": f"{theme['name']} needs enough papers before writing",
-            "target": "theme",
-            "severity": "warning",
-            "condition": {"type": "theme_min_papers", "theme": theme["theme_id"], "min_papers": minimum},
-            "message": f"{theme['name']} has only {{count}} supporting paper(s); target is {{minimum}} before drafting.",
-            "suggested_action": "Add verified papers and structured claims for this theme before writing.",
-        }
-        for theme in themes
-    ]
+    rules = []
+    for theme in themes:
+        threshold = int(theme.get("min_papers") or minimum)
+        rules.append(
+            {
+                "rule_id": f"{template_key}.{theme['theme_id']}.min_papers",
+                "name": f"{theme['name']} needs enough papers before writing",
+                "target": "theme",
+                "severity": "warning",
+                "condition": {"type": "theme_min_papers", "theme": theme["theme_id"], "min_papers": threshold},
+                "message": f"{theme['name']} has only {{count}} supporting paper(s); target is {{minimum}} before drafting.",
+                "suggested_action": "Add verified papers and structured claims for this theme before writing.",
+            }
+        )
+    return rules
 
 
 BASE_NOTE_TEMPLATE = """# Paper Note: [Title]

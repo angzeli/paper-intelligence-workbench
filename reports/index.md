@@ -11,6 +11,9 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [dogfooding_workflow_v1_7.md](dogfooding_workflow_v1_7.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
 - [release_readiness_v1_7.md](release_readiness_v1_7.md)
+- [template_finance_overview.md](template_finance_overview.md)
+- [template_ml_methods_overview.md](template_ml_methods_overview.md)
+- [template_photocatalysis_overview.md](template_photocatalysis_overview.md)
 
 ## Next Patch Plan
 
@@ -147,9 +150,6 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [reading_status.md](reading_status.md)
 - [release_readiness.md](release_readiness.md)
 - [repo_cleanup_recommendations.md](repo_cleanup_recommendations.md)
-- [template_finance_overview.md](template_finance_overview.md)
-- [template_ml_methods_overview.md](template_ml_methods_overview.md)
-- [template_photocatalysis_overview.md](template_photocatalysis_overview.md)
 - [theme_dashboard.md](theme_dashboard.md)
 - [weak_claims.md](weak_claims.md)
 - [workspace_health.md](workspace_health.md)

@@ -24,6 +24,18 @@ def test_template_listing_and_inspection() -> None:
     assert "does not provide investment advice" in inspect_template("finance")
 
 
+def test_template_theme_min_papers_match_rule_thresholds() -> None:
+    for template in list_templates():
+        theme_thresholds = {theme["theme_id"]: theme["min_papers"] for theme in template.themes}
+        rule_thresholds = {
+            rule["condition"]["theme"]: rule["condition"]["min_papers"]
+            for rule in template.rules["rules"]
+            if rule["condition"]["type"] == "theme_min_papers"
+        }
+
+        assert rule_thresholds == theme_thresholds
+
+
 def test_template_create_generates_project_structure(tmp_path: Path) -> None:
     result = create_project_from_template("photocatalysis", "demo_photo", root=tmp_path)
     project = tmp_path / "projects" / "demo_photo"
