@@ -18,6 +18,8 @@ v0.8 adds release-engineering and onboarding hardening: package metadata, instal
 
 v0.9 adds data-integrity safeguards for real local use: workspace integrity checks, local audit logs, backup snapshots, non-destructive restore planning, and legacy `data/` to project-profile migration plans.
 
+v0.10 adds an adversarial torture suite, fuzz-style fixtures, clearer error taxonomy, CLI failure-path tests, and regression checks for malformed local data.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -38,6 +40,7 @@ v0.9 adds data-integrity safeguards for real local use: workspace integrity chec
 - Exports Obsidian-friendly Markdown vaults and local backup bundles.
 - Generates theme-specific writing aids from tracked local claims and citations.
 - Checks workspace integrity, writes local audit events, creates local backup snapshots, plans safe restores, and plans/copies non-destructive legacy-to-project migrations.
+- Stress-tests malformed local data with synthetic adversarial fixtures and clear error-message expectations.
 
 ## What It Does Not Do
 
@@ -237,6 +240,22 @@ paperwb migrate run --from legacy --to-project migrated_lit_review --dry-run
 Audit logs are local JSONL files under `.paperwb/` and are ignored by git.
 
 See [docs/WORKSPACE_INTEGRITY.md](docs/WORKSPACE_INTEGRITY.md), [docs/BACKUPS.md](docs/BACKUPS.md), [docs/RESTORE.md](docs/RESTORE.md), [docs/MIGRATION.md](docs/MIGRATION.md), and [docs/AUDIT_LOG.md](docs/AUDIT_LOG.md).
+
+## v0.10 Failure-Path Workflow
+
+Run the adversarial regression suite:
+
+```bash
+python -m pytest tests/test_adversarial_v0_10.py
+```
+
+Review the guidance:
+
+- [docs/ADVERSARIAL_TESTING.md](docs/ADVERSARIAL_TESTING.md)
+- [docs/ERROR_TAXONOMY.md](docs/ERROR_TAXONOMY.md)
+- [docs/ERROR_MESSAGE_GUIDE.md](docs/ERROR_MESSAGE_GUIDE.md)
+- [docs/RECOVERING_FROM_BAD_DATA.md](docs/RECOVERING_FROM_BAD_DATA.md)
+- [docs/CLI_FAILURE_MODES.md](docs/CLI_FAILURE_MODES.md)
 
 ## Data Folder Convention
 

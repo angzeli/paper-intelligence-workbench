@@ -65,7 +65,15 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Non-destructive legacy `data/` to project-profile migration plans.
 - Safe-write documentation and workflow examples.
 
-## Near-Term Patches for v0.10
+## v0.10 Completed
+
+- Adversarial synthetic fixture library for malformed local data.
+- Central error taxonomy and error-message guidance.
+- CLI failure-path regression tests.
+- Parser/import/backup hardening for recoverable bad inputs.
+- Warning snapshot-style assertions for representative diagnostics.
+
+## Near-Term Patches for v1.0-rc
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.

@@ -47,3 +47,7 @@ Instructions for future agents working in this repository:
 - Use dry-run for restore and migration workflows unless the user explicitly asks for `--force`.
 - Create or recommend a backup before forced migrations and restores.
 - Do not silently rewrite, move, or delete legacy `data/` files during migration; copy into projects instead.
+- Add adversarial fixtures for parser, importer, migration, backup, or CLI failure-path changes.
+- Preserve error-message clarity: explain what happened, where, why it matters, and the next step.
+- Avoid crashing on imperfect local data; warnings are preferred when conservative recovery is possible.
+- Test destructive-action safeguards and force/dry-run behavior when changing write paths.
