@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 import tempfile
 
+from .auditlog import append_audit_event, audit_log_markdown, clear_audit_log, default_audit_log_path, load_audit_events
 from .authoring import (
     build_claim_bank,
     build_citation_bank,
@@ -24,6 +25,16 @@ from .authoring import (
     writing_packet_report,
 )
 from .audit import citation_audit
+from .backups import (
+    backup_manifest_report,
+    create_backup,
+    find_backup,
+    list_backups,
+    load_backup_manifest,
+    plan_restore,
+    restore_backup,
+    restore_plan_report,
+)
 from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_claims, collect_notes, save_claims_csv
 from .doctor import workspace_health
@@ -69,7 +80,9 @@ from .index import (
     source_counts,
 )
 from .init import init_workspace
+from .integrity import check_workspace_integrity, workspace_integrity_report
 from .io import write_text
+from .migration import migration_plan_report, plan_legacy_migration, run_legacy_migration
 from .notes import write_note_template
 from .paths import default_bibtex_path, default_notes_dir, default_registry_path, default_reports_dir, default_themes_path
 from .projects import create_project_profile, list_project_profiles, profile_summary, resolve_project_profile
@@ -182,6 +195,30 @@ def _preflight_output_paths(paths: list[str | Path], *, force: bool) -> None:
         seen[resolved] = path
         if path.exists() and not force:
             raise FileExistsError(f"{path} already exists")
+
+
+def _record_audit_event(
+    paths: dict[str, Path | None],
+    *,
+    command: str,
+    action: str,
+    affected_paths: list[str | Path],
+    dry_run: bool = False,
+    success: bool = True,
+    warnings: list[str] | tuple[str, ...] = (),
+    summary: str = "",
+) -> None:
+    append_audit_event(
+        root=paths["root"] or ".",
+        command=command,
+        action=action,
+        project=_project_id_from_paths(paths),
+        affected_paths=affected_paths,
+        dry_run=dry_run,
+        success=success,
+        warnings=warnings,
+        summary=summary,
+    )
 
 
 def _default_text_dir(paths: dict[str, Path | None]) -> Path:
@@ -299,6 +336,13 @@ def cmd_add_paper(args: argparse.Namespace) -> int:
         paper_id=args.paper_id,
     )
     save_registry(papers, registry_path)
+    _record_audit_event(
+        paths,
+        command="add-paper",
+        action="registry_add_paper",
+        affected_paths=[registry_path],
+        summary=f"Added paper {paper.paper_id}",
+    )
     print(f"Added {paper.paper_id}: {paper.title}")
     return 0
 
@@ -333,6 +377,7 @@ def cmd_note_template(args: argparse.Namespace) -> int:
         print(f"Unknown paper_id: {args.paper_id}", file=sys.stderr)
         return 2
     path = write_note_template(paper, notes_dir=paths["notes_dir"], output_path=args.output, force=args.force)
+    _record_audit_event(paths, command="note-template", action="write_note_template", affected_paths=[path], summary=f"Wrote note template for {paper.paper_id}")
     print(f"Wrote note template to {path}")
     return 0
 
@@ -345,6 +390,7 @@ def cmd_claims(args: argparse.Namespace) -> int:
     claims = collect_claims(notes_path)
     if args.output:
         save_claims_csv(claims, args.output)
+        _record_audit_event(paths, command="claims", action="export_claims_csv", affected_paths=[args.output], summary=f"Exported {len(claims)} claims")
         print(f"Wrote {len(claims)} claims to {args.output}")
     else:
         for claim in claims:
@@ -435,7 +481,9 @@ def cmd_index_rebuild(args: argparse.Namespace) -> int:
         print(f"  {source_type}: {count}")
     if args.out:
         path = write_text(args.out, index_status_markdown(status, base_path=paths["root"]), force=args.force)
+        _record_audit_event(paths, command="index rebuild", action="write_index_status_report", affected_paths=[args.out], summary="Wrote index status report")
         print(f"Wrote {path}")
+    _record_audit_event(paths, command="index rebuild", action="rebuild_index", affected_paths=[_index_path_from_args(args, paths)], summary=f"Rebuilt {len(records)} index records")
     return 0
 
 
@@ -458,6 +506,7 @@ def cmd_index_clear(args: argparse.Namespace) -> int:
     index_path = _index_path_from_args(args, paths)
     project_id = _project_id_from_paths(paths)
     clear_index(index_path, project_id=project_id)
+    _record_audit_event(paths, command="index clear", action="clear_index", affected_paths=[index_path], summary=f"Cleared index records for {project_id}")
     print(f"Cleared index records for {project_id} at {index_path}")
     return 0
 
@@ -484,6 +533,7 @@ def cmd_files_scan(args: argparse.Namespace) -> int:
         merged_records = merge_file_registry_records(result.records, existing_records)
         path = save_file_registry(merged_records, result.file_registry_path, force=args.force)
         preserved = len(merged_records) - len(result.records)
+        _record_audit_event(_paths, command="files scan", action="write_file_registry", affected_paths=[result.file_registry_path], warnings=result.warnings, summary=f"Wrote {len(merged_records)} file registry records")
         print(f"Wrote file registry to {path}")
         if preserved:
             print(f"Preserved {preserved} existing file registry record(s) not present in the current scan.")
@@ -533,6 +583,7 @@ def cmd_files_audit(args: argparse.Namespace) -> int:
         written.append(path)
     for path in written:
         print(f"Wrote {path}")
+    _record_audit_event(paths, command="files audit", action="write_file_audit_reports", affected_paths=written, warnings=result.warnings, summary=f"Wrote {len(written)} local-file audit reports")
     return 0
 
 
@@ -548,6 +599,7 @@ def cmd_files_link(args: argparse.Namespace) -> int:
         force=args.force,
         notes=args.notes,
     )
+    _record_audit_event(paths, command="files link", action="link_local_file", affected_paths=[record.relative_path, _file_registry_path_from_args(args, paths), paths["registry"]], summary=f"Linked {record.paper_id} to {record.relative_path}")
     print(f"Linked {record.paper_id} to {record.relative_path} ({record.file_type}, sha256={record.sha256[:12]})")
     return 0
 
@@ -562,6 +614,7 @@ def cmd_files_unlink(args: argparse.Namespace) -> int:
         file_registry_path=_file_registry_path_from_args(args, paths),
         clear_pdf=not args.keep_pdf_path,
     )
+    _record_audit_event(paths, command="files unlink", action="unlink_local_file", affected_paths=[_file_registry_path_from_args(args, paths), paths["registry"]], summary=f"Unlinked {removed} file registry records for {args.paper_id}")
     print(f"Unlinked {removed} file registry record(s) for {args.paper_id}")
     return 0
 
@@ -667,14 +720,17 @@ def cmd_report(args: argparse.Namespace) -> int:
         else:
             path = write_report(name.replace("-", "_"), content, reports_dir, force=args.force)
         print(f"Wrote {path}")
+        _record_audit_event(paths, command="report", action=f"write_report:{name}", affected_paths=[path], summary=f"Wrote {name} report")
         if name == "evidence-matrix":
             matrix = build_evidence_matrix(args.theme or "", papers, claims, themes, notes, project=_project_id_from_paths(paths))
             if args.csv_out:
                 csv_path = write_evidence_matrix_csv(matrix, args.csv_out, force=args.force)
                 print(f"Wrote {csv_path}")
+                _record_audit_event(paths, command="report", action="write_evidence_matrix_csv", affected_paths=[csv_path], summary="Wrote evidence matrix CSV")
             if args.json_out:
                 json_path = write_evidence_matrix_json(matrix, args.json_out, force=args.force)
                 print(f"Wrote {json_path}")
+                _record_audit_event(paths, command="report", action="write_evidence_matrix_json", affected_paths=[json_path], summary="Wrote evidence matrix JSON")
     return 0
 
 
@@ -687,6 +743,7 @@ def cmd_writing_packet(args: argparse.Namespace) -> int:
     content = writing_packet_report(args.theme, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
     output = args.out or (Path(paths["reports_dir"]) / f"{normalize_tag(args.theme)}_writing_packet.md")
     path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="writing-packet", action="write_writing_packet", affected_paths=[path], summary=f"Wrote writing packet for {args.theme}")
     print(f"Wrote {path}")
     return 0
 
@@ -716,6 +773,13 @@ def cmd_checklist(args: argparse.Namespace) -> int:
 
 def cmd_project_init(args: argparse.Namespace) -> int:
     profile = create_project_profile(args.name, description=args.description, force=args.force)
+    _record_audit_event(
+        {"root": Path(profile.root), "profile": profile},
+        command="project init",
+        action="create_project_profile",
+        affected_paths=[profile.root, profile.registry_path, profile.bibtex_path, profile.themes_path],
+        summary=f"Created project {profile.name}",
+    )
     print(f"Created project {profile.name}")
     print(profile_summary(profile))
     return 0
@@ -761,6 +825,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     _print_findings(findings)
     if args.out:
         path = write_text(args.out, workspace_health_report(findings), force=args.force)
+        _record_audit_event(paths, command="doctor", action="write_workspace_health_report", affected_paths=[path], summary="Wrote workspace health report")
         print(f"Wrote {path}")
     return 1 if args.strict and any(finding.severity == "error" for finding in findings) else 0
 
@@ -828,6 +893,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     else:
         print(f"Unknown export type: {args.export_type}", file=sys.stderr)
         return 2
+    _record_audit_event(paths, command="export", action=f"export:{args.export_type}", affected_paths=[path], summary=f"Exported {args.export_type}")
     print(f"Wrote {path}")
     return 0
 
@@ -877,6 +943,15 @@ def _finish_import(args: argparse.Namespace, result, paths: dict[str, Path | Non
             os.replace(report_tmp, report_path)
     finally:
         _cleanup_temp_paths([path for path in (report_tmp, registry_tmp) if path is not None])
+    _record_audit_event(
+        paths,
+        command=f"import {import_type}",
+        action="import_registry_data",
+        affected_paths=[paths["registry"], report_path],
+        dry_run=result.dry_run,
+        warnings=result.warnings,
+        summary=f"Rows read: {result.rows_read}; imported: {result.imported}; updated: {result.updated}; skipped: {result.skipped}",
+    )
     print(f"Wrote import report to {report_path}")
     print(f"Rows read: {result.rows_read}; imported: {result.imported}; updated: {result.updated}; skipped: {result.skipped}; dry-run: {result.dry_run}")
     return 0
@@ -970,7 +1045,226 @@ def cmd_synthetic_generate(args: argparse.Namespace) -> int:
     print(f"  claims: {summary.claims}")
     print(f"  themes: {summary.themes}")
     print(f"  bibtex entries: {summary.bibtex_entries}")
+    append_audit_event(
+        root=summary.root,
+        command="synthetic generate",
+        action="generate_synthetic_project",
+        project=summary.project,
+        affected_paths=[summary.root],
+        summary=f"Generated {summary.papers} synthetic papers and {summary.claims} claims",
+    )
     return 0
+
+
+def cmd_integrity_check(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    paths = _paths_from_args(args)
+    result = check_workspace_integrity(
+        root=paths["root"],
+        registry_path=paths["registry"],
+        bibtex_path=paths["bibtex"],
+        notes_dir=paths["notes_dir"],
+        themes_path=paths["themes"],
+        reports_dir=paths["reports_dir"],
+        profile=paths["profile"],
+    )
+    print(f"Integrity errors: {len(result.errors)}")
+    print(f"Integrity warnings: {len(result.warnings)}")
+    if args.out:
+        path = write_text(args.out, workspace_integrity_report(result), force=args.force)
+        _record_audit_event(paths, command="integrity check", action="write_integrity_report", affected_paths=[path], warnings=[finding.message for finding in result.findings], summary="Wrote workspace integrity report")
+        print(f"Wrote {path}")
+    elif result.findings:
+        _print_findings(result.findings)
+    return 1 if args.strict and result.errors else 0
+
+
+def _audit_log_path_from_args(args: argparse.Namespace) -> tuple[Path, dict[str, Path | None]]:
+    paths = _paths_from_args(args)
+    target = Path(args.path) if getattr(args, "path", "") else default_audit_log_path(paths["root"])
+    return target, paths
+
+
+def cmd_audit_log_show(args: argparse.Namespace) -> int:
+    path, _paths = _audit_log_path_from_args(args)
+    events = load_audit_events(path)
+    if args.limit:
+        events = events[-args.limit :]
+    if args.out:
+        written = write_text(args.out, audit_log_markdown(events), force=args.force)
+        print(f"Wrote {written}")
+        return 0
+    if args.markdown:
+        print(audit_log_markdown(events), end="")
+        return 0
+    if not events:
+        print("No audit events found.")
+        return 0
+    for event in events:
+        print(f"{event.get('timestamp', '')}\t{event.get('project', '')}\t{event.get('action', '')}\t{event.get('summary', '')}")
+    return 0
+
+
+def cmd_audit_log_clear(args: argparse.Namespace) -> int:
+    path, paths = _audit_log_path_from_args(args)
+    removed = clear_audit_log(path, force=args.force)
+    if removed:
+        print(f"Cleared audit log {path}")
+    else:
+        print(f"Audit log did not exist: {path}")
+    return 0
+
+
+def _backup_paths(args: argparse.Namespace) -> dict[str, Path | None]:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    return _paths_from_args(args)
+
+
+def cmd_backup_create(args: argparse.Namespace) -> int:
+    paths = _backup_paths(args)
+    manifest, backup_path = create_backup(
+        root=paths["root"],
+        registry_path=paths["registry"],
+        bibtex_path=paths["bibtex"],
+        notes_dir=paths["notes_dir"],
+        themes_path=paths["themes"],
+        reports_dir=paths["reports_dir"],
+        profile=paths["profile"],
+        backups_dir=args.backups_dir or None,
+        include_reports=args.include_reports,
+        notes=args.notes,
+    )
+    _record_audit_event(paths, command="backup create", action="create_backup", affected_paths=[backup_path], summary=f"Created backup {manifest.backup_id}")
+    print(f"Created backup {manifest.backup_id}")
+    print(f"Path: {backup_path}")
+    print(f"Files included: {len(manifest.included_files)}")
+    return 0
+
+
+def cmd_backup_list(args: argparse.Namespace) -> int:
+    paths = _backup_paths(args)
+    backups = list_backups(paths["root"], project=_project_id_from_paths(paths) if args.project else "", backups_dir=args.backups_dir or None)
+    if not backups:
+        print("No backups found.")
+        return 0
+    for manifest in backups:
+        print(f"{manifest.backup_id}\t{manifest.project or 'default'}\t{manifest.created_at}\tfiles={len(manifest.included_files)}")
+    return 0
+
+
+def cmd_backup_inspect(args: argparse.Namespace) -> int:
+    paths = _backup_paths(args)
+    backup_path = find_backup(paths["root"], args.backup_id, backups_dir=args.backups_dir or None)
+    manifest = load_backup_manifest(backup_path)
+    content = backup_manifest_report(manifest)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="backup inspect", action="write_backup_manifest_report", affected_paths=[path], summary=f"Inspected backup {args.backup_id}")
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_backup_plan_restore(args: argparse.Namespace) -> int:
+    paths = _backup_paths(args)
+    plan = plan_restore(
+        root=paths["root"],
+        backup_id=args.backup_id,
+        backups_dir=args.backups_dir or None,
+        project=_project_id_from_paths(paths) if args.project else "",
+        dry_run=True,
+    )
+    content = restore_plan_report(plan)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="backup plan-restore", action="write_restore_plan", affected_paths=[path], summary=f"Planned restore for {args.backup_id}")
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_backup_restore(args: argparse.Namespace) -> int:
+    paths = _backup_paths(args)
+    dry_run = args.dry_run or not args.force
+    if dry_run:
+        plan = plan_restore(
+            root=paths["root"],
+            backup_id=args.backup_id,
+            backups_dir=args.backups_dir or None,
+            project=_project_id_from_paths(paths) if args.project else "",
+            dry_run=True,
+        )
+    else:
+        plan = restore_backup(
+            root=paths["root"],
+            backup_id=args.backup_id,
+            registry_path=paths["registry"],
+            bibtex_path=paths["bibtex"],
+            notes_dir=paths["notes_dir"],
+            themes_path=paths["themes"],
+            reports_dir=paths["reports_dir"],
+            profile=paths["profile"],
+            backups_dir=args.backups_dir or None,
+            force=True,
+            create_pre_restore_backup=not args.no_pre_restore_backup,
+        )
+    content = restore_plan_report(plan)
+    if args.out:
+        path = write_text(args.out, content, force=args.force_report)
+        affected = [path]
+    else:
+        print(content, end="")
+        affected = []
+    _record_audit_event(
+        paths,
+        command="backup restore",
+        action="restore_backup" if not dry_run else "restore_backup_dry_run",
+        affected_paths=affected + [args.backup_id],
+        dry_run=dry_run,
+        warnings=plan.missing_backup_files,
+        summary=f"Restore {'planned' if dry_run else 'applied'} for {args.backup_id}",
+    )
+    return 0
+
+
+def cmd_migrate_plan(args: argparse.Namespace) -> int:
+    if args.from_workflow != "legacy":
+        raise ValueError("only --from legacy is supported")
+    plan = plan_legacy_migration(root=args.root, to_project=args.to_project)
+    content = migration_plan_report(plan)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 1 if args.strict and plan.conflicts else 0
+
+
+def cmd_migrate_run(args: argparse.Namespace) -> int:
+    if args.from_workflow != "legacy":
+        raise ValueError("only --from legacy is supported")
+    dry_run = args.dry_run or not args.force
+    plan, backup = run_legacy_migration(root=args.root, to_project=args.to_project, dry_run=dry_run, force=args.force)
+    content = migration_plan_report(plan)
+    if args.out:
+        path = write_text(args.out, content, force=args.force_report)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    append_audit_event(
+        root=args.root,
+        command="migrate run",
+        action="legacy_migration" if not dry_run else "legacy_migration_dry_run",
+        project=args.to_project,
+        affected_paths=[operation.target_path for operation in plan.operations],
+        dry_run=dry_run,
+        warnings=plan.warnings + plan.conflicts,
+        success=not plan.conflicts,
+        summary=f"Migration {'planned' if dry_run else 'copied'} to project {args.to_project}; backup={backup.backup_id if backup else 'none'}",
+    )
+    return 1 if plan.conflicts and args.strict else 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1262,6 +1556,99 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser.add_argument("--force", action="store_true", help="Overwrite an existing workspace-health report path.")
     doctor_parser.add_argument("--strict", action="store_true", help="Return non-zero when errors are found.")
     doctor_parser.set_defaults(func=cmd_doctor)
+
+    integrity_parser = subparsers.add_parser("integrity", help="Run v0.9 workspace integrity checks.")
+    integrity_sub = integrity_parser.add_subparsers(dest="integrity_command", required=True)
+    integrity_check = integrity_sub.add_parser("check", help="Check workspace/project consistency without modifying inputs.")
+    integrity_check.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+    integrity_check.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+    integrity_check.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+    integrity_check.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+    integrity_check.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+    integrity_check.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+    integrity_check.add_argument("--out", default="", help="Optional Markdown integrity report path.")
+    integrity_check.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    integrity_check.add_argument("--strict", action="store_true", help="Return non-zero when integrity errors are found.")
+    integrity_check.set_defaults(func=cmd_integrity_check)
+
+    audit_log_parser = subparsers.add_parser("audit-log", help="Show or clear the local v0.9 audit log.")
+    audit_log_sub = audit_log_parser.add_subparsers(dest="audit_log_command", required=True)
+    audit_log_show = audit_log_sub.add_parser("show", help="Show audit events for the selected workspace/project.")
+    audit_log_show.add_argument("--project", default="", help="Use a project profile audit log.")
+    audit_log_show.add_argument("--path", default="", help="Explicit audit log path.")
+    audit_log_show.add_argument("--limit", type=int, default=0, help="Show only the most recent N events.")
+    audit_log_show.add_argument("--markdown", action="store_true", help="Print Markdown output.")
+    audit_log_show.add_argument("--out", default="", help="Optional Markdown output path.")
+    audit_log_show.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    audit_log_show.set_defaults(func=cmd_audit_log_show)
+    audit_log_clear = audit_log_sub.add_parser("clear", help="Clear the selected audit log. Requires --force.")
+    audit_log_clear.add_argument("--project", default="", help="Use a project profile audit log.")
+    audit_log_clear.add_argument("--path", default="", help="Explicit audit log path.")
+    audit_log_clear.add_argument("--force", action="store_true", help="Required confirmation to clear the audit log.")
+    audit_log_clear.set_defaults(func=cmd_audit_log_clear)
+
+    backup_parser = subparsers.add_parser("backup", help="Create, inspect, and restore local v0.9 backups.")
+    backup_sub = backup_parser.add_subparsers(dest="backup_command", required=True)
+
+    def add_backup_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports directory.")
+        command_parser.add_argument("--backups-dir", default="", help="Optional backups directory. Defaults to backups/ under the selected root.")
+
+    backup_create = backup_sub.add_parser("create", help="Create a local backup snapshot. PDFs and caches are excluded by default.")
+    add_backup_common(backup_create)
+    backup_create.add_argument("--include-reports", action="store_true", help="Include generated Markdown reports in the backup.")
+    backup_create.add_argument("--notes", default="", help="Optional backup note stored in the manifest.")
+    backup_create.set_defaults(func=cmd_backup_create)
+    backup_list = backup_sub.add_parser("list", help="List local backup snapshots.")
+    add_backup_common(backup_list)
+    backup_list.set_defaults(func=cmd_backup_list)
+    backup_inspect = backup_sub.add_parser("inspect", help="Inspect a backup manifest.")
+    backup_inspect.add_argument("backup_id", help="Backup ID to inspect.")
+    add_backup_common(backup_inspect)
+    backup_inspect.add_argument("--out", default="", help="Optional Markdown manifest report path.")
+    backup_inspect.add_argument("--force", action="store_true", help="Overwrite an existing --out path.")
+    backup_inspect.set_defaults(func=cmd_backup_inspect)
+    backup_plan = backup_sub.add_parser("plan-restore", help="Plan a restore without modifying files.")
+    backup_plan.add_argument("backup_id", help="Backup ID to restore.")
+    add_backup_common(backup_plan)
+    backup_plan.add_argument("--out", default="", help="Optional Markdown restore-plan report path.")
+    backup_plan.add_argument("--force", action="store_true", help="Overwrite an existing --out path.")
+    backup_plan.set_defaults(func=cmd_backup_plan_restore)
+    backup_restore = backup_sub.add_parser("restore", help="Restore files from a backup. Defaults to dry-run unless --force is provided.")
+    backup_restore.add_argument("backup_id", help="Backup ID to restore.")
+    add_backup_common(backup_restore)
+    backup_restore.add_argument("--dry-run", action="store_true", help="Plan the restore without writing files.")
+    backup_restore.add_argument("--force", action="store_true", help="Actually restore files from the backup.")
+    backup_restore.add_argument("--no-pre-restore-backup", action="store_true", help="Do not create a pre-restore backup when --force is used.")
+    backup_restore.add_argument("--out", default="", help="Optional Markdown restore report path.")
+    backup_restore.add_argument("--force-report", action="store_true", help="Overwrite an existing --out report path.")
+    backup_restore.set_defaults(func=cmd_backup_restore)
+
+    migrate_parser = subparsers.add_parser("migrate", help="Plan or run non-destructive workspace migrations.")
+    migrate_sub = migrate_parser.add_subparsers(dest="migrate_command", required=True)
+    migrate_plan = migrate_sub.add_parser("plan", help="Plan a legacy data/ to project-profile migration.")
+    migrate_plan.add_argument("--from", dest="from_workflow", default="legacy", choices=["legacy"], help="Source workflow. Only legacy is supported in v0.9.")
+    migrate_plan.add_argument("--to-project", required=True, help="New project profile name to create.")
+    migrate_plan.add_argument("--root", default=".", help="Workspace root.")
+    migrate_plan.add_argument("--out", default="", help="Optional Markdown migration plan path.")
+    migrate_plan.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    migrate_plan.add_argument("--strict", action="store_true", help="Return non-zero when migration conflicts are present.")
+    migrate_plan.set_defaults(func=cmd_migrate_plan)
+    migrate_run = migrate_sub.add_parser("run", help="Run or dry-run a legacy data/ to project-profile migration.")
+    migrate_run.add_argument("--from", dest="from_workflow", default="legacy", choices=["legacy"], help="Source workflow. Only legacy is supported in v0.9.")
+    migrate_run.add_argument("--to-project", required=True, help="New project profile name to create.")
+    migrate_run.add_argument("--root", default=".", help="Workspace root.")
+    migrate_run.add_argument("--dry-run", action="store_true", help="Plan the migration without copying files.")
+    migrate_run.add_argument("--force", action="store_true", help="Actually copy files into the new project. Existing targets still block.")
+    migrate_run.add_argument("--out", default="", help="Optional Markdown migration report path.")
+    migrate_run.add_argument("--force-report", action="store_true", help="Overwrite an existing --out report path.")
+    migrate_run.add_argument("--strict", action="store_true", help="Return non-zero when migration conflicts are present.")
+    migrate_run.set_defaults(func=cmd_migrate_run)
 
     export_parser = subparsers.add_parser("export", help="Export local data to CSV, JSON, or Markdown.")
     export_parser.add_argument(
