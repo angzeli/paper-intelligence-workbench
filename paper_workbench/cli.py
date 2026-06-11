@@ -94,6 +94,17 @@ from .init import init_workspace
 from .integrity import check_workspace_integrity, workspace_integrity_report
 from .io import write_text
 from .migration import migration_plan_report, plan_legacy_migration, run_legacy_migration
+from .manuscript import (
+    audit_manuscript,
+    build_claim_traceability,
+    claim_traceability_report,
+    manuscript_citations_report,
+    manuscript_context_table_report,
+    manuscript_parse_report,
+    manuscript_paragraph_evidence_report,
+    manuscript_qa_report,
+    manuscript_revision_checklist_report,
+)
 from .notes import write_note_template
 from .paths import default_bibtex_path, default_notes_dir, default_registry_path, default_reports_dir, default_themes_path
 from .projects import create_project_profile, list_project_profiles, profile_summary, resolve_project_profile
@@ -944,6 +955,98 @@ def cmd_draft_evidence_matrix(args: argparse.Namespace) -> int:
     output = args.out or (Path(paths["reports_dir"]) / "draft_paragraph_evidence_matrix.md")
     path = write_text(output, content, force=args.force)
     _record_audit_event(paths, command="draft evidence-matrix", action="write_draft_evidence_matrix", affected_paths=[path], warnings=[finding.message for finding in report.findings], summary=f"Wrote draft evidence matrix for {args.draft}")
+    print(f"Wrote {path}")
+    return 0
+
+
+def _manuscript_inputs(args: argparse.Namespace):
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    paths = _paths_from_args(args)
+    papers = _load_registry(paths["registry"])
+    notes = collect_notes(paths["notes_dir"]) if Path(paths["notes_dir"]).exists() else []
+    claims = [claim for note in notes for claim in note.claims]
+    entries = parse_bibtex_file(paths["bibtex"]) if Path(paths["bibtex"]).exists() else []
+    themes = load_themes(paths["themes"]) if Path(paths["themes"]).exists() else []
+    result = audit_manuscript(args.manuscript, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
+    return result, claims, themes, paths
+
+
+def cmd_manuscript_parse(args: argparse.Namespace) -> int:
+    from .manuscript import parse_manuscript
+
+    document = parse_manuscript(args.manuscript)
+    content = manuscript_parse_report(document)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_manuscript_citations(args: argparse.Namespace) -> int:
+    result, _claims, _themes, paths = _manuscript_inputs(args)
+    content = manuscript_citations_report(result)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="manuscript citations", action="write_manuscript_citation_coverage", affected_paths=[path], warnings=[finding.message for finding in result.audit.findings], summary=f"Audited manuscript citations in {args.manuscript}")
+        print(f"Wrote {path}")
+        return 0
+    for status in result.audit.citation_coverage:
+        print(f"{status.key}\tbibtex={str(status.in_bibtex).lower()}\tregistry={str(status.in_registry).lower()}\tpaper={status.paper_id or '[missing]'}\tclaims={status.claim_count}")
+    if not result.audit.citation_coverage:
+        print("No citation keys found.")
+    return 0
+
+
+def cmd_manuscript_qa(args: argparse.Namespace) -> int:
+    result, _claims, _themes, paths = _manuscript_inputs(args)
+    content = manuscript_qa_report(result)
+    output = args.out or (Path(paths["reports_dir"]) / "manuscript_qa.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="manuscript qa", action="write_manuscript_qa", affected_paths=[path], warnings=[finding.message for finding in result.audit.findings], summary=f"Audited manuscript {args.manuscript}; verdict={result.verdict}")
+    print(f"Wrote {path}")
+    return 0
+
+
+def cmd_manuscript_checklist(args: argparse.Namespace) -> int:
+    result, _claims, _themes, paths = _manuscript_inputs(args)
+    content = manuscript_revision_checklist_report(result)
+    output = args.out or (Path(paths["reports_dir"]) / "manuscript_revision_checklist.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="manuscript checklist", action="write_manuscript_revision_checklist", affected_paths=[path], warnings=[finding.message for finding in result.audit.findings], summary=f"Wrote manuscript checklist for {args.manuscript}")
+    print(f"Wrote {path}")
+    return 0
+
+
+def cmd_manuscript_context_table(args: argparse.Namespace) -> int:
+    result, _claims, _themes, paths = _manuscript_inputs(args)
+    content = manuscript_context_table_report(result)
+    output = args.out or (Path(paths["reports_dir"]) / "citation_context_table.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="manuscript context-table", action="write_manuscript_context_table", affected_paths=[path], warnings=[finding.message for finding in result.audit.findings], summary=f"Wrote citation context table for {args.manuscript}")
+    print(f"Wrote {path}")
+    return 0
+
+
+def cmd_manuscript_trace_claims(args: argparse.Namespace) -> int:
+    result, claims, themes, paths = _manuscript_inputs(args)
+    papers = _load_registry(paths["registry"])
+    rows = build_claim_traceability(result.audit, claims, papers, themes, theme=args.theme)
+    content = claim_traceability_report(rows, draft_path=result.draft_path, project=result.project, theme=args.theme)
+    output = args.out or (Path(paths["reports_dir"]) / "claim_traceability.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="manuscript trace-claims", action="write_claim_traceability", affected_paths=[path], warnings=[row.warning for row in rows if row.warning], summary=f"Wrote claim traceability for {args.manuscript}")
+    print(f"Wrote {path}")
+    return 0
+
+
+def cmd_manuscript_evidence_matrix(args: argparse.Namespace) -> int:
+    result, _claims, _themes, paths = _manuscript_inputs(args)
+    content = manuscript_paragraph_evidence_report(result)
+    output = args.out or (Path(paths["reports_dir"]) / "paragraph_evidence_table.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="manuscript evidence-matrix", action="write_manuscript_paragraph_evidence", affected_paths=[path], warnings=[finding.message for finding in result.audit.findings], summary=f"Wrote manuscript paragraph evidence table for {args.manuscript}")
     print(f"Wrote {path}")
     return 0
 
@@ -2157,6 +2260,51 @@ def build_parser() -> argparse.ArgumentParser:
     draft_matrix = draft_sub.add_parser("evidence-matrix", help="Generate paragraph-level evidence matching matrix for a draft.")
     add_draft_common(draft_matrix)
     draft_matrix.set_defaults(func=cmd_draft_evidence_matrix)
+
+    manuscript_parser = subparsers.add_parser("manuscript", help="Run reviewer-style manuscript citation QA against local evidence.")
+    manuscript_sub = manuscript_parser.add_subparsers(dest="manuscript_command", required=True)
+
+    def add_manuscript_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("manuscript", help="Markdown or LaTeX-ish manuscript draft path.")
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--out", default="", help="Optional Markdown output path.")
+        command_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+
+    manuscript_parse = manuscript_sub.add_parser("parse", help="Parse manuscript sections, paragraphs, and citation keys.")
+    manuscript_parse.add_argument("manuscript", help="Markdown or LaTeX-ish manuscript draft path.")
+    manuscript_parse.add_argument("--out", default="", help="Optional Markdown parse report path.")
+    manuscript_parse.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    manuscript_parse.set_defaults(func=cmd_manuscript_parse)
+
+    manuscript_citations = manuscript_sub.add_parser("citations", help="Report manuscript citation-key coverage against BibTeX and registry data.")
+    add_manuscript_common(manuscript_citations)
+    manuscript_citations.set_defaults(func=cmd_manuscript_citations)
+
+    manuscript_qa = manuscript_sub.add_parser("qa", help="Generate a reviewer-style manuscript citation QA report.")
+    add_manuscript_common(manuscript_qa)
+    manuscript_qa.set_defaults(func=cmd_manuscript_qa)
+
+    manuscript_checklist = manuscript_sub.add_parser("checklist", help="Generate a manuscript revision checklist.")
+    add_manuscript_common(manuscript_checklist)
+    manuscript_checklist.set_defaults(func=cmd_manuscript_checklist)
+
+    manuscript_trace = manuscript_sub.add_parser("trace-claims", help="Trace tracked claims into manuscript paragraphs.")
+    add_manuscript_common(manuscript_trace)
+    manuscript_trace.add_argument("--theme", default="", help="Optional theme name or ID to trace.")
+    manuscript_trace.set_defaults(func=cmd_manuscript_trace_claims)
+
+    manuscript_context = manuscript_sub.add_parser("context-table", help="Generate a citation occurrence context table.")
+    add_manuscript_common(manuscript_context)
+    manuscript_context.set_defaults(func=cmd_manuscript_context_table)
+
+    manuscript_matrix = manuscript_sub.add_parser("evidence-matrix", help="Generate a paragraph-level manuscript evidence table.")
+    add_manuscript_common(manuscript_matrix)
+    manuscript_matrix.set_defaults(func=cmd_manuscript_evidence_matrix)
 
     reading_parser = subparsers.add_parser("reading", help="Manage local reading queues, sessions, and review reports.")
     reading_sub = reading_parser.add_subparsers(dest="reading_command", required=True)

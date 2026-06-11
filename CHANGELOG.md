@@ -2,6 +2,12 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.4.0 - Manuscript Citation QA
+
+- Added `paperwb manuscript` commands for parsing, citation coverage, reviewer-style QA, revision checklists, citation context tables, paragraph evidence tables, and claim-to-draft traceability.
+- Added synthetic manuscript drafts covering good support, unknown citations, overconfident wording, review-only support, and claim mismatch cases.
+- Kept manuscript workflows audit-only: no final-prose rewriting, no fabricated citations, no fabricated claims, and no scientific truth judgment.
+
 ## v1.3.0 - Sync Planning and Conflict Resolution
 
 - Added local `paperwb sync` planning for Zotero-style CSV, generic CSV, BibTeX, and RIS sources.

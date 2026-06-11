@@ -14,7 +14,7 @@ from .schema import BibTeXEntry, Claim, EvidenceType, Paper, PaperNote, ProjectT
 from .tags import normalize_tag, parse_tags, theme_by_tag
 
 
-CITE_COMMAND_RE = re.compile(r"\\cite[a-zA-Z*]*\s*(?:\[[^\]]*\]\s*){0,2}\{([^}]+)\}")
+CITE_COMMAND_RE = re.compile(r"\\(?:cite[a-zA-Z*]*|autocite|parencite)\s*(?:\[[^\]]*\]\s*){0,2}\{([^}]+)\}")
 AT_CITATION_RE = re.compile(r"(?<![\\\w./:-])@([A-Za-z0-9][A-Za-z0-9_.:+-]*)")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
