@@ -8,6 +8,21 @@ from pathlib import Path
 import sys
 import tempfile
 
+from .authoring import (
+    build_claim_bank,
+    build_citation_bank,
+    build_evidence_matrix,
+    build_paragraph_plan,
+    build_subsection_readiness,
+    citation_bank_report,
+    claim_bank_report,
+    evidence_matrix_report as authoring_evidence_matrix_report,
+    paragraph_plan_report,
+    subsection_readiness_report,
+    write_evidence_matrix_csv,
+    write_evidence_matrix_json,
+    writing_packet_report,
+)
 from .audit import citation_audit
 from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_claims, collect_notes, save_claims_csv
@@ -453,14 +468,30 @@ def cmd_report(args: argparse.Namespace) -> int:
         "missing-evidence": lambda: missing_evidence_report(claims),
         "workspace-health": lambda: workspace_health_report(health_findings),
         "section-outline": lambda: section_outline_report(args.theme or "", papers, claims, themes, notes),
+        "evidence-matrix": lambda: authoring_evidence_matrix_report(
+            build_evidence_matrix(args.theme or "", papers, claims, themes, notes, project=_project_id_from_paths(paths))
+        ),
+        "claim-bank": lambda: claim_bank_report(build_claim_bank(args.theme or "", claims, themes, project=_project_id_from_paths(paths))),
+        "citation-bank": lambda: citation_bank_report(
+            build_citation_bank(args.theme or "", papers, claims, themes, notes, entries, project=_project_id_from_paths(paths)),
+            claims,
+        ),
+        "paragraph-plan": lambda: paragraph_plan_report(build_paragraph_plan(args.theme or "", papers, claims, themes, notes, project=_project_id_from_paths(paths))),
+        "subsection-readiness": lambda: subsection_readiness_report(
+            build_subsection_readiness(args.theme or "", papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
+        ),
     }
-    selected = [name for name in builders if name != "section-outline"] if args.report_type == "all" else [args.report_type]
+    theme_report_types = {"section-outline", "evidence-matrix", "claim-bank", "citation-bank", "paragraph-plan", "subsection-readiness"}
+    selected = [name for name in builders if name not in theme_report_types] if args.report_type == "all" else [args.report_type]
     for name in selected:
-        if name == "section-outline" and not args.theme:
-            print("--theme is required for section-outline", file=sys.stderr)
+        if name in theme_report_types and not args.theme:
+            print(f"--theme is required for {name}", file=sys.stderr)
             return 2
-        if name == "section-outline" and not _theme_exists(args.theme, themes):
+        if name in theme_report_types and not _theme_exists(args.theme, themes):
             print(f"Unknown theme: {args.theme}", file=sys.stderr)
+            return 2
+        if name != "evidence-matrix" and (getattr(args, "csv_out", "") or getattr(args, "json_out", "")):
+            print("--csv-out and --json-out are only supported for evidence-matrix", file=sys.stderr)
             return 2
         content = builders[name]()
         if args.out and len(selected) == 1:
@@ -468,6 +499,27 @@ def cmd_report(args: argparse.Namespace) -> int:
         else:
             path = write_report(name.replace("-", "_"), content, reports_dir, force=args.force)
         print(f"Wrote {path}")
+        if name == "evidence-matrix":
+            matrix = build_evidence_matrix(args.theme or "", papers, claims, themes, notes, project=_project_id_from_paths(paths))
+            if args.csv_out:
+                csv_path = write_evidence_matrix_csv(matrix, args.csv_out, force=args.force)
+                print(f"Wrote {csv_path}")
+            if args.json_out:
+                json_path = write_evidence_matrix_json(matrix, args.json_out, force=args.force)
+                print(f"Wrote {json_path}")
+    return 0
+
+
+def cmd_writing_packet(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes"))
+    papers, notes, claims, entries, themes, paths = _report_inputs(args)
+    if not _theme_exists(args.theme, themes):
+        print(f"Unknown theme: {args.theme}", file=sys.stderr)
+        return 2
+    content = writing_packet_report(args.theme, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
+    output = args.out or (Path(paths["reports_dir"]) / f"{normalize_tag(args.theme)}_writing_packet.md")
+    path = write_text(output, content, force=args.force)
+    print(f"Wrote {path}")
     return 0
 
 
@@ -936,6 +988,11 @@ def build_parser() -> argparse.ArgumentParser:
             "missing-evidence",
             "workspace-health",
             "section-outline",
+            "evidence-matrix",
+            "claim-bank",
+            "citation-bank",
+            "paragraph-plan",
+            "subsection-readiness",
             "all",
         ],
     )
@@ -947,8 +1004,21 @@ def build_parser() -> argparse.ArgumentParser:
     report_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
     report_parser.add_argument("--theme", default="", help="Theme name or ID for theme-specific reports.")
     report_parser.add_argument("--out", help="Write a single report to this exact output path.")
+    report_parser.add_argument("--csv-out", default="", help="Optional CSV export path for evidence-matrix reports.")
+    report_parser.add_argument("--json-out", default="", help="Optional JSON export path for evidence-matrix reports.")
     report_parser.add_argument("--force", action="store_true", help="Overwrite an existing report file.")
     report_parser.set_defaults(func=cmd_report)
+
+    writing_packet_parser = subparsers.add_parser("writing-packet", help="Generate a theme-specific literature-review writing packet from tracked evidence.")
+    writing_packet_parser.add_argument("--theme", required=True, help="Theme name or ID.")
+    writing_packet_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+    writing_packet_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+    writing_packet_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+    writing_packet_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+    writing_packet_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+    writing_packet_parser.add_argument("--out", default="", help="Output Markdown path. Defaults to the selected reports directory.")
+    writing_packet_parser.add_argument("--force", action="store_true", help="Overwrite an existing writing packet.")
+    writing_packet_parser.set_defaults(func=cmd_writing_packet)
 
     checklist_parser = subparsers.add_parser("checklist", help="Generate a theme review checklist.")
     checklist_parser.add_argument("--theme", required=True, help="Theme name or ID.")
