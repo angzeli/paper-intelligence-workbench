@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import subprocess
+import sys
+
 from paper_workbench.audit import citation_audit
 from paper_workbench.bibtex import parse_bibtex_file
 from paper_workbench.claims import collect_claims, collect_notes
@@ -9,7 +12,7 @@ from paper_workbench.search import search_claims, search_note_files, search_pape
 from paper_workbench.schema import Claim, ProjectTheme
 from paper_workbench.tags import count_claim_tags, group_claims_by_theme, load_themes, normalize_tag
 
-from conftest import EXAMPLE_BIBTEX, EXAMPLE_NOTES, EXAMPLE_REGISTRY, EXAMPLE_THEMES
+from conftest import EXAMPLE_BIBTEX, EXAMPLE_NOTES, EXAMPLE_REGISTRY, EXAMPLE_THEMES, ROOT
 
 
 def test_tag_normalization_and_theme_mapping():
@@ -27,6 +30,32 @@ def test_search_registry_claims_and_notes():
     assert search_papers(papers, "charge separation")
     assert search_claims(claims, "rubric")
     assert search_note_files(EXAMPLE_NOTES, "photocorrosion")
+
+
+def test_cli_search_report_uses_relative_paths_for_project_outputs(tmp_path):
+    out = tmp_path / "search.md"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "paper_workbench.cli",
+            "search",
+            "photocorrosion",
+            "--project",
+            "zis_photocatalysis",
+            "--out",
+            str(out),
+        ],
+        cwd=ROOT,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+    assert result.returncode == 0, result.stderr
+    content = out.read_text(encoding="utf-8")
+    assert "/Users/" not in content
+    assert "/private/" not in content
+    assert "notes/zis_stability_2024.md" in content
 
 
 def test_report_generation_contains_expected_sections():

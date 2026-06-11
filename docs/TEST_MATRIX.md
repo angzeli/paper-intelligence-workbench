@@ -13,6 +13,7 @@
 | Sync planning | Local sources produce dry-run plans, conflict reports, and safe registry applies | `tests/test_sync_v1_3.py` | `docs/SYNC.md`, `docs/SAFE_SYNC_WORKFLOW.md` | Non-empty metadata conflict resolution is manual |
 | Indexed search | SQLite cache rebuilds and search falls back where needed | `tests/test_index_v0_5.py` | `docs/local-search.md` | No concurrent index update tests |
 | Authoring workbench | Generates planning aids without final prose | `tests/test_authoring_workbench.py` | `docs/authoring-workbench.md` | Readiness scoring remains heuristic |
+| Manuscript QA | Audits user drafts against local citations, notes, claims, and themes without rewriting prose | `tests/test_manuscript_v1_4.py` | `docs/MANUSCRIPT_QA.md`, `docs/CITATION_CONTEXT_TABLE.md`, `docs/CLAIM_TRACEABILITY.md` | Matching remains lexical and heuristic |
 | Local files | Scans, hashes, links, audits, and preserves user files | `tests/test_local_files_v0_7.py` | `docs/local-files.md` | Optional PDF metadata extraction is future work |
 | Notebook validation | Notebooks are valid JSON and portable | `scripts/check_notebooks.py`, release tests | `docs/SITE_MAP.md` | Notebooks are not executed in CI by default |
 | Data safety | Tracked files are checked for forbidden artifacts and secrets | `scripts/data_safety_audit.py`, release tests | `docs/safety-and-boundaries.md` | Warnings require human review |

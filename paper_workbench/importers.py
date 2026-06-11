@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import date
@@ -610,14 +611,14 @@ def import_report(result: ImportResult) -> str:
     lines = [
         f"# Import Report: {result.source_type}",
         "",
-        f"- Source file: {result.source_path}",
+        f"- Source file: {_display_path(result.source_path)}",
         f"- Project: {result.project or 'default data workflow'}",
         f"- Dry run: {str(result.dry_run).lower()}",
         f"- Rows read: {result.rows_read}",
         f"- Records imported: {result.imported}",
         f"- Records updated: {result.updated}",
         f"- Records skipped: {result.skipped}",
-        f"- Output registry path: {result.registry_path}",
+        f"- Output registry path: {_display_path(result.registry_path)}",
         "",
         "## Imported Paper IDs",
         "",
@@ -646,6 +647,22 @@ def import_report(result: ImportResult) -> str:
     else:
         lines.append("No warnings.")
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _display_path(path: str | Path) -> str:
+    if not path:
+        return ""
+    target = Path(path)
+    base = Path.cwd()
+    try:
+        if target.is_absolute():
+            return target.relative_to(base.resolve()).as_posix()
+    except ValueError:
+        pass
+    try:
+        return Path(os.path.relpath(target, start=base)).as_posix()
+    except (OSError, ValueError):
+        return target.as_posix()
 
 
 def write_import_report(result: ImportResult, out: str | Path, *, force: bool = False) -> Path:

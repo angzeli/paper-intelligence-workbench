@@ -559,7 +559,7 @@ def cmd_search(args: argparse.Namespace) -> int:
         if args.claims:
             results.extend(search_claims(collect_claims(paths["notes_dir"]), args.query, exact=args.exact))
     if args.markdown:
-        markdown = results_markdown(results, args.query)
+        markdown = results_markdown(results, args.query, base_path=paths["root"])
         if args.out:
             path = write_text(args.out, markdown, force=args.force)
             print(f"Wrote {path}")
@@ -567,11 +567,11 @@ def cmd_search(args: argparse.Namespace) -> int:
             print(markdown, end="")
         return 0
     if args.out:
-        path = write_text(args.out, results_markdown(results, args.query), force=args.force)
+        path = write_text(args.out, results_markdown(results, args.query, base_path=paths["root"]), force=args.force)
         print(f"Wrote {path}")
         return 0
     for result in results:
-        path = f"\t{result['path']}" if result.get("path") else ""
+        path = f"\t{display_path(result['path'], base_path=paths['root'])}" if result.get("path") else ""
         print(f"{result['kind']}\t{result['id']}\t{result['title']}{path}")
     if not results:
         print("No matches.")

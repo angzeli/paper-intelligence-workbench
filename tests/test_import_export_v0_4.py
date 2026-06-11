@@ -56,6 +56,23 @@ def test_zotero_csv_dry_run_does_not_modify_registry(tmp_path):
     assert len(load_registry(registry)) == 0
 
 
+def test_project_import_report_uses_relative_paths():
+    papers = load_registry(ZIS_PROJECT / "registry.csv")
+    result = import_zotero_csv(
+        EXAMPLE_ZOTERO_CSV,
+        papers,
+        registry_path=ZIS_PROJECT / "registry.csv",
+        project="zis_photocatalysis",
+        dry_run=True,
+    )
+    report = import_report(result)
+
+    assert "/Users/" not in report
+    assert "/private/" not in report
+    assert "projects/zis_photocatalysis/registry.csv" in report
+    assert "data/examples/zotero_export.csv" in report
+
+
 def test_generic_csv_import_with_mapping(tmp_path):
     registry = tmp_path / "papers.csv"
     create_empty_registry(registry)

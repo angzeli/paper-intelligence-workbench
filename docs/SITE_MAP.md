@@ -13,6 +13,10 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/local-search.md`
 - `docs/import-export.md`
 - `docs/authoring-workbench.md`
+- `docs/MANUSCRIPT_QA.md`
+- `docs/CITATION_CONTEXT_TABLE.md`
+- `docs/CLAIM_TRACEABILITY.md`
+- `docs/MANUSCRIPT_LIMITATIONS.md`
 - `docs/READING_SESSIONS.md`
 - `docs/READING_QUEUE.md`
 - `docs/FOLLOW_UP_ACTIONS.md`
@@ -32,6 +36,10 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/IMPORTS.md`
 - `docs/EXPORTS.md`
 - `docs/AUTHORING_WORKBENCH.md`
+- `docs/MANUSCRIPT_QA.md`
+- `docs/CITATION_CONTEXT_TABLE.md`
+- `docs/CLAIM_TRACEABILITY.md`
+- `docs/MANUSCRIPT_LIMITATIONS.md`
 - `docs/READING_SESSIONS.md`
 - `docs/READING_QUEUE.md`
 - `docs/FOLLOW_UP_ACTIONS.md`

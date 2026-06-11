@@ -79,6 +79,37 @@ def test_report_index_treats_v1_reports_as_current(tmp_path):
     assert "release_readiness_v1_0_rc.md" in index
 
 
+def test_checked_in_report_index_matches_latest_generated_reports():
+    index_path = ROOT / "reports" / "index.md"
+    content = index_path.read_text(encoding="utf-8")
+    generated = report_index_markdown(ROOT / "reports", output_path=index_path)
+
+    assert content == generated
+    assert "## Current v1.4 Release Reports" in content
+    assert "[manuscript_qa_v1_4.md]" in content
+    assert "[citation_context_table_v1_4.md]" in content
+    assert "[claim_traceability_v1_4.md]" in content
+    assert "[manuscript_revision_checklist_v1_4.md]" in content
+    assert "[release_readiness_v1_4.md]" in content
+    assert "## Next Patch Plan" in content
+    assert "[v1_5_recommended_patch_plan.md]" in content
+
+
+def test_v1_4_manuscript_docs_are_wired_into_release_docs():
+    docs_index = (ROOT / "docs" / "index.md").read_text(encoding="utf-8")
+    site_map = (ROOT / "docs" / "SITE_MAP.md").read_text(encoding="utf-8")
+    report_matrix = (ROOT / "docs" / "REPORT_MATRIX.md").read_text(encoding="utf-8")
+    test_matrix = (ROOT / "docs" / "TEST_MATRIX.md").read_text(encoding="utf-8")
+
+    for expected in ("MANUSCRIPT_QA.md", "CITATION_CONTEXT_TABLE.md", "CLAIM_TRACEABILITY.md", "MANUSCRIPT_LIMITATIONS.md"):
+        assert expected in docs_index
+        assert expected in site_map
+    for expected in ("Manuscript QA", "Citation context table", "Claim traceability", "Manuscript revision checklist"):
+        assert expected in report_matrix
+    assert "Manuscript QA" in test_matrix
+    assert "tests/test_manuscript_v1_4.py" in test_matrix
+
+
 def test_active_generated_reports_do_not_leak_maintainer_absolute_paths():
     checked_reports = [
         "reports/import_zotero_csv_v0_4.md",

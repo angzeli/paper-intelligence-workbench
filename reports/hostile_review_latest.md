@@ -87,7 +87,7 @@ Required fix:
 
 Evidence:
 
-- `paperwb search photocorrosion --project zis_photocatalysis --out scratch/hostile_search_report.md --force` wrote absolute paths such as `/Users/liangze/Desktop/paper-intelligence-workbench/projects/zis_photocatalysis/notes/zis_stability_2024.md`.
+- `paperwb search photocorrosion --project zis_photocatalysis --out scratch/hostile_search_report.md --force` wrote absolute paths such as `<workspace>/projects/zis_photocatalysis/notes/zis_stability_2024.md`.
 - `paper_workbench/search.py:60` returns `claim.note_file` directly.
 - `paper_workbench/search.py:72` returns `str(note_path)` directly.
 - `paper_workbench/cli.py:569-575` writes and prints non-indexed search results without applying the relative `display_path` behavior used by indexed search.
@@ -108,7 +108,7 @@ Required fix:
 
 Evidence:
 
-- `paperwb import zotero-csv ... --project zis_photocatalysis --dry-run --report scratch/hostile_import_zotero.md --force` wrote `Output registry path: /Users/liangze/Desktop/paper-intelligence-workbench/projects/zis_photocatalysis/registry.csv`.
+- `paperwb import zotero-csv ... --project zis_photocatalysis --dry-run --report scratch/hostile_import_zotero.md --force` wrote `Output registry path: <workspace>/projects/zis_photocatalysis/registry.csv`.
 - `paper_workbench/importers.py:620` renders `result.registry_path` directly.
 
 Why this matters:

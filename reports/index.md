@@ -2,22 +2,22 @@
 
 Reports directory: .
 
-Markdown reports indexed: 114
+Markdown reports indexed: 120
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v1.3 Release Reports
+## Current v1.4 Release Reports
 
+- [citation_context_table_v1_4.md](citation_context_table_v1_4.md)
+- [claim_traceability_v1_4.md](claim_traceability_v1_4.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [obsidian_roundtrip_v1_3.md](obsidian_roundtrip_v1_3.md)
-- [release_readiness_v1_3.md](release_readiness_v1_3.md)
-- [sync_apply_dry_run_v1_3.md](sync_apply_dry_run_v1_3.md)
-- [sync_conflicts_v1_3.md](sync_conflicts_v1_3.md)
-- [sync_plan_v1_3.md](sync_plan_v1_3.md)
+- [manuscript_qa_v1_4.md](manuscript_qa_v1_4.md)
+- [manuscript_revision_checklist_v1_4.md](manuscript_revision_checklist_v1_4.md)
+- [release_readiness_v1_4.md](release_readiness_v1_4.md)
 
 ## Next Patch Plan
 
-- [v1_4_recommended_patch_plan.md](v1_4_recommended_patch_plan.md)
+- [v1_5_recommended_patch_plan.md](v1_5_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -56,6 +56,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [migration_plan_v0_9.md](migration_plan_v0_9.md)
 - [missing_files_v0_7.md](missing_files_v0_7.md)
 - [obsidian_export_summary_v0_4.md](obsidian_export_summary_v0_4.md)
+- [obsidian_roundtrip_v1_3.md](obsidian_roundtrip_v1_3.md)
 - [paragraph_evidence_matrix_v1_1.md](paragraph_evidence_matrix_v1_1.md)
 - [paragraph_plan_v0_6.md](paragraph_plan_v0_6.md)
 - [performance_sanity_v0_3.md](performance_sanity_v0_3.md)
@@ -80,6 +81,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v1_0_rc.md](release_readiness_v1_0_rc.md)
 - [release_readiness_v1_1.md](release_readiness_v1_1.md)
 - [release_readiness_v1_2.md](release_readiness_v1_2.md)
+- [release_readiness_v1_3.md](release_readiness_v1_3.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [restore_dry_run_v0_9.md](restore_dry_run_v0_9.md)
 - [revision_checklist_v1_1.md](revision_checklist_v1_1.md)
@@ -94,6 +96,9 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [stress_weak_claims_v0_3.md](stress_weak_claims_v0_3.md)
 - [stress_workspace_health_v0_3.md](stress_workspace_health_v0_3.md)
 - [subsection_readiness_v0_6.md](subsection_readiness_v0_6.md)
+- [sync_apply_dry_run_v1_3.md](sync_apply_dry_run_v1_3.md)
+- [sync_conflicts_v1_3.md](sync_conflicts_v1_3.md)
+- [sync_plan_v1_3.md](sync_plan_v1_3.md)
 - [text_sidecars_v0_7.md](text_sidecars_v0_7.md)
 - [v0_10_recommended_patch_plan.md](v0_10_recommended_patch_plan.md)
 - [v0_3_recommended_patch_plan.md](v0_3_recommended_patch_plan.md)
@@ -106,6 +111,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v1_0_rc_recommended_patch_plan.md](v1_0_rc_recommended_patch_plan.md)
 - [v1_2_recommended_patch_plan.md](v1_2_recommended_patch_plan.md)
 - [v1_3_recommended_patch_plan.md](v1_3_recommended_patch_plan.md)
+- [v1_4_recommended_patch_plan.md](v1_4_recommended_patch_plan.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
 - [workspace_integrity_v0_9.md](workspace_integrity_v0_9.md)

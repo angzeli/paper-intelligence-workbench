@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from .claims import collect_claims
@@ -77,12 +78,29 @@ def search_notes_claims(notes_path: str | Path, query: str, *, exact: bool = Fal
     return search_claims(collect_claims(notes_path), query, exact=exact)
 
 
-def results_markdown(results: list[dict[str, str]], query: str) -> str:
+def _display_path(path: str | Path, *, base_path: str | Path | None = None) -> str:
+    if not path:
+        return ""
+    target = Path(path)
+    base = Path(base_path) if base_path is not None else Path.cwd()
+    try:
+        if target.is_absolute():
+            return target.relative_to(base.resolve()).as_posix()
+    except ValueError:
+        pass
+    try:
+        return Path(os.path.relpath(target, start=base)).as_posix()
+    except (OSError, ValueError):
+        return target.as_posix()
+
+
+def results_markdown(results: list[dict[str, str]], query: str, *, base_path: str | Path | None = None) -> str:
     lines = [f"# Search Results: {query}", "", "| Kind | ID | Title | Path |", "| --- | --- | --- | --- |"]
     for result in results:
         title = result.get("title", "").replace("|", "\\|")
+        path = _display_path(result.get("path", ""), base_path=base_path)
         lines.append(
-            f"| {result.get('kind', '')} | {result.get('id', '')} | {title} | {result.get('path', '')} |"
+            f"| {result.get('kind', '')} | {result.get('id', '')} | {title} | {path} |"
         )
     if not results:
         lines.append("| none |  | No matches. |  |")
