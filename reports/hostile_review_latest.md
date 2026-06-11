@@ -1,204 +1,324 @@
-# Hostile Maintainer Review: v0.10 Current Repository
+# Hostile Maintainer Review: v1.0-rc Current Repository
 
 Date: 2026-06-11
 
 ## Release Verdict
 
-**Verdict: do not cut an external release until the two safe-write blockers below are fixed.**
+**Verdict: do not ship this as an external release candidate until the claims and registry JSON safe-write blockers are fixed.**
 
-The repository is much stronger than the original MVP: the package imports, the 136-test suite passes, notebooks validate structurally, CI exists, local-first boundaries are documented, and representative CLI workflows run. The architecture is coherent for an alpha local-first workbench.
+The repository is much stronger than the earlier MVP line. It has a coherent local-first architecture, zero runtime dependencies, broad tests, CI, project profiles, import/export workflows, authoring aids, local search, local-file audits, backup/migration safeguards, adversarial fixtures, and v1.0-rc surface documentation.
 
-The release is still blocked by two command-ordering bugs in safety-sensitive workflows. Both can apply data-changing work before discovering that the requested report output cannot be written. That violates the project's own v0.9/v0.10 guarantees around dry-run-first workflows, auditability, and non-destructive operation.
+That said, the current command surface still has unsafe and misleading behavior in ordinary user-facing commands:
+
+- `paperwb claims` silently treats a missing notes path as a successful empty extraction.
+- `paperwb claims --output` silently overwrites existing files and has no `--force` flag.
+- `paperwb validate-registry --json` silently overwrites existing JSON output and has no `--force` flag.
+
+Those bugs directly contradict `docs/COMMAND_CONTRACTS.md`, which says generated files must not be overwritten without an explicit force flag and that normal bad inputs should return user-facing errors. They are release blockers because they can erase user-generated analysis artifacts or produce empty claim registries after a typo.
 
 Validation performed during this review:
 
-- `python -m pytest -q`: passed, 136 collected tests
-- `python scripts/check_notebooks.py`: passed, 8 notebooks checked
-- `python scripts/validate_notebooks.py`: passed, 8 notebooks validated
-- `python scripts/data_safety_audit.py --out <temporary-review-report> --strict`: passed with 0 errors and 12 warnings
-- `python -m paper_workbench.cli --help`: passed
-- Representative CLI checks for registry validation, BibTeX validation, project validation, evidence-map generation, citation-audit generation, writing-packet generation, indexed search, local-file status, claims export, import failure handling, and migration dry-run
+- `python -m pytest -q`: passed, 148 tests collected.
+- `python scripts/data_safety_audit.py --out <temporary-review-report> --title "Hostile Review Data Safety" --strict`: passed with 0 errors and 11 warnings.
+- `python scripts/clean_room_install_check.py --quick --out <temporary-review-report>`: passed, 7 steps, 0 failures.
+- `python scripts/check_notebooks.py`: passed, 8 notebooks checked.
+- `python -m paper_workbench.cli --help`: passed.
+- Failure-path probes for missing project, missing indexed-search cache, and missing backup returned non-zero without tracebacks.
+- Overwrite and missing-path probes for `claims` and `validate-registry --json` reproduced the blockers below.
+- `python -m build`: failed because the current environment does not provide an executable `build.__main__`.
 
 ## Release Blockers
 
-### 1. Forced backup restore can mutate files before report-output preflight
+### 1. `paperwb claims` silently succeeds on a missing notes path
 
-`paper_workbench/cli.py` runs `restore_backup(...)` in `cmd_backup_restore` before attempting to write `args.out` with `force=args.force_report`.
+Repro:
 
-Consequence: `paperwb backup restore BACKUP_ID --force --out existing_report.md` can restore project files and only then fail because the report path already exists. The user sees an error after a state change that should have been preflighted.
+```bash
+python -m paper_workbench.cli claims /private/tmp/definitely_missing_paperwb_notes_dir
+```
+
+Observed behavior:
+
+- exit code: `0`
+- stdout/stderr: empty
+
+With an output path:
+
+```bash
+python -m paper_workbench.cli claims /private/tmp/definitely_missing_paperwb_notes_dir --output /private/tmp/paperwb_missing_claims_probe.csv
+```
+
+Observed behavior:
+
+- exit code: `0`
+- stdout: `Wrote 0 claims to ...`
 
 Why this blocks release:
 
-- Restore is one of the highest-risk commands in the tool.
-- The docs say restore is safety-oriented and reportable.
-- The v0.10 failure-mode guide says commands should avoid partial outputs when preflight checks fail.
-- The audit log event is also written after the restore/report path, so the failure path can leave a state change without the intended report.
+- A mistyped notes directory can produce an empty claims CSV that looks successful.
+- Claim extraction is central to citation audits, evidence maps, writing packets, and exports.
+- The command contract says bad inputs should return a user-facing error.
 
 Required fix:
 
-- Preflight `args.out` before calling `restore_backup` when an output path is requested.
-- Add a regression test proving that an existing restore report path prevents any restore and prevents pre-restore backup creation.
-- Keep dry-run behavior unchanged.
+- Validate that the notes path exists before collecting notes.
+- Return exit code `2` with an actionable error when the path is missing.
+- Add tests for missing directory, missing file, and valid empty existing directory behavior.
 
-### 2. Forced legacy migration can copy files before report-output preflight
+### 2. `paperwb claims --output` silently overwrites existing files
 
-`paper_workbench/cli.py` runs `run_legacy_migration(...)` in `cmd_migrate_run` before attempting to write `args.out` with `force=args.force_report`.
+Repro:
 
-Consequence: `paperwb migrate run --force --out existing_report.md` can copy files into a new project and only then fail because the report path already exists.
+```bash
+python -m paper_workbench.cli claims data/notes --output /private/tmp/paperwb_claims_overwrite_probe.csv
+python -m paper_workbench.cli claims data/notes --output /private/tmp/paperwb_claims_overwrite_probe.csv
+```
+
+Observed behavior:
+
+- Both commands exit `0`.
+- The second command overwrites the existing CSV.
+- There is no `--force` option for `paperwb claims`.
+
+Code path:
+
+- `paper_workbench/cli.py::cmd_claims`
+- `paper_workbench/claims.py::save_claims_csv(..., force=True)`
 
 Why this blocks release:
 
-- Migration is explicitly marketed as non-destructive and reviewable.
-- Report generation is part of the migration audit trail.
-- A failed report write after copying files is a bad external-user experience and undermines trust in dry-run/force semantics.
+- Claim CSVs are user work products, not rebuildable caches in every workflow.
+- This violates the v1.0-rc command contract for generated files.
+- It undermines the project’s “preserve user notes and raw files” safety posture.
 
 Required fix:
 
-- Preflight `args.out` before forced migration work starts.
-- Add a regression test proving an existing migration report path prevents project creation/copying.
-- Preserve the existing dry-run default and legacy `data/` compatibility.
+- Add `--force` to `paperwb claims`.
+- Default to refusing existing output paths.
+- Pass `force=args.force` into `save_claims_csv`.
+- Add no-overwrite and force-overwrite CLI regression tests.
+
+### 3. `paperwb validate-registry --json` silently overwrites existing files
+
+Repro:
+
+```bash
+python -m paper_workbench.cli validate-registry data/registries/example_papers.csv --json /private/tmp/paperwb_registry_overwrite_probe.json
+python -m paper_workbench.cli validate-registry data/registries/example_papers.csv --json /private/tmp/paperwb_registry_overwrite_probe.json
+```
+
+Observed behavior:
+
+- Both commands exit `0`.
+- The second command overwrites the existing JSON output.
+- There is no `--force` option for this export path.
+
+Code path:
+
+- `paper_workbench/cli.py::cmd_validate_registry`
+- `paper_workbench/registry.py::save_registry_json`
+- `paper_workbench/io.py::write_json(..., force=True)`
+
+Why this blocks release:
+
+- `validate-registry --json` is effectively an export command.
+- The command contract says generated files should not be overwritten without force.
+- The README and docs encourage external users to run validation commands early.
+
+Required fix:
+
+- Add `--force` for the JSON export path.
+- Refuse existing `--json` output by default.
+- Add tests for no-overwrite and force behavior.
 
 ## High-Priority Issues
 
-### 1. Claims CSV exports leak machine-local absolute paths
+### 1. README quickstart writes into tracked `reports/` files with `--force`
 
-`paper_workbench/claims.py` writes `Claim.note_file` directly. Project notes are parsed from absolute project-profile paths, so `paperwb claims --project ... --output ...` emits rows such as:
+The dedicated external quickstart correctly writes to `scratch/`, but the top-level README quickstart still tells new users to run commands such as:
 
-```text
-.../projects/zis_photocatalysis/notes/zis_charge_2025.md
+```bash
+paperwb claims data/notes --output reports/example_claims.csv
+paperwb report inventory --registry data/registries/example_papers.csv --force
+paperwb report evidence-map ... --force
 ```
 
-The data-safety audit also reports absolute-path warnings in generated stress claims and historical reports.
+This dirties a fresh clone and can overwrite checked-in report artifacts. That is the opposite of a safe first-run experience.
 
 Required fix:
 
-- Relativize `note_file` values in claims CSV exports where possible.
-- Add tests for `paperwb claims --project ... --output ...` and `export claims` to ensure committed/generated outputs do not contain local absolute paths.
-- Regenerate affected reports/CSV outputs.
+- Change README quickstart outputs to `scratch/` or a temp workspace.
+- Add a doc smoke test or script check that README quickstart examples do not write to tracked report files.
 
-### 2. External installation docs state the wrong package version
+### 2. Package metadata still says `0.10.0` while release docs advertise `v1.0-rc`
 
-`docs/INSTALLATION.md` says the expected package version is `0.8.0`, while `pyproject.toml` and `paper_workbench.__version__` are `0.10.0`.
+`pyproject.toml` and `paper_workbench.__version__` are still `0.10.0`. The v1.0-rc reports acknowledge this, but an external user running install verification sees `0.10.0`, not an RC identity.
+
+This is acceptable for an internal hardening pass, but not for a public release candidate.
+
+Required fix before public RC:
+
+- Decide whether the RC is versioned `1.0.0rc1`, `1.0.0-rc`, or stays `0.10.0`.
+- Align `pyproject.toml`, `paper_workbench.__version__`, changelog, and release reports.
+
+### 3. The "clean-room install check" is not a real clean-room install
+
+`scripts/clean_room_install_check.py` explicitly uses the current environment, injects `PYTHONPATH`, and invokes `python -m paper_workbench.cli`. That is useful, but it does not prove that a fresh external checkout can install and run the console entry point.
+
+CI does run editable install, but the clean-room report title overstates what the script proves.
 
 Required fix:
 
-- Update the version claim or remove the hardcoded version from installation docs.
-- Add a lightweight docs/version consistency test if the version remains documented.
+- Either rename the script/report to "current-environment release check" or add an optional true venv mode.
+- Make CI prove `paperwb --help` after editable install, not only `python -m paper_workbench.cli --help`.
 
-### 3. Forced restore validates the target backup after creating a pre-restore backup
+### 4. Wheel/sdist build is not verified
 
-`paper_workbench/backups.py::restore_backup` creates the pre-restore backup before calling `plan_restore(...)` for the selected backup. If the selected backup is corrupt or missing internal files, the command can create a new backup before failing to restore.
-
-This is not data-loss behavior, but it is still a surprising side effect in a failure path.
-
-Required fix:
-
-- Validate/plan the requested backup before creating the pre-restore backup.
-- Add a regression test for corrupt or incomplete backup input.
-
-### 4. Several CLI failure messages still miss the v0.10 error-quality bar
-
-The error taxonomy asks for what happened, where it happened, why it matters, and what to do next. Some common failure paths still emit terse messages, for example:
+`python -m build` failed in the review environment:
 
 ```text
-error: backup not found: missing_backup
+/opt/anaconda3/bin/python: No module named build.__main__; 'build' is a package and cannot be directly executed
 ```
 
-Required fix:
-
-- Improve high-traffic errors for missing backup, wrong project, missing registry, and missing index.
-- Add assertions that important failure messages include a next-step hint.
-
-### 5. Current data-safety report is stale and under-versioned
-
-The only data-safety report is `reports/data_safety_audit_v0_8.md`, while the package is v0.10. The script also titles new output as v0.8.
+The project is not being published yet, but external release engineering should at least verify that source and wheel distributions can be built in CI or document that the release is editable-install only.
 
 Required fix:
 
-- Regenerate a current data-safety report for v0.10 after absolute-path cleanup.
-- Either remove version-specific wording from `paper_workbench/safety.py` or update it consistently.
+- Add a CI build check after installing `.[dev]`, or document that v1.0-rc is not a distribution artifact.
+- Keep build artifacts ignored.
+
+### 5. The API surface doc over-promises stability
+
+`docs/API_SURFACE.md` marks many module helpers as "stable enough" without detailed function contracts. Several of those helpers are implementation-facing and may need refactoring, especially `reporting`, `exports`, `index`, `files`, `backups`, and `migration`.
+
+Required fix:
+
+- Narrow the stable Python API to dataclasses plus a small set of loader/validator functions, or mark module helpers as semi-stable/experimental.
+- State that CLI and file formats are the stable API for v1.0.
+
+### 6. CLI errors expose absolute local paths
+
+Examples from review probes:
+
+- missing project: `/Users/liangze/Desktop/paper-intelligence-workbench/projects/...`
+- missing backup: `/Users/liangze/Desktop/paper-intelligence-workbench/projects/...`
+- missing index: `/private/tmp/nonexistent_paperwb_review.sqlite`
+
+Absolute paths are useful locally, but users often paste CLI errors into issues. This is not a functional blocker, but it conflicts with the data-safety posture and keeps absolute-path warnings alive in reports.
+
+Required fix:
+
+- Prefer workspace-relative paths in user-facing errors when possible.
+- Keep absolute paths available only when the path is outside the workspace or when explicitly requested.
+
+### 7. Historical absolute-path warnings remain in tracked reports
+
+The v1.0-rc data-safety audit reports 0 errors and 11 warnings. All warnings are absolute local path patterns in historical reports/tests.
+
+This is documented, but for a public release candidate the report archive still looks untidy and machine-specific.
+
+Required fix:
+
+- Decide whether historical reports are immutable audit artifacts or should be sanitized/regenerated.
+- If kept, document the warning budget explicitly in `DATA_SAFETY_MATRIX.md`.
+
+### 8. CI tests only Python 3.11 despite classifiers for 3.10, 3.11, and 3.12
+
+`pyproject.toml` claims Python 3.10, 3.11, and 3.12 support. CI only runs 3.11.
+
+Required fix:
+
+- Add a matrix for 3.10, 3.11, and 3.12, or narrow classifiers.
 
 ## Medium-Priority Issues
 
-- Non-indexed search output prints absolute paths for project note matches, while indexed search displays project-relative paths.
-- Many current CLI help strings and generated report headings still say v0.7, v0.8, or v0.9. Historical reports can keep old versions, but active commands should not look stale.
-- The canonical `zis_photocatalysis` example project reports an integrity error for a missing evidence location. That is useful for demos, but the docs should label it clearly as intentional synthetic bad data.
-- Reports and docs are now numerous and partially duplicated between uppercase release docs and docs-site-style lowercase pages.
-- Backup creation is not transactional; a copy failure midway could leave a partial backup directory.
-- BibTeX parsing is intentionally lightweight and still not suitable for arbitrary BibTeX edge cases beyond the tested recovery behavior.
-- Note parsing remains template-sensitive. It tolerates some variants but still silently ignores claim styles outside the supported heading/field pattern.
-- CI runs Python 3.11 only despite package classifiers for 3.10, 3.11, and 3.12.
+- `paper_workbench/cli.py` is over 1,700 lines and now owns too much orchestration, argument parsing, error handling, and command behavior.
+- Active help text still embeds older release numbers such as v0.7, v0.9, and v0.9/v0.10 in command descriptions. Historical reports can keep versions; active CLI help should be release-neutral.
+- The canonical `zis_photocatalysis` project intentionally contains evidence gaps and integrity errors, but this is not obvious enough in every quickstart path.
+- There are many duplicated docs: uppercase release docs and lowercase docs-site pages can drift.
+- `write_text`, `write_json`, and `write_csv_rows` default to `force=True`. Callers often override it, but this default contributed to the blockers above.
+- Backup creation is not transactional; a copy failure can leave a partial backup directory.
+- BibTeX parsing remains intentionally lightweight and should not be presented as robust for arbitrary user libraries.
+- Note parsing remains template-sensitive and ignores unsupported claim-heading styles.
+- The release report says `paperwb --help` passed, but the clean-room script itself does not call the installed `paperwb` console script.
 
 ## Low-Priority Polish
 
-- `paperwb project validate` defaults to exit 0 even when errors are printed unless `--strict` is used; this is consistent with other commands but may surprise new users.
-- `paperwb files status` prints absolute root and file-registry paths; readable, but less portable than the newer report path style.
-- The report directory is crowded with historical release artifacts, making it hard for external users to identify the latest reports.
-- Notebook numbering has gaps because some workflows were implemented as scripts instead of notebooks. This is harmless but looks unfinished.
-- Some report headings include "Demo" in files that are now used as real command output.
+- `paperwb project validate` exits 0 by default even when errors are printed unless `--strict` is used. This is consistent with validators but surprising.
+- `reports/` is crowded with historical artifacts; a new user has to know which report index is current.
+- Notebook numbering has gaps.
+- Some generated report titles still say "Demo".
+- `CONTRIBUTING.md` release checks do not mention `scripts/clean_room_install_check.py` or notebook JSON validation.
+- Some command-contract tests check for option/help fragments rather than end-to-end behavior for every command they list.
 
 ## Missing Tests
 
 Add focused tests for:
 
-- forced restore with an existing `--out` path does not restore files
-- forced restore with an invalid/corrupt backup does not create a pre-restore backup
-- forced migration with an existing `--out` path does not create/copy a project
-- `paperwb claims --project ... --output ...` writes portable `note_file` paths
-- `paperwb export claims ...` writes portable `note_file` paths
-- installation docs do not claim a version different from `paper_workbench.__version__`
-- non-indexed search path display is project-relative or intentionally documented
-- data-safety warnings stay below an agreed budget after report regeneration
+- `paperwb claims MISSING_PATH` returns non-zero and does not write output.
+- `paperwb claims --output existing.csv` refuses overwrite by default.
+- `paperwb claims --output existing.csv --force` overwrites intentionally after the new flag is added.
+- `paperwb validate-registry --json existing.json` refuses overwrite by default.
+- `paperwb validate-registry --json existing.json --force` overwrites intentionally after the new flag is added.
+- README quickstart commands write only to ignored `scratch/` or temporary paths.
+- Installed console script `paperwb --help` works in CI after editable install.
+- Source and wheel distribution build succeeds.
+- Python 3.10 and 3.12 test matrix, or classifier consistency if matrix is not added.
+- User-facing errors avoid workspace absolute paths where possible.
 
 ## Documentation Mismatches
 
-- `docs/INSTALLATION.md` expects version `0.8.0`; package version is `0.10.0`.
-- `docs/CLI_FAILURE_MODES.md` says commands should avoid partial outputs when preflight checks fail, but forced restore/migration violate that with `--out`.
-- `docs/CLI_REFERENCE.md` says report commands refuse to overwrite existing output unless forced. That is true for direct report commands, but restore/migration combine state changes with later report writes and need stricter wording or fixed behavior.
-- `README.md` presents the safety workflow clearly, but it does not warn that the included synthetic example projects intentionally contain errors and warnings.
-- Data-safety docs mention historical absolute-path warnings, but the tracked reports still contain them.
+- `docs/COMMAND_CONTRACTS.md` says generated files are not overwritten without force; `claims --output` and `validate-registry --json` violate that.
+- `docs/CLI_SURFACE.md` says report/export write safety is stable; claims extraction and registry JSON validation have export-like writes without safe defaults.
+- README quickstart uses tracked `reports/` outputs and `--force`, while `docs/EXTERNAL_USER_QUICKSTART.md` correctly uses `scratch/`.
+- `docs/API_SURFACE.md` implies broader Python API stability than the implementation is ready to support.
+- `reports/release_readiness_v1_0_rc.md` says no blockers were found, but the overwrite and missing-path probes above show release blockers.
+- `reports/clean_room_install_check_v1_0_rc.md` is named as clean-room even though the script says it uses the current Python environment.
 
 ## CLI Usability Problems
 
-- Missing backup errors are terse and do not tell the user how to list backups or check `--backups-dir`.
-- Forced restore and forced migration can fail after doing work if report output cannot be written.
-- Non-indexed search results show absolute paths, while indexed results show portable paths.
-- Some active help text still embeds older release numbers, which makes the current CLI look stale.
-- Project-profile commands reject path overrides correctly, but the error messages could point users to `--out` or project config when relevant.
+- `paperwb claims` has no `--force` despite writing files.
+- `paperwb validate-registry --json` has no `--force` despite writing files.
+- `paperwb claims` gives no error for a nonexistent notes path.
+- Some errors include absolute local paths that are noisy and privacy-sensitive in shared logs.
+- Active command help still includes old release numbers, making the CLI look like a stack of historical prototypes.
 
 ## Data-Safety Risks
 
-No tracked PDFs, cache databases, `.paperwb` directories, backup archives, `.idea`, or Python cache files were found in `git ls-files`.
+No tracked PDFs, SQLite cache databases, `.paperwb` directories, backup archives, `.idea`, Python cache files, or obvious secret files were found in `git ls-files`.
 
 No cloud API, LLM API, publisher scraping, PDF download, OCR, or copyrighted example PDF behavior was found.
 
 Remaining data-safety risks:
 
-- Claims CSV and historical reports contain local absolute paths.
-- The data-safety audit currently reports 12 absolute-path warnings.
-- User-provided text sidecars are supported correctly, but the audit cannot prove text copyright status. The docs should keep emphasizing synthetic/user-owned text only.
-- Restore/migration report-output ordering can weaken auditability on failure.
+- Silent overwrites in `claims --output` and `validate-registry --json`.
+- Silent empty claim extraction on missing notes paths.
+- README quickstart overwrites tracked reports.
+- Historical absolute-path warnings remain in tracked reports/tests.
+- User-facing CLI errors expose local absolute paths.
+- Text sidecar copyright safety cannot be proven automatically; docs correctly keep emphasizing synthetic or user-owned text.
 
 ## Overengineering Risks
 
-The project now has a very broad CLI surface: registry, BibTeX, notes, claims, themes, reports, project profiles, imports, exports, search index, local files, authoring aids, backups, migration, integrity, audit logs, synthetic corpora, and adversarial fixtures.
+The project has become a large local workbench with registry validation, BibTeX parsing, structured notes, claims, themes, reports, project profiles, import/export, search indexing, local-file ingestion, authoring aids, backups, restore, migration, audit logs, synthetic data, adversarial fixtures, docs-site pages, CI, and release reports.
 
-That breadth is useful, but it creates release-management risk:
+That breadth is defensible, but the risks are now release-management risks:
 
-- docs and report labels drift across versions
-- safety guarantees need command-contract tests, not just module tests
-- historical artifacts can mask current release state
-- duplicated docs make it easy to update one page and miss another
+- safety guarantees must be enforced uniformly across all write commands;
+- docs drift is already visible;
+- versioned historical reports can contradict current release claims;
+- a broad "stable" API surface will slow necessary refactors;
+- monolithic CLI orchestration makes command-level safety audits harder.
 
-The architecture should stay boring: standard library, CSV/Markdown/JSON, SQLite cache, deterministic reports, and explicit force/dry-run behavior.
+Keep the v1.0 scope boring: local files, explicit force/dry-run semantics, reproducible reports, and CLI/file-format stability. Do not expand features until the safe-write contract is uniformly enforced.
 
 ## Recommended Fix Sequence
 
-1. Fix `backup restore --force --out ...` preflight ordering and add no-mutation regression tests.
-2. Fix `migrate run --force --out ...` preflight ordering and add no-copy regression tests.
-3. Validate selected backups before creating pre-restore backups.
-4. Relativize claims CSV/export note paths and regenerate affected reports.
-5. Update `docs/INSTALLATION.md` and current data-safety report/version labels.
-6. Improve missing-backup and missing-project CLI error messages.
-7. Re-run `pytest`, notebook checks, data-safety audit, and representative CLI smoke tests.
-8. Regenerate `reports/hostile_review_latest.md` only after the fixes are verified.
+1. Fix `paperwb claims` missing-path handling and add regression tests.
+2. Add `--force` to `paperwb claims`; refuse existing output by default; add tests.
+3. Add `--force` to `validate-registry --json`; refuse existing output by default; add tests.
+4. Update README quickstart to use `scratch/` outputs only.
+5. Update command-contract docs and release-readiness report after blockers are fixed.
+6. Add CI proof for installed `paperwb --help`, package build, and Python version matrix or adjust classifiers.
+7. Narrow `docs/API_SURFACE.md` to avoid overpromising Python helper stability.
+8. Reduce absolute local paths in user-facing errors and regenerate the data-safety report.
