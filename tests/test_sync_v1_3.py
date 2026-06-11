@@ -7,7 +7,8 @@ import sys
 import pytest
 
 from conftest import ROOT
-from paper_workbench.registry import load_registry, save_registry
+from paper_workbench.io import read_csv_rows, write_csv_rows
+from paper_workbench.registry import REGISTRY_FIELDS, load_registry, save_registry
 from paper_workbench.schema import Author, Paper
 from paper_workbench.sync import (
     SyncSource,
@@ -79,6 +80,30 @@ def test_registry_sync_plan_detects_create_fill_skip_and_conflict():
     assert "Sync Plan" in sync_plan_report(plan)
 
 
+@pytest.mark.parametrize(
+    ("incoming_kwargs", "conflict_type"),
+    [
+        ({"title": "Conflicting Synthetic Title", "doi": "10.1300/sync.known", "bibtex_key": "different2026"}, "same_doi_different_title"),
+        ({"title": "Known Synthetic Study", "doi": "10.1300/sync.other", "bibtex_key": "different2026"}, "same_title_different_doi"),
+        ({"title": "Different Synthetic Title", "doi": "10.1300/sync.other", "bibtex_key": "known2026"}, "same_bibtex_key_different_doi"),
+    ],
+)
+def test_registry_sync_plan_suppresses_actions_for_high_risk_identity_conflicts(incoming_kwargs, conflict_type):
+    existing = [_paper("known", title="Known Synthetic Study", doi="10.1300/sync.known", journal="", bibtex_key="known2026")]
+    plan = build_registry_sync_plan(
+        existing_papers=existing,
+        source_papers=[_paper("incoming", journal="Filled Journal", **incoming_kwargs)],
+        source=SyncSource("zotero-csv", "source.csv"),
+        target=SyncTarget("registry", "registry.csv"),
+        now=datetime(2026, 6, 11, tzinfo=timezone.utc),
+    )
+
+    assert [conflict.conflict_type for conflict in plan.conflicts] == [conflict_type]
+    assert plan.conflicts[0].risk_level == "high"
+    assert not [action for action in plan.actions if action.paper_id == "known"]
+    assert "Suppressed registry updates for known" in " ".join(plan.warnings)
+
+
 def test_sync_apply_dry_run_and_force_apply_safe_actions():
     existing = [_paper("known", title="Known Synthetic Study", doi="10.1300/sync.known", journal="")]
     source = SyncSource("zotero-csv", "source.csv")
@@ -99,6 +124,10 @@ def test_sync_apply_dry_run_and_force_apply_safe_actions():
     assert dry_papers[0].journal == ""
     assert len(dry_papers) == 1
     assert len(dry_result.applied_actions) == 2
+    dry_report = sync_apply_report(plan, dry_result)
+    assert "Would apply actions: 2" in dry_report
+    assert "## Actions That Would Apply" in dry_report
+    assert "Applied actions:" not in dry_report
 
     applied_papers, result = apply_registry_sync_plan(plan, existing, dry_run=False, force=True)
     assert {paper.paper_id for paper in applied_papers} == {"known", "created"}
@@ -122,6 +151,8 @@ def test_sync_apply_refuses_high_risk_conflicts_without_force():
     assert "high-risk conflict" in dry_result.warnings[0]
     with pytest.raises(PermissionError):
         apply_registry_sync_plan(plan, existing, dry_run=False, force=False)
+    with pytest.raises(PermissionError):
+        apply_registry_sync_plan(plan, existing, dry_run=False, force=True)
 
 
 def test_sync_plan_json_roundtrip(tmp_path):
@@ -214,6 +245,7 @@ def test_sync_cli_plan_apply_and_conflicts(tmp_path):
     assert dry.returncode == 0, dry.stderr
     assert load_registry(registry)[0].journal == ""
     assert "Dry run: true" in dry_report.read_text(encoding="utf-8")
+    assert "Would apply actions:" in dry_report.read_text(encoding="utf-8")
 
     applied = run_cli("sync", "apply", str(plan_json), "--registry", str(registry), "--force", "--no-backup", "--out", str(tmp_path / "apply.md"))
     assert applied.returncode == 0, applied.stderr
@@ -226,6 +258,73 @@ def test_sync_cli_plan_apply_and_conflicts(tmp_path):
     assert "Sync Conflicts" in conflicts.stdout
 
 
+def test_sync_cli_force_apply_preserves_unplanned_registry_field_formatting(tmp_path):
+    registry = tmp_path / "registry.csv"
+    source = tmp_path / "zotero.csv"
+    row = {field: "" for field in REGISTRY_FIELDS}
+    row.update(
+        {
+            "paper_id": "known",
+            "title": "Known Synthetic Study",
+            "authors": "Synthetic Author",
+            "year": "2026",
+            "doi": "10.1300/sync.known",
+            "reading_status": "unread",
+        }
+    )
+    write_csv_rows(registry, [row], REGISTRY_FIELDS)
+    source.write_text(
+        "Title,Author,Publication Year,Publication Title,DOI,Url,Item Type,Tags\n"
+        "Known Synthetic Study,Synthetic Author,2026,Filled Journal,10.1300/sync.known,,Journal Article,sync\n",
+        encoding="utf-8",
+    )
+    plan_json = tmp_path / "sync_plan.json"
+
+    planned = run_cli("sync", "plan", "--source", str(source), "--source-type", "zotero-csv", "--registry", str(registry), "--reports-dir", str(tmp_path), "--json-out", str(plan_json), "--out", str(tmp_path / "plan.md"))
+    assert planned.returncode == 0, planned.stderr
+    applied = run_cli("sync", "apply", str(plan_json), "--registry", str(registry), "--force", "--no-backup", "--out", str(tmp_path / "apply.md"))
+    assert applied.returncode == 0, applied.stderr
+
+    rows = read_csv_rows(registry)
+    assert rows[0]["authors"] == "Synthetic Author"
+    assert rows[0]["journal"] == "Filled Journal"
+    assert rows[0]["tags"] == "sync; imported-zotero"
+
+
+def test_sync_cli_refuses_stale_plan_after_registry_change(tmp_path):
+    registry = tmp_path / "registry.csv"
+    source = tmp_path / "zotero.csv"
+    save_registry([_paper("known", title="Known Synthetic Study", doi="10.1300/sync.known", journal="")], registry)
+    source.write_text(
+        "Title,Author,Publication Year,Publication Title,DOI,Url,Item Type,Tags\n"
+        "Known Synthetic Study,Synthetic Author,2026,Filled Journal,10.1300/sync.known,,Journal Article,sync\n",
+        encoding="utf-8",
+    )
+    plan_json = tmp_path / "sync_plan.json"
+    planned = run_cli("sync", "plan", "--source", str(source), "--source-type", "zotero-csv", "--registry", str(registry), "--reports-dir", str(tmp_path), "--json-out", str(plan_json), "--out", str(tmp_path / "plan.md"))
+    assert planned.returncode == 0, planned.stderr
+
+    rows = read_csv_rows(registry)
+    rows[0]["user_comment"] = "User edited after plan."
+    write_csv_rows(registry, rows, REGISTRY_FIELDS)
+    applied = run_cli("sync", "apply", str(plan_json), "--registry", str(registry), "--force", "--no-backup", "--out", str(tmp_path / "apply.md"))
+
+    assert applied.returncode == 2
+    assert "Stale sync plan" in applied.stderr
+    assert read_csv_rows(registry)[0]["journal"] == ""
+
+
+def test_sync_cli_reports_malformed_plan_json(tmp_path):
+    bad_plan = tmp_path / "bad_plan.json"
+    bad_plan.write_text("{}", encoding="utf-8")
+
+    result = run_cli("sync", "conflicts", str(bad_plan))
+
+    assert result.returncode == 2
+    assert "Invalid sync plan" in result.stderr
+    assert "paperwb sync plan" in result.stderr
+
+
 def test_sync_cli_plan_obsidian_reports_note_conflict(tmp_path):
     notes = tmp_path / "notes"
     vault_notes = tmp_path / "vault" / "papers"
@@ -233,6 +332,7 @@ def test_sync_cli_plan_obsidian_reports_note_conflict(tmp_path):
     vault_notes.mkdir(parents=True)
     (notes / "paper_a.md").write_text(_note("paper_a", claim="Local claim."), encoding="utf-8")
     (vault_notes / "paper_a.md").write_text(_note("paper_a", claim="Vault claim."), encoding="utf-8")
+    (tmp_path / "vault" / "export_summary.md").write_text("# Synthetic Obsidian export\n", encoding="utf-8")
     out = tmp_path / "obsidian_roundtrip.md"
     json_out = tmp_path / "obsidian_roundtrip.json"
 
@@ -251,5 +351,7 @@ def test_sync_cli_plan_obsidian_reports_note_conflict(tmp_path):
 
     assert result.returncode == 0, result.stderr
     assert "Conflicts:" in result.stdout
-    assert "local_note_differs_from_exported_note" in out.read_text(encoding="utf-8")
+    report = out.read_text(encoding="utf-8")
+    assert "local_note_differs_from_exported_note" in report
+    assert "one-way Markdown views" in report
     assert json_out.exists()

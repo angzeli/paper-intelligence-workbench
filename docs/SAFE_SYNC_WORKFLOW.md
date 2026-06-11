@@ -29,3 +29,6 @@ backup by default. Use `--no-backup` only for disposable test workspaces.
 Never use sync to overwrite notes or registry fields that contain user-entered
 data. Resolve those conflicts manually.
 
+Real applies are refused when a plan contains high-risk identity conflicts or
+when the source/registry files changed after plan generation. Regenerate the
+plan after manual edits so the dry-run report reflects the current workspace.

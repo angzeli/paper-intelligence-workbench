@@ -55,7 +55,8 @@ No commands are deprecated in v1.3.
 - Imports preserve existing non-empty registry fields unless the user asks for a
   documented fill behavior.
 - Sync apply is dry-run by default. Forced sync applies create a backup by
-  default and do not overwrite non-empty registry fields or auto-merge notes.
+  default, refuse high-risk or stale plans, and do not overwrite non-empty
+  registry fields or auto-merge notes.
 - Restore and migration workflows default to planning or dry-run behavior unless
   `--force` is passed.
 - `paperwb reading start` preserves existing notes by default and requires

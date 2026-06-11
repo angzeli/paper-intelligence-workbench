@@ -321,8 +321,9 @@ paperwb sync apply scratch/sync_plan.json --dry-run --out scratch/sync_apply_dry
 ```
 
 Forced sync applies create a local backup by default and only create missing
-registry rows or fill blank fields. Note and metadata conflicts are reported
-for manual review. See [docs/SYNC.md](docs/SYNC.md).
+registry rows or fill blank fields when the plan has no high-risk conflicts and
+the source/registry files still match the plan. Note and metadata conflicts are
+reported for manual review. See [docs/SYNC.md](docs/SYNC.md).
 
 ## Data Folder Convention
 

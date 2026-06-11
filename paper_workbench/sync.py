@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 from collections import Counter
+import copy
 from dataclasses import dataclass, field as dataclass_field
 from datetime import datetime, timezone
+import hashlib
 from pathlib import Path
 from typing import Iterable
 
 from .claims import collect_notes
 from .importers import import_bibtex, import_generic_csv, import_ris, import_zotero_csv
-from .io import load_json, write_json
+from .io import load_json, read_csv_rows, write_csv_rows, write_json
 from .registry import REGISTRY_FIELDS, display_authors, normalize_doi, normalize_title, paper_from_row, paper_to_row, save_registry
 from .schema import Paper, PaperNote, dataclass_to_plain
 from .tags import format_tags, parse_tags
@@ -19,6 +21,10 @@ from .tags import format_tags, parse_tags
 SYNC_SOURCE_TYPES = {"zotero-csv", "bibtex", "generic-csv", "ris"}
 UPDATE_FIELDS = ["title", "authors", "year", "journal", "doi", "url", "bibtex_key", "tags", "source_type"]
 IDENTITY_FIELDS = {"title", "doi", "bibtex_key"}
+
+
+class SyncPlanError(ValueError):
+    """Raised when a sync plan file is malformed or unsafe to apply."""
 
 
 @dataclass(slots=True)
@@ -77,6 +83,8 @@ class SyncPlan:
     conflicts: list[SyncConflict] = dataclass_field(default_factory=list)
     warnings: list[str] = dataclass_field(default_factory=list)
     dry_run: bool = True
+    source_hash: str = ""
+    target_hash: str = ""
 
 
 @dataclass(slots=True)
@@ -130,6 +138,8 @@ def build_registry_sync_plan(
         target=target,
         generated_at=generated.isoformat(),
         warnings=list(warnings),
+        source_hash=_file_sha256(source.path),
+        target_hash=_file_sha256(target.path),
     )
     action_counter = 1
     conflict_counter = 1
@@ -175,6 +185,11 @@ def build_registry_sync_plan(
         new_conflicts = _identifier_conflicts(existing, incoming, source, target, conflict_counter)
         plan.conflicts.extend(new_conflicts)
         conflict_counter += len(new_conflicts)
+        if any(conflict.risk_level == "high" for conflict in new_conflicts):
+            plan.warnings.append(
+                f"Suppressed registry updates for {existing.paper_id} because the imported record has a high-risk identity conflict."
+            )
+            continue
         for field_name in UPDATE_FIELDS:
             current = _field_value(existing, field_name)
             incoming_value = _field_value(incoming, field_name)
@@ -329,6 +344,10 @@ def build_obsidian_roundtrip_plan(
     plan = build_note_sync_plan(local_notes_dir=local_notes_dir, exported_notes_dir=papers_dir, source=source, target=target, project=project, now=now)
     if not papers_dir.exists():
         plan.warnings.append(f"Obsidian vault papers directory not found: {papers_dir}")
+    if (vault_path / "export_summary.md").exists():
+        plan.warnings.append(
+            "Obsidian vault exports are one-way Markdown views, not authoritative structured-note round trips; review reported note differences manually."
+        )
     return plan
 
 
@@ -338,14 +357,19 @@ def apply_registry_sync_plan(
     *,
     dry_run: bool = True,
     force: bool = False,
+    registry_path: str | Path | None = None,
 ) -> tuple[list[Paper], SyncApplyResult]:
     result = SyncApplyResult(plan_id=plan.plan_id, dry_run=dry_run, registry_path=plan.target.path)
     high_risk = [conflict for conflict in plan.conflicts if conflict.risk_level == "high"]
-    if high_risk and not force and not dry_run:
-        raise PermissionError("sync apply refused high-risk conflicts without --force")
     if high_risk and dry_run:
-        result.warnings.append(f"Plan contains {len(high_risk)} high-risk conflict(s); a real apply would require --force.")
-    working = [paper_from_row(paper_to_row(paper)) for paper in existing_papers]
+        result.warnings.append(f"Plan contains {len(high_risk)} high-risk conflict(s); a real apply will be refused until conflicts are resolved.")
+    if high_risk and not dry_run:
+        raise PermissionError("sync apply refused high-risk conflicts; resolve conflicts and regenerate the plan before applying")
+    stale_warnings = _stale_plan_warnings(plan, registry_path=registry_path)
+    result.warnings.extend(stale_warnings)
+    if stale_warnings and not dry_run:
+        raise PermissionError("; ".join(stale_warnings))
+    working = copy.deepcopy(existing_papers)
     by_id = {paper.paper_id: paper for paper in working}
     for action in plan.actions:
         if action.action_type == "skip_unchanged":
@@ -387,12 +411,40 @@ def save_sync_plan_json(plan: SyncPlan, path: str | Path, *, force: bool = True)
 
 
 def load_sync_plan_json(path: str | Path) -> SyncPlan:
-    data = load_json(path)
+    try:
+        data = load_json(path)
+    except ValueError as exc:
+        raise SyncPlanError(f"Invalid sync plan JSON at {path}: {exc}. Regenerate the plan with `paperwb sync plan`.") from exc
     return sync_plan_from_dict(data)
 
 
-def write_registry_apply_result(papers: list[Paper], registry_path: str | Path) -> Path:
-    return save_registry(papers, registry_path)
+def write_registry_apply_result(
+    papers: list[Paper],
+    registry_path: str | Path,
+    *,
+    plan: SyncPlan | None = None,
+    result: SyncApplyResult | None = None,
+) -> Path:
+    if plan is None or result is None:
+        return save_registry(papers, registry_path)
+    return _write_registry_apply_result_rows(registry_path, plan, result)
+
+
+def _write_registry_apply_result_rows(registry_path: str | Path, plan: SyncPlan, result: SyncApplyResult) -> Path:
+    rows = read_csv_rows(registry_path)
+    by_id = {row.get("paper_id", ""): row for row in rows}
+    applied = set(result.applied_actions)
+    for action in plan.actions:
+        if action.action_id not in applied:
+            continue
+        if action.action_type == "create_paper":
+            rows.append({field: action.paper.get(field, "") for field in REGISTRY_FIELDS})
+            continue
+        if action.action_type == "fill_blank_field":
+            row = by_id.get(action.paper_id)
+            if row is not None and action.field in REGISTRY_FIELDS:
+                row[action.field] = action.new_value
+    return write_csv_rows(registry_path, rows, REGISTRY_FIELDS, force=True)
 
 
 def sync_plan_report(plan: SyncPlan) -> str:
@@ -440,7 +492,7 @@ def sync_plan_report(plan: SyncPlan) -> str:
             "",
             "## Safety Boundary",
             "",
-            "This plan is local and non-destructive until applied. v1.3 does not auto-merge note conflicts or overwrite non-empty registry fields.",
+            "This plan is local and non-destructive until applied. Real registry applies are refused for high-risk conflicts or stale source/registry files. v1.3 does not auto-merge note conflicts or overwrite non-empty registry fields.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
@@ -465,6 +517,8 @@ def conflict_report(plan: SyncPlan) -> str:
 
 
 def sync_apply_report(plan: SyncPlan, result: SyncApplyResult) -> str:
+    action_count_label = "Would apply actions" if result.dry_run else "Applied actions"
+    action_section_label = "Actions That Would Apply" if result.dry_run else "Applied Actions"
     lines = [
         "# Sync Apply Report",
         "",
@@ -472,10 +526,10 @@ def sync_apply_report(plan: SyncPlan, result: SyncApplyResult) -> str:
         f"- Dry run: {str(result.dry_run).lower()}",
         f"- Registry path: {_display_path(result.registry_path)}",
         f"- Backup ID: {result.backup_id or 'none'}",
-        f"- Applied actions: {len(result.applied_actions)}",
+        f"- {action_count_label}: {len(result.applied_actions)}",
         f"- Skipped actions: {len(result.skipped_actions)}",
         "",
-        "## Applied Actions",
+        f"## {action_section_label}",
         "",
     ]
     lines.extend(f"- {action_id}" for action_id in result.applied_actions) if result.applied_actions else lines.append("- None.")
@@ -504,19 +558,76 @@ def sync_plan_to_dict(plan: SyncPlan) -> dict[str, object]:
 
 
 def sync_plan_from_dict(data: dict[str, object]) -> SyncPlan:
-    source_data = data.get("source", {})
-    target_data = data.get("target", {})
+    if not isinstance(data, dict):
+        raise SyncPlanError("Invalid sync plan: expected a JSON object. Regenerate the plan with `paperwb sync plan`.")
+    source_data = _require_mapping(data.get("source"), "source")
+    target_data = _require_mapping(data.get("target"), "target")
+    actions_data = _require_list(data, "actions")
+    conflicts_data = _require_list(data, "conflicts")
+    warnings_data = _require_list(data, "warnings")
+    try:
+        source = SyncSource(**source_data)
+        target = SyncTarget(**target_data)
+        actions = [SyncAction(**_require_mapping(item, f"actions[{index}]")) for index, item in enumerate(actions_data)]
+        conflicts = [SyncConflict(**_require_mapping(item, f"conflicts[{index}]")) for index, item in enumerate(conflicts_data)]
+    except TypeError as exc:
+        raise SyncPlanError(f"Invalid sync plan fields: {exc}. Regenerate the plan with `paperwb sync plan`.") from exc
     return SyncPlan(
         plan_id=str(data.get("plan_id", "")),
         project=str(data.get("project", "")),
-        source=SyncSource(**source_data),
-        target=SyncTarget(**target_data),
+        source=source,
+        target=target,
         generated_at=str(data.get("generated_at", "")),
-        actions=[SyncAction(**item) for item in data.get("actions", [])],
-        conflicts=[SyncConflict(**item) for item in data.get("conflicts", [])],
-        warnings=[str(item) for item in data.get("warnings", [])],
+        actions=actions,
+        conflicts=conflicts,
+        warnings=[str(item) for item in warnings_data],
         dry_run=bool(data.get("dry_run", True)),
+        source_hash=str(data.get("source_hash", "")),
+        target_hash=str(data.get("target_hash", "")),
     )
+
+
+def _require_mapping(value: object, field_name: str) -> dict[str, object]:
+    if not isinstance(value, dict):
+        raise SyncPlanError(f"Invalid sync plan: {field_name} must be an object. Regenerate the plan with `paperwb sync plan`.")
+    return value
+
+
+def _require_list(data: dict[str, object], field_name: str) -> list[object]:
+    value = data.get(field_name, [])
+    if not isinstance(value, list):
+        raise SyncPlanError(f"Invalid sync plan: {field_name} must be a list. Regenerate the plan with `paperwb sync plan`.")
+    return value
+
+
+def _file_sha256(path_value: str | Path) -> str:
+    path = Path(path_value)
+    if not path.exists() or not path.is_file():
+        return ""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _stale_plan_warnings(plan: SyncPlan, *, registry_path: str | Path | None = None) -> list[str]:
+    warnings: list[str] = []
+    target_path = Path(registry_path) if registry_path is not None else Path(plan.target.path)
+    if plan.target_hash:
+        current_target_hash = _file_sha256(target_path)
+        if current_target_hash and current_target_hash != plan.target_hash:
+            warnings.append(
+                f"Stale sync plan: registry changed since plan generation at {target_path}. Regenerate the plan before applying."
+            )
+    if plan.source_hash:
+        source_path = Path(plan.source.path)
+        current_source_hash = _file_sha256(source_path)
+        if not current_source_hash:
+            warnings.append(f"Stale sync plan: source file is missing at {source_path}. Regenerate the plan before applying.")
+        elif current_source_hash != plan.source_hash:
+            warnings.append(f"Stale sync plan: source file changed since plan generation at {source_path}. Regenerate the plan before applying.")
+    return warnings
 
 
 def _plan_id(source: SyncSource, target: SyncTarget, generated: datetime) -> str:

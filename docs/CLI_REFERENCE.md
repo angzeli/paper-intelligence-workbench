@@ -52,8 +52,9 @@ paperwb sync plan-obsidian --project zis_photocatalysis --vault scratch/obsidian
 
 Sync commands compare local files only. `sync apply` is dry-run by default and
 forced applies create a backup unless `--no-backup` is explicitly supplied.
-v1.3 applies safe registry creates and blank-field fills only; conflicts and
-note differences are manual-review items.
+v1.3 applies safe registry creates and blank-field fills only when the plan has
+no high-risk conflicts and has not gone stale. Conflicts and note differences
+are manual-review items.
 
 Report types:
 

@@ -1480,6 +1480,7 @@ def cmd_sync_apply(args: argparse.Namespace) -> int:
     if args.out:
         _preflight_output_paths([args.out], force=args.force_report)
     papers = _load_registry(registry_path, create_if_missing=False)
+    updated, result = apply_registry_sync_plan(plan, papers, dry_run=dry_run, force=args.force, registry_path=registry_path)
     backup_id = ""
     backup_path = None
     if not dry_run and not args.no_backup:
@@ -1494,11 +1495,10 @@ def cmd_sync_apply(args: argparse.Namespace) -> int:
             notes=f"Pre-sync backup for {plan.plan_id}",
         )
         backup_id = manifest.backup_id
-    updated, result = apply_registry_sync_plan(plan, papers, dry_run=dry_run, force=args.force)
     result.backup_id = backup_id
     result.registry_path = str(registry_path)
     if not dry_run:
-        write_registry_apply_result(updated, registry_path)
+        write_registry_apply_result(updated, registry_path, plan=plan, result=result)
     content = sync_apply_report(plan, result)
     if args.out:
         path = write_text(args.out, content, force=args.force_report)
