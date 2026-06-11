@@ -1,287 +1,247 @@
-# Hostile Maintainer Review: v1.3 Current Repository
+# Hostile Maintainer Review: v1.4 Current Repository
 
 Date: 2026-06-11
 
 ## Release Verdict
 
-Do not release the current v1.3 state to external users until the sync data-integrity blockers are fixed.
+Do not tag or announce a broad external release from the current tree without a short release-hygiene patch first.
 
-The non-sync surface looks substantially hardened: package import works, the full test suite passes, notebook JSON checks pass, the data-safety audit reports no errors, and the repository does not appear to track PDFs, SQLite cache databases, backup archives, or `.paperwb` cache folders. However, the new v1.3 sync workflow violates the project's core safety promise: a forced sync can mutate registry data in ways that were not explicitly planned, and the planner can attach applyable updates to a source row that it simultaneously classifies as a high-risk identity conflict.
+I did not find a current data-loss release blocker in the inspected paths. The package imports, the full test suite passes, notebooks validate structurally, the new manuscript QA CLI fails safely on common bad inputs, and tracked-file hygiene does not show PDFs, cache databases, `.paperwb` directories, or secrets.
 
-That is release-blocking for a local-first research data tool.
+However, the repository is not presentation-clean for external users. The current report index still advertises v1.3 as current, the docs-site index and matrices omit v1.4 manuscript QA artifacts, and several generated user-facing reports can emit absolute local paths. Those are high-priority issues because this project repeatedly promises reproducible, portable, local-first outputs.
 
 ## Review Scope
 
 Inspected:
 
 - package metadata and package layout
-- CLI command surface, especially `paperwb sync`
-- project profiles and generated synthetic projects
-- registry, BibTeX, note, claim, evidence-map, citation-audit, authoring, search, file-ingestion, import/export, backup, audit-log, reading-session, draft-audit, and sync modules
-- tests and fixture coverage
-- notebooks and notebook validation
-- generated reports
-- docs and release-readiness notes
-- tracked-file hygiene and data-safety boundaries
+- CLI command surface, including `paperwb manuscript`
+- project profiles and synthetic projects
+- registry, BibTeX, note parsing, claim extraction, evidence maps, citation audits, authoring reports, draft/manuscript audit, local search/indexing, local files, imports/exports, sync, backups, migrations, reading sessions, and safety utilities
+- tests, CI workflow, smoke scripts, and notebook checkers
+- README, docs-site pages, detailed docs, generated reports, and release-readiness notes
+- synthetic data and tracked-file hygiene
 
-Validation commands run during review:
+Validation commands run:
 
 - `git status --short --branch --ignored=matching`
 - `python -m pytest -q`
 - `python -m pytest --collect-only -q`
 - `python scripts/check_notebooks.py`
-- `python scripts/data_safety_audit.py --out scratch/hostile_review_data_safety_current.md --strict`
+- `python scripts/data_safety_audit.py --out scratch/hostile_review_v1_4_data_safety.md --strict`
+- `python scripts/smoke_cli_workflow.py --quick --out scratch/hostile_smoke_quick.md`
+- `python scripts/clean_room_install_check.py --quick --out scratch/hostile_clean_room_check.md`
 - `paperwb --help`
-- `paperwb sync --help`
+- `paperwb manuscript --help`
 - `paperwb project list`
-- `paperwb report all --out scratch/hostile_should_fail.md`
-- focused `paperwb sync plan`, `paperwb sync apply --dry-run`, and `paperwb sync apply --force --no-backup` probes against synthetic scratch registries
+- `paperwb project validate zis_photocatalysis`
+- `paperwb validate-registry projects/zis_photocatalysis/registry.csv`
+- `paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv`
+- `paperwb report evidence-map --project zis_photocatalysis --out scratch/hostile_evidence_map.md --force`
+- `paperwb report citation-audit --project zis_photocatalysis --out scratch/hostile_citation_audit.md --force`
+- `paperwb manuscript qa drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/hostile_review_manuscript_qa.md --force`
+- manuscript failure probes for missing draft, missing project, and overwrite refusal
+- `paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --report scratch/hostile_import_zotero.md --force`
+- `paperwb files audit --project zis_photocatalysis --reports-dir scratch/hostile_file_reports --force`
+- tracked-file hygiene probes with `git ls-files`
 
 Observed validation results:
 
-- Full tests passed: 187 pytest tests.
+- Full pytest passed.
+- Pytest collection reported 199 tests.
 - Notebook structural validation passed for 8 notebooks.
-- Data-safety audit checked 508 files with 0 errors and 8 warnings.
-- `paperwb report all --out ...` correctly fails with a clear error instead of overwriting a single report path.
-- `paperwb sync` help and basic planning commands work.
+- Data-safety audit checked 526 repository files with 0 errors and 7 existing absolute-path warnings in historical reports/tests.
+- CLI smoke workflow passed 11 quick steps.
+- Current-environment install check passed 7 quick steps.
+- New manuscript QA command wrote reports and common failure paths returned user-facing errors without tracebacks.
 
 ## Release Blockers
 
-### 1. Sync plans can include applyable actions for a high-risk conflicted source record
+No immediate release-blocking data-loss or unsafe-write issue was found in this review.
 
-The sync planner detects high-risk identity conflicts, but it still schedules low-risk `fill_blank_field` actions for the same matched registry paper and source record.
-
-Synthetic reproduction:
-
-- Registry row: `known`, title `Known Synthetic Study`, DOI `10.1300/sync.known`, blank journal/tags/source_type.
-- Import row: title `Conflicting Title`, same DOI `10.1300/sync.known`, journal/tags/source_type populated.
-- Command: `paperwb sync plan --source scratch/.../conflict.csv --source-type zotero-csv --registry scratch/.../registry.csv ...`
-- Result: plan contains conflict `C0001 same_doi_different_title` with risk `high`, but also action IDs `A0001`, `A0002`, and `A0003` to fill `journal`, `tags`, and `source_type` on `known`.
-
-Why this blocks release:
-
-- The planner is saying "this may be the wrong paper" and "these fields are safe to copy" at the same time.
-- A user who sees low-risk actions in the same report can reasonably believe the forced apply is constrained to safe changes.
-- The project repeatedly promises conservative, non-destructive sync behavior.
-
-Required fix:
-
-- If an incoming source row produces a high-risk identity conflict for a matched paper, suppress all applyable actions derived from that source row.
-- Emit only conflict records and manual-review guidance for that row.
-- Add a regression test that a same-DOI/different-title record produces zero `fill_blank_field` actions for the conflicted paper.
-
-### 2. Forced sync apply rewrites registry fields that are not present in the sync plan
-
-`sync apply --force` can change existing registry formatting for fields not listed in the plan. In a scratch probe, the registry author value changed from `Synthetic Author` to `Author, Synthetic` even though no author action appeared in the plan.
-
-Likely cause:
-
-- `apply_registry_sync_plan()` deep-copies every existing `Paper` through `paper_to_row()` and `paper_from_row()`.
-- CLI writeback uses `save_registry()` on the reconstructed `Paper` objects.
-- This normalizes existing rows even when a field was not part of the sync plan.
-
-Why this blocks release:
-
-- The apply report does not list the author change.
-- The user did not approve that field change.
-- This directly contradicts "report every changed field" and "never silently overwrite user data".
-- Even if the normalized form is acceptable internally, sync apply must preserve untouched registry text unless the plan explicitly says the field will change.
-
-Required fix:
-
-- Make sync apply row-preserving for existing registry CSV rows.
-- Apply only planned field changes to the original row dictionaries.
-- Preserve original values and formatting for untouched fields.
-- Add a regression test that forced sync apply leaves non-action fields byte-for-byte or value-for-value unchanged.
-
-### 3. `--force` is overloaded as both write confirmation and high-risk conflict override
-
-Current behavior lets a forced apply proceed when a plan contains high-risk conflicts. Combined with blocker 1, this allows safe-looking field fills from a conflicted record to be written after a single `--force`.
-
-Why this blocks release:
-
-- `--force` is already used throughout the project to mean "perform the write" or "overwrite output".
-- Using the same flag to allow high-risk identity-conflict plans makes the most dangerous path too easy.
-- This is especially risky for imported Zotero CSV/BibTeX/RIS data, where title, DOI, and citation-key conflicts are common.
-
-Required fix:
-
-- Refuse real apply when any high-risk conflict exists, regardless of ordinary `--force`, unless a separate explicit conflict-override flag is introduced.
-- Prefer no conflict override for v1.3 unless there is a strong use case.
-- Add CLI and unit tests that high-risk plans cannot write registry changes by default.
+This is not a clean external release verdict. The high-priority issues below should be fixed before a public-facing v1.4 announcement because they affect trust, portability, and discoverability.
 
 ## High-Priority Issues
 
-### 1. Dry-run apply reports use misleading "Applied actions" language
+### 1. `reports/index.md` is stale and still says v1.3 is current
 
-`paperwb sync apply PLAN --dry-run` produces a report with `Applied actions: N` and an `## Applied Actions` section even though no registry write occurred.
+Evidence:
 
-Why it matters:
+- `reports/index.md:9` says `Current v1.3 Release Reports`.
+- `reports/index.md:11-16` lists v1.3 sync reports as the current release report set.
+- `reports/index.md:18-20` lists `v1_4_recommended_patch_plan.md` as the next patch plan, even though v1.4 release reports now exist.
 
-- Dry-run reports are the user's safety mechanism.
-- The report should say "Would apply actions" or "Planned actions in dry run".
+Why this matters:
 
-Required fix:
-
-- Change dry-run report labels while preserving the existing command behavior.
-- Add a test that dry-run Markdown does not claim actions were actually applied.
-
-### 2. Fresh Obsidian export round-trip reports conflicts immediately
-
-`reports/obsidian_roundtrip_v1_3.md` shows 8 `local_note_differs_from_exported_note` conflicts for the `zis_photocatalysis` project after comparing a generated Obsidian-style vault back to local notes.
-
-Why it matters:
-
-- A fresh export that immediately produces conflicts will make users distrust the round-trip workflow.
-- The report is technically conservative, but the feature name and docs imply a round-trip comparison. The current behavior looks more like a one-way export format being parsed as if it were the original structured note format.
+- External users are likely to open `reports/index.md` to understand the current state.
+- It currently points them to the previous release stage and the old hostile review context.
+- This undermines the v1.4 release-readiness claim even though `reports/release_readiness_v1_4.md` exists.
 
 Required fix:
 
-- Define whether Obsidian export is one-way or round-trip-capable.
-- If one-way, rename or document the command/report clearly and avoid implying parseable round-trip fidelity.
-- If round-trip-capable, adjust export or parsing so a fresh export does not generate false conflicts for unchanged notes.
-- Add a regression test for the chosen behavior.
+- Regenerate `reports/index.md` after v1.4.
+- Ensure current release reports include `manuscript_qa_v1_4.md`, `citation_context_table_v1_4.md`, `claim_traceability_v1_4.md`, `manuscript_revision_checklist_v1_4.md`, and `release_readiness_v1_4.md`.
+- Add a test or smoke check that the report index current version matches the latest release-readiness report.
 
-### 3. Sync apply has weak stale-plan protection
+### 2. Non-indexed search reports leak absolute local paths
 
-The apply path skips some actions when the current registry no longer matches expected blank fields, but the plan does not appear to include a registry content hash, source hash, or generated-against fingerprint.
+Evidence:
 
-Why it matters:
+- `paperwb search photocorrosion --project zis_photocatalysis --out scratch/hostile_search_report.md --force` wrote absolute paths such as `/Users/liangze/Desktop/paper-intelligence-workbench/projects/zis_photocatalysis/notes/zis_stability_2024.md`.
+- `paper_workbench/search.py:60` returns `claim.note_file` directly.
+- `paper_workbench/search.py:72` returns `str(note_path)` directly.
+- `paper_workbench/cli.py:569-575` writes and prints non-indexed search results without applying the relative `display_path` behavior used by indexed search.
 
-- A user can generate a sync plan, edit the registry, and then apply an old plan.
-- The tool may skip some actions, but the report does not clearly identify "this plan may be stale".
+Why this matters:
 
-Required fix:
-
-- Add lightweight plan freshness metadata, such as registry file hash and source file hash.
-- Warn loudly or refuse apply if hashes differ.
-- Add tests for applying a stale plan after registry mutation.
-
-### 4. Sync plan JSON is treated as trusted internal input
-
-`sync_plan_from_dict()` constructs dataclasses directly from JSON fields. Malformed or hand-edited plan JSON can produce low-level type errors rather than a user-quality CLI error.
-
-Why it matters:
-
-- Sync plans are files the user may inspect, move, or edit.
-- A bad plan should fail with an actionable error: which file, what field, and how to regenerate.
+- Search reports are a documented exportable report type.
+- The project repeatedly claims reproducible, portable local reports and has data-safety tooling for absolute-path hygiene.
+- A user can easily commit or share a search report containing their machine path.
 
 Required fix:
 
-- Add validation around plan JSON loading.
-- Convert malformed plan errors into a clear CLI failure.
-- Add adversarial tests for missing source/target/actions/conflicts fields.
+- Normalize non-indexed search result paths relative to the workspace or selected project root before printing or writing Markdown.
+- Add tests for `paperwb search ... --project ... --out ...` proving no `/Users/`, `/private/`, or drive-letter path appears in the report.
+- Reuse the indexed-search `display_path(..., base_path=...)` behavior where possible.
+
+### 3. Import reports can emit absolute registry paths
+
+Evidence:
+
+- `paperwb import zotero-csv ... --project zis_photocatalysis --dry-run --report scratch/hostile_import_zotero.md --force` wrote `Output registry path: /Users/liangze/Desktop/paper-intelligence-workbench/projects/zis_photocatalysis/registry.csv`.
+- `paper_workbench/importers.py:620` renders `result.registry_path` directly.
+
+Why this matters:
+
+- Import reports are explicitly meant to be auditable local artifacts.
+- They currently expose machine-specific paths when project profiles resolve to absolute paths.
+- This is the same portability class as the search-report issue.
+
+Required fix:
+
+- Display import report paths relative to the workspace or project root.
+- Add a regression test for project import reports that rejects absolute local path patterns.
+
+### 4. v1.4 docs are not fully wired into the docs-site navigation and matrices
+
+Evidence:
+
+- `docs/index.md:27-30` links authoring and older manuscript evidence-checker docs, but not `MANUSCRIPT_QA.md`, `CITATION_CONTEXT_TABLE.md`, `CLAIM_TRACEABILITY.md`, or `MANUSCRIPT_LIMITATIONS.md`.
+- `docs/REPORT_MATRIX.md:19-24` includes draft audit and search report rows but not the new manuscript QA, citation context table, claim traceability, or manuscript revision checklist reports.
+- `docs/TEST_MATRIX.md:11-18` omits manuscript QA despite `tests/test_manuscript_v1_4.py` being the new feature coverage.
+
+Why this matters:
+
+- A new external user entering through `docs/index.md` will not discover the main v1.4 docs.
+- Release matrices are supposed to map features to tests and docs; the new feature is missing from the canonical matrices.
+
+Required fix:
+
+- Add the v1.4 docs to `docs/index.md` and `docs/SITE_MAP.md`.
+- Add manuscript QA rows to `docs/REPORT_MATRIX.md` and `docs/TEST_MATRIX.md`.
+- Add a small release-hygiene test that new stable command groups appear in the docs matrices.
 
 ## Medium-Priority Issues
 
-### 1. `paper_workbench/cli.py` is too large for the current feature set
+### 1. Manuscript QA has tests, but no report-regression or golden coverage
 
-The CLI now contains many command groups and inline helpers across import/export/search/files/backup/migration/reading/drafts/sync. It still works, but future changes are likely to regress unrelated commands.
-
-Recommendation:
-
-- Split command registration into focused modules by command group after v1.3 blockers are fixed.
-- Keep argparse, but move each group into a small `add_*_commands(parser)` function.
-
-### 2. Historical reports are numerous and sometimes stale by design
-
-The `reports/` directory contains release-readiness, hostile-review, patch-plan, stress, and workflow reports from many stages. This is useful for audit history, but an external user can easily confuse stale historical verdicts with the current release state.
+`tests/test_manuscript_v1_4.py` covers parsing, basic findings, report generation, CLI smoke, and overwrite refusal. It does not lock the structure of `reports/manuscript_qa_v1_4.md`, `reports/citation_context_table_v1_4.md`, or `reports/claim_traceability_v1_4.md`.
 
 Recommendation:
 
-- Add a short "current report index" at the top of `reports/index.md`.
-- Clearly separate current release artifacts from historical phase artifacts.
+- Add normalized snapshot or structured assertions for v1.4 manuscript reports.
+- Include at least one unknown-citation and one review-only-support snapshot.
 
-### 3. Documentation volume is high and overlapping
+### 2. Manuscript parser coverage is still narrow relative to real drafts
 
-There are many pairs of uppercase workflow docs and docs-site lowercase equivalents. The coverage is strong, but it is hard to know which file is canonical.
-
-Recommendation:
-
-- Mark canonical docs in `docs/index.md`.
-- Move older stage-specific docs into an archive section or link them as reference material.
-
-### 4. Notebook coverage is structural, not executable
-
-The notebook checker validates JSON and path hygiene. That is appropriate for a lightweight release check, but it does not prove notebooks run top-to-bottom in a clean environment.
+The parser intentionally stays conservative, but current tests do not cover bibliography sections, YAML front matter, block quotes, figure captions, Markdown tables, footnotes, or multi-line LaTeX commands.
 
 Recommendation:
 
-- Keep structural checks in CI.
-- Add one optional manual or nightly notebook execution target for the smallest notebook set.
+- Add adversarial manuscript fixtures before claiming broad manuscript QA readiness.
+- At minimum, ensure bibliography/reference sections do not become ordinary claim paragraphs.
+
+### 3. Smoke and release-check scripts lag the current feature set
+
+Evidence:
+
+- `scripts/smoke_cli_workflow.py:35-95` still exercises the MVP-style workflow plus search/files, but not draft QA, manuscript QA, reading sessions, sync, backups, or authoring packets.
+- The smoke report title still defaults to `CLI Smoke Workflow v0.8`.
+- `scripts/clean_room_install_check.py` output is still framed as v1.0-rc.
+
+Recommendation:
+
+- Keep quick mode short, but add at least one `paperwb manuscript qa` smoke step.
+- Update report titles or make them version-neutral.
+
+### 4. `paper_workbench/cli.py` remains a large regression risk
+
+`paper_workbench/cli.py` is now 2,570 lines and registers many unrelated command groups inline. It still works, but every feature release increases the chance of cross-command regressions.
+
+Recommendation:
+
+- Split command registration and handlers by group after the v1.4 hygiene fixes.
+- Keep argparse if desired; the issue is module size and reviewability, not the parser choice.
+
+### 5. Historical report volume is overwhelming
+
+The reports directory contains many stage-specific release-readiness, hostile-review, patch-plan, and demo reports. This is useful audit history, but without a current index it is easy to read stale reports as current state.
+
+Recommendation:
+
+- Archive older reports under a clearly named historical section or directory.
+- Keep only the latest release-readiness, hostile review, and report gallery prominent.
 
 ## Low-Priority Polish
 
-- Several reports include stage-specific naming that makes the current state harder to scan.
-- Some CLI help text is accurate but long; command groups would benefit from one-line workflow examples in docs rather than expanding help output further.
-- Sync reports should show the source record identifier next to every action and conflict, not only target paper ID.
-- The conflict report should group conflicts by source record and target paper for review ergonomics.
-- `reports/audit_log_demo_v0_9.md` is tracked, but actual audit logs are ignored; the demo should stay clearly labelled synthetic.
+- `docs/index.md` includes both lowercase docs-site pages and uppercase detailed pages; canonical status is not always obvious.
+- `paperwb manuscript citations` without `--out` prints terse tab-separated coverage and omits QA findings; that is acceptable but less helpful than the Markdown report.
+- The manuscript QA report has an extra blank line before the embedded paragraph evidence table.
+- The readiness verdict `not ready` can be triggered by any uncited paragraph, which is conservative but may be noisy for connective prose.
+- The project has ignored local `dist/` and `*.egg-info/` artifacts from older package builds in the working directory. They are not tracked, but they should be cleaned before packaging demonstrations.
 
 ## Missing Tests
 
-Add tests for these release-relevant cases:
-
-- Same DOI with different title produces a high-risk conflict and no field-fill actions for that source row.
-- Same title with different DOI produces a high-risk conflict and no field-fill actions for that source row.
-- Same BibTeX key with different DOI produces a high-risk conflict and no field-fill actions for that source row.
-- Forced sync apply preserves all untouched registry fields and formatting.
-- Forced sync apply refuses high-risk plans unless a separately named conflict override exists.
-- Dry-run sync apply report uses "would apply" language.
-- Stale sync plan detection after registry file changes.
-- Malformed sync plan JSON fails with an actionable CLI error.
-- Fresh Obsidian export round-trip behavior, either no false conflicts or explicitly documented one-way behavior.
+- Search report path-normalization test for project mode.
+- Import report path-normalization test for project mode.
+- Report-index freshness test for latest release reports.
+- Docs matrix coverage test for stable command groups, especially `manuscript`.
+- Manuscript report regression tests for generated Markdown sections and key counts.
+- Parser fixtures for manuscript bibliography sections, front matter, footnotes, captions, tables, and multi-line citation commands.
 
 ## Documentation Mismatches
 
-### Sync safety docs overpromise current behavior
-
-`docs/SYNC.md` says forced applies "only create missing registry rows and fill blank fields" and "do not overwrite non-empty registry fields." That is incomplete because forced apply can still rewrite untouched row formatting through normalization.
-
-`docs/SAFE_SYNC_WORKFLOW.md` says "Never use sync to overwrite notes or registry fields that contain user-entered data." The implementation currently can alter user-entered author formatting without a planned action.
-
-`reports/release_readiness_v1_3.md` says v1.3 does not overwrite non-empty registry metadata. The scratch probe contradicts that at the file-output level.
-
-### Obsidian round-trip docs need sharper boundaries
-
-The generated Obsidian round-trip report shows immediate conflicts for a generated vault. The docs should state whether Obsidian export is a one-way readable vault export or a supported note round-trip source.
+- `reports/index.md` is stale and advertises v1.3 as current.
+- `docs/index.md` and `docs/SITE_MAP.md` do not expose the new v1.4 manuscript QA docs directly.
+- `docs/REPORT_MATRIX.md` and `docs/TEST_MATRIX.md` omit the v1.4 manuscript QA/report/test surface.
+- `scripts/smoke_cli_workflow.py` produces a v0.8-titled report despite being used as current release infrastructure.
 
 ## CLI Usability Problems
 
-- `sync apply --dry-run` reports "Applied actions" for a dry-run.
-- `sync apply --force` is too broad: it means "write changes" and effectively "accept high-risk plan conflicts".
-- Sync plan reports do not visually tie actions to conflict-bearing source records, making it hard to see when one import row generated both a conflict and applyable actions.
-- Malformed sync plan JSON needs a better user-facing error path.
+- Non-indexed `paperwb search` prints absolute paths in project mode, while indexed search uses friendlier relative paths.
+- Import reports include absolute registry output paths in project mode.
+- `paperwb manuscript citations` terminal output is minimal; users need `--out` for useful warnings and context.
+- `paperwb index status --project ...` reports a global `.paperwb/index.sqlite` path; this is technically valid but can confuse users expecting project-local cache paths.
 
 ## Data-Safety Risks
 
-No evidence of cloud, LLM, publisher scraping, copyrighted PDFs, tracked cache databases, tracked backup archives, or tracked `.paperwb` directories was found in the current tracked file list.
-
-The primary data-safety risk is local data mutation:
-
-- Sync apply can modify registry values not present in the plan.
-- Sync apply can mutate a paper from a source record with a high-risk identity conflict.
-- The current report language can make dry-run behavior look like actual application.
-
-These are not theoretical release-polish issues. They affect user registry integrity.
+- No tracked PDFs, SQLite databases, cache folders, `.paperwb` directories, or obvious secrets were found by `git ls-files` probes.
+- Data-safety audit reported 0 errors and 7 existing absolute-path warnings in historical reports/tests.
+- Generated user reports can still contain absolute paths, especially non-indexed search and import reports.
+- Ignored local audit logs and index databases exist in the working tree. They are ignored correctly, but should not be copied into release bundles.
 
 ## Overengineering Risks
 
-- The project has accumulated many workflow modules and reports. The core value remains evidence tracking and auditability, but the expanding CLI surface is now hard to reason about.
-- Sync conflict application should not grow into an automatic merge engine. The right v1.3 fix is stricter suppression/refusal, not smarter guessing.
-- Obsidian round-trip should stay conservative. If exact round-trip is not feasible, document one-way export rather than adding fragile Markdown merge logic.
+- The project has many feature surfaces for a zero-dependency local CLI. The breadth is now larger than the CLI architecture.
+- Manuscript QA can easily drift from "heuristic audit" toward implied semantic validation. Keep wording conservative.
+- Adding full Markdown/LaTeX support would be expensive and fragile; targeted fixtures are a better next step.
+- More generated reports without a canonical index will worsen external-user confusion.
 
 ## Recommended Fix Sequence
 
-1. Change sync planning so any source row with a high-risk identity conflict emits conflicts only and no applyable actions.
-2. Change sync apply to operate on original registry CSV rows and update only explicitly planned fields.
-3. Make real sync apply refuse high-risk-conflict plans unless a separate, deliberately named override is introduced.
-4. Fix dry-run report wording.
-5. Add the missing sync regression tests listed above.
-6. Decide and document Obsidian round-trip semantics; add one regression test for that behavior.
-7. Regenerate affected sync reports and release-readiness notes.
-8. Re-run full pytest, notebook JSON validation, data-safety audit, and representative CLI smoke tests.
-
-## Final Maintainer Position
-
-The repository is close to an external-quality local research workbench, but the current v1.3 sync workflow is not safe enough to release. Fix the sync blockers before any public release candidate or external-user handoff.
+1. Regenerate `reports/index.md` for v1.4 and add a freshness check.
+2. Normalize paths in non-indexed search output and import reports; add regression tests.
+3. Wire v1.4 manuscript QA docs into `docs/index.md`, `docs/SITE_MAP.md`, `docs/REPORT_MATRIX.md`, and `docs/TEST_MATRIX.md`.
+4. Add one current smoke step for `paperwb manuscript qa` and make smoke report titles version-neutral.
+5. Add manuscript report regression tests and adversarial manuscript parser fixtures.
+6. Defer CLI module splitting until the release-hygiene fixes are complete.
