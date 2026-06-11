@@ -56,7 +56,16 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - v0.8 release notes, release-readiness, external-user simulation, and v0.9 patch-plan reports.
 - CI release gates for tests, package import, CLI smoke paths, notebook checks, and data-safety checks.
 
-## Near-Term Patches for v0.9
+## v0.9 Completed
+
+- Workspace integrity checks for project profiles and the legacy `data/` workflow.
+- Local audit logs under `.paperwb/`.
+- Local backup snapshots with manifests and PDF/cache exclusions.
+- Non-destructive restore planning with pre-restore backup support.
+- Non-destructive legacy `data/` to project-profile migration plans.
+- Safe-write documentation and workflow examples.
+
+## Near-Term Patches for v0.10
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -65,7 +74,9 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add safer citation-key suggestions such as `FirstAuthorYearShortTitle`.
 - Add richer report filters for specific tags, statuses, and themes.
 - Add note repair diagnostics for malformed claim blocks.
-- Add non-destructive workspace migration reports for moving legacy `data/` work into profiles.
+- Add checksum verification after forced restores.
+- Add optional compressed backup archives while keeping manifests inspectable.
+- Add project-to-project migration plans for profile restructuring.
 - Add import preview tables and conflict-resolution commands for ambiguous matches.
 - Add writer-facing filters for authoring reports, such as minimum claim strength and evidence type.
 - Add optional advisory PDF metadata extraction if a lightweight dependency is justified.

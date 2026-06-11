@@ -213,7 +213,7 @@ def workspace_integrity_report(result: IntegrityResult) -> str:
         "",
         "This report checks local workspace consistency. It does not modify files.",
         "",
-        f"Root: {result.root}",
+        f"Root: {_portable_path(result.root)}",
         f"Project: {result.project or 'default data workflow'}",
         f"Errors: {len(result.errors)}",
         f"Warnings: {len(result.warnings)}",
@@ -223,7 +223,7 @@ def workspace_integrity_report(result: IntegrityResult) -> str:
         "",
     ]
     for path in result.checked_paths:
-        lines.append(f"- `{path}`")
+        lines.append(f"- `{_portable_path(path)}`")
     lines.extend(["", "## Findings", ""])
     if not result.findings:
         lines.append("No integrity findings detected.")
@@ -248,6 +248,14 @@ def workspace_integrity_report(result: IntegrityResult) -> str:
 
 def _escape(value: str) -> str:
     return str(value).replace("|", "\\|").replace("\n", " ")
+
+
+def _portable_path(value: str | Path) -> str:
+    path = Path(value)
+    try:
+        return path.resolve(strict=False).relative_to(Path.cwd().resolve(strict=False)).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def _dedupe_findings(findings: list[ValidationFinding]) -> list[ValidationFinding]:

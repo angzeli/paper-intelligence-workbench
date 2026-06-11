@@ -16,6 +16,8 @@ v0.7 adds local document ingestion and metadata reconciliation: file scans, SHA2
 
 v0.8 adds release-engineering and onboarding hardening: package metadata, install docs, CI smoke checks, notebook checks, data-safety audits, docs-site Markdown pages, test/report matrices, and external-user quickstart reports.
 
+v0.9 adds data-integrity safeguards for real local use: workspace integrity checks, local audit logs, backup snapshots, non-destructive restore planning, and legacy `data/` to project-profile migration plans.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -35,6 +37,7 @@ v0.8 adds release-engineering and onboarding hardening: package metadata, instal
 - Imports local Zotero-style CSV, generic CSV, BibTeX, and RIS files into registries with duplicate reports.
 - Exports Obsidian-friendly Markdown vaults and local backup bundles.
 - Generates theme-specific writing aids from tracked local claims and citations.
+- Checks workspace integrity, writes local audit events, creates local backup snapshots, plans safe restores, and plans/copies non-destructive legacy-to-project migrations.
 
 ## What It Does Not Do
 
@@ -46,6 +49,7 @@ v0.8 adds release-engineering and onboarding hardening: package metadata, instal
 - It does not use cloud services, LLM APIs, or embeddings.
 - It does not decide whether a scientific claim is true.
 - It does not write polished literature-review prose as if it were user-authored.
+- It does not silently migrate, restore, or overwrite user data without explicit force flags.
 
 ## Installation
 
@@ -205,6 +209,34 @@ paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out
 ```
 
 See [docs/AUTHORING_WORKBENCH.md](docs/AUTHORING_WORKBENCH.md).
+
+## v0.9 Safety Workflow
+
+Check integrity and create a local backup before risky changes:
+
+```bash
+paperwb integrity check --project zis_photocatalysis --out reports/workspace_integrity_v0_9.md --force
+paperwb backup create --project zis_photocatalysis --notes "Before major note cleanup"
+paperwb backup list --project zis_photocatalysis
+```
+
+Restore is dry-run by default unless `--force` is passed:
+
+```bash
+paperwb backup plan-restore BACKUP_ID --project zis_photocatalysis
+paperwb backup restore BACKUP_ID --project zis_photocatalysis --dry-run --out reports/restore_dry_run_v0_9.md --force-report
+```
+
+Plan a non-destructive legacy `data/` migration:
+
+```bash
+paperwb migrate plan --from legacy --to-project migrated_lit_review --out reports/migration_plan_v0_9.md --force
+paperwb migrate run --from legacy --to-project migrated_lit_review --dry-run
+```
+
+Audit logs are local JSONL files under `.paperwb/` and are ignored by git.
+
+See [docs/WORKSPACE_INTEGRITY.md](docs/WORKSPACE_INTEGRITY.md), [docs/BACKUPS.md](docs/BACKUPS.md), [docs/RESTORE.md](docs/RESTORE.md), [docs/MIGRATION.md](docs/MIGRATION.md), and [docs/AUDIT_LOG.md](docs/AUDIT_LOG.md).
 
 ## Data Folder Convention
 

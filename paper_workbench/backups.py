@@ -80,10 +80,10 @@ def _source_paths_for_backup(
     if include_reports and reports_dir and Path(reports_dir).exists():
         sources.extend(sorted(path for path in Path(reports_dir).rglob("*.md") if path.is_file()))
     elif reports_dir and Path(reports_dir).exists():
-        excluded.append(f"{Path(reports_dir)} (reports excluded by default)")
+        excluded.append(f"{_workspace_relative(Path(reports_dir), Path(root))} (reports excluded by default)")
     for path in sorted(Path(root).glob("**/*")):
         if path.is_file() and (".paperwb" in path.parts or path.suffix.lower() in {".sqlite", ".db", ".pdf"}):
-            excluded.append(str(path))
+            excluded.append(_workspace_relative(path, Path(root)))
     return sources, excluded
 
 
@@ -296,7 +296,7 @@ def restore_plan_report(plan: RestorePlan) -> str:
         "",
         f"Backup ID: {plan.backup_id}",
         f"Project: {plan.project or 'default data workflow'}",
-        f"Target root: {plan.target_root}",
+        f"Target root: {_portable_path(plan.target_root)}",
         f"Dry run: {str(plan.dry_run).lower()}",
         f"Files to restore: {len(plan.files_to_restore)}",
         f"Files that would be overwritten: {len(plan.files_to_overwrite)}",
@@ -347,3 +347,11 @@ def _manifest_from_dict(data: dict) -> BackupManifest:
         excluded_files=list(data.get("excluded_files", [])),
         notes=str(data.get("notes", "")),
     )
+
+
+def _portable_path(value: str | Path) -> str:
+    path = Path(value)
+    try:
+        return path.resolve(strict=False).relative_to(Path.cwd().resolve(strict=False)).as_posix()
+    except ValueError:
+        return path.as_posix()

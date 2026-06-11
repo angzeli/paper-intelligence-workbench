@@ -13,7 +13,7 @@ from paper_workbench.integrity import check_workspace_integrity, is_path_within,
 from paper_workbench.io import write_text
 from paper_workbench.migration import plan_legacy_migration, run_legacy_migration
 from paper_workbench.registry import save_registry
-from paper_workbench.schema import Author, Paper
+from paper_workbench.schema import Author, Paper, ValidationFinding
 
 
 def run_cli(*args: str):
@@ -102,10 +102,18 @@ def test_path_containment_helper_handles_relative_and_absolute(tmp_path):
 
 def test_audit_log_append_load_and_force_clear(tmp_path):
     path = default_audit_log_path(tmp_path)
-    append_audit_event(root=tmp_path, command="unit", action="write", affected_paths=["data/registries/papers.csv"], summary="Synthetic event")
+    append_audit_event(
+        root=tmp_path,
+        command="unit",
+        action="write",
+        affected_paths=["data/registries/papers.csv"],
+        warnings=[ValidationFinding("warning", "synthetic_warning", "Synthetic warning object")],
+        summary="Synthetic event",
+    )
     events = load_audit_events(path)
     assert len(events) == 1
     assert events[0]["summary"] == "Synthetic event"
+    assert events[0]["warnings"] == ["synthetic_warning: Synthetic warning object"]
     with pytest.raises(PermissionError):
         clear_audit_log(path)
     assert clear_audit_log(path, force=True)
@@ -218,6 +226,7 @@ def test_cli_integrity_backup_migration_and_audit_log_smoke(tmp_path):
     restore_out = tmp_path / "restore.md"
     restore = run_cli("backup", "restore", backup_id, "--backups-dir", str(tmp_path / "backups"), "--dry-run", "--out", str(restore_out))
     assert restore.returncode == 0, restore.stderr
+    assert f"Wrote {restore_out}" in restore.stdout
     assert "Dry run: true" in restore_out.read_text(encoding="utf-8")
 
     migration_out = tmp_path / "migration.md"

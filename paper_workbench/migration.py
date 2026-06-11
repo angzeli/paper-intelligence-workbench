@@ -71,7 +71,7 @@ def plan_legacy_migration(*, root: str | Path = ".", to_project: str) -> Migrati
 
     reports = default_reports_dir(root_path)
     if reports.exists():
-        warnings.append(f"Legacy reports detected but not copied by default: {reports}")
+        warnings.append(f"Legacy reports detected but not copied by default: {_rel(reports, root_path)}")
     config_target = target_root / PROJECT_CONFIG
     operations.append(_op_marker(config_target, root_path))
     for operation in operations:

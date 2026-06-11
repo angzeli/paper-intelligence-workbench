@@ -43,3 +43,7 @@ Instructions for future agents working in this repository:
 - Do not commit build artifacts under `build/`, `dist/`, `*.egg-info/`, `exports/`, `scratch/`, or `tmp/`.
 - Update release matrices and smoke scripts when changing public CLI workflows.
 - Keep documentation-site pages as Markdown source unless a future static-site generator is explicitly introduced.
+- Do not commit backup snapshots under `backups/` or audit logs under `.paperwb/`.
+- Use dry-run for restore and migration workflows unless the user explicitly asks for `--force`.
+- Create or recommend a backup before forced migrations and restores.
+- Do not silently rewrite, move, or delete legacy `data/` files during migration; copy into projects instead.

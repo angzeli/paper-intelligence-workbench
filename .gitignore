@@ -12,6 +12,7 @@ build/
 dist/
 *.egg-info/
 exports/
+backups/
 scratch/
 tmp/
 reports/hostile_review_v0_*.md

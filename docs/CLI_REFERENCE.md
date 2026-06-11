@@ -121,4 +121,45 @@ paperwb files sidecars --project zis_photocatalysis
 
 Local-file commands do not download, scrape, OCR, copy, move, or delete documents. PDF links update `local_pdf_path`; existing values require `--force` to replace. `files scan --write-registry` merges with existing `files.csv` rows so curated notes are preserved. `files unlink` clears `local_pdf_path` only when it removed at least one matching file-registry row, unless `--keep-pdf-path` is used.
 
+Data integrity:
+
+```bash
+paperwb integrity check --project zis_photocatalysis
+paperwb integrity check --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json
+```
+
+`integrity check` is read-only. Use `--out` and `--force` to write a Markdown report.
+
+Audit log:
+
+```bash
+paperwb audit-log show --project zis_photocatalysis --markdown
+paperwb audit-log clear --project zis_photocatalysis --force
+```
+
+Audit logs are local JSONL files under `.paperwb/` and are ignored by git.
+
+Backups and restore:
+
+```bash
+paperwb backup create --project zis_photocatalysis
+paperwb backup list --project zis_photocatalysis
+paperwb backup inspect BACKUP_ID --project zis_photocatalysis
+paperwb backup plan-restore BACKUP_ID --project zis_photocatalysis
+paperwb backup restore BACKUP_ID --project zis_photocatalysis --dry-run
+paperwb backup restore BACKUP_ID --project zis_photocatalysis --force
+```
+
+Restore defaults to dry-run behavior unless `--force` is passed. A forced restore creates a pre-restore backup unless `--no-pre-restore-backup` is provided.
+
+Migration:
+
+```bash
+paperwb migrate plan --from legacy --to-project migrated_lit_review
+paperwb migrate run --from legacy --to-project migrated_lit_review --dry-run
+paperwb migrate run --from legacy --to-project migrated_lit_review --force
+```
+
+Migration copies files into a new project. It does not move or delete legacy `data/` files.
+
 Most workflow commands accept `--project NAME` to use profile paths. When `--project` is used, registry, notes, BibTeX, themes, and reports path flags are rejected to avoid silently ignoring user input. Use `--out` for an explicit single report or export destination.

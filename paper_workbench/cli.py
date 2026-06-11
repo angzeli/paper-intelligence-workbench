@@ -1213,6 +1213,7 @@ def cmd_backup_restore(args: argparse.Namespace) -> int:
     content = restore_plan_report(plan)
     if args.out:
         path = write_text(args.out, content, force=args.force_report)
+        print(f"Wrote {path}")
         affected = [path]
     else:
         print(content, end="")

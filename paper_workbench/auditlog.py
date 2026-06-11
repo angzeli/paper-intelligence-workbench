@@ -62,7 +62,7 @@ def append_audit_event(
         affected_paths=[str(item) for item in affected_paths],
         dry_run=dry_run,
         success=success,
-        warnings=list(warnings),
+        warnings=[_warning_to_text(warning) for warning in warnings],
         summary=summary,
     )
     with target.open("a", encoding="utf-8") as handle:
@@ -134,3 +134,11 @@ def audit_log_markdown(events: list[dict[str, object]], *, title: str = "Audit L
 
 def _escape(value: object) -> str:
     return str(value).replace("|", "\\|").replace("\n", " ")
+
+
+def _warning_to_text(value: object) -> str:
+    code = getattr(value, "code", "")
+    message = getattr(value, "message", "")
+    if code or message:
+        return f"{code}: {message}".strip(": ")
+    return str(value)
