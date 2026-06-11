@@ -75,9 +75,10 @@ def test_smoke_cli_workflow_quick_generates_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "CLI Smoke Workflow v0.8" in content
+    assert "CLI Smoke Workflow v1.6" in content
     assert "Failures: 0" in content
     assert "validate registry" in content
+    assert "dashboard next actions" in content
 
 
 def test_data_safety_audit_script_generates_report(tmp_path):

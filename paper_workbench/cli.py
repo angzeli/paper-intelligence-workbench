@@ -979,6 +979,15 @@ def cmd_rules_explain(args: argparse.Namespace) -> int:
 
 def cmd_dashboard(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    if args.limit <= 0:
+        raise ValueError(
+            format_error_message(
+                what="Invalid dashboard limit.",
+                where=f"--limit {args.limit}",
+                why="The dashboard uses this value to bound next actions, audit events, queues, and report rows.",
+                next_step="Pass a positive integer such as `--limit 10`.",
+            )
+        )
     papers, notes, claims, entries, themes, paths = _report_inputs(args)
     bib_findings = validate_bibtex(entries, papers) if entries else []
     audit_findings = citation_audit(papers, notes, claims, entries, themes, root=paths["root"])
@@ -1023,7 +1032,7 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         )
     reports_dir = Path(paths["reports_dir"])
     report_paths = [display_path(path, base_path=paths["root"]) for path in sorted(reports_dir.glob("*.md"))] if reports_dir.exists() else []
-    audit_events = load_audit_events(default_audit_log_path(paths["root"]))[-args.limit :]
+    audit_events = [] if args.no_audit_log else load_audit_events(default_audit_log_path(paths["root"]))[-args.limit :]
     dashboard = build_dashboard(
         project=_project_id_from_paths(paths),
         root=display_path(paths["root"], base_path=Path(".")),
@@ -2423,6 +2432,7 @@ def build_parser() -> argparse.ArgumentParser:
     dashboard_parser.add_argument("--manuscript", default="", help="Optional manuscript draft path for manuscript QA warnings.")
     dashboard_parser.add_argument("--view", choices=["full", "next-actions", "health"], default="full", help="Terminal/report view to render.")
     dashboard_parser.add_argument("--limit", type=int, default=10, help="Maximum items to show in each dashboard section.")
+    dashboard_parser.add_argument("--no-audit-log", action="store_true", help="Do not include ignored local audit-log events in dashboard output.")
     dashboard_parser.add_argument("--no-rules", action="store_true", help="Skip rule engine findings in the dashboard.")
     dashboard_parser.add_argument("--no-builtins", action="store_true", help="When rules run, skip built-in validation adapters.")
     dashboard_parser.add_argument("--out", default="", help="Optional Markdown dashboard report path.")

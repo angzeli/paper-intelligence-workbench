@@ -91,13 +91,14 @@ paperwb dashboard
 paperwb dashboard --project zis_photocatalysis
 paperwb dashboard --project zis_photocatalysis --view next-actions
 paperwb dashboard --project zis_photocatalysis --view health --manuscript drafts/synthetic_unknown_citations.md
-paperwb dashboard --project zis_photocatalysis --out scratch/dashboard.md --force
+paperwb dashboard --project zis_photocatalysis --no-audit-log --out scratch/dashboard.md --force
 ```
 
 The dashboard is read-only unless `--out` is supplied. It summarizes local
 project health, weak evidence, missing notes, BibTeX/citation/rule findings,
 reading queue items, follow-ups, recent audit events, and optional manuscript
-QA warnings. It does not run suggested next-action commands automatically.
+QA warnings. Use `--no-audit-log` for deterministic shared reports. It does not
+run suggested next-action commands automatically.
 
 Authoring reports:
 

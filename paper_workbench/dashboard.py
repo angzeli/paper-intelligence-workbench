@@ -506,11 +506,25 @@ def _dedupe_actions(actions: list[NextAction]) -> list[NextAction]:
     seen: set[str] = set()
     unique: list[NextAction] = []
     for action in sorted(actions, key=lambda item: (PRIORITY_ORDER.get(item.priority, 9), item.action_id)):
-        if action.action_id in seen:
+        dedupe_key = _action_dedupe_key(action)
+        if dedupe_key in seen:
             continue
-        seen.add(action.action_id)
+        seen.add(dedupe_key)
         unique.append(action)
     return unique
+
+
+def _action_dedupe_key(action: NextAction) -> str:
+    action_text = f"{action.action_id} {action.reason}".lower()
+    related = action.related or action.action_id
+    if (
+        "claim_missing_evidence_location" in action_text
+        or "missing_evidence" in action.action_id
+        or "no section/page evidence location" in action_text
+        or "has no section or page evidence location" in action_text
+    ):
+        return f"missing_evidence_location:{related}"
+    return f"action:{action.action_id}"
 
 
 def _escape(value: object) -> str:

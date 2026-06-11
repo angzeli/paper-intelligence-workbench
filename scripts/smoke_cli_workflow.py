@@ -93,6 +93,7 @@ def build_steps(tmp: Path, *, quick: bool = False) -> list[SmokeStep]:
         SmokeStep("project list", _cli_args("project", "list")),
         SmokeStep("project search", _cli_args("search", "photocorrosion", "--project", "zis_photocatalysis")),
         SmokeStep("files scan", _cli_args("files", "scan", "--project", "zis_photocatalysis")),
+        SmokeStep("dashboard next actions", _cli_args("dashboard", "--project", "zis_photocatalysis", "--view", "next-actions", "--limit", "3", "--no-audit-log")),
     ]
     if quick:
         return steps
@@ -146,7 +147,7 @@ def run_step(step: SmokeStep) -> SmokeResult:
     return SmokeResult(step.name, step.args, result.returncode, result.stdout, result.stderr)
 
 
-def report_markdown(results: list[SmokeResult], tmp: Path, *, title: str = "CLI Smoke Workflow v0.8") -> str:
+def report_markdown(results: list[SmokeResult], tmp: Path, *, title: str = "CLI Smoke Workflow v1.6") -> str:
     lines = [
         f"# {title}",
         "",
@@ -181,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run a non-destructive Paper Workbench CLI smoke workflow.")
     parser.add_argument("--out", default="", help="Optional Markdown report path.")
     parser.add_argument("--quick", action="store_true", help="Run a shorter smoke set for unit tests.")
-    parser.add_argument("--title", default="CLI Smoke Workflow v0.8", help="Markdown report title.")
+    parser.add_argument("--title", default="CLI Smoke Workflow v1.6", help="Markdown report title.")
     args = parser.parse_args(argv)
 
     with tempfile.TemporaryDirectory(prefix="paperwb_smoke_") as tmp_name:

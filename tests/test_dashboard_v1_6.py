@@ -67,6 +67,50 @@ def test_dashboard_aggregation_and_next_actions() -> None:
     }
 
 
+def test_dashboard_dedupes_same_missing_evidence_action() -> None:
+    claim = Claim(
+        claim_id="paper1:c1",
+        paper_id="paper1",
+        claim_text="Synthetic claim needs a location.",
+        strength="moderate",
+        confidence="high",
+    )
+    dashboard = build_dashboard(
+        project="demo",
+        root="projects/demo",
+        papers=[_paper("paper1", status="read")],
+        notes=[PaperNote(paper_id="paper1", claims=[claim])],
+        claims=[claim],
+        bibtex_entries=[],
+        themes=[],
+        health_findings=[
+            ValidationFinding(
+                "error",
+                "claim_missing_evidence_location",
+                "paper1:c1 has no section/page evidence location.",
+                identifier="paper1:c1",
+            )
+        ],
+        rule_findings=[
+            ValidationFinding(
+                "error",
+                "builtin.workspace_health.claim_missing_evidence_location",
+                "paper1:c1 has no section/page evidence location.",
+                identifier="paper1:c1",
+            )
+        ],
+        limit=10,
+    )
+
+    related_missing_evidence = [
+        action
+        for action in dashboard.next_actions
+        if action.related == "paper1:c1" and "evidence location" in action.reason
+    ]
+
+    assert len(related_missing_evidence) == 1
+
+
 def test_dashboard_markdown_views_render_tables() -> None:
     dashboard = build_dashboard(
         project="demo",
@@ -97,6 +141,17 @@ def test_dashboard_cli_project_smoke(tmp_path: Path) -> None:
     assert "# Terminal Dashboard v1.6" in report.read_text(encoding="utf-8")
 
 
+def test_dashboard_cli_rejects_non_positive_limits() -> None:
+    zero = run_cli("dashboard", "--project", "zis_photocatalysis", "--limit", "0")
+    negative = run_cli("dashboard", "--project", "zis_photocatalysis", "--limit", "-1")
+
+    assert zero.returncode == 2
+    assert negative.returncode == 2
+    assert "Invalid dashboard limit" in zero.stderr
+    assert "positive integer" in zero.stderr
+    assert "Invalid dashboard limit" in negative.stderr
+
+
 def test_dashboard_cli_next_actions_and_health_views(tmp_path: Path) -> None:
     actions = tmp_path / "next_actions.md"
     health = tmp_path / "health.md"
@@ -120,6 +175,26 @@ def test_dashboard_cli_next_actions_and_health_views(tmp_path: Path) -> None:
     health_text = health.read_text(encoding="utf-8")
     assert "Project Health Summary v1.6" in health_text
     assert "Manuscript QA" in health_text
+
+
+def test_dashboard_cli_can_suppress_local_audit_log(tmp_path: Path) -> None:
+    report = tmp_path / "dashboard.md"
+
+    result = run_cli(
+        "dashboard",
+        "--project",
+        "zis_photocatalysis",
+        "--limit",
+        "3",
+        "--no-audit-log",
+        "--out",
+        str(report),
+    )
+
+    assert result.returncode == 0
+    text = report.read_text(encoding="utf-8")
+    assert "No audit events found." in text
+    assert "write_index_status_report" not in text
 
 
 def test_dashboard_cli_refuses_to_overwrite_report(tmp_path: Path) -> None:

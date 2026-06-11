@@ -109,6 +109,23 @@ def test_v1_4_manuscript_docs_are_wired_into_release_docs():
     assert "tests/test_manuscript_v1_4.py" in test_matrix
 
 
+def test_v1_6_dashboard_docs_and_smoke_are_wired_into_release_docs():
+    cli_surface = (ROOT / "docs" / "CLI_SURFACE.md").read_text(encoding="utf-8")
+    command_contracts = (ROOT / "docs" / "COMMAND_CONTRACTS.md").read_text(encoding="utf-8")
+    report_matrix = (ROOT / "docs" / "REPORT_MATRIX.md").read_text(encoding="utf-8")
+    report_gallery = (ROOT / "docs" / "REPORT_GALLERY.md").read_text(encoding="utf-8")
+    test_matrix = (ROOT / "docs" / "TEST_MATRIX.md").read_text(encoding="utf-8")
+    smoke_script = (ROOT / "scripts" / "smoke_cli_workflow.py").read_text(encoding="utf-8")
+
+    assert "paperwb dashboard" in cli_surface
+    assert "dashboard" in command_contracts
+    assert "Terminal dashboard" in report_matrix
+    assert "reports/dashboard_v1_6.md" in report_gallery
+    assert "tests/test_dashboard_v1_6.py" in test_matrix
+    assert "dashboard next actions" in smoke_script
+    assert "--no-audit-log" in smoke_script
+
+
 def test_active_generated_reports_do_not_leak_maintainer_absolute_paths():
     checked_reports = [
         "reports/import_zotero_csv_v0_4.md",

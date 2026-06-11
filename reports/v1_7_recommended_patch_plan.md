@@ -4,8 +4,6 @@
 
 - Add dashboard filters for `--theme`, `--tag`, `--status`, and
   `--priority`.
-- Reduce duplicate next actions when the same evidence gap appears in
-  workspace health, citation audit, and rule findings.
 - Add report-regression checks for dashboard Markdown sections and count
   tables.
 
@@ -15,6 +13,8 @@
 - Add a compact terminal view for small panes.
 - Add current-feature notebook or script coverage for the dashboard workflow.
 - Add severity/category filters for rule findings before dashboard aggregation.
+- Add grouped issue-count summaries so duplicated workspace, citation-audit,
+  and rule-adapter findings are easier to interpret.
 
 ## Low Priority
 
@@ -29,4 +29,3 @@
 - Do not add a heavy TUI framework.
 - Do not auto-run next actions from the dashboard.
 - Do not use LLMs to rank or explain actions.
-

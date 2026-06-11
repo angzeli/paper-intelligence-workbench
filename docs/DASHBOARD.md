@@ -37,7 +37,7 @@ paperwb dashboard --project zis_photocatalysis
 Markdown dashboard report:
 
 ```bash
-paperwb dashboard --project zis_photocatalysis --out reports/dashboard_v1_6.md --force
+paperwb dashboard --project zis_photocatalysis --no-audit-log --out reports/dashboard_v1_6.md --force
 ```
 
 Dashboard with manuscript QA warnings:
@@ -53,10 +53,13 @@ paperwb dashboard --project zis_photocatalysis --view next-actions
 paperwb dashboard --project zis_photocatalysis --view health
 ```
 
+Use `--no-audit-log` for release-facing or shared reports when you do not want
+ignored local `.paperwb/audit_log.jsonl` events included. `--limit` must be a
+positive integer; invalid values are rejected instead of silently hiding rows.
+
 ## Interpretation
 
 The dashboard reports completeness and workflow status. It does not decide
 whether a scientific claim is true and does not infer claims from papers. Weak
 evidence, missing notes, and citation findings are based only on local user
 metadata and structured notes.
-
