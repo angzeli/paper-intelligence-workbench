@@ -1,6 +1,6 @@
-# Command Contracts v1.3
+# Command Contracts v1.4
 
-This page defines the v1.3 behavior expected by tests and external
+This page defines the v1.4 behavior expected by tests and external
 users. The contract is intentionally practical: it describes command behavior,
 not internal implementation details.
 
@@ -37,6 +37,7 @@ not internal implementation details.
 | `report` | yes | inventory/evidence/citation/authoring reports | missing theme, invalid `report all --out`, or overwrite refusal | no overwrite without `--force`; `report all` preflights every output before writing |
 | `writing-packet` | yes | synthetic theme packet | unknown theme | planning aid only |
 | `draft` | yes | parse/audit/checklist synthetic drafts | unknown citations or overwrite refusal | no draft rewrite; reports only |
+| `manuscript` | yes | parse/qa/context/trace synthetic manuscripts | unknown citations or overwrite refusal | no manuscript rewrite; reports only |
 | `reading` | yes | temp queue/start/finish/status/review | invalid status or missing session | existing notes preserved unless `--force-note` |
 | `followups` | yes | list/export/done temp actions | missing state path tolerated | source notes preserved; completion state stored separately |
 | `doctor` | yes | workspace-health report | missing inputs | read-only unless `--out` |
@@ -54,8 +55,9 @@ readiness checks, and writing packets. They must not produce polished literature
 review prose as if it were user-authored, and they must not infer claims from
 papers without user-entered notes.
 
-Draft commands audit manuscript text and emit reports, matrices, and checklists.
-They must not rewrite the user draft or invent missing citations.
+Draft and manuscript commands audit manuscript text and emit reports, matrices,
+tables, and checklists. They must not rewrite the user draft or invent missing
+citations.
 
 ## Test Mapping
 
@@ -73,6 +75,7 @@ Representative contract tests live in:
 - `tests/test_drafts_v1_1.py`
 - `tests/test_reading_v1_2.py`
 - `tests/test_sync_v1_3.py`
+- `tests/test_manuscript_v1_4.py`
 
 Release scripts used by the contract:
 

@@ -104,7 +104,15 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Backup-before-force behavior for sync apply.
 - Conservative note and Obsidian round-trip conflict detection.
 
-## Near-Term Patches for v1.4
+## v1.4 Completed
+
+- Manuscript citation QA for Markdown and LaTeX-ish drafts.
+- Citation context tables for every citation occurrence.
+- Claim-to-draft traceability reports by theme.
+- Manuscript revision checklists and paragraph evidence tables.
+- Synthetic manuscript drafts covering unknown citations, overconfident wording, review-only support, and citation mismatch cases.
+
+## Near-Term Patches for v1.5
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -154,8 +162,8 @@ Possible future commands:
 
 ## v1.4 Candidate Scope
 
-- Harden reading-session edge cases after real user feedback.
-- Add richer follow-up filters by status, age, and linked theme.
-- Add report diffs for draft audits and weekly reading reviews.
+- Harden manuscript QA against more real-world footnotes, captions, and appendices.
+- Add report diffs for manuscript QA, draft audits, and weekly reading reviews.
 - Improve citation-pattern fixtures without becoming a full citation processor.
 - Add opt-in sync field patch files for manually approved non-empty metadata changes.
+- Add richer follow-up filters by status, age, and linked theme.

@@ -109,6 +109,22 @@ paperwb draft evidence-matrix drafts/synthetic_photocorrosion_section.md --proje
 Draft commands audit user-written Markdown against local citations, notes, and
 claims. They do not rewrite final prose or infer unsupported claims.
 
+Manuscript QA:
+
+```bash
+paperwb manuscript parse drafts/synthetic_overconfident_section.md
+paperwb manuscript citations drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_citations.md --force
+paperwb manuscript qa drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_qa.md --force
+paperwb manuscript checklist drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_revision_checklist.md --force
+paperwb manuscript context-table drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/citation_context_table.md --force
+paperwb manuscript trace-claims drafts/synthetic_overconfident_section.md --project zis_photocatalysis --theme photocorrosion --out scratch/claim_traceability.md --force
+paperwb manuscript evidence-matrix drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_paragraph_evidence.md --force
+```
+
+Manuscript commands generate reviewer-style QA reports and traceability tables
+from local evidence only. They do not rewrite manuscript prose, fabricate
+claims, or fabricate citations.
+
 Reading sessions and follow-ups:
 
 ```bash

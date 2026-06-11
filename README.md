@@ -28,6 +28,8 @@ v1.2 adds a reading-session workflow loop: transparent reading queues, local ses
 
 v1.3 adds two-way sync planning and conflict detection for local import/export workflows. It compares registry data with Zotero-style CSV, BibTeX, RIS, generic CSV, and Obsidian-style Markdown exports, then writes dry-run plans and conflict reports before any safe registry apply.
 
+v1.4 adds manuscript citation QA and review packet reports. It audits Markdown or LaTeX-ish drafts against local citations, notes, claims, evidence, and themes, then generates reviewer-style QA reports, citation context tables, claim traceability reports, and revision checklists without writing final prose.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -53,6 +55,7 @@ v1.3 adds two-way sync planning and conflict detection for local import/export w
 - Audits Markdown drafts against local citation keys, structured notes, extracted claims, and theme evidence.
 - Manages local reading queues, session records, follow-up actions, and weekly reading-review reports.
 - Plans local sync and conflict-resolution workflows before writing registry changes.
+- Audits manuscript drafts and generates citation QA, context, traceability, and revision reports from local evidence only.
 
 ## What It Does Not Do
 
@@ -68,6 +71,7 @@ v1.3 adds two-way sync planning and conflict detection for local import/export w
 - It does not rewrite user drafts or generate final manuscript prose.
 - It does not mark papers as read, create session outcomes, or add follow-up actions unless the user runs the relevant local command.
 - It does not sync with cloud services or overwrite non-empty user data during sync.
+- Manuscript QA remains audit-only: it flags local evidence gaps rather than rewriting the draft.
 
 ## Installation
 
@@ -324,6 +328,23 @@ Forced sync applies create a local backup by default and only create missing
 registry rows or fill blank fields when the plan has no high-risk conflicts and
 the source/registry files still match the plan. Note and metadata conflicts are
 reported for manual review. See [docs/SYNC.md](docs/SYNC.md).
+
+## v1.4 Manuscript QA Workflow
+
+Audit a synthetic manuscript draft against local project evidence:
+
+```bash
+paperwb manuscript parse drafts/synthetic_overconfident_section.md
+paperwb manuscript qa drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_qa.md --force
+paperwb manuscript context-table drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/citation_context_table.md --force
+paperwb manuscript trace-claims drafts/synthetic_overconfident_section.md --project zis_photocatalysis --theme photocorrosion --out scratch/claim_traceability.md --force
+paperwb manuscript checklist drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_revision_checklist.md --force
+```
+
+Manuscript QA uses transparent local citation, keyword, tag, and theme overlap.
+It flags possible problems for manual revision; it does not judge scientific
+truth, fabricate support, or write polished prose. See
+[docs/MANUSCRIPT_QA.md](docs/MANUSCRIPT_QA.md).
 
 ## Data Folder Convention
 

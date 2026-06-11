@@ -57,6 +57,10 @@ Instructions for future agents working in this repository:
 - Do not fabricate citations or paper claims when auditing manuscripts.
 - Keep draft evidence matching heuristic, local, and transparent.
 - Add tests for new draft citation patterns or strong-wording heuristics.
+- Manuscript QA workflows must not rewrite final prose, fabricate citations, or fabricate paper claims.
+- Treat manuscript paragraph-to-claim evidence matching as heuristic and transparent.
+- Preserve user manuscript drafts; generated QA reports and checklists are separate artifacts.
+- Add tests for new manuscript citation patterns and review-warning heuristics.
 - Do not fabricate reading notes, session summaries, claims-added counts, or follow-up actions.
 - Do not mark papers as read unless a user command explicitly requests that status update.
 - Preserve reading session logs and follow-up completion state; do not overwrite them outside explicit force or clear commands.

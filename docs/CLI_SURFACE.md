@@ -1,6 +1,6 @@
-# CLI Surface v1.3
+# CLI Surface v1.4
 
-The stable external interface for Paper Intelligence Workbench v1.3 is the
+The stable external interface for Paper Intelligence Workbench v1.4 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -23,6 +23,7 @@ release line unless a release note explicitly says otherwise.
 | `paperwb writing-packet` | stable | Generate a theme-specific writing planning packet, not final prose |
 | `paperwb checklist` | stable | Generate a theme review checklist |
 | `paperwb draft parse/citations/audit/checklist/evidence-matrix` | stable | Audit Markdown drafts against local citations and tracked evidence without rewriting prose |
+| `paperwb manuscript parse/citations/qa/checklist/trace-claims/context-table/evidence-matrix` | stable | Run reviewer-style manuscript citation QA against local evidence without rewriting prose |
 | `paperwb reading queue/start/finish/status/review` | stable | Manage local reading queues and session records without reading papers or fabricating notes |
 | `paperwb followups list/export/done` | stable | Collect follow-up actions from notes/sessions and track completion outside source notes |
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
@@ -45,7 +46,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.3.
+No commands are deprecated in v1.4.
 
 ## Write Safety Contract
 
@@ -84,5 +85,6 @@ Reports and authoring commands organize user-entered local evidence. They do not
 judge scientific truth, invent claims, invent citations, fabricate quotes, or
 write polished final prose.
 
-Draft commands use transparent local heuristics. They flag possible support
-gaps for manual checking; they do not certify whether a paragraph is true.
+Draft and manuscript commands use transparent local heuristics. They flag
+possible support gaps for manual checking; they do not certify whether a
+paragraph is true.
