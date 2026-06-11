@@ -39,6 +39,9 @@ jobs:
       - name: CLI workflow smoke test
         run: python scripts/smoke_cli_workflow.py --quick
 
+      - name: Clean-room install check
+        run: python scripts/clean_room_install_check.py --quick --out /tmp/paperwb_clean_room_check.md
+
       - name: Local file CLI smoke tests
         run: |
           python -m paper_workbench.cli files --help

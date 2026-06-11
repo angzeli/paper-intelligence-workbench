@@ -18,11 +18,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", default=".", help="Repository root. Defaults to the current directory.")
     parser.add_argument("--out", default="reports/data_safety_audit_v0_10.md", help="Optional Markdown report path.")
     parser.add_argument("--max-file-bytes", type=int, default=1_000_000, help="Warn on tracked files larger than this size.")
+    parser.add_argument("--title", default="Data Safety Audit v0.10", help="Markdown report title.")
     parser.add_argument("--strict", action="store_true", help="Return non-zero when error-severity findings exist.")
     args = parser.parse_args(argv)
 
     result = audit_data_safety(args.root, max_file_bytes=args.max_file_bytes)
-    markdown = safety_audit_markdown(result)
+    markdown = safety_audit_markdown(result, title=args.title)
     if args.out:
         target = Path(args.out)
         target.parent.mkdir(parents=True, exist_ok=True)

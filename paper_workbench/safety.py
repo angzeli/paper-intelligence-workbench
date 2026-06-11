@@ -71,7 +71,9 @@ def _read_text_if_possible(path: Path) -> str:
 
 
 def _skip_absolute_path_content_scan(relative_path: str) -> bool:
-    return bool(re.fullmatch(r"reports/data_safety_audit_v[0-9_]+\.md", relative_path))
+    return bool(
+        re.fullmatch(r"reports/data_safety(?:_audit)?_v[0-9A-Za-z_]+\.md", relative_path)
+    )
 
 
 def audit_data_safety(root: str | Path = ".", *, max_file_bytes: int = 1_000_000) -> SafetyAuditResult:
@@ -111,10 +113,15 @@ def audit_data_safety(root: str | Path = ".", *, max_file_bytes: int = 1_000_000
     return SafetyAuditResult(root=str(root_path), files_checked=len(files), findings=findings)
 
 
-def safety_audit_markdown(result: SafetyAuditResult, *, max_findings_per_code: int = 20) -> str:
+def safety_audit_markdown(
+    result: SafetyAuditResult,
+    *,
+    max_findings_per_code: int = 20,
+    title: str = "Data Safety Audit v0.10",
+) -> str:
     counts = Counter(finding.code for finding in result.findings)
     lines = [
-        "# Data Safety Audit v0.10",
+        f"# {title}",
         "",
         "This audit checks tracked and unignored repository files. It does not inspect ignored user caches, local PDFs, or ignored private files.",
         "",

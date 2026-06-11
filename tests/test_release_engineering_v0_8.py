@@ -43,6 +43,9 @@ def test_release_docs_site_and_matrices_exist():
         "docs/REPORT_MATRIX.md",
         "docs/DATA_SAFETY_MATRIX.md",
         "docs/INSTALLATION.md",
+        "docs/API_SURFACE.md",
+        "docs/CLI_SURFACE.md",
+        "docs/COMMAND_CONTRACTS.md",
     ]
 
     for relative in expected:
@@ -101,4 +104,5 @@ def test_ci_runs_v0_8_release_checks():
 
     assert "python scripts/check_notebooks.py" in content
     assert "python scripts/smoke_cli_workflow.py --quick" in content
+    assert "python scripts/clean_room_install_check.py --quick" in content
     assert "python scripts/data_safety_audit.py" in content

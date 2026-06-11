@@ -1,0 +1,133 @@
+from __future__ import annotations
+
+import subprocess
+import sys
+
+from conftest import EXAMPLE_REGISTRY, ROOT
+
+
+def run_cli(*args: str):
+    return subprocess.run([sys.executable, "-m", "paper_workbench.cli", *args], cwd=ROOT, check=False, text=True, capture_output=True)
+
+
+def run_script(*args: str):
+    return subprocess.run([sys.executable, *args], cwd=ROOT, check=False, text=True, capture_output=True)
+
+
+def test_major_cli_help_contracts_are_available():
+    commands = [
+        (("--help",), "Local-first academic paper registry"),
+        (("init", "--help"), "--root"),
+        (("project", "--help"), "{init,list,validate}"),
+        (("project", "init", "--help"), "--description"),
+        (("validate-registry", "--help"), "--strict"),
+        (("validate-bib", "--help"), "--registry"),
+        (("import", "--help"), "{zotero-csv,csv,bibtex,ris}"),
+        (("import", "csv", "--help"), "--mapping"),
+        (("export", "--help"), "{registry-csv,registry-json"),
+        (("index", "--help"), "{rebuild,status,clear}"),
+        (("files", "--help"), "{scan,status,link"),
+        (("report", "--help"), "evidence-matrix"),
+        (("writing-packet", "--help"), "--theme"),
+        (("doctor", "--help"), "--strict"),
+        (("integrity", "--help"), "{check}"),
+        (("audit-log", "--help"), "{show,clear}"),
+        (("backup", "--help"), "{create,list,inspect"),
+        (("migrate", "--help"), "{plan,run}"),
+        (("synthetic", "--help"), "{generate}"),
+    ]
+
+    for args, expected in commands:
+        result = run_cli(*args)
+        assert result.returncode == 0, (args, result.stderr)
+        assert expected in result.stdout, args
+        assert "Traceback" not in result.stderr
+
+
+def test_release_candidate_docs_describe_frozen_surfaces():
+    expected = [
+        "docs/API_SURFACE.md",
+        "docs/CLI_SURFACE.md",
+        "docs/COMMAND_CONTRACTS.md",
+    ]
+    for relative in expected:
+        path = ROOT / relative
+        assert path.exists(), relative
+        content = path.read_text(encoding="utf-8")
+        assert "v1.0-rc" in content
+        assert "local-first" in content
+
+
+def test_command_contract_no_overwrite_and_failure_paths(tmp_path):
+    out = tmp_path / "inventory.md"
+    result = run_cli("report", "inventory", "--registry", str(EXAMPLE_REGISTRY), "--out", str(out))
+    assert result.returncode == 0, result.stderr
+    original = out.read_text(encoding="utf-8")
+
+    refusal = run_cli("report", "inventory", "--registry", str(EXAMPLE_REGISTRY), "--out", str(out))
+    assert refusal.returncode == 2
+    assert out.read_text(encoding="utf-8") == original
+    assert "Traceback" not in refusal.stderr
+
+    missing_project = run_cli("project", "validate", "missing_release_candidate_project")
+    assert missing_project.returncode == 2
+    assert "Next step:" in missing_project.stderr
+    assert "Traceback" not in missing_project.stderr
+
+    missing_backup = run_cli("backup", "restore", "missing-backup-id", "--dry-run", "--out", str(tmp_path / "restore.md"))
+    assert missing_backup.returncode == 2
+    assert "Next step:" in missing_backup.stderr
+    assert "Traceback" not in missing_backup.stderr
+
+
+def test_import_dry_run_contract_does_not_modify_registry(tmp_path):
+    registry = tmp_path / "papers.csv"
+    registry.write_text((ROOT / "data" / "registries" / "example_papers.csv").read_text(encoding="utf-8"), encoding="utf-8")
+    before = registry.read_text(encoding="utf-8")
+    report = tmp_path / "zotero_import.md"
+
+    result = run_cli(
+        "import",
+        "zotero-csv",
+        "data/examples/zotero_export.csv",
+        "--registry",
+        str(registry),
+        "--reports-dir",
+        str(tmp_path),
+        "--report",
+        str(report),
+        "--dry-run",
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert registry.read_text(encoding="utf-8") == before
+    assert "dry-run: True" in result.stdout
+    assert report.exists()
+
+
+def test_clean_room_install_check_quick_generates_release_report(tmp_path):
+    out = tmp_path / "clean_room.md"
+    result = run_script("scripts/clean_room_install_check.py", "--quick", "--out", str(out))
+
+    assert result.returncode == 0, result.stderr
+    content = out.read_text(encoding="utf-8")
+    assert "Clean-room Install Check v1.0-rc" in content
+    assert "Failures: 0" in content
+    assert "create temp project" in content
+
+
+def test_data_safety_audit_accepts_release_candidate_title(tmp_path):
+    out = tmp_path / "data_safety.md"
+    result = run_script(
+        "scripts/data_safety_audit.py",
+        "--out",
+        str(out),
+        "--title",
+        "Data Safety Audit v1.0-rc",
+        "--strict",
+    )
+
+    assert result.returncode == 0, result.stderr
+    content = out.read_text(encoding="utf-8")
+    assert "Data Safety Audit v1.0-rc" in content
+    assert "Errors: 0" in content

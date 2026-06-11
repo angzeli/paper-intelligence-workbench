@@ -38,6 +38,17 @@ python -m pytest -q
 
 The printed package version should match the `version` value in `pyproject.toml`.
 
+For a release-candidate workflow check that writes only to a temporary
+directory:
+
+```bash
+python scripts/clean_room_install_check.py --quick
+```
+
+The script uses the current Python environment and `python -m
+paper_workbench.cli`, so it also works before the console entry point is
+installed.
+
 ## Local-Only Boundary
 
 Installation does not configure cloud services, API keys, publisher scraping, PDF downloaders, or LLM APIs. SQLite indexes are local rebuildable caches under `.paperwb/` and should not be committed.
