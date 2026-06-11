@@ -176,6 +176,7 @@ from .sync import (
     write_registry_apply_result,
 )
 from .tags import load_themes, normalize_tag
+from .templates import create_project_from_template, inspect_template, list_templates, template_summary
 
 
 def _path(value: str | Path) -> Path:
@@ -1520,6 +1521,34 @@ def cmd_project_validate(args: argparse.Namespace) -> int:
     return 1 if args.strict and any(finding.severity == "error" for finding in findings) else 0
 
 
+def cmd_template_list(args: argparse.Namespace) -> int:
+    for template in list_templates():
+        print(template_summary(template))
+    return 0
+
+
+def cmd_template_inspect(args: argparse.Namespace) -> int:
+    print(inspect_template(args.template), end="")
+    return 0
+
+
+def cmd_template_create(args: argparse.Namespace) -> int:
+    result = create_project_from_template(args.template, args.project, root=args.root)
+    _record_audit_event(
+        {"root": Path(result.profile.root), "profile": result.profile},
+        command="template create",
+        action="create_project_from_template",
+        affected_paths=[result.profile.root, *result.written_paths],
+        summary=f"Created project {result.profile.name} from template {result.template.template_id}",
+    )
+    print(f"Created project {result.profile.name} from template {result.template.template_id}")
+    print(profile_summary(result.profile))
+    print("Wrote:")
+    for path in result.written_paths:
+        print(f"- {path}")
+    return 0
+
+
 def cmd_doctor(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     paths = _paths_from_args(args)
@@ -2127,6 +2156,19 @@ def build_parser() -> argparse.ArgumentParser:
     project_validate.add_argument("name", help="Project profile name.")
     project_validate.add_argument("--strict", action="store_true", help="Return non-zero when errors are found.")
     project_validate.set_defaults(func=cmd_project_validate)
+
+    template_parser = subparsers.add_parser("template", help="List, inspect, or create reusable project templates.")
+    template_sub = template_parser.add_subparsers(dest="template_command", required=True)
+    template_list = template_sub.add_parser("list", help="List available project templates.")
+    template_list.set_defaults(func=cmd_template_list)
+    template_inspect = template_sub.add_parser("inspect", help="Show the files, themes, and rules included in a template.")
+    template_inspect.add_argument("template", help="Template ID, such as photocatalysis, finance, ml-methods, or generic.")
+    template_inspect.set_defaults(func=cmd_template_inspect)
+    template_create = template_sub.add_parser("create", help="Create a non-destructive project scaffold from a template.")
+    template_create.add_argument("template", help="Template ID, such as photocatalysis, finance, ml-methods, or generic.")
+    template_create.add_argument("--project", required=True, help="New project profile name to create.")
+    template_create.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+    template_create.set_defaults(func=cmd_template_create)
 
     validate_registry_parser = subparsers.add_parser("validate-registry", help="Validate a CSV paper registry.")
     validate_registry_parser.add_argument("registry", help="Registry CSV path.")

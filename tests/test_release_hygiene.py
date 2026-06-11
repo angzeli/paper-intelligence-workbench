@@ -85,13 +85,14 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v1.6 Release Reports" in content
-    assert "[dashboard_v1_6.md]" in content
-    assert "[next_actions_v1_6.md]" in content
-    assert "[project_health_summary_v1_6.md]" in content
-    assert "[release_readiness_v1_6.md]" in content
+    assert "## Current v1.7 Release Reports" in content
+    assert "[template_photocatalysis_overview.md]" in content
+    assert "[template_finance_overview.md]" in content
+    assert "[template_ml_methods_overview.md]" in content
+    assert "[dogfooding_workflow_v1_7.md]" in content
+    assert "[release_readiness_v1_7.md]" in content
     assert "## Next Patch Plan" in content
-    assert "[v1_7_recommended_patch_plan.md]" in content
+    assert "[v1_8_recommended_patch_plan.md]" in content
 
 
 def test_v1_4_manuscript_docs_are_wired_into_release_docs():
@@ -124,6 +125,23 @@ def test_v1_6_dashboard_docs_and_smoke_are_wired_into_release_docs():
     assert "tests/test_dashboard_v1_6.py" in test_matrix
     assert "dashboard next actions" in smoke_script
     assert "--no-audit-log" in smoke_script
+
+
+def test_v1_7_template_docs_and_smoke_are_wired_into_release_docs():
+    docs_index = (ROOT / "docs" / "index.md").read_text(encoding="utf-8")
+    site_map = (ROOT / "docs" / "SITE_MAP.md").read_text(encoding="utf-8")
+    cli_surface = (ROOT / "docs" / "CLI_SURFACE.md").read_text(encoding="utf-8")
+    command_contracts = (ROOT / "docs" / "COMMAND_CONTRACTS.md").read_text(encoding="utf-8")
+    test_matrix = (ROOT / "docs" / "TEST_MATRIX.md").read_text(encoding="utf-8")
+    smoke_script = (ROOT / "scripts" / "smoke_cli_workflow.py").read_text(encoding="utf-8")
+
+    for expected in ("PROJECT_TEMPLATES.md", "DOGFOODING_WORKFLOW.md"):
+        assert expected in docs_index
+        assert expected in site_map
+    assert "paperwb template" in cli_surface
+    assert "`template`" in command_contracts
+    assert "tests/test_templates_v1_7.py" in test_matrix
+    assert "template create" in smoke_script
 
 
 def test_active_generated_reports_do_not_leak_maintainer_absolute_paths():
