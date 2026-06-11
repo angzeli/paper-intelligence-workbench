@@ -39,6 +39,11 @@ def test_checked_in_stress_corpus_size():
     assert total_themes >= 15
 
 
+def test_checked_in_stress_project_report_dirs_are_tracked():
+    for project in [STRESS_ZIS_PROJECT, STRESS_FINANCE_PROJECT, STRESS_ML_PROJECT]:
+        assert (project / "reports").exists()
+
+
 def test_stress_registry_contains_intentional_validation_findings():
     profile = load_project_profile("stress_zis_photocatalysis", root=ROOT)
     papers = load_registry(profile.registry_path)

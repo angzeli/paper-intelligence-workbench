@@ -15,6 +15,8 @@ python -m paper_workbench.cli --help
 
 You can use `paperwb` after installation, or run the module form shown above.
 
+In offline or restricted-network environments, editable install may fail if `pip` cannot fetch build dependencies. The module form still works from the repository root without installing the package.
+
 ## 2. Understand the Example Data
 
 The included corpus is synthetic. It intentionally contains duplicate DOIs, incomplete BibTeX entries, weak claims, missing evidence locations, and under-supported themes. Those problems are useful because they show what the audit reports catch.

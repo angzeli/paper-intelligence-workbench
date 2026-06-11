@@ -57,6 +57,8 @@ You can also run it without installing:
 python -m paper_workbench.cli --help
 ```
 
+In offline or restricted-network environments, `pip` may be unable to fetch build dependencies for editable install. In that case, use the no-install `python -m paper_workbench.cli ...` form from the repository root, or install after local build dependencies such as `setuptools` and `pytest` are available.
+
 ## Quickstart
 
 Initialize a workspace:
