@@ -1,304 +1,287 @@
-# Hostile Maintainer Review: v1.2 Current Repository
+# Hostile Maintainer Review: v1.3 Current Repository
 
 Date: 2026-06-11
 
 ## Release Verdict
 
-**Verdict: do not ship v1.2 to external users until the new reading-session
-write-path blockers are fixed.**
+Do not release the current v1.3 state to external users until the sync data-integrity blockers are fixed.
 
-The repository is substantially more mature than the older v1.1 hostile review
-suggested. The previous `paperwb report all` blockers are fixed: output paths
-are preflighted and `report all --out` is rejected cleanly. The package remains
-local-first, has no runtime dependencies, and the full test suite currently
-passes.
+The non-sync surface looks substantially hardened: package import works, the full test suite passes, notebook JSON checks pass, the data-safety audit reports no errors, and the repository does not appear to track PDFs, SQLite cache databases, backup archives, or `.paperwb` cache folders. However, the new v1.3 sync workflow violates the project's core safety promise: a forced sync can mutate registry data in ways that were not explicitly planned, and the planner can attach applyable updates to a source row that it simultaneously classifies as a high-risk identity conflict.
 
-The current release blocker is narrower but serious: `paperwb reading start`
-and `paperwb reading finish` can mutate user data before failing on an existing
-`--out` report path. That violates the safe-write contract and is especially
-bad because `reading finish` updates the authoritative registry reading status.
+That is release-blocking for a local-first research data tool.
 
-Validation performed during this review:
+## Review Scope
 
-- `git status --short --branch --ignored=matching`: tracked worktree clean;
-  ignored IDE/cache/build/scratch artifacts present.
-- `python -m pytest -q`: passed.
-- `python -m pytest --collect-only -q`: collected the current suite across 22
-  test modules.
-- `python scripts/check_notebooks.py`: passed; 8 notebooks checked
-  structurally.
-- `python scripts/data_safety_audit.py --out scratch/hostile_review_data_safety.md --strict`:
-  passed with 0 errors and 11 warnings.
-- `paperwb --help`: passed.
-- `paperwb reading --help`: passed.
-- `paperwb draft audit drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/hostile_draft_audit.md --force`:
-  passed.
-- `paperwb report all` with a seeded later output collision: failed before
-  writing partial reports, as expected.
-- `paperwb report all --out ...`: returned exit code 2 and wrote nothing, as
-  expected.
-- `paperwb reading start` and `paperwb reading finish` output-collision probes:
-  both revealed partial writes before failure.
+Inspected:
+
+- package metadata and package layout
+- CLI command surface, especially `paperwb sync`
+- project profiles and generated synthetic projects
+- registry, BibTeX, note, claim, evidence-map, citation-audit, authoring, search, file-ingestion, import/export, backup, audit-log, reading-session, draft-audit, and sync modules
+- tests and fixture coverage
+- notebooks and notebook validation
+- generated reports
+- docs and release-readiness notes
+- tracked-file hygiene and data-safety boundaries
+
+Validation commands run during review:
+
+- `git status --short --branch --ignored=matching`
+- `python -m pytest -q`
+- `python -m pytest --collect-only -q`
+- `python scripts/check_notebooks.py`
+- `python scripts/data_safety_audit.py --out scratch/hostile_review_data_safety_current.md --strict`
+- `paperwb --help`
+- `paperwb sync --help`
+- `paperwb project list`
+- `paperwb report all --out scratch/hostile_should_fail.md`
+- focused `paperwb sync plan`, `paperwb sync apply --dry-run`, and `paperwb sync apply --force --no-backup` probes against synthetic scratch registries
+
+Observed validation results:
+
+- Full tests passed: 187 pytest tests.
+- Notebook structural validation passed for 8 notebooks.
+- Data-safety audit checked 508 files with 0 errors and 8 warnings.
+- `paperwb report all --out ...` correctly fails with a clear error instead of overwriting a single report path.
+- `paperwb sync` help and basic planning commands work.
 
 ## Release Blockers
 
-### 1. `paperwb reading start --out EXISTING` mutates state before failing
+### 1. Sync plans can include applyable actions for a high-risk conflicted source record
 
-Probe setup used a scratch-only registry and pre-existing output file:
+The sync planner detects high-risk identity conflicts, but it still schedules low-risk `fill_blank_field` actions for the same matched registry paper and source record.
 
-```bash
-paperwb reading start probe \
-  --registry scratch/hostile_reading_probe/registry.csv \
-  --notes-dir scratch/hostile_reading_probe/notes \
-  --sessions scratch/hostile_reading_probe/sessions.jsonl \
-  --out scratch/hostile_reading_probe/existing.md
-```
+Synthetic reproduction:
 
-Observed behavior:
-
-- exit code: `2`
-- error: output report already exists
-- nevertheless, the command created:
-  - `scratch/hostile_reading_probe/notes/probe.md`
-  - `scratch/hostile_reading_probe/sessions.jsonl`
-- it also updated `notes_path` in the registry.
+- Registry row: `known`, title `Known Synthetic Study`, DOI `10.1300/sync.known`, blank journal/tags/source_type.
+- Import row: title `Conflicting Title`, same DOI `10.1300/sync.known`, journal/tags/source_type populated.
+- Command: `paperwb sync plan --source scratch/.../conflict.csv --source-type zotero-csv --registry scratch/.../registry.csv ...`
+- Result: plan contains conflict `C0001 same_doi_different_title` with risk `high`, but also action IDs `A0001`, `A0002`, and `A0003` to fill `journal`, `tags`, and `source_type` on `known`.
 
 Why this blocks release:
 
-- A failed command should not silently start a reading session.
-- A failed command should not create a note or update registry metadata.
-- This breaks the documented no-overwrite/safe-write model.
+- The planner is saying "this may be the wrong paper" and "these fields are safe to copy" at the same time.
+- A user who sees low-risk actions in the same report can reasonably believe the forced apply is constrained to safe changes.
+- The project repeatedly promises conservative, non-destructive sync behavior.
 
 Required fix:
 
-- Preflight `--out` before calling `start_reading_session()`.
-- Add a regression test that seeds an existing `--out`, runs `reading start`,
-  and asserts the registry, note directory, and session log remain unchanged.
+- If an incoming source row produces a high-risk identity conflict for a matched paper, suppress all applyable actions derived from that source row.
+- Emit only conflict records and manual-review guidance for that row.
+- Add a regression test that a same-DOI/different-title record produces zero `fill_blank_field` actions for the conflicted paper.
 
-### 2. `paperwb reading finish --out EXISTING` updates registry/session state before failing
+### 2. Forced sync apply rewrites registry fields that are not present in the sync plan
 
-Probe:
+`sync apply --force` can change existing registry formatting for fields not listed in the plan. In a scratch probe, the registry author value changed from `Synthetic Author` to `Author, Synthetic` even though no author action appeared in the plan.
 
-```bash
-paperwb reading finish read_probe_20260611T163128Z \
-  --registry scratch/hostile_reading_probe/registry.csv \
-  --sessions scratch/hostile_reading_probe/sessions.jsonl \
-  --status read \
-  --out scratch/hostile_reading_probe/existing.md
-```
+Likely cause:
 
-Observed behavior:
-
-- exit code: `2`
-- error: output report already exists
-- nevertheless, the session was marked completed in the JSONL log
-- the registry `reading_status` changed from `unread` to `read`
-- `last_reviewed_date` was set.
+- `apply_registry_sync_plan()` deep-copies every existing `Paper` through `paper_to_row()` and `paper_from_row()`.
+- CLI writeback uses `save_registry()` on the reconstructed `Paper` objects.
+- This normalizes existing rows even when a field was not part of the sync plan.
 
 Why this blocks release:
 
-- This is an authoritative data mutation hidden behind a failed report write.
-- A user can reasonably retry the command and create inconsistent or duplicate
-  outcomes.
-- It contradicts the project's data-integrity positioning.
+- The apply report does not list the author change.
+- The user did not approve that field change.
+- This directly contradicts "report every changed field" and "never silently overwrite user data".
+- Even if the normalized form is acceptable internally, sync apply must preserve untouched registry text unless the plan explicitly says the field will change.
 
 Required fix:
 
-- Preflight `--out` before calling `finish_reading_session()`.
-- Add a regression test that asserts an output collision leaves the registry
-  and session log byte-for-byte unchanged.
+- Make sync apply row-preserving for existing registry CSV rows.
+- Apply only planned field changes to the original row dictionaries.
+- Preserve original values and formatting for untouched fields.
+- Add a regression test that forced sync apply leaves non-action fields byte-for-byte or value-for-value unchanged.
+
+### 3. `--force` is overloaded as both write confirmation and high-risk conflict override
+
+Current behavior lets a forced apply proceed when a plan contains high-risk conflicts. Combined with blocker 1, this allows safe-looking field fills from a conflicted record to be written after a single `--force`.
+
+Why this blocks release:
+
+- `--force` is already used throughout the project to mean "perform the write" or "overwrite output".
+- Using the same flag to allow high-risk identity-conflict plans makes the most dangerous path too easy.
+- This is especially risky for imported Zotero CSV/BibTeX/RIS data, where title, DOI, and citation-key conflicts are common.
+
+Required fix:
+
+- Refuse real apply when any high-risk conflict exists, regardless of ordinary `--force`, unless a separate explicit conflict-override flag is introduced.
+- Prefer no conflict override for v1.3 unless there is a strong use case.
+- Add CLI and unit tests that high-risk plans cannot write registry changes by default.
 
 ## High-Priority Issues
 
-### 1. Weekly reading reports are time-dependent without an `--as-of` control
+### 1. Dry-run apply reports use misleading "Applied actions" language
 
-`build_weekly_review()` uses `datetime.now(timezone.utc)` internally. The
-committed synthetic v1.2 session fixture is dated 2026-06-08 and 2026-06-09.
-The generated `reports/weekly_reading_review_v1_2.md` is reproducible only
-while those dates fall inside the default 7-day window.
+`paperwb sync apply PLAN --dry-run` produces a report with `Applied actions: N` and an `## Applied Actions` section even though no registry write occurred.
 
-Why this matters:
+Why it matters:
 
-- Generated reports are supposed to be reproducible from local inputs.
-- Regenerating v1.2 reports after the fixture ages out will change counts to
-  zero unless `--days` is expanded manually.
+- Dry-run reports are the user's safety mechanism.
+- The report should say "Would apply actions" or "Planned actions in dry run".
 
 Required fix:
 
-- Add an explicit `--as-of YYYY-MM-DD` or equivalent deterministic clock input
-  for `paperwb reading review`.
-- Regenerate v1.2 reports using that deterministic date.
-- Add a test for deterministic review-window behavior.
+- Change dry-run report labels while preserving the existing command behavior.
+- Add a test that dry-run Markdown does not claim actions were actually applied.
 
-### 2. Reading session IDs can collide for same-paper starts in the same second
+### 2. Fresh Obsidian export round-trip reports conflicts immediately
 
-`make_session_id()` uses `paper_id` plus a UTC timestamp with second
-precision. Two starts for the same paper in the same second produce identical
-IDs. `finish_reading_session()` then finds the first matching session, so a
-duplicate ID can update the wrong record.
+`reports/obsidian_roundtrip_v1_3.md` shows 8 `local_note_differs_from_exported_note` conflicts for the `zis_photocatalysis` project after comparing a generated Obsidian-style vault back to local notes.
 
-Required fix:
+Why it matters:
 
-- Add a collision-resistant suffix or retry loop.
-- Add a test that starts two same-paper sessions with the same injected time.
-
-### 3. Corrupt reading-session and follow-up state is silently ignored
-
-`load_reading_sessions()` skips invalid JSONL lines without surfacing a warning.
-`load_followup_state()` returns `{}` on invalid JSON. That avoids crashes, but
-it can make status/review/follow-up reports silently undercount user state.
+- A fresh export that immediately produces conflicts will make users distrust the round-trip workflow.
+- The report is technically conservative, but the feature name and docs imply a round-trip comparison. The current behavior looks more like a one-way export format being parsed as if it were the original structured note format.
 
 Required fix:
 
-- Return parse warnings, or add diagnostic commands that report corrupted local
-  reading/follow-up state.
-- Add failure-path CLI tests for malformed session JSONL and follow-up state.
+- Define whether Obsidian export is one-way or round-trip-capable.
+- If one-way, rename or document the command/report clearly and avoid implying parseable round-trip fidelity.
+- If round-trip-capable, adjust export or parsing so a fresh export does not generate false conflicts for unchanged notes.
+- Add a regression test for the chosen behavior.
 
-### 4. `paperwb followups done ACTION_ID` accepts arbitrary action IDs
+### 3. Sync apply has weak stale-plan protection
 
-The command writes completion state for any string without verifying that the
-action currently exists in notes or session logs. A typo can create a "done"
-record that does not correspond to any action and is not obvious to the user.
+The apply path skips some actions when the current registry no longer matches expected blank fields, but the plan does not appear to include a registry content hash, source hash, or generated-against fingerprint.
 
-Required fix:
+Why it matters:
 
-- Validate the action ID against collected follow-ups when registry/notes/session
-  context is available, or at least warn when marking an unknown action.
-- Add a CLI failure-path test.
-
-### 5. Tracked historical reports still contain local absolute paths
-
-Examples found by scan:
-
-- `reports/import_zotero_csv_v0_4.md`
-- `reports/import_generic_csv_v0_4.md`
-- `reports/import_bibtex_v0_4.md`
-- `reports/import_ris_v0_4.md`
-- `reports/stress_workspace_health_v0_3.md`
-
-Why this matters:
-
-- They are not secrets, but they leak maintainer machine paths and look
-  unprofessional in a public release.
-- They undermine recent work to relativize report paths.
+- A user can generate a sync plan, edit the registry, and then apply an old plan.
+- The tool may skip some actions, but the report does not clearly identify "this plan may be stale".
 
 Required fix:
 
-- Regenerate or normalize historical generated reports that remain in the
-  public report gallery/index.
-- Add a report hygiene test that flags `/Users/`, `/private/tmp`, and similar
-  paths in active generated reports, allowing explicitly historical simulation
-  reports only when labelled.
+- Add lightweight plan freshness metadata, such as registry file hash and source file hash.
+- Warn loudly or refuse apply if hashes differ.
+- Add tests for applying a stale plan after registry mutation.
+
+### 4. Sync plan JSON is treated as trusted internal input
+
+`sync_plan_from_dict()` constructs dataclasses directly from JSON fields. Malformed or hand-edited plan JSON can produce low-level type errors rather than a user-quality CLI error.
+
+Why it matters:
+
+- Sync plans are files the user may inspect, move, or edit.
+- A bad plan should fail with an actionable error: which file, what field, and how to regenerate.
+
+Required fix:
+
+- Add validation around plan JSON loading.
+- Convert malformed plan errors into a clear CLI failure.
+- Add adversarial tests for missing source/target/actions/conflicts fields.
 
 ## Medium-Priority Issues
 
-- `paper_workbench/cli.py` is still a very large command orchestration file.
-  It is now carrying init, project, validation, import, export, report,
-  authoring, draft, file, backup, migration, search, reading, and follow-up
-  behavior in one module.
-- `paperwb reading start` permits multiple active sessions for the same paper
-  without warning. That may be acceptable, but it should be explicit.
-- The reading queue currently ranks already `deeply_read` papers highly when
-  they have high priority and weak-theme signals. That is transparent but
-  surprising for a "what to read next" workflow.
-- Draft citation matching remains lexical and useful, but it still has known
-  false-positive/false-negative risks around tables, footnotes, and unusual
-  Markdown structures.
-- BibTeX parsing is intentionally lightweight; macro/string handling and broken
-  entry recovery are still limited.
-- Local file link/unlink workflows touch multiple metadata files. I did not see
-  write-failure simulation proving they cannot leave partially updated state.
-- Notebook validation is structural only. The project has notebook examples,
-  but CI/release validation does not execute them by default.
-- Some generated release reports are historical but live beside active release
-  reports with little separation.
+### 1. `paper_workbench/cli.py` is too large for the current feature set
+
+The CLI now contains many command groups and inline helpers across import/export/search/files/backup/migration/reading/drafts/sync. It still works, but future changes are likely to regress unrelated commands.
+
+Recommendation:
+
+- Split command registration into focused modules by command group after v1.3 blockers are fixed.
+- Keep argparse, but move each group into a small `add_*_commands(parser)` function.
+
+### 2. Historical reports are numerous and sometimes stale by design
+
+The `reports/` directory contains release-readiness, hostile-review, patch-plan, stress, and workflow reports from many stages. This is useful for audit history, but an external user can easily confuse stale historical verdicts with the current release state.
+
+Recommendation:
+
+- Add a short "current report index" at the top of `reports/index.md`.
+- Clearly separate current release artifacts from historical phase artifacts.
+
+### 3. Documentation volume is high and overlapping
+
+There are many pairs of uppercase workflow docs and docs-site lowercase equivalents. The coverage is strong, but it is hard to know which file is canonical.
+
+Recommendation:
+
+- Mark canonical docs in `docs/index.md`.
+- Move older stage-specific docs into an archive section or link them as reference material.
+
+### 4. Notebook coverage is structural, not executable
+
+The notebook checker validates JSON and path hygiene. That is appropriate for a lightweight release check, but it does not prove notebooks run top-to-bottom in a clean environment.
+
+Recommendation:
+
+- Keep structural checks in CI.
+- Add one optional manual or nightly notebook execution target for the smallest notebook set.
 
 ## Low-Priority Polish
 
-- CLI help still embeds old version labels in places, for example "v0.7
-  local-file audit reports" and "v0.9 workspace integrity checks".
-- `docs/index.md` still says "No site generator is required for v0.8", which is
-  stale wording in a v1.2 repository.
-- Uppercase reference docs and lowercase docs-site pages overlap heavily.
-- `reports/` is crowded enough that new users can easily open stale risk or
-  readiness reports.
-- Ignored build artifacts are present locally, including a stale
-  `dist/paper_intelligence_workbench-1.1.0.tar.gz`; it is ignored and untracked
-  but should not be included in any release archive.
+- Several reports include stage-specific naming that makes the current state harder to scan.
+- Some CLI help text is accurate but long; command groups would benefit from one-line workflow examples in docs rather than expanding help output further.
+- Sync reports should show the source record identifier next to every action and conflict, not only target paper ID.
+- The conflict report should group conflicts by source record and target paper for review ergonomics.
+- `reports/audit_log_demo_v0_9.md` is tracked, but actual audit logs are ignored; the demo should stay clearly labelled synthetic.
 
 ## Missing Tests
 
-- `reading start` output-collision no-mutation regression.
-- `reading finish` output-collision no-mutation regression.
-- duplicate reading-session ID handling.
-- duplicate active-session warning or documented behavior.
-- malformed reading-session JSONL diagnostics.
-- malformed follow-up state diagnostics.
-- `followups done` unknown action behavior.
-- deterministic `reading review` window behavior.
-- report hygiene checks for absolute local paths in active generated reports.
-- write-failure simulation for multi-file local-file link/unlink metadata
-  updates.
+Add tests for these release-relevant cases:
+
+- Same DOI with different title produces a high-risk conflict and no field-fill actions for that source row.
+- Same title with different DOI produces a high-risk conflict and no field-fill actions for that source row.
+- Same BibTeX key with different DOI produces a high-risk conflict and no field-fill actions for that source row.
+- Forced sync apply preserves all untouched registry fields and formatting.
+- Forced sync apply refuses high-risk plans unless a separately named conflict override exists.
+- Dry-run sync apply report uses "would apply" language.
+- Stale sync plan detection after registry file changes.
+- Malformed sync plan JSON fails with an actionable CLI error.
+- Fresh Obsidian export round-trip behavior, either no false conflicts or explicitly documented one-way behavior.
 
 ## Documentation Mismatches
 
-- `docs/index.md` has stale v0.8 wording.
-- `docs/CLI_SURFACE.md` and `docs/COMMAND_CONTRACTS.md` describe no-overwrite
-  behavior broadly, but `reading start/finish` currently violate it when `--out`
-  collides.
-- The report directory contains historical release-readiness reports that
-  disagree with the current v1.2 risk state unless the reader knows to treat
-  `hostile_review_latest.md` as canonical.
-- The reading workflow docs correctly warn about no fabrication and note
-  preservation, but they do not warn that session logs currently lack malformed
-  state diagnostics.
+### Sync safety docs overpromise current behavior
+
+`docs/SYNC.md` says forced applies "only create missing registry rows and fill blank fields" and "do not overwrite non-empty registry fields." That is incomplete because forced apply can still rewrite untouched row formatting through normalization.
+
+`docs/SAFE_SYNC_WORKFLOW.md` says "Never use sync to overwrite notes or registry fields that contain user-entered data." The implementation currently can alter user-entered author formatting without a planned action.
+
+`reports/release_readiness_v1_3.md` says v1.3 does not overwrite non-empty registry metadata. The scratch probe contradicts that at the file-output level.
+
+### Obsidian round-trip docs need sharper boundaries
+
+The generated Obsidian round-trip report shows immediate conflicts for a generated vault. The docs should state whether Obsidian export is a one-way readable vault export or a supported note round-trip source.
 
 ## CLI Usability Problems
 
-- `reading start` and `reading finish` report output collisions only after
-  state mutation.
-- `followups done` can succeed for a typo.
-- `reading review` has no deterministic clock option.
-- `reading queue` can recommend already deeply read papers without a clear
-  "why still recommended" distinction.
-- Some command help labels still reference old version milestones rather than
-  feature names.
+- `sync apply --dry-run` reports "Applied actions" for a dry-run.
+- `sync apply --force` is too broad: it means "write changes" and effectively "accept high-risk plan conflicts".
+- Sync plan reports do not visually tie actions to conflict-bearing source records, making it hard to see when one import row generated both a conflict and applyable actions.
+- Malformed sync plan JSON needs a better user-facing error path.
 
 ## Data-Safety Risks
 
-- No tracked PDFs, SQLite caches, pyc files, `.paperwb` caches, backup archives,
-  or IDE files were found.
-- Runtime dependencies remain empty and there is no evidence of cloud/LLM API
-  dependencies.
-- Ignored local artifacts are present and should be excluded from release
-  archives.
-- Tracked generated reports still contain local absolute paths.
-- The reading-finish output-collision bug can silently change authoritative
-  registry state despite a failed command.
+No evidence of cloud, LLM, publisher scraping, copyrighted PDFs, tracked cache databases, tracked backup archives, or tracked `.paperwb` directories was found in the current tracked file list.
+
+The primary data-safety risk is local data mutation:
+
+- Sync apply can modify registry values not present in the plan.
+- Sync apply can mutate a paper from a source record with a high-risk identity conflict.
+- The current report language can make dry-run behavior look like actual application.
+
+These are not theoretical release-polish issues. They affect user registry integrity.
 
 ## Overengineering Risks
 
-- The tool has grown into many workflows while keeping all orchestration in one
-  CLI module. More feature growth without modular command groups will make
-  safety reviews harder.
-- There are many generated reports and overlapping docs. More reports without a
-  clearer active/historical split will increase user confusion.
-- Reading workflows should stay simple and local; avoid turning them into a TUI,
-  scheduler, or automatic recommendation engine before the current safe-write
-  issues are fixed.
+- The project has accumulated many workflow modules and reports. The core value remains evidence tracking and auditability, but the expanding CLI surface is now hard to reason about.
+- Sync conflict application should not grow into an automatic merge engine. The right v1.3 fix is stricter suppression/refusal, not smarter guessing.
+- Obsidian round-trip should stay conservative. If exact round-trip is not feasible, document one-way export rather than adding fragile Markdown merge logic.
 
 ## Recommended Fix Sequence
 
-1. Fix `reading start` and `reading finish` by preflighting `--out` before any
-   note, session, or registry mutation.
-2. Add regression tests proving output collisions leave all source files
-   unchanged.
-3. Add deterministic `reading review --as-of` support and regenerate v1.2
-   reading reports with it.
-4. Add duplicate session ID protection and tests.
-5. Add warnings or diagnostics for malformed reading/follow-up state files.
-6. Validate or warn on unknown `followups done` IDs.
-7. Normalize local absolute paths in active generated reports and add a report
-   hygiene test.
-8. Clean stale ignored build artifacts before any public source archive or tag.
+1. Change sync planning so any source row with a high-risk identity conflict emits conflicts only and no applyable actions.
+2. Change sync apply to operate on original registry CSV rows and update only explicitly planned fields.
+3. Make real sync apply refuse high-risk-conflict plans unless a separate, deliberately named override is introduced.
+4. Fix dry-run report wording.
+5. Add the missing sync regression tests listed above.
+6. Decide and document Obsidian round-trip semantics; add one regression test for that behavior.
+7. Regenerate affected sync reports and release-readiness notes.
+8. Re-run full pytest, notebook JSON validation, data-safety audit, and representative CLI smoke tests.
 
+## Final Maintainer Position
+
+The repository is close to an external-quality local research workbench, but the current v1.3 sync workflow is not safe enough to release. Fix the sync blockers before any public release candidate or external-user handoff.
