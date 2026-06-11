@@ -2,6 +2,13 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.5.0 - Local Rule Engine
+
+- Added `paperwb rules` commands for listing, validating, running, reporting, and explaining local declarative validation rules.
+- Added safe JSON rule configs for project-specific registry, claim, theme, and manuscript checks.
+- Added built-in rule adapters for registry validation, citation audits, evidence-map readiness, manuscript QA, and workspace health findings.
+- Kept rule execution local and declarative: no arbitrary Python execution, no cloud APIs, no LLM APIs, and no user-data mutation.
+
 ## v1.4.0 - Manuscript Citation QA
 
 - Added `paperwb manuscript` commands for parsing, citation coverage, reviewer-style QA, revision checklists, citation context tables, paragraph evidence tables, and claim-to-draft traceability.

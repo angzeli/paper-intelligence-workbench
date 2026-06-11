@@ -28,6 +28,7 @@ paperwb doctor --out scratch/workspace_health.md
 paperwb reading queue --project zis_photocatalysis
 paperwb reading start PAPER_ID --project zis_photocatalysis
 paperwb followups list --project zis_photocatalysis
+paperwb rules list --project zis_photocatalysis --builtins
 ```
 
 Imports:
@@ -124,6 +125,23 @@ paperwb manuscript evidence-matrix drafts/synthetic_overconfident_section.md --p
 Manuscript commands generate reviewer-style QA reports and traceability tables
 from local evidence only. They do not rewrite manuscript prose, fabricate
 claims, or fabricate citations.
+
+Rule engine:
+
+```bash
+paperwb rules list --project zis_photocatalysis --builtins
+paperwb rules validate-config --project zis_photocatalysis --strict
+paperwb rules run --project zis_photocatalysis
+paperwb rules run --project zis_photocatalysis --no-builtins
+paperwb rules report --project zis_photocatalysis --out scratch/rule_report.md --force
+paperwb rules explain zis.theme.photocorrosion.min_papers --project zis_photocatalysis
+paperwb rules report --project zis_photocatalysis --manuscript drafts/synthetic_unknown_citations.md --out scratch/manuscript_rule_report.md --force
+```
+
+Rule commands load declarative local JSON only. They do not execute arbitrary
+Python code, use cloud services, or modify user data. Project-specific rules
+default to `projects/PROJECT/rules.json` when present; pass `--rules-file` for
+an explicit config.
 
 Reading sessions and follow-ups:
 

@@ -112,7 +112,15 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Manuscript revision checklists and paragraph evidence tables.
 - Synthetic manuscript drafts covering unknown citations, overconfident wording, review-only support, and citation mismatch cases.
 
-## Near-Term Patches for v1.5
+## v1.5 Completed
+
+- Local declarative rule engine for project-specific validation policies.
+- JSON rule files with safe condition types and no arbitrary code execution.
+- Built-in adapters for registry validation, citation audits, evidence-map readiness, manuscript QA, and workspace health findings.
+- Project-specific synthetic rules for ZIS photocatalysis and finance reading profiles.
+- Rule config audit and rule report commands.
+
+## Near-Term Patches for v1.6
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -129,6 +137,9 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add optional advisory PDF metadata extraction if a lightweight dependency is justified.
 - Add reading-session conflict handling for interrupted/duplicate active sessions.
 - Add optional calendar-style session summaries while keeping all state local.
+- Add rule severity filters and rule-category filters.
+- Add CSV/JSON export for rule findings if users need spreadsheet review.
+- Add more custom rule types only when a real local workflow needs them.
 
 ## Project Profiles
 
@@ -160,10 +171,9 @@ Possible future commands:
 - unresolved question summaries
 - safer BibTeX key normalization commands
 
-## v1.4 Candidate Scope
+## v1.6 Candidate Scope
 
-- Harden manuscript QA against more real-world footnotes, captions, and appendices.
-- Add report diffs for manuscript QA, draft audits, and weekly reading reviews.
-- Improve citation-pattern fixtures without becoming a full citation processor.
-- Add opt-in sync field patch files for manually approved non-empty metadata changes.
-- Add richer follow-up filters by status, age, and linked theme.
+- Harden the rule engine with more real project fixtures.
+- Add rule-finding export formats.
+- Add optional rule filters to avoid noisy all-in reports.
+- Add documentation examples for teams maintaining several project profiles.

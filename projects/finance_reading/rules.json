@@ -1,0 +1,42 @@
+{
+  "version": "1.5",
+  "name": "Synthetic finance reading project rules",
+  "rules": [
+    {
+      "rule_id": "finance.included.minimum_reading_status",
+      "name": "Included valuation papers should be at least partially read",
+      "description": "Synthetic finance profile policy for literature-review inclusion.",
+      "target": "registry",
+      "severity": "warning",
+      "enabled": true,
+      "condition": {
+        "type": "allowed_values",
+        "field": "reading_status",
+        "values": ["partially_read", "read", "deeply_read"],
+        "where_field": "included_in_lit_review",
+        "where_equals": "true"
+      },
+      "message": "Included paper {identifier} has reading status {value}; expected at least partially_read.",
+      "suggested_action": "Read the paper further or remove it from included_in_lit_review until it is supported by notes.",
+      "tags": ["synthetic", "reading-status"],
+      "project_scope": "finance_reading"
+    },
+    {
+      "rule_id": "finance.valuation.evidence_type",
+      "name": "Valuation claims should use method or mechanism evidence",
+      "description": "Synthetic profile rule showing domain-specific evidence-type expectations.",
+      "target": "claim",
+      "severity": "warning",
+      "enabled": true,
+      "condition": {
+        "type": "evidence_type_required",
+        "theme": "finance valuation",
+        "evidence_types": ["theory_or_mechanism", "method_description"]
+      },
+      "message": "Claim {identifier} uses evidence type {evidence_type}; expected one of {allowed}.",
+      "suggested_action": "Check whether the claim is really valuation evidence or retag it.",
+      "tags": ["synthetic", "finance-valuation"],
+      "project_scope": "finance_reading"
+    }
+  ]
+}

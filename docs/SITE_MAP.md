@@ -17,6 +17,8 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/CITATION_CONTEXT_TABLE.md`
 - `docs/CLAIM_TRACEABILITY.md`
 - `docs/MANUSCRIPT_LIMITATIONS.md`
+- `docs/RULE_ENGINE.md`
+- `docs/CUSTOM_RULES.md`
 - `docs/READING_SESSIONS.md`
 - `docs/READING_QUEUE.md`
 - `docs/FOLLOW_UP_ACTIONS.md`
@@ -40,6 +42,11 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/CITATION_CONTEXT_TABLE.md`
 - `docs/CLAIM_TRACEABILITY.md`
 - `docs/MANUSCRIPT_LIMITATIONS.md`
+- `docs/RULE_ENGINE.md`
+- `docs/CUSTOM_RULES.md`
+- `docs/BUILT_IN_RULES.md`
+- `docs/RULE_CONFIG_SCHEMA.md`
+- `docs/RULE_SAFETY.md`
 - `docs/READING_SESSIONS.md`
 - `docs/READING_QUEUE.md`
 - `docs/FOLLOW_UP_ACTIONS.md`

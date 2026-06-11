@@ -1,7 +1,7 @@
-# API Surface v1.4
+# API Surface v1.5
 
 Paper Intelligence Workbench is a local-first command-line project. The Python
-package is usable by tests and scripts, but v1.4 does not promise a broad
+package is usable by tests and scripts, but v1.5 does not promise a broad
 stable library API. The stable user interface is the `paperwb` CLI plus the
 documented local file formats.
 
@@ -9,9 +9,9 @@ The package does not use cloud APIs, LLM APIs, publisher scraping, or remote
 metadata lookup. API helpers operate on user-provided local CSV, JSON,
 Markdown, BibTeX, RIS, text sidecar, and project-profile files.
 
-## Stable For v1.4
+## Stable For v1.5
 
-The stable external API for v1.4 is the CLI plus documented file formats.
+The stable external API for v1.5 is the CLI plus documented file formats.
 For Python callers, only these small entry points are treated as stable enough
 for local automation:
 
@@ -28,6 +28,7 @@ for local automation:
 | `paper_workbench.reading` | `build_reading_queue`, `start_reading_session`, `finish_reading_session`, `collect_followups`, `build_weekly_review` | Local reading-session workflow helpers |
 | `paper_workbench.sync` | `build_registry_sync_plan`, `apply_registry_sync_plan`, `build_obsidian_roundtrip_plan` | Local sync planning, safe registry apply, and conflict detection |
 | `paper_workbench.manuscript` | `audit_manuscript`, `manuscript_qa_report`, `manuscript_context_table_report`, `build_claim_traceability` | Manuscript citation QA and traceability reports |
+| `paper_workbench.rules` | `load_rule_set`, `validate_rule_set`, `run_rule_set`, `rule_report` | Declarative local rule loading, validation, execution, and reporting |
 
 ## Stable Data Models
 
@@ -45,7 +46,7 @@ The dataclasses in `paper_workbench.schema` are stable enough for local scripts:
 - `ValidationFinding`
 - enum-like constants for reading status, claim strength, and evidence type
 
-Fields may grow in future releases, but v1.4 aims to preserve existing field
+Fields may grow in future releases, but v1.5 aims to preserve existing field
 names and meanings.
 
 ## Semi-Stable And Experimental Modules
@@ -75,6 +76,7 @@ the CLI when possible unless a script specifically needs Python objects:
   paragraph evidence matching, and draft-audit report helpers.
 - `paper_workbench.manuscript`: reviewer-style manuscript QA and traceability
   helpers built on the draft-audit core.
+- `paper_workbench.rules`: local declarative rule engine and built-in adapters.
 - `paper_workbench.errors`: user-facing diagnostic taxonomy helpers.
 - `paper_workbench.doctor`: workspace-health aggregation.
 
@@ -93,7 +95,7 @@ They can be imported by tests, but they are not a stable extension API.
 
 ## Compatibility Notes
 
-- v1.4 keeps the legacy `data/` workflow and the `projects/` workflow.
+- v1.5 keeps the legacy `data/` workflow and the `projects/` workflow.
 - CSV, JSON, Markdown notes, BibTeX, RIS, and theme JSON remain authoritative
   inputs.
 - SQLite indexes, audit logs, caches, backups, and generated reports are

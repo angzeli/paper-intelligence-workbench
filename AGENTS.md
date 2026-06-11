@@ -69,3 +69,7 @@ Instructions for future agents working in this repository:
 - Sync workflows should produce a dry-run plan before applying changes.
 - Forced sync applies should create a backup by default when practical.
 - Do not auto-merge note or Obsidian round-trip conflicts; preserve user notes and report conflicts for manual review.
+- Do not execute arbitrary user code from rule files.
+- Keep rule configs declarative JSON and local-only.
+- Add tests for every new rule type or rule adapter.
+- Preserve existing validation behavior when adding custom rules.

@@ -1,6 +1,6 @@
-# Command Contracts v1.4
+# Command Contracts v1.5
 
-This page defines the v1.4 behavior expected by tests and external
+This page defines the v1.5 behavior expected by tests and external
 users. The contract is intentionally practical: it describes command behavior,
 not internal implementation details.
 
@@ -38,6 +38,7 @@ not internal implementation details.
 | `writing-packet` | yes | synthetic theme packet | unknown theme | planning aid only |
 | `draft` | yes | parse/audit/checklist synthetic drafts | unknown citations or overwrite refusal | no draft rewrite; reports only |
 | `manuscript` | yes | parse/qa/context/trace synthetic manuscripts | unknown citations or overwrite refusal | no manuscript rewrite; reports only |
+| `rules` | yes | list/validate/run/report synthetic project rules | invalid config or overwrite refusal | no user data mutation; JSON rules only |
 | `reading` | yes | temp queue/start/finish/status/review | invalid status or missing session | existing notes preserved unless `--force-note` |
 | `followups` | yes | list/export/done temp actions | missing state path tolerated | source notes preserved; completion state stored separately |
 | `doctor` | yes | workspace-health report | missing inputs | read-only unless `--out` |
@@ -76,6 +77,7 @@ Representative contract tests live in:
 - `tests/test_reading_v1_2.py`
 - `tests/test_sync_v1_3.py`
 - `tests/test_manuscript_v1_4.py`
+- `tests/test_rules_v1_5.py`
 
 Release scripts used by the contract:
 

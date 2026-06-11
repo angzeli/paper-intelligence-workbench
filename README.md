@@ -30,6 +30,8 @@ v1.3 adds two-way sync planning and conflict detection for local import/export w
 
 v1.4 adds manuscript citation QA and review packet reports. It audits Markdown or LaTeX-ish drafts against local citations, notes, claims, evidence, and themes, then generates reviewer-style QA reports, citation context tables, claim traceability reports, and revision checklists without writing final prose.
 
+v1.5 adds a local declarative rule engine. Projects can define JSON rules for registry rows, notes, claims, themes, manuscript drafts, and workspace checks without changing core code or executing arbitrary plugins.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -56,6 +58,7 @@ v1.4 adds manuscript citation QA and review packet reports. It audits Markdown o
 - Manages local reading queues, session records, follow-up actions, and weekly reading-review reports.
 - Plans local sync and conflict-resolution workflows before writing registry changes.
 - Audits manuscript drafts and generates citation QA, context, traceability, and revision reports from local evidence only.
+- Runs project-specific JSON rules and built-in validation adapters through a local rule engine.
 
 ## What It Does Not Do
 
@@ -72,6 +75,7 @@ v1.4 adds manuscript citation QA and review packet reports. It audits Markdown o
 - It does not mark papers as read, create session outcomes, or add follow-up actions unless the user runs the relevant local command.
 - It does not sync with cloud services or overwrite non-empty user data during sync.
 - Manuscript QA remains audit-only: it flags local evidence gaps rather than rewriting the draft.
+- Custom rules are declarative JSON only; the tool does not execute arbitrary Python code from rule files.
 
 ## Installation
 
@@ -345,6 +349,23 @@ Manuscript QA uses transparent local citation, keyword, tag, and theme overlap.
 It flags possible problems for manual revision; it does not judge scientific
 truth, fabricate support, or write polished prose. See
 [docs/MANUSCRIPT_QA.md](docs/MANUSCRIPT_QA.md).
+
+## v1.5 Rule Engine Workflow
+
+Run project-specific rules without changing core code:
+
+```bash
+paperwb rules list --project zis_photocatalysis --builtins
+paperwb rules validate-config --project zis_photocatalysis --strict
+paperwb rules run --project zis_photocatalysis
+paperwb rules report --project zis_photocatalysis --out scratch/rule_report.md --force
+paperwb rules explain zis.theme.photocorrosion.min_papers --project zis_photocatalysis
+```
+
+Rules are local JSON data such as `projects/zis_photocatalysis/rules.json`.
+They can enforce project policies around theme coverage, evidence locations,
+reading status, and manuscript citation keys. They do not execute arbitrary code
+or rewrite user data. See [docs/RULE_ENGINE.md](docs/RULE_ENGINE.md).
 
 ## Data Folder Convention
 

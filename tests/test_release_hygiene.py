@@ -85,7 +85,7 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v1.4 Release Reports" in content
+    assert "## Current v1.5 Release Reports" in content
     assert "[manuscript_qa_v1_4.md]" in content
     assert "[citation_context_table_v1_4.md]" in content
     assert "[claim_traceability_v1_4.md]" in content

@@ -1,6 +1,6 @@
-# CLI Surface v1.4
+# CLI Surface v1.5
 
-The stable external interface for Paper Intelligence Workbench v1.4 is the
+The stable external interface for Paper Intelligence Workbench v1.5 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -24,6 +24,7 @@ release line unless a release note explicitly says otherwise.
 | `paperwb checklist` | stable | Generate a theme review checklist |
 | `paperwb draft parse/citations/audit/checklist/evidence-matrix` | stable | Audit Markdown drafts against local citations and tracked evidence without rewriting prose |
 | `paperwb manuscript parse/citations/qa/checklist/trace-claims/context-table/evidence-matrix` | stable | Run reviewer-style manuscript citation QA against local evidence without rewriting prose |
+| `paperwb rules list/validate-config/run/report/explain` | stable | Run declarative local validation rules without executing arbitrary code or changing user data |
 | `paperwb reading queue/start/finish/status/review` | stable | Manage local reading queues and session records without reading papers or fabricating notes |
 | `paperwb followups list/export/done` | stable | Collect follow-up actions from notes/sessions and track completion outside source notes |
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
@@ -46,7 +47,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.4.
+No commands are deprecated in v1.5.
 
 ## Write Safety Contract
 
@@ -58,6 +59,8 @@ No commands are deprecated in v1.4.
 - Sync apply is dry-run by default. Forced sync applies create a backup by
   default, refuse high-risk or stale plans, and do not overwrite non-empty
   registry fields or auto-merge notes.
+- Rule commands are read-only except for optional Markdown report outputs, and
+  rule files are declarative JSON only.
 - Restore and migration workflows default to planning or dry-run behavior unless
   `--force` is passed.
 - `paperwb reading start` preserves existing notes by default and requires

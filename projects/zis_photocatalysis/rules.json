@@ -1,0 +1,73 @@
+{
+  "version": "1.5",
+  "name": "Synthetic ZIS photocatalysis project rules",
+  "rules": [
+    {
+      "rule_id": "zis.theme.photocorrosion.min_papers",
+      "name": "Photocorrosion needs at least three supporting papers",
+      "description": "Synthetic project policy used to demonstrate theme coverage checks.",
+      "target": "theme",
+      "severity": "warning",
+      "enabled": true,
+      "condition": {
+        "type": "theme_min_papers",
+        "theme": "photocorrosion",
+        "min_papers": 3
+      },
+      "message": "Theme {identifier} has {count} supporting paper(s); project target is {minimum}.",
+      "suggested_action": "Add more user-verified notes and claims before treating this theme as review-ready.",
+      "tags": ["synthetic", "theme-coverage"],
+      "project_scope": "zis_photocatalysis"
+    },
+    {
+      "rule_id": "zis.theme.photocorrosion.strong_claims",
+      "name": "Photocorrosion needs at least one strong claim",
+      "description": "Flags a theme that is tracked only by weak or speculative claims.",
+      "target": "theme",
+      "severity": "warning",
+      "enabled": true,
+      "condition": {
+        "type": "theme_min_strong_claims",
+        "theme": "photocorrosion",
+        "min_strong_claims": 1
+      },
+      "message": "Theme {identifier} has {count} strong claim(s); project target is {minimum}.",
+      "suggested_action": "Re-read the supporting papers or add stronger primary evidence before using confident manuscript wording.",
+      "tags": ["synthetic", "evidence-strength"],
+      "project_scope": "zis_photocatalysis"
+    },
+    {
+      "rule_id": "zis.claim.strong_claims_need_location",
+      "name": "Strong claims need a section or page location",
+      "description": "Strong claim blocks should include a concrete evidence location.",
+      "target": "claim",
+      "severity": "error",
+      "enabled": true,
+      "condition": {
+        "type": "required_field",
+        "field": "section",
+        "where_field": "strength",
+        "where_equals": "strong"
+      },
+      "message": "Strong claim {identifier} is missing a section/page evidence location.",
+      "suggested_action": "Add section, page, figure, table, or appendix location in the structured note.",
+      "tags": ["synthetic", "evidence-location"],
+      "project_scope": "zis_photocatalysis"
+    },
+    {
+      "rule_id": "zis.manuscript.no_unknown_citations",
+      "name": "Manuscripts should not contain unknown citation keys",
+      "description": "Runs only when a manuscript draft is passed to the rules command.",
+      "target": "manuscript",
+      "severity": "error",
+      "enabled": true,
+      "condition": {
+        "type": "manuscript_no_unknown_citations"
+      },
+      "message": "Manuscript citation {citation_key} is not known to the local registry or BibTeX data.",
+      "suggested_action": "Correct the citation key or add a verified registry/BibTeX entry.",
+      "tags": ["synthetic", "manuscript"],
+      "project_scope": "zis_photocatalysis"
+    }
+  ]
+}

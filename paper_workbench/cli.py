@@ -145,6 +145,18 @@ from .reporting import (
     workspace_health_report,
     write_report,
 )
+from .rules import (
+    BUILT_IN_RULE_DESCRIPTIONS,
+    RuleContext,
+    empty_rule_set,
+    explain_rule,
+    load_rule_set,
+    maybe_audit_manuscript,
+    rule_config_audit_report,
+    rule_report,
+    run_rule_set,
+    validate_rule_set,
+)
 from .search import results_markdown, search_claims, search_note_files, search_papers
 from .synthetic import generate_synthetic_project
 from .sync import (
@@ -850,6 +862,116 @@ def cmd_report(args: argparse.Namespace) -> int:
                 json_path = write_evidence_matrix_json(matrix, args.json_out, force=args.force)
                 print(f"Wrote {json_path}")
                 _record_audit_event(paths, command="report", action="write_evidence_matrix_json", affected_paths=[json_path], summary="Wrote evidence matrix JSON")
+    return 0
+
+
+def _rules_file_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path | None:
+    if getattr(args, "rules_file", ""):
+        return Path(args.rules_file)
+    candidate = Path(paths["root"]) / "rules.json"
+    return candidate if candidate.exists() else None
+
+
+def _load_rule_set_from_args(args: argparse.Namespace, paths: dict[str, Path | None], *, require: bool = False):
+    rules_file = _rules_file_from_args(args, paths)
+    if rules_file is None:
+        if require:
+            raise FileNotFoundError("no rules file found; pass --rules-file or add rules.json to the selected project root")
+        return empty_rule_set()
+    return load_rule_set(rules_file)
+
+
+def _rule_context_from_args(args: argparse.Namespace) -> RuleContext:
+    papers, notes, claims, entries, themes, paths = _report_inputs(args)
+    context = RuleContext(
+        project=_project_id_from_paths(paths),
+        root=str(paths["root"]),
+        registry_path=str(paths["registry"]),
+        bibtex_path=str(paths["bibtex"]),
+        notes_dir=str(paths["notes_dir"]),
+        themes_path=str(paths["themes"]),
+        reports_dir=str(paths["reports_dir"]),
+        profile=paths["profile"],
+        papers=papers,
+        bibtex_entries=entries,
+        notes=notes,
+        claims=claims,
+        themes=themes,
+    )
+    file_registry_path = default_file_registry_path(paths["root"], project=paths["profile"] is not None)
+    if file_registry_path.exists():
+        context.files = load_file_registry(file_registry_path)
+    manuscript = getattr(args, "manuscript", "")
+    context.manuscript_audit = maybe_audit_manuscript(manuscript, context) if manuscript else None
+    return context
+
+
+def cmd_rules_list(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    paths = _paths_from_args(args)
+    rule_set = _load_rule_set_from_args(args, paths)
+    if rule_set.path:
+        print(f"Rule file: {display_path(rule_set.path, base_path=paths['root'])}")
+    else:
+        print("Rule file: [none]")
+    print("Configured rules:")
+    if rule_set.rules:
+        for rule in rule_set.rules:
+            status = "enabled" if rule.enabled else "disabled"
+            print(f"{rule.rule_id}\t{rule.target}\t{rule.rule_type}\t{rule.severity}\t{status}\t{rule.name}")
+    else:
+        print("  [none]")
+    if args.builtins:
+        print("Built-in adapters:")
+        for rule_id in sorted(BUILT_IN_RULE_DESCRIPTIONS):
+            print(f"{rule_id}\t{BUILT_IN_RULE_DESCRIPTIONS[rule_id]}")
+    return 0
+
+
+def cmd_rules_validate_config(args: argparse.Namespace) -> int:
+    paths = _paths_from_args(args)
+    rule_set = _load_rule_set_from_args(args, paths, require=True)
+    findings = validate_rule_set(rule_set)
+    for finding in findings:
+        print(f"{finding.severity}\t{finding.rule_id}\t{finding.identifier}\t{finding.message}")
+    if not findings:
+        print(f"Rule config is valid: {display_path(rule_set.path, base_path=paths['root'])}")
+    if args.out:
+        path = write_text(args.out, rule_config_audit_report(rule_set, findings), force=args.force)
+        print(f"Wrote {path}")
+    return 1 if args.strict and any(finding.severity == "error" for finding in findings) else 0
+
+
+def cmd_rules_run(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    context = _rule_context_from_args(args)
+    paths = _paths_from_args(args)
+    rule_set = _load_rule_set_from_args(args, paths)
+    result = run_rule_set(rule_set, context, include_builtins=not args.no_builtins)
+    for finding in result.findings:
+        print(f"{finding.severity}\t{finding.rule_id}\t{finding.target}\t{finding.identifier}\t{finding.message}")
+    if not result.findings:
+        print("No rule findings.")
+    return 1 if args.strict and result.errors else 0
+
+
+def cmd_rules_report(args: argparse.Namespace) -> int:
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    context = _rule_context_from_args(args)
+    paths = _paths_from_args(args)
+    rule_set = _load_rule_set_from_args(args, paths)
+    result = run_rule_set(rule_set, context, include_builtins=not args.no_builtins)
+    output = args.out or (Path(paths["reports_dir"]) / "rule_report.md")
+    path = write_text(output, rule_report(result), force=args.force)
+    _record_audit_event(paths, command="rules report", action="write_rule_report", affected_paths=[path], summary=f"Wrote rule report with {len(result.findings)} findings")
+    print(f"Wrote {path}")
+    return 1 if args.strict and result.errors else 0
+
+
+def cmd_rules_explain(args: argparse.Namespace) -> int:
+    paths = _paths_from_args(args)
+    rule_set = _load_rule_set_from_args(args, paths)
+    print(explain_rule(args.rule_id, rule_set), end="")
     return 0
 
 
@@ -2204,6 +2326,53 @@ def build_parser() -> argparse.ArgumentParser:
     report_parser.add_argument("--json-out", default="", help="Optional JSON export path for evidence-matrix reports.")
     report_parser.add_argument("--force", action="store_true", help="Overwrite an existing report file.")
     report_parser.set_defaults(func=cmd_report)
+
+    rules_parser = subparsers.add_parser("rules", help="Run local declarative validation rules.")
+    rules_sub = rules_parser.add_subparsers(dest="rules_command", required=True)
+
+    def add_rules_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--rules-file", default="", help="Rules JSON path. Defaults to rules.json in the selected project root when present.")
+
+    rules_list = rules_sub.add_parser("list", help="List configured rules and optional built-in adapters.")
+    add_rules_common(rules_list)
+    rules_list.add_argument("--builtins", action="store_true", help="Also list built-in validation adapter IDs.")
+    rules_list.set_defaults(func=cmd_rules_list)
+
+    rules_validate = rules_sub.add_parser("validate-config", help="Validate a declarative rules JSON file without running checks.")
+    rules_validate.add_argument("rules_file", nargs="?", default="", help="Rules JSON path. Defaults to project rules.json when --project is used.")
+    rules_validate.add_argument("--project", default="", help="Use a project profile to find rules.json.")
+    rules_validate.add_argument("--out", default="", help="Optional Markdown config-audit report path.")
+    rules_validate.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    rules_validate.add_argument("--strict", action="store_true", help="Return non-zero when config errors are found.")
+    rules_validate.set_defaults(func=cmd_rules_validate_config)
+
+    rules_run = rules_sub.add_parser("run", help="Run built-in adapters and configured rules without writing reports.")
+    add_rules_common(rules_run)
+    rules_run.add_argument("--manuscript", default="", help="Optional manuscript draft path for manuscript-specific rules.")
+    rules_run.add_argument("--no-builtins", action="store_true", help="Run only configured rules.")
+    rules_run.add_argument("--strict", action="store_true", help="Return non-zero when error-level findings are found.")
+    rules_run.set_defaults(func=cmd_rules_run)
+
+    rules_report_parser = rules_sub.add_parser("report", help="Generate a Markdown rule report.")
+    add_rules_common(rules_report_parser)
+    rules_report_parser.add_argument("--manuscript", default="", help="Optional manuscript draft path for manuscript-specific rules.")
+    rules_report_parser.add_argument("--no-builtins", action="store_true", help="Report only configured rules.")
+    rules_report_parser.add_argument("--out", default="", help="Output Markdown path. Defaults to reports/rule_report.md.")
+    rules_report_parser.add_argument("--force", action="store_true", help="Overwrite an existing rule report.")
+    rules_report_parser.add_argument("--strict", action="store_true", help="Return non-zero when error-level findings are found.")
+    rules_report_parser.set_defaults(func=cmd_rules_report)
+
+    rules_explain = rules_sub.add_parser("explain", help="Explain a configured rule or built-in adapter ID.")
+    rules_explain.add_argument("rule_id", help="Rule ID to explain.")
+    rules_explain.add_argument("--project", default="", help="Use a project profile to load configured rules.")
+    rules_explain.add_argument("--rules-file", default="", help="Rules JSON path.")
+    rules_explain.set_defaults(func=cmd_rules_explain)
 
     writing_packet_parser = subparsers.add_parser("writing-packet", help="Generate a theme-specific literature-review writing packet from tracked evidence.")
     writing_packet_parser.add_argument("--theme", required=True, help="Theme name or ID.")

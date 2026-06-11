@@ -11,6 +11,7 @@
 | Index | `paperwb index rebuild --project zis_photocatalysis --include-text` | Writes ignored cache | Rebuildable cache | Yes | Index tests |
 | Files | `paperwb files scan --project zis_photocatalysis` | Read-only | `--write-registry` writes merged CSV | Yes | Local-file tests |
 | Reports | `paperwb report evidence-map --project zis_photocatalysis --force` | Refuses existing reports | `--force` overwrites reports | Yes | Report tests |
+| Rules | `paperwb rules report --project zis_photocatalysis` | Read-only except optional report output | `--force` overwrites rule report | Yes | Rule tests |
 | Import | `paperwb import zotero-csv ... --dry-run` | Dry-run available | Writes only when not dry-run | Yes | Import/export tests |
 | Export | `paperwb export claims-json --out scratch/claims.json` | Explicit output path | `--force` for files | Yes | Import/export tests |
 | Synthetic | `paperwb synthetic generate --project stress_demo` | Refuses existing project | `--force` for regeneration | Creates profile | Stress tests |
