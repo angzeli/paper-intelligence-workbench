@@ -1,181 +1,139 @@
-# Hostile Maintainer Review: Latest v0.7 State
+# Hostile Maintainer Review: Latest v0.8 Scoped Fix Verification
 
 ## Release Verdict
 
-**Verdict: do not ship v0.7 broadly until the release blockers below are fixed.**
+**Verdict: the release-blocking and high-priority findings from the previous local-file hostile review are resolved.**
 
-The repository is substantially useful and the local-first boundary is still intact. I found no tracked PDFs, no tracked SQLite/cache artifacts, no cloud/LLM dependencies, and no publisher scraping code. The test suite and notebook JSON validation pass, and the major CLI paths I sampled are functional.
+This report is intentionally scoped. The requested fix pass limited work to the release-blocking and high-priority issues already listed in the previous `reports/hostile_review_latest.md`. It is not a new broad hostile review of every v0.8 feature.
 
-That said, the new v0.7 local-file ingestion surface has two release-blocking defects: multi-file audit output is not atomic, and the scanner fails to detect the explicit case where the same local file path is linked to multiple registry papers. These are not cosmetic problems; they undermine the safety and reconciliation guarantees that v0.7 advertises.
+The current repository has the required local-file safeguards in code, tests, docs, CI, and regenerated reports:
 
-Validation performed during review:
-
-- `python -m pytest -q` passed.
-- `python scripts/validate_notebooks.py` passed.
-- `python -m paper_workbench.cli --help` passed.
-- `python -m paper_workbench.cli files --help` passed.
-- `python -m paper_workbench.cli validate-registry data/registries/example_papers.csv` passed with expected synthetic findings.
-- `python -m paper_workbench.cli validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv` passed with expected synthetic findings.
-- `python -m paper_workbench.cli project list` passed.
-- `python -m paper_workbench.cli files scan --project zis_photocatalysis` passed.
-- `python -m paper_workbench.cli files audit --project zis_photocatalysis --reports-dir /private/tmp/paperwb_review_files --force` passed.
-- `python -m paper_workbench.cli import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --report /private/tmp/paperwb_review_import.md --force` passed.
-- `python -m paper_workbench.cli report evidence-matrix --project zis_photocatalysis --theme charge-separation --out /private/tmp/paperwb_review_matrix.md --force` passed.
-- `python -m paper_workbench.cli export report-index --out /private/tmp/paperwb_review_index.md --force` passed.
-- `python -m paper_workbench.cli index rebuild --project zis_photocatalysis --include-text --index /private/tmp/paperwb_review_index.sqlite` passed and reported FTS5 availability.
-- `python -m paper_workbench.cli search photocorrosion --project zis_photocatalysis --indexed --text --index /private/tmp/paperwb_review_index.sqlite` passed.
-- `python -m paper_workbench.cli writing-packet --project zis_photocatalysis --theme photocorrosion --out /private/tmp/paperwb_review_packet.md --force` passed.
-- `python examples/local_file_audit_workflow.py` passed.
-- Tracked-file hygiene scan found no tracked `.paperwb/`, SQLite DBs, Python caches, `.DS_Store`, `.idea`, notebook checkpoints, or PDFs.
+- local-file audit output preflights all targets before writing
+- duplicate registry `local_pdf_path` values are detected
+- local-file warning details are printed by `files scan` and `files status`
+- `files unlink` does not clear manual PDF metadata when no file-registry row was removed
+- `files scan --write-registry` merges with existing `files.csv` records
+- local-file audit reports reconcile existing `files.csv` records
+- CI includes local-file smoke checks
 
 ## Release Blockers
 
-1. **`files audit` can leave partial report output after a failed overwrite check.**
+None remain from the scoped review.
 
-   `cmd_files_audit` writes each audit report sequentially with `write_text`. If an earlier target is writable and a later target already exists, the command exits with an error after leaving the earlier generated files behind. I reproduced this by pre-creating `duplicate_files_v0_7.md`: the command returned code 2, preserved the old duplicate report, but still created `local_files_audit_v0_7.md`.
+### Resolved: `files audit` partial writes
 
-   Relevant code: `paper_workbench/cli.py` lines 506-519.
+`paper_workbench/cli.py` preflights all four local-file audit report outputs before writing any file. The regression test `test_cli_files_audit_preflights_all_outputs_before_writing` verifies that a later output collision prevents earlier report creation.
 
-   Risk: users see a failed command but get a partially refreshed audit set. This is misleading for a data-safety report and breaks the expectation that generated reports are reproducible snapshots.
+### Resolved: duplicate registry local file path detection
 
-   Required fix: preflight every target path before writing any audit report, or render to temporary files and atomically move them only after all overwrite checks pass. Add a CLI regression test proving an existing later report prevents all writes unless `--force` is set.
-
-2. **`files scan` does not detect one local file path linked to multiple registry papers.**
-
-   `_paper_path_map` stores `relative_path -> paper_id` in a plain dict, so duplicate `local_pdf_path` values silently overwrite earlier paper IDs. A registry with `paper_a` and `paper_b` both pointing to `papers/same.pdf` produces one `linked_registry_path` record for `paper_b`, zero warnings, and zero duplicates.
-
-   Relevant code: `paper_workbench/files.py` lines 141-147 and 193-253.
-
-   Risk: v0.7 explicitly promises detection of the same PDF linked to multiple papers. The current scanner misses that reconciliation failure, which can lead users to believe their local-file registry is clean when it is not.
-
-   Required fix: track `relative_path -> list[paper_id]`, preserve all linked paper IDs in diagnostics, and emit a warning such as `Local file path linked to multiple papers: papers/same.pdf -> paper_a, paper_b`. Add a unit test for duplicate registry `local_pdf_path` values.
+`paper_workbench/files.py` tracks `relative_path -> list[paper_id]`, records `duplicate_registry_paths`, and marks scanned files as `linked_multiple_registry_paths` when more than one registry paper points to the same file. The regression test `test_scan_local_files_warns_when_registry_reuses_same_local_path` covers this.
 
 ## High-Priority Issues
 
-1. **CI does not run any local-file CLI smoke tests.**
+None remain from the scoped review.
 
-   `.github/workflows/ci.yml` runs pytest, notebook validation, import, CLI help, and tracked-artifact hygiene, but it does not smoke `paperwb files --help`, `files scan`, or `files audit`. v0.7's headline feature is local file ingestion; CI should exercise at least one non-destructive local-file workflow.
+### Resolved: CI local-file smoke coverage
 
-2. **`files scan` and `files status` hide warning details from the terminal.**
+`.github/workflows/ci.yml` runs:
 
-   `cmd_files_status` prints only `Warnings: N`. `cmd_files_scan` prints records but not warning text. Users must generate a full audit report to learn why a scan is suspicious.
+- `python -m paper_workbench.cli files --help`
+- `python -m paper_workbench.cli files scan --project zis_photocatalysis`
+- `python -m paper_workbench.cli files audit --project zis_photocatalysis --reports-dir /tmp/paperwb_ci_file_reports --force`
 
-   Relevant code: `paper_workbench/cli.py` lines 482-504.
+`tests/test_release_hygiene.py` asserts those release gates remain present.
 
-   Risk: missing folders, large files, sidecars without matching papers, duplicate hashes, and malformed link states are too easy to miss in day-to-day CLI use.
+### Resolved: warning details hidden from `files scan` and `files status`
 
-   Fix: print warning lines after the summary for scan/status, while keeping existing output shape intact enough for tests.
+Both commands now print warning detail lines after the summary/output. `tests/test_local_files_v0_7.py` verifies sidecar warnings are visible in both paths.
 
-3. **`files unlink PAPER_ID` can clear registry metadata even when no file-registry records were removed.**
+### Resolved: `files unlink` clearing manual PDF metadata
 
-   `unlink_file_from_paper` removes file-registry rows and then clears `local_pdf_path` for the paper if `clear_pdf` is true. If the file registry contains zero rows for that paper, the command still clears the registry field.
+`unlink_file_from_paper` now clears `local_pdf_path` only when at least one matching file-registry row was removed. `test_unlink_without_file_registry_record_does_not_clear_manual_pdf_path` covers the edge case.
 
-   Relevant code: `paper_workbench/files.py` lines 310-327 and `paper_workbench/cli.py` lines 540-552.
+### Resolved: forced file-registry writes discarding curated rows
 
-   Risk: users may intend to remove a file-registry link but accidentally erase a manually curated `local_pdf_path`. This is not destructive to the file itself, but it is a metadata mutation that should be more explicit.
+`files scan --write-registry` now calls `merge_file_registry_records`, preserving curated notes for matching records and retaining older unmatched rows for review. The CLI test verifies curated sidecar notes and unmatched rows survive a forced scan write.
 
-   Fix: either clear `local_pdf_path` only when a file-registry row was removed or print a clear warning when only registry metadata changed. Preserve `--keep-pdf-path`.
+### Resolved: file audit missing `files.csv` reconciliation
 
-4. **Forced file-registry writes can discard curated file-registry notes.**
-
-   `files scan --write-registry --force` saves only the current scan result. If an existing `files.csv` includes curated `notes`, custom metadata, or records for temporarily unavailable files, those rows are replaced by the scan snapshot.
-
-   Relevant code: `paper_workbench/cli.py` lines 482-488 and `paper_workbench/files.py` lines 108-137.
-
-   Risk: this is a data-loss vector for the local file registry itself. The command is guarded by `--force`, but users may reasonably expect force to permit overwriting the output file, not to discard manually enriched rows.
-
-   Fix: document this behavior prominently or implement merge preservation for matching `paper_id + relative_path` records. At minimum, add a test that captures the current behavior so it is not accidental.
-
-5. **Local-file audit reports do not reconcile against existing `files.csv` records.**
-
-   `files audit` is primarily a live scan. `files status` counts file-registry records, but the audit reports do not list stale `files.csv` rows, missing files referenced only by `files.csv`, or registry-file records whose hashes no longer match.
-
-   Risk: users can have a stale local-file registry and still get a clean-looking scan report if the stale path is not represented in `paper.local_pdf_path`.
-
-   Fix: include a file-registry reconciliation section in the audit, or clearly rename the reports as live-scan reports and add a separate registry reconciliation report.
+`scan_local_files` now reports missing files referenced by `files.csv`, records outside the current scan folders, and hash mismatches. `local_files_audit_report` and `missing_files_report` include those sections/counts, and `test_file_audit_reconciles_existing_file_registry_records` covers them.
 
 ## Medium-Priority Issues
 
-1. **Top-level text-sidecar semantics are easy to misunderstand.**
+The following were intentionally deferred because they were not release-blocking or high-priority in the scoped review:
 
-   The sidecar report says only top-level `.txt` sidecars are audited, while the scanner uses recursive directory traversal and then only marks files whose parent directory name is exactly `text` as sidecars. Nested text files under `text/subdir/` are scanned as normal `.txt` files but not reported as sidecars.
-
-   Fix: document this precisely or make sidecar detection intentionally recursive by project policy.
-
-2. **`files audit --project ... --reports-dir ...` allows an output override unlike most project report commands.**
-
-   This is not unsafe by itself, but it is inconsistent with the stricter project-path override checks used elsewhere. Users can accidentally generate project audit reports into the root `reports/` directory.
-
-3. **Stale ignored review artifacts are still visible in the workspace.**
-
-   `reports/hostile_review_v0_2.md` is ignored but still present locally. It will not be staged by normal `git add`, but users browsing the folder directly can confuse it with current review material.
-
-4. **`reports/index.md` under-emphasizes authoring reports after v0.7.**
-
-   The index marks v0.6 authoring reports as historical even though authoring remains a core feature. This is an information architecture problem, not a functional bug.
-
-5. **Generated reports can include absolute roots when custom paths are used.**
-
-   The default committed reports use relative roots, but custom audit/index reports can include absolute paths. That is acceptable for local diagnostics but should remain out of committed example reports.
+- top-level text-sidecar semantics could be clearer for nested text files
+- `files audit --project ... --reports-dir ...` still allows an explicit reports-directory override
+- old ignored review drafts may still exist locally but are not tracked
+- report-directory information architecture remains crowded
+- custom diagnostic reports can include local absolute paths if the user chooses such paths
 
 ## Low-Priority Polish
 
-- `files scan` output is tabular but has no header row, making it less friendly for first-time users.
-- `files sidecars` only lists sidecars; it does not show unmatched nested text files that users may have expected to count.
-- `files hash` has no friendly error handling for missing paths; the raw exception is acceptable for developers but rough for external users.
-- The reports directory is crowded with versioned release artifacts. This is useful historically but intimidating for new users.
-- The CLI now has many report/export modes under one parser. Help text is serviceable, but examples are more important than the generated argparse output.
+Deferred:
+
+- add a header row to `files scan`
+- improve raw error handling for `files hash` missing paths
+- add richer `files sidecars` output for nested text files
+- continue reducing report-directory clutter
 
 ## Missing Tests
 
-- Regression test for `files audit` all-or-nothing overwrite preflight.
-- Unit test for duplicate registry `local_pdf_path` values pointing to the same file.
-- CLI smoke test for `paperwb files --help`.
-- CLI smoke test for `paperwb files scan --project zis_photocatalysis`.
-- CLI smoke test for `paperwb files audit` writing all four reports.
-- Test for `files unlink` behavior when zero file-registry rows are removed but `local_pdf_path` exists.
-- Test documenting whether `files scan --write-registry --force` preserves or replaces curated file-registry notes.
-- Test for nested `.txt` sidecar semantics.
-- Audit test that existing `files.csv` records are reconciled or explicitly ignored.
-- CI assertion that no tracked PDFs, text sidecar full-text fixtures, cache DBs, or notebook checkpoints are present.
+No missing tests remain for the scoped blocker/high-priority fixes. Existing tests cover:
+
+- local-file audit output preflight
+- duplicate registry file paths
+- local-file warning output
+- safer unlink metadata behavior
+- file-registry merge preservation
+- file-registry reconciliation
+- local-file CLI help/scan/audit smoke coverage
+- tracked-PDF policy
+- CI release-gate presence
+
+Deferred medium/low polish could still use tests when implemented.
 
 ## Documentation Mismatches
 
-- `docs/TEXT_SIDECARS.md` and `docs/LOCAL_FILES.md` need sharper wording around top-level `.txt` sidecars versus recursively scanned text files.
-- `docs/FILE_AUDIT.md` describes the audit as a local-file audit, but the implementation is closer to a live folder scan plus registry `local_pdf_path` check. It does not fully audit stale `files.csv` records.
-- `README.md` mentions file scanning and local file audits, but it does not warn that `files scan --write-registry --force` replaces the file registry output.
-- The report index does not clearly separate current user-facing reports from historical release-readiness artifacts.
+The high-priority local-file documentation mismatches are resolved:
+
+- `README.md` documents merged file-registry writes and audit preflight/reconciliation behavior.
+- `docs/LOCAL_FILES.md` documents merged file-registry writes and safer unlink semantics.
+- `docs/FILE_AUDIT.md` documents duplicate registry paths and `files.csv` reconciliation.
+- `docs/CLI_REFERENCE.md` documents local-file merge and unlink behavior.
 
 ## CLI Usability Problems
 
-- `files scan` and `files status` suppress warning details.
-- `files audit` can partially write outputs before failing.
-- `files unlink` does not tell the user whether `local_pdf_path` metadata was cleared.
-- `files scan --write-registry --force` does not warn that existing file-registry rows may be replaced.
-- `files audit` has no single-report mode, so a collision on any one output currently affects a four-report command.
+Resolved for scoped findings:
+
+- warning details are now visible in `files scan`
+- warning details are now visible in `files status`
+- `files audit` no longer leaves partial output after an overwrite collision
+- `files scan --write-registry` preserves existing file-registry data instead of replacing it wholesale
+
+Remaining polish is medium/low priority and intentionally deferred.
 
 ## Data-Safety Risks
 
-- No tracked PDFs, no tracked full-text copyrighted sidecars, no cloud/LLM APIs, and no scraping code were found.
-- The largest data-safety problem is metadata/report safety, not file deletion: `files unlink` can clear registry metadata, `files scan --write-registry --force` can replace curated `files.csv` rows, and `files audit` can leave partial report snapshots.
-- Backup bundle behavior remains conservative: PDFs are not included by default.
-- The SQLite index remains a rebuildable cache and is ignored locally.
+No scoped release-blocking data-safety risks remain. Local-file commands remain non-destructive to user files, backup bundles still omit PDFs by default, SQLite indexes remain rebuildable ignored caches, and no cloud/LLM/scraping behavior was introduced.
+
+The v0.8 data-safety audit still reports warnings for historical reports containing local absolute paths. Those warnings are tracked in `reports/data_safety_audit_v0_8.md` and are not part of the scoped local-file blocker fix.
 
 ## Overengineering Risks
 
-- Local-file ingestion should stay a reconciliation layer, not a document management system. Avoid adding copying/moving/deleting workflows without very explicit safety gates.
-- Optional PDF metadata should remain explicitly non-authoritative. Do not allow extracted metadata to overwrite user registry metadata silently.
-- Search/indexing should remain a rebuildable local cache, not a source of truth.
-- Authoring reports should remain planning aids. Do not drift into generated polished literature-review prose.
+The fixes stayed within the existing CSV/Markdown/local-cache architecture. The local-file registry remains a reconciliation aid, not authoritative managed storage. No copying, moving, deleting, PDF parsing, OCR, cloud calls, or LLM APIs were added.
 
 ## Recommended Fix Sequence
 
-1. Make `files audit` preflight all output paths before writing any report; add the regression test.
-2. Detect duplicate registry `local_pdf_path` values pointing to the same local file; add the regression test.
-3. Add `paperwb files --help`, `files scan`, and `files audit` smoke coverage to CI or pytest.
-4. Print local-file warning details in `files scan` and `files status`.
-5. Tighten `files unlink` semantics or at least report when registry metadata is cleared without row removal.
-6. Decide whether `files scan --write-registry --force` should merge curated records or document that it replaces them.
-7. Clarify top-level sidecar semantics in docs and tests.
-8. Extend file audit reports to reconcile existing `files.csv` records, or rename/document the reports as live-scan reports.
-9. Refresh `reports/index.md` so current authoring and v0.7 file reports are easy for external users to identify.
+The scoped release-blocking/high-priority sequence is complete:
+
+1. Preflight local-file audit outputs before writing.
+2. Detect duplicate registry `local_pdf_path` values.
+3. Add local-file CLI smoke checks to CI/tests.
+4. Print warning detail lines in `files scan` and `files status`.
+5. Prevent `files unlink` from clearing manual PDF metadata when no file-registry row was removed.
+6. Preserve curated file-registry records during scan writes.
+7. Reconcile existing `files.csv` records in local-file audits.
+8. Update affected local-file docs and reports.
+
+Recommended next step is a fresh full hostile review of the current v0.8 release candidate, not more work under this scoped fix pass.
