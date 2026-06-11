@@ -38,6 +38,15 @@ from .backups import (
 from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_claims, collect_notes, save_claims_csv
 from .doctor import workspace_health
+from .drafts import (
+    audit_draft,
+    citation_coverage_report as draft_citation_coverage_report,
+    draft_audit_markdown,
+    paragraph_evidence_matrix_report as draft_paragraph_evidence_matrix_report,
+    parse_markdown_draft,
+    parse_report as draft_parse_report,
+    revision_checklist_report,
+)
 from .exports import (
     export_bundle,
     export_claims_csv,
@@ -792,6 +801,75 @@ def cmd_checklist(args: argparse.Namespace) -> int:
             for claim in [claim for claim in mapped_claims if claim.paper_id == paper.paper_id]:
                 evidence = claim.section or claim.page or "missing evidence location"
                 print(f"  - [ ] {claim.strength}: {claim.claim_text} [{evidence}]")
+    return 0
+
+
+def _draft_inputs(args: argparse.Namespace):
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    paths = _paths_from_args(args)
+    document = parse_markdown_draft(args.draft)
+    papers = _load_registry(paths["registry"])
+    notes = collect_notes(paths["notes_dir"]) if Path(paths["notes_dir"]).exists() else []
+    claims = [claim for note in notes for claim in note.claims]
+    entries = parse_bibtex_file(paths["bibtex"]) if Path(paths["bibtex"]).exists() else []
+    themes = load_themes(paths["themes"]) if Path(paths["themes"]).exists() else []
+    report = audit_draft(document, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
+    return document, report, paths
+
+
+def cmd_draft_parse(args: argparse.Namespace) -> int:
+    document = parse_markdown_draft(args.draft)
+    content = draft_parse_report(document)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_draft_citations(args: argparse.Namespace) -> int:
+    _document, report, paths = _draft_inputs(args)
+    content = draft_citation_coverage_report(report)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="draft citations", action="write_draft_citation_coverage", affected_paths=[path], summary=f"Audited citations in {args.draft}")
+        print(f"Wrote {path}")
+        return 0
+    for status in report.citation_coverage:
+        print(f"{status.key}\tbibtex={str(status.in_bibtex).lower()}\tregistry={str(status.in_registry).lower()}\tpaper={status.paper_id or '[missing]'}\tclaims={status.claim_count}")
+    if not report.citation_coverage:
+        print("No citation keys found.")
+    return 0
+
+
+def cmd_draft_audit(args: argparse.Namespace) -> int:
+    _document, report, paths = _draft_inputs(args)
+    content = draft_audit_markdown(report)
+    output = args.out or (Path(paths["reports_dir"]) / "draft_audit.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="draft audit", action="write_draft_audit", affected_paths=[path], warnings=[finding.message for finding in report.findings], summary=f"Audited draft {args.draft}")
+    print(f"Wrote {path}")
+    return 0
+
+
+def cmd_draft_checklist(args: argparse.Namespace) -> int:
+    _document, report, paths = _draft_inputs(args)
+    content = revision_checklist_report(report)
+    output = args.out or (Path(paths["reports_dir"]) / "draft_revision_checklist.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="draft checklist", action="write_draft_revision_checklist", affected_paths=[path], warnings=[finding.message for finding in report.findings], summary=f"Wrote draft checklist for {args.draft}")
+    print(f"Wrote {path}")
+    return 0
+
+
+def cmd_draft_evidence_matrix(args: argparse.Namespace) -> int:
+    _document, report, paths = _draft_inputs(args)
+    content = draft_paragraph_evidence_matrix_report(report)
+    output = args.out or (Path(paths["reports_dir"]) / "draft_paragraph_evidence_matrix.md")
+    path = write_text(output, content, force=args.force)
+    _record_audit_event(paths, command="draft evidence-matrix", action="write_draft_evidence_matrix", affected_paths=[path], warnings=[finding.message for finding in report.findings], summary=f"Wrote draft evidence matrix for {args.draft}")
+    print(f"Wrote {path}")
     return 0
 
 
@@ -1576,6 +1654,42 @@ def build_parser() -> argparse.ArgumentParser:
     checklist_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
     checklist_parser.set_defaults(func=cmd_checklist)
 
+    draft_parser = subparsers.add_parser("draft", help="Audit Markdown drafts against local citations, notes, and claims.")
+    draft_sub = draft_parser.add_subparsers(dest="draft_command", required=True)
+
+    def add_draft_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("draft", help="Markdown draft path.")
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--out", default="", help="Optional Markdown output path.")
+        command_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+
+    draft_parse = draft_sub.add_parser("parse", help="Parse a Markdown draft into sections, paragraphs, and citation keys.")
+    draft_parse.add_argument("draft", help="Markdown draft path.")
+    draft_parse.add_argument("--out", default="", help="Optional Markdown parse report path.")
+    draft_parse.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    draft_parse.set_defaults(func=cmd_draft_parse)
+
+    draft_citations = draft_sub.add_parser("citations", help="Report citation-key coverage against local BibTeX and registry data.")
+    add_draft_common(draft_citations)
+    draft_citations.set_defaults(func=cmd_draft_citations)
+
+    draft_audit = draft_sub.add_parser("audit", help="Audit a Markdown draft against local notes, claims, themes, and BibTeX.")
+    add_draft_common(draft_audit)
+    draft_audit.set_defaults(func=cmd_draft_audit)
+
+    draft_checklist = draft_sub.add_parser("checklist", help="Generate a manual revision checklist from a draft audit.")
+    add_draft_common(draft_checklist)
+    draft_checklist.set_defaults(func=cmd_draft_checklist)
+
+    draft_matrix = draft_sub.add_parser("evidence-matrix", help="Generate paragraph-level evidence matching matrix for a draft.")
+    add_draft_common(draft_matrix)
+    draft_matrix.set_defaults(func=cmd_draft_evidence_matrix)
+
     doctor_parser = subparsers.add_parser("doctor", help="Run workspace health diagnostics.")
     doctor_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
     doctor_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
@@ -1737,7 +1851,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return args.func(args)
-    except (FileNotFoundError, FileExistsError, IsADirectoryError, NotADirectoryError, ValueError) as exc:
+    except (FileNotFoundError, FileExistsError, IsADirectoryError, NotADirectoryError, PermissionError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
