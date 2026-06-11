@@ -17,14 +17,14 @@ paperwb validate-bib data/bibtex/library.bib --registry data/registries/papers.c
 paperwb add-paper --title "..." --year 2026
 paperwb list --tag photocorrosion
 paperwb note-template PAPER_ID
-paperwb claims data/notes --output reports/claims.csv
+paperwb claims data/notes --output scratch/claims.csv
 paperwb search "charge separation" --claims
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb index status --project zis_photocatalysis --check-files
 paperwb search "charge separation" --project zis_photocatalysis --indexed
 paperwb files scan --project zis_photocatalysis
 paperwb files audit --project zis_photocatalysis --force
-paperwb doctor --out reports/workspace_health.md
+paperwb doctor --out scratch/workspace_health.md
 ```
 
 Imports:
@@ -62,7 +62,7 @@ paperwb report subsection-readiness --theme photocorrosion
 paperwb report all
 ```
 
-Report commands refuse to overwrite an existing output file unless `--force` is provided. The same no-overwrite behavior applies to `doctor --out` and `validate-bib --report`.
+Report commands refuse to overwrite an existing output file unless `--force` is provided. The same no-overwrite behavior applies to `claims --output`, `doctor --out`, `validate-bib --report`, and `validate-registry --json`.
 
 Authoring reports:
 

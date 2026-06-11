@@ -6,8 +6,8 @@ All notable changes are tracked here for local release planning. This project ha
 
 - Added API and CLI surface inventories that mark stable, experimental, and internal surfaces.
 - Added command-contract documentation and release-candidate tests for help output, safe writes, dry-run imports, and common failure paths.
-- Added a local clean-room install check script that exercises package import, CLI help, temporary workspace initialization, project creation, validation, reports, indexed search, integrity checks, and notebook structure checks.
-- Added v1.0-rc release reports for clean-room checks, external-user simulation, data safety, limitations, release notes, and post-v1.0 roadmap planning.
+- Added a local current-environment release check script that exercises package import, CLI help, temporary workspace initialization, project creation, validation, reports, indexed search, integrity checks, and notebook structure checks.
+- Added v1.0-rc release reports for current-environment checks, external-user simulation, data safety, limitations, release notes, and post-v1.0 roadmap planning.
 - Kept the release candidate local-first, unpublished, untagged, and free of cloud, LLM, scraping, or copyrighted example content.
 
 ## v0.10.0 - Adversarial Testing

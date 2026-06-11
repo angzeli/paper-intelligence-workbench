@@ -16,7 +16,7 @@ def test_package_metadata_matches_import_version_and_cli_entrypoint():
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert f'version = "{__version__}"' in content
-    assert __version__ == "0.10.0"
+    assert __version__ == "1.0.0rc1"
     assert 'requires-python = ">=3.10"' in content
     assert "dependencies = []" in content
     assert 'paperwb = "paper_workbench.cli:main"' in content
@@ -102,7 +102,11 @@ def test_data_safety_audit_module_flags_forbidden_artifacts_without_failing_on_w
 def test_ci_runs_v0_8_release_checks():
     content = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
+    assert 'python-version: ["3.10", "3.11", "3.12"]' in content
+    assert 'python -m pip install -e ".[dev]"' in content
     assert "python scripts/check_notebooks.py" in content
     assert "python scripts/smoke_cli_workflow.py --quick" in content
     assert "python scripts/clean_room_install_check.py --quick" in content
     assert "python scripts/data_safety_audit.py" in content
+    assert "paperwb --help" in content
+    assert "python -m build --sdist --wheel" in content

@@ -1,4 +1,4 @@
-# Clean-room Install Check v1.0-rc
+# Current-Environment Release Check v1.0-rc
 
 This check runs in the current Python environment and writes generated files to a temporary directory.
 It does not create a virtual environment, publish packages, call network services, or modify checked-in examples.
@@ -11,7 +11,7 @@ Failures: 0
 | --- | --- | --- |
 | import package | pass | `python -c import paper_workbench; print(paper_workbench.__version__)` |
 | CLI help | pass | `python -m paper_workbench.cli --help` |
-| initialize temp workspace | pass | `python -m paper_workbench.cli init --root <temporary directory>/clean_workspace` |
+| initialize temp workspace | pass | `python -m paper_workbench.cli init --root <temporary directory>/release_check_workspace` |
 | create temp project | pass | `python -m paper_workbench.cli project init rc_demo --description Synthetic RC demo` |
 | list temp projects | pass | `python -m paper_workbench.cli project list` |
 | validate example registry | pass | `python -m paper_workbench.cli validate-registry data/registries/example_papers.csv` |
@@ -28,7 +28,7 @@ Failures: 0
 
 ## Manual Fresh-Venv Check
 
-For a stricter local clean-room install, run these commands in a disposable directory:
+For a stricter local fresh-venv install, run these commands in a disposable directory:
 
 ```bash
 python -m venv .venv

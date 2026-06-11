@@ -20,8 +20,9 @@ def test_major_cli_help_contracts_are_available():
         (("init", "--help"), "--root"),
         (("project", "--help"), "{init,list,validate}"),
         (("project", "init", "--help"), "--description"),
-        (("validate-registry", "--help"), "--strict"),
+        (("validate-registry", "--help"), "--force"),
         (("validate-bib", "--help"), "--registry"),
+        (("claims", "--help"), "--force"),
         (("import", "--help"), "{zotero-csv,csv,bibtex,ris}"),
         (("import", "csv", "--help"), "--mapping"),
         (("export", "--help"), "{registry-csv,registry-json"),
@@ -58,6 +59,15 @@ def test_release_candidate_docs_describe_frozen_surfaces():
         assert "local-first" in content
 
 
+def test_readme_quickstart_uses_ignored_scratch_outputs():
+    content = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "paperwb claims data/notes --output scratch/example_claims.csv" in content
+    assert "reports/example_claims.csv" not in content
+    assert "--out reports/workspace_health.md" not in content
+    assert "--out reports/photocorrosion_section_outline.md" not in content
+
+
 def test_command_contract_no_overwrite_and_failure_paths(tmp_path):
     out = tmp_path / "inventory.md"
     result = run_cli("report", "inventory", "--registry", str(EXAMPLE_REGISTRY), "--out", str(out))
@@ -72,6 +82,7 @@ def test_command_contract_no_overwrite_and_failure_paths(tmp_path):
     missing_project = run_cli("project", "validate", "missing_release_candidate_project")
     assert missing_project.returncode == 2
     assert "Next step:" in missing_project.stderr
+    assert str(ROOT) not in missing_project.stderr
     assert "Traceback" not in missing_project.stderr
 
     missing_backup = run_cli("backup", "restore", "missing-backup-id", "--dry-run", "--out", str(tmp_path / "restore.md"))
@@ -111,7 +122,7 @@ def test_clean_room_install_check_quick_generates_release_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "Clean-room Install Check v1.0-rc" in content
+    assert "Current-Environment Release Check v1.0-rc" in content
     assert "Failures: 0" in content
     assert "create temp project" in content
 

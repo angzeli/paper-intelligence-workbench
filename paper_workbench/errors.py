@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,6 +76,19 @@ def describe_error(code: str) -> ErrorCategory | None:
     return ERROR_TAXONOMY.get(code)
 
 
+def _display_where(value: str) -> str:
+    text = value.strip()
+    if not text:
+        return text
+    path = Path(text)
+    if not path.is_absolute():
+        return text
+    try:
+        return path.resolve(strict=False).relative_to(Path.cwd().resolve(strict=False)).as_posix()
+    except ValueError:
+        return text
+
+
 def format_error_message(
     *,
     what: str,
@@ -85,7 +99,7 @@ def format_error_message(
     """Build a concise CLI/report error with the expected quality fields."""
     parts = [what.strip()]
     if where:
-        parts.append(f"Where: {where.strip()}")
+        parts.append(f"Where: {_display_where(where)}")
     if why:
         parts.append(f"Why it matters: {why.strip()}")
     if next_step:

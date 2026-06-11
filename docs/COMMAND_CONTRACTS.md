@@ -23,13 +23,13 @@ not internal implementation details.
 | --- | --- | --- | --- | --- |
 | `init` | yes | temp workspace init | existing files preserved | folder creation only |
 | `project` | yes | list and validate synthetic projects | missing project | no legacy data mutation |
-| `validate-registry` | yes | example registry | missing/malformed registry | read-only unless JSON output requested |
+| `validate-registry` | yes | example registry | missing/malformed registry | JSON export refuses overwrite without `--force` |
 | `validate-bib` | yes | example BibTeX | broken/missing BibTeX | report preflight |
 | `import` | yes | dry-run Zotero/generic/BibTeX/RIS | bad mapping/missing columns | registry unchanged on dry-run |
 | `add-paper` | yes | synthetic row append in temp tests | invalid reading status | appends only to selected registry |
 | `list` | yes | filtered example listings | missing registry | read-only |
 | `note-template` | yes | temp note output | missing paper or overwrite refusal | no overwrite without `--force` |
-| `claims` | yes | example notes to temp CSV | malformed notes warn | note files preserved |
+| `claims` | yes | example notes to temp CSV | missing notes path or malformed notes | output CSV refuses overwrite without `--force`; note files preserved |
 | `search` | yes | substring and indexed examples | missing index with `--indexed` | read-only unless `--out` |
 | `index` | yes | temp SQLite index rebuild/status | stale or missing index | cache is rebuildable and ignored |
 | `files` | yes | scan/audit/hash sidecars | missing files or overwrite refusal | no delete/move/copy |

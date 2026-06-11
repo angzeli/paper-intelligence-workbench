@@ -238,8 +238,8 @@ def save_registry(papers: list[Paper], path: str | Path) -> Path:
     return write_csv_rows(path, (paper_to_row(paper) for paper in papers), REGISTRY_FIELDS)
 
 
-def save_registry_json(papers: list[Paper], path: str | Path) -> Path:
-    return write_json(path, [dataclass_to_plain(paper) for paper in papers])
+def save_registry_json(papers: list[Paper], path: str | Path, force: bool = True) -> Path:
+    return write_json(path, [dataclass_to_plain(paper) for paper in papers], force=force)
 
 
 def _slug_words(value: str, limit: int = 4) -> list[str]:

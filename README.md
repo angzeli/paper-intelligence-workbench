@@ -20,7 +20,7 @@ v0.9 adds data-integrity safeguards for real local use: workspace integrity chec
 
 v0.10 adds an adversarial torture suite, fuzz-style fixtures, clearer error taxonomy, CLI failure-path tests, and regression checks for malformed local data.
 
-v1.0-rc adds release-candidate hardening: API and CLI surface inventories, command-contract checks, clean-room install checks, external-user simulation reports, data-safety review, and a final release-readiness verdict before tagging.
+v1.0-rc adds release-candidate hardening: API and CLI surface inventories, command-contract checks, current-environment release checks, external-user simulation reports, data-safety review, and a final release-readiness verdict before tagging.
 
 ## What It Does
 
@@ -104,23 +104,23 @@ paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/
 Extract claims from notes:
 
 ```bash
-paperwb claims data/notes --output reports/example_claims.csv
+paperwb claims data/notes --output scratch/example_claims.csv
 ```
 
 Generate reports:
 
 ```bash
-paperwb report inventory --registry data/registries/example_papers.csv --force
-paperwb report bibtex-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --force
-paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --force
-paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --force
+paperwb report inventory --registry data/registries/example_papers.csv --out scratch/inventory.md --force
+paperwb report bibtex-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --out scratch/bibtex_audit.md --force
+paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/evidence_map.md --force
+paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/citation_audit.md --force
 ```
 
 Run v0.2 diagnostics and a section outline:
 
 ```bash
-paperwb doctor --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/workspace_health.md --force
-paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out reports/photocorrosion_section_outline.md --force
+paperwb doctor --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/workspace_health.md --force
+paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/photocorrosion_section_outline.md --force
 ```
 
 ## Project Profile Workflow
@@ -136,8 +136,8 @@ paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb search photocorrosion --project zis_photocatalysis --indexed
 paperwb files scan --project zis_photocatalysis
 paperwb files audit --project zis_photocatalysis --force
-paperwb report evidence-map --project zis_photocatalysis --force
-paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json --force
+paperwb report evidence-map --project zis_photocatalysis --out scratch/zis_evidence_map.md --force
+paperwb export claims-json --project zis_photocatalysis --out scratch/zis_claims.json --force
 ```
 
 `files scan` is read-only unless `--write-registry` is provided. When it writes `files.csv`, it merges with existing file-registry rows so curated notes and older unmatched rows are preserved for review. `files audit` preflights all report paths before writing and reconciles live scan results with existing `files.csv` records.
@@ -350,7 +350,7 @@ paperwb report paragraph-plan --theme photocorrosion
 paperwb report subsection-readiness --theme photocorrosion
 paperwb writing-packet --theme photocorrosion
 paperwb doctor
-paperwb export claims --out data/processed/claims.csv
+paperwb export claims --out scratch/claims.csv
 paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
 paperwb import zotero-csv data/examples/zotero_export.csv --dry-run
 paperwb project list

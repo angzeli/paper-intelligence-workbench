@@ -77,7 +77,7 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 
 - API and CLI surface inventories.
 - Command-contract documentation and tests.
-- Current-environment clean-room install and workflow check.
+- Current-environment release check and documented fresh-venv install workflow.
 - External-user simulation and data-safety reports.
 - Final release-readiness and known-limitations reports.
 

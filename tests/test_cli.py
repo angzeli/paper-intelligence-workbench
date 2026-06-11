@@ -33,6 +33,64 @@ def test_cli_claims_output(tmp_path):
     assert "Wrote 3 claims" in result.stdout
 
 
+def test_cli_claims_missing_path_returns_error_without_output(tmp_path):
+    missing = tmp_path / "missing_notes"
+    target = tmp_path / "claims.csv"
+
+    result = run_cli("claims", str(missing), "--output", str(target))
+
+    assert result.returncode == 2
+    assert not target.exists()
+    assert "Notes path not found" in result.stderr
+    assert "Next step:" in result.stderr
+    assert "Traceback" not in result.stderr
+
+
+def test_cli_claims_empty_existing_directory_is_valid(tmp_path):
+    notes_dir = tmp_path / "notes"
+    notes_dir.mkdir()
+    target = tmp_path / "claims.csv"
+
+    result = run_cli("claims", str(notes_dir), "--output", str(target))
+
+    assert result.returncode == 0, result.stderr
+    assert "Wrote 0 claims" in result.stdout
+    assert target.exists()
+
+
+def test_cli_claims_output_requires_force_to_overwrite(tmp_path):
+    target = tmp_path / "claims.csv"
+    target.write_text("keep me", encoding="utf-8")
+
+    result = run_cli("claims", str(EXAMPLE_NOTES), "--output", str(target))
+
+    assert result.returncode == 2
+    assert target.read_text(encoding="utf-8") == "keep me"
+    assert "already exists" in result.stderr
+    assert "Traceback" not in result.stderr
+
+    forced = run_cli("claims", str(EXAMPLE_NOTES), "--output", str(target), "--force")
+    assert forced.returncode == 0, forced.stderr
+    assert "Wrote 3 claims" in forced.stdout
+    assert "claim_id,paper_id" in target.read_text(encoding="utf-8")
+
+
+def test_cli_validate_registry_json_requires_force_to_overwrite(tmp_path):
+    target = tmp_path / "registry.json"
+    target.write_text("keep me", encoding="utf-8")
+
+    result = run_cli("validate-registry", str(EXAMPLE_REGISTRY), "--json", str(target))
+
+    assert result.returncode == 2
+    assert target.read_text(encoding="utf-8") == "keep me"
+    assert "already exists" in result.stderr
+    assert "Traceback" not in result.stderr
+
+    forced = run_cli("validate-registry", str(EXAMPLE_REGISTRY), "--json", str(target), "--force")
+    assert forced.returncode == 0, forced.stderr
+    assert json.loads(target.read_text(encoding="utf-8"))
+
+
 def test_cli_project_claims_output_uses_portable_note_paths(tmp_path):
     target = tmp_path / "project_claims.csv"
     result = run_cli("claims", "--project", "zis_photocatalysis", "--output", str(target))
@@ -130,6 +188,12 @@ def test_cli_missing_inputs_return_user_facing_errors(tmp_path):
     assert "error:" in result.stderr
     assert "Next step:" in result.stderr
     assert "Traceback" not in result.stderr
+
+    missing_workspace_registry = ROOT / "missing_release_candidate_registry.csv"
+    workspace_result = run_cli("validate-registry", str(missing_workspace_registry))
+    assert workspace_result.returncode == 2
+    assert "Where: missing_release_candidate_registry.csv" in workspace_result.stderr
+    assert str(ROOT) not in workspace_result.stderr
 
     bad_status = run_cli("add-paper", "--registry", str(tmp_path / "papers.csv"), "--title", "Synthetic", "--status", "invalid_status")
     assert bad_status.returncode == 2

@@ -5,17 +5,18 @@ This audit checks tracked and unignored repository files. It does not inspect ig
 Root: .
 Repository files checked: 460
 Errors: 0
-Warnings: 11
+Warnings: 12
 
 ## Summary By Code
 
 | Code | Count |
 | --- | ---: |
-| absolute_local_path | 11 |
+| absolute_local_path | 12 |
 
 ## Findings
 
 - **warning absolute_local_path** `reports/external_user_simulation_final.md`: Text contains local absolute-path pattern `/private/[^\s`|,\"]+`.
+- **warning absolute_local_path** `reports/hostile_review_latest.md`: Text contains local absolute-path pattern `/Users/[^\s`|,\"]+`.
 - **warning absolute_local_path** `reports/hostile_review_v0_4.md`: Text contains local absolute-path pattern `/Users/[^\s`|,\"]+`.
 - **warning absolute_local_path** `reports/hostile_review_v0_5.md`: Text contains local absolute-path pattern `/Users/[^\s`|,\"]+`.
 - **warning absolute_local_path** `reports/import_bibtex_v0_4.md`: Text contains local absolute-path pattern `/Users/[^\s`|,\"]+`.

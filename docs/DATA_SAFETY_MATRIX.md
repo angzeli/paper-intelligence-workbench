@@ -12,3 +12,12 @@
 | User notes overwritten | Note template requires explicit force | CLI tests | Review new write commands |
 | Registry metadata overwritten | Imports fill blanks only; local-file writes merge records | import/local-file tests | Review force behavior |
 | Generated prose mistaken for user writing | Authoring docs state planning-aid boundary | authoring tests | Review report wording |
+
+## Historical Warning Budget
+
+The v1.0-rc release keeps older generated review reports as audit artifacts,
+including a small number of historical absolute-path warnings. New onboarding
+docs, quickstarts, examples, and release reports should use relative paths,
+`scratch/`, or temporary-directory placeholders. Treat any increase in
+absolute-path warnings as a release-hygiene regression unless it is an
+intentional hostile-review reproduction.

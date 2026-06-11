@@ -1,4 +1,4 @@
-"""Run a local release-candidate install and workflow check.
+"""Run a local release-candidate current-environment workflow check.
 
 The script avoids creating or deleting virtual environments by default. It checks
 the current Python environment, runs the package by module path, and writes all
@@ -45,7 +45,7 @@ def _paperwb(*args: str) -> list[str]:
 
 
 def build_steps(tmp: Path, *, quick: bool = False) -> list[CheckStep]:
-    workspace = tmp / "clean_workspace"
+    workspace = tmp / "release_check_workspace"
     steps = [
         CheckStep("import package", _python("-c", "import paper_workbench; print(paper_workbench.__version__)"), ROOT),
         CheckStep("CLI help", _paperwb("--help"), ROOT),
@@ -187,7 +187,7 @@ def report_markdown(results: list[CheckResult], *, tmp: Path, title: str) -> str
             "",
             "## Manual Fresh-Venv Check",
             "",
-            "For a stricter local clean-room install, run these commands in a disposable directory:",
+            "For a stricter local fresh-venv install, run these commands in a disposable directory:",
             "",
             "```bash",
             "python -m venv .venv",
@@ -204,10 +204,10 @@ def report_markdown(results: list[CheckResult], *, tmp: Path, title: str) -> str
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run a local v1.0-rc clean-room install and workflow check.")
+    parser = argparse.ArgumentParser(description="Run a local v1.0-rc current-environment install and workflow check.")
     parser.add_argument("--out", default="", help="Optional Markdown report path.")
     parser.add_argument("--quick", action="store_true", help="Run a shorter check for CI and tests.")
-    parser.add_argument("--title", default="Clean-room Install Check v1.0-rc", help="Markdown report title.")
+    parser.add_argument("--title", default="Current-Environment Release Check v1.0-rc", help="Markdown report title.")
     args = parser.parse_args(argv)
 
     with tempfile.TemporaryDirectory(prefix="paperwb_clean_room_") as tmp_name:
@@ -220,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
             target.write_text(markdown, encoding="utf-8")
             print(f"Wrote {target}")
         failures = sum(1 for result in results if result.returncode != 0)
-        print(f"Ran {len(results)} clean-room check step(s); failures: {failures}")
+        print(f"Ran {len(results)} current-environment release check step(s); failures: {failures}")
         return 1 if failures else 0
 
 

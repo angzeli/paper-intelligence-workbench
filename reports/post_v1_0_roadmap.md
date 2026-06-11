@@ -2,8 +2,8 @@
 
 ## High Priority
 
-- Decide whether to bump package metadata from `0.10.0` to a v1.0 release
-  version before tagging.
+- Decide whether to keep `1.0.0rc1` for another release-candidate pass or bump
+  to a final v1.0.0 release version before tagging.
 - Run a true fresh virtual-environment install on at least one machine outside
   the development checkout.
 - Review historical reports with absolute-path warnings and either keep them as
@@ -39,7 +39,7 @@
 ## v1.0.0 Tagging Checklist
 
 - Run the full test suite.
-- Run the clean-room check.
+- Run the current-environment release check and a fresh-venv install check.
 - Run the CLI smoke workflow.
 - Run the data-safety audit.
 - Inspect `git status` for ignored caches and unsafe artifacts.

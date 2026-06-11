@@ -299,7 +299,7 @@ def cmd_validate_registry(args: argparse.Namespace) -> int:
     findings = validate_registry_headers(args.registry) + validate_registry(papers, root=_registry_validation_root(args.registry))
     _print_findings(findings)
     if args.json:
-        save_registry_json(papers, args.json)
+        save_registry_json(papers, args.json, force=args.force)
         print(f"Wrote JSON registry to {args.json}")
     return 1 if args.strict and any(finding.severity == "error" for finding in findings) else 0
 
@@ -395,9 +395,18 @@ def cmd_claims(args: argparse.Namespace) -> int:
         raise ValueError("--project cannot be combined with notes_path; project profile notes are used instead.")
     paths = _paths_from_args(args)
     notes_path = Path(args.notes_path) if args.notes_path else paths["notes_dir"]
+    if not notes_path.exists():
+        raise FileNotFoundError(
+            format_error_message(
+                what="Notes path not found.",
+                where=str(notes_path),
+                why="Claim extraction needs an existing Markdown note file or notes directory.",
+                next_step="Check the path, run `paperwb init`, or use `--project NAME` for a configured project.",
+            )
+        )
     claims = collect_claims(notes_path)
     if args.output:
-        save_claims_csv(claims, args.output, root=paths["root"])
+        save_claims_csv(claims, args.output, force=args.force, root=paths["root"])
         _record_audit_event(paths, command="claims", action="export_claims_csv", affected_paths=[args.output], summary=f"Exported {len(claims)} claims")
         print(f"Wrote {len(claims)} claims to {args.output}")
     else:
@@ -1312,6 +1321,7 @@ def build_parser() -> argparse.ArgumentParser:
     validate_registry_parser = subparsers.add_parser("validate-registry", help="Validate a CSV paper registry.")
     validate_registry_parser.add_argument("registry", help="Registry CSV path.")
     validate_registry_parser.add_argument("--json", help="Optional JSON export path.")
+    validate_registry_parser.add_argument("--force", action="store_true", help="Overwrite an existing JSON export path.")
     validate_registry_parser.add_argument("--strict", action="store_true", help="Return non-zero when errors are found.")
     validate_registry_parser.set_defaults(func=cmd_validate_registry)
 
@@ -1401,6 +1411,7 @@ def build_parser() -> argparse.ArgumentParser:
     claims_parser.add_argument("notes_path", nargs="?", help="Notes directory or Markdown note file. Defaults to project/default notes.")
     claims_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
     claims_parser.add_argument("--output", help="Optional output CSV path.")
+    claims_parser.add_argument("--force", action="store_true", help="Overwrite an existing output CSV path.")
     claims_parser.set_defaults(func=cmd_claims)
 
     search_parser = subparsers.add_parser("search", help="Search registry, notes, claims, or the local SQLite index.")

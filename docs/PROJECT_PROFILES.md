@@ -25,7 +25,7 @@ Use a profile with commands:
 
 ```bash
 paperwb search photocorrosion --project zis_photocatalysis
-paperwb claims --project zis_photocatalysis --output data/processed/zis_claims.csv
+paperwb claims --project zis_photocatalysis --output scratch/zis_claims.csv
 paperwb report evidence-map --project zis_photocatalysis --force
 paperwb doctor --project zis_photocatalysis
 ```

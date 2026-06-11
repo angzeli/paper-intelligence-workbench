@@ -11,7 +11,9 @@ Markdown, BibTeX, RIS, text sidecar, and project-profile files.
 
 ## Stable For v1.0-rc
 
-These modules are treated as stable enough for local automation in v1.0-rc:
+The stable external API for v1.0-rc is the CLI plus documented file formats.
+For Python callers, only these small entry points are treated as stable enough
+for local automation:
 
 | Module | Stable entry points | Purpose |
 | --- | --- | --- |
@@ -20,18 +22,8 @@ These modules are treated as stable enough for local automation in v1.0-rc:
 | `paper_workbench.notes` | `write_note_template`, `parse_note_file` | Structured note template writing and conservative note parsing |
 | `paper_workbench.claims` | `collect_notes`, `collect_claims`, `save_claims_csv` | Claim extraction from local structured notes |
 | `paper_workbench.tags` | `normalize_tag`, `load_themes`, `map_claims_to_themes` | Tag normalization and theme mapping |
-| `paper_workbench.reporting` | report Markdown helpers | Inventory, reading-status, tag, BibTeX, evidence, and authoring reports |
 | `paper_workbench.audit` | `citation_audit` | Citation-readiness findings from registry, notes, claims, themes, and BibTeX |
 | `paper_workbench.projects` | `create_project_profile`, `list_project_profiles`, `resolve_project_profile` | Project-profile path resolution |
-| `paper_workbench.importers` | `import_zotero_csv`, `import_generic_csv`, `import_bibtex`, `import_ris` | Local import workflows with reports and dry-run support |
-| `paper_workbench.exports` | export helpers | CSV, JSON, Markdown, Obsidian, bundle, reading-list, and report-index exports |
-| `paper_workbench.index` | `rebuild_index`, `index_status`, `search_index`, `clear_index` | Rebuildable local SQLite search cache |
-| `paper_workbench.files` | scan/link/hash/audit helpers | Local file registry, sidecar, hash, duplicate, and missing-file checks |
-| `paper_workbench.authoring` | evidence matrix, claim bank, citation bank, paragraph plan, readiness, writing packet helpers | Writing planning aids from tracked local evidence |
-| `paper_workbench.integrity` | `check_workspace_integrity`, `workspace_integrity_report` | Structural consistency checks |
-| `paper_workbench.backups` | `create_backup`, `list_backups`, `plan_restore`, `restore_backup` | Local backup snapshots and non-destructive restore planning |
-| `paper_workbench.migration` | `plan_legacy_migration`, `run_legacy_migration` | Legacy `data/` to project-profile migration planning/copying |
-| `paper_workbench.auditlog` | `append_audit_event`, `load_audit_events`, `clear_audit_log` | Local JSONL audit log events |
 | `paper_workbench.safety` | `audit_data_safety`, `safety_audit_markdown` | Tracked-file data-safety audit |
 
 ## Stable Data Models
@@ -53,10 +45,27 @@ The dataclasses in `paper_workbench.schema` are stable enough for local scripts:
 Fields may grow in future releases, but v1.0-rc aims to preserve existing field
 names and meanings.
 
-## Experimental Modules
+## Semi-Stable And Experimental Modules
 
-These modules are public in the package but remain more likely to change:
+These modules are public in the package but remain more likely to change. Use
+the CLI when possible unless a script specifically needs Python objects:
 
+- `paper_workbench.reporting`: report Markdown helpers.
+- `paper_workbench.importers`: Zotero CSV, generic CSV, BibTeX, and RIS import
+  workflows.
+- `paper_workbench.exports`: CSV, JSON, Markdown, Obsidian, bundle,
+  reading-list, and report-index exports.
+- `paper_workbench.index`: rebuildable local SQLite search cache helpers.
+- `paper_workbench.files`: local file registry, sidecar, hash, duplicate, and
+  missing-file helpers.
+- `paper_workbench.authoring`: evidence matrix, claim bank, citation bank,
+  paragraph plan, readiness, and writing packet helpers.
+- `paper_workbench.integrity`: structural consistency checks.
+- `paper_workbench.backups`: local backup snapshots and non-destructive restore
+  planning.
+- `paper_workbench.migration`: legacy `data/` to project-profile migration
+  planning/copying.
+- `paper_workbench.auditlog`: local JSONL audit log events.
 - `paper_workbench.synthetic`: deterministic stress fixtures and generated
   synthetic projects.
 - `paper_workbench.errors`: user-facing diagnostic taxonomy helpers.

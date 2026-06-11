@@ -36,6 +36,6 @@
 - Historical reports still contain some absolute-path warnings. The v1.0-rc
   data-safety audit reports zero blocking errors and keeps these warnings
   visible rather than rewriting historical review artifacts.
-- The clean-room check uses the current Python environment by default. A stricter
+- The release check uses the current Python environment by default. A stricter
   fresh virtual-environment process is documented in the generated report.
 - The package is not published to PyPI and is not tagged as v1.0.0.
