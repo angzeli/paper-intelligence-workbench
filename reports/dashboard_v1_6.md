@@ -69,16 +69,16 @@ Projects discovered: 6
 
 | Timestamp | Action | Success | Summary |
 | --- | --- | --- | --- |
-| 2026-06-11T20:03:17.285687+00:00 | write_manuscript_citation_coverage | True | Audited manuscript citations in drafts/synthetic_overconfident_section.md |
-| 2026-06-11T20:03:17.369419+00:00 | write_manuscript_qa | True | Audited manuscript drafts/synthetic_overconfident_section.md; verdict=needs evidence strengthening |
-| 2026-06-11T20:03:17.451731+00:00 | write_manuscript_revision_checklist | True | Wrote manuscript checklist for drafts/synthetic_overconfident_section.md |
-| 2026-06-11T20:03:17.532351+00:00 | write_manuscript_context_table | True | Wrote citation context table for drafts/synthetic_overconfident_section.md |
-| 2026-06-11T20:03:17.616548+00:00 | write_manuscript_paragraph_evidence | True | Wrote manuscript paragraph evidence table for drafts/synthetic_overconfident_section.md |
-| 2026-06-11T20:03:17.703731+00:00 | write_claim_traceability | True | Wrote claim traceability for drafts/synthetic_overconfident_section.md |
-| 2026-06-11T20:03:20.394594+00:00 | write_rule_report | True | Wrote rule report with 2 findings |
-| 2026-06-11T20:03:40.123241+00:00 | write_rule_report | True | Wrote rule report with 2 findings |
-| 2026-06-11T20:03:48.717805+00:00 | write_rule_report | True | Wrote rule report with 16 findings |
-| 2026-06-11T20:03:48.735263+00:00 | write_rule_report | True | Wrote rule report with 2 findings |
+| 2026-06-11T20:15:53.698703+00:00 | write_index_status_report | True | Wrote index status report |
+| 2026-06-11T20:15:53.699428+00:00 | rebuild_index | True | Rebuilt 15 index records |
+| 2026-06-11T20:15:53.991058+00:00 | clear_index | True | Cleared index records for zis_photocatalysis |
+| 2026-06-11T20:15:55.740061+00:00 | write_manuscript_citation_coverage | True | Audited manuscript citations in drafts/synthetic_overconfident_section.md |
+| 2026-06-11T20:15:55.811966+00:00 | write_manuscript_qa | True | Audited manuscript drafts/synthetic_overconfident_section.md; verdict=needs evidence strengthening |
+| 2026-06-11T20:15:55.885801+00:00 | write_manuscript_revision_checklist | True | Wrote manuscript checklist for drafts/synthetic_overconfident_section.md |
+| 2026-06-11T20:15:55.957814+00:00 | write_manuscript_context_table | True | Wrote citation context table for drafts/synthetic_overconfident_section.md |
+| 2026-06-11T20:15:56.046333+00:00 | write_manuscript_paragraph_evidence | True | Wrote manuscript paragraph evidence table for drafts/synthetic_overconfident_section.md |
+| 2026-06-11T20:15:56.129325+00:00 | write_claim_traceability | True | Wrote claim traceability for drafts/synthetic_overconfident_section.md |
+| 2026-06-11T20:15:58.391961+00:00 | write_rule_report | True | Wrote rule report with 2 findings |
 
 ## Generated Reports
 

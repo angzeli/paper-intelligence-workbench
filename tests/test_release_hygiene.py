@@ -85,14 +85,13 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v1.5 Release Reports" in content
-    assert "[manuscript_qa_v1_4.md]" in content
-    assert "[citation_context_table_v1_4.md]" in content
-    assert "[claim_traceability_v1_4.md]" in content
-    assert "[manuscript_revision_checklist_v1_4.md]" in content
-    assert "[release_readiness_v1_4.md]" in content
+    assert "## Current v1.6 Release Reports" in content
+    assert "[dashboard_v1_6.md]" in content
+    assert "[next_actions_v1_6.md]" in content
+    assert "[project_health_summary_v1_6.md]" in content
+    assert "[release_readiness_v1_6.md]" in content
     assert "## Next Patch Plan" in content
-    assert "[v1_5_recommended_patch_plan.md]" in content
+    assert "[v1_7_recommended_patch_plan.md]" in content
 
 
 def test_v1_4_manuscript_docs_are_wired_into_release_docs():
