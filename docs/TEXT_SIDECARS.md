@@ -22,7 +22,7 @@ The v0.7 file scanner reports top-level `.txt` files in the selected `text/` fol
 
 ```bash
 paperwb files sidecars --project zis_photocatalysis
-paperwb files sidecars --project zis_photocatalysis --out reports/text_sidecars.md --force
+paperwb files sidecars --project zis_photocatalysis --out scratch/text_sidecars.md --force
 ```
 
 ## Search Integration

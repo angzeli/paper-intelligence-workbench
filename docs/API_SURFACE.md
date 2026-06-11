@@ -1,7 +1,7 @@
-# API Surface v1.0-rc
+# API Surface v1.1
 
 Paper Intelligence Workbench is a local-first command-line project. The Python
-package is usable by tests and scripts, but v1.0-rc does not promise a broad
+package is usable by tests and scripts, but v1.1 does not promise a broad
 stable library API. The stable user interface is the `paperwb` CLI plus the
 documented local file formats.
 
@@ -9,9 +9,9 @@ The package does not use cloud APIs, LLM APIs, publisher scraping, or remote
 metadata lookup. API helpers operate on user-provided local CSV, JSON,
 Markdown, BibTeX, RIS, text sidecar, and project-profile files.
 
-## Stable For v1.0-rc
+## Stable For v1.1
 
-The stable external API for v1.0-rc is the CLI plus documented file formats.
+The stable external API for v1.1 is the CLI plus documented file formats.
 For Python callers, only these small entry points are treated as stable enough
 for local automation:
 
@@ -42,7 +42,7 @@ The dataclasses in `paper_workbench.schema` are stable enough for local scripts:
 - `ValidationFinding`
 - enum-like constants for reading status, claim strength, and evidence type
 
-Fields may grow in future releases, but v1.0-rc aims to preserve existing field
+Fields may grow in future releases, but v1.1 aims to preserve existing field
 names and meanings.
 
 ## Semi-Stable And Experimental Modules
@@ -88,7 +88,7 @@ They can be imported by tests, but they are not a stable extension API.
 
 ## Compatibility Notes
 
-- v1.0-rc keeps the legacy `data/` workflow and the `projects/` workflow.
+- v1.1 keeps the legacy `data/` workflow and the `projects/` workflow.
 - CSV, JSON, Markdown notes, BibTeX, RIS, and theme JSON remain authoritative
   inputs.
 - SQLite indexes, audit logs, caches, backups, and generated reports are

@@ -79,7 +79,7 @@ Reports to treat as historical rather than current:
 - `reports/release_readiness_v0_10.md`
 - `reports/release_readiness_v1_0_rc.md`
 
-The current handoff should be read with `reports/hostile_review_latest.md`. That latest hostile review supersedes the older release-readiness verdict by identifying a release blocker.
+The current handoff should be read with `reports/release_readiness_v1_1.md` and `reports/hostile_review_latest.md`. The hostile review is the pre-fix risk register; the v1.1 readiness report records the targeted blocker and high-priority fixes.
 
 Other stale or historical report groups:
 
@@ -95,7 +95,7 @@ Other stale or historical report groups:
 Recommended approach:
 
 - Keep historical reports until after v1.0.0.
-- Add a short note in `reports/index_v1_0_rc.md` or future release index saying `hostile_review_latest.md` is the current risk register.
+- Keep the generated report index pointed at the latest release-readiness report and the current hostile-review risk register.
 - After v1.0.0, consider moving old reports into `reports/archive/` if the project wants a cleaner public tree.
 
 ## Docs That Overlap
@@ -203,7 +203,7 @@ If keeping history:
 
 - Tag only after release blockers are fixed.
 - Add a current `CHANGELOG.md` entry and release notes that explain v1.0.0 clearly.
-- Keep `reports/hostile_review_latest.md` as the current risk register until all release blockers are closed.
+- Keep `reports/hostile_review_latest.md` as the pre-fix risk register and keep `reports/release_readiness_v1_1.md` current with fix status.
 
 Recommended practical path:
 

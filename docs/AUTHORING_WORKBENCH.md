@@ -16,12 +16,12 @@ It does not write final literature-review prose, invent claims, invent citations
 ## Core Workflow
 
 ```bash
-paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_evidence_matrix.md --force
-paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_claim_bank.md --force
-paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_citation_bank.md --force
-paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_paragraph_plan.md --force
-paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_readiness.md --force
-paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_writing_packet.md --force
+paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_evidence_matrix.md --force
+paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_claim_bank.md --force
+paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_citation_bank.md --force
+paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_paragraph_plan.md --force
+paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_readiness.md --force
+paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_writing_packet.md --force
 ```
 
 Use these reports before drafting a subsection. They show what is supported, what is weak, which citations are linked, and which evidence gaps should be fixed first.

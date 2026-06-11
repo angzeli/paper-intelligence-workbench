@@ -490,12 +490,16 @@ def _display_path(path: Path, *, base: Path | None = None) -> str:
         return path.as_posix()
 
 
-def _report_version(path: Path) -> int | None:
-    match = re.search(r"(?:^|_)v0_(\d+)", path.stem)
-    return int(match.group(1)) if match else None
+def _report_version(path: Path) -> tuple[int, int] | None:
+    match = re.search(r"(?:^|_)v(\d+)_(\d+)", path.stem)
+    return (int(match.group(1)), int(match.group(2))) if match else None
 
 
-def _latest_release_version(reports: list[Path]) -> int | None:
+def _format_report_version(version: tuple[int, int]) -> str:
+    return f"v{version[0]}.{version[1]}"
+
+
+def _latest_release_version(reports: list[Path]) -> tuple[int, int] | None:
     versions = [
         version
         for report in reports
@@ -540,7 +544,7 @@ def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | 
         "Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.",
     ]
     sections = [
-        (f"Current v0.{latest_release} Release Reports" if latest_release is not None else "Current Reports", current),
+        (f"Current {_format_report_version(latest_release)} Release Reports" if latest_release is not None else "Current Reports", current),
         ("Next Patch Plan", next_plans),
         ("Historical Versioned Reports", historical),
         ("Legacy Unversioned Reports", legacy),

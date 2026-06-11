@@ -56,8 +56,22 @@ def test_release_candidate_docs_describe_frozen_surfaces():
         path = ROOT / relative
         assert path.exists(), relative
         content = path.read_text(encoding="utf-8")
-        assert "v1.0-rc" in content
+        assert "v1.1" in content
         assert "local-first" in content
+
+
+def test_active_docs_use_ignored_scratch_outputs_for_user_commands():
+    checked_docs = [
+        "README.md",
+        "docs/CLI_REFERENCE.md",
+        "docs/EXTERNAL_USER_QUICKSTART.md",
+        "docs/WORKFLOW_EXAMPLES.md",
+    ]
+    for relative in checked_docs:
+        content = (ROOT / relative).read_text(encoding="utf-8")
+        assert "--out reports/" not in content, relative
+        assert "--output reports/" not in content, relative
+        assert "--reports-dir reports" not in content, relative
 
 
 def test_readme_quickstart_uses_ignored_scratch_outputs():

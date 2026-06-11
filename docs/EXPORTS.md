@@ -15,13 +15,13 @@ paperwb export theme-claims --theme photocorrosion --out exports/photocorrosion_
 ## Reading Lists
 
 ```bash
-paperwb export reading-list --status unread --out reports/unread.md
-paperwb export reading-list --tag photocorrosion --out reports/photocorrosion.md
-paperwb export reading-list --theme charge-separation --project zis_photocatalysis --out reports/charge_separation.md
-paperwb export reading-list --high-priority --out reports/high_priority.md
-paperwb export reading-list --missing-notes --out reports/missing_notes_reading_list.md
+paperwb export reading-list --status unread --out scratch/unread.md
+paperwb export reading-list --tag photocorrosion --out scratch/photocorrosion.md
+paperwb export reading-list --theme charge-separation --project zis_photocatalysis --out scratch/charge_separation.md
+paperwb export reading-list --high-priority --out scratch/high_priority.md
+paperwb export reading-list --missing-notes --out scratch/missing_notes_reading_list.md
 paperwb export reading-list --included --format csv --out exports/included.csv
-paperwb export reading-list --excluded --out reports/excluded.md
+paperwb export reading-list --excluded --out scratch/excluded.md
 ```
 
 ## Vaults and Bundles
@@ -38,8 +38,8 @@ Vault and bundle exports require a new or empty output directory. They do not me
 ## Report Index and Summary
 
 ```bash
-paperwb export project-summary --project zis_photocatalysis --out reports/project_summary.md --force
-paperwb export report-index --project zis_photocatalysis --out reports/index.md --force
+paperwb export project-summary --project zis_photocatalysis --out scratch/project_summary.md --force
+paperwb export report-index --project zis_photocatalysis --out scratch/report_index.md --force
 ```
 
 The report index groups current release reports, next patch plans, historical versioned reports, and legacy unversioned reports. Versioned hostile-review drafts are omitted in favor of `hostile_review_latest.md`.

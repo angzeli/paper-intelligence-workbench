@@ -119,6 +119,59 @@ def test_cli_report_smoke(tmp_path):
     assert (tmp_path / "citation_audit.md").exists()
 
 
+def test_cli_report_all_preflights_outputs_before_writing(tmp_path):
+    protected = tmp_path / "citation_audit.md"
+    protected.write_text("existing citation audit\n", encoding="utf-8")
+
+    result = run_cli(
+        "report",
+        "all",
+        "--registry",
+        str(EXAMPLE_REGISTRY),
+        "--bibtex",
+        str(EXAMPLE_BIBTEX),
+        "--notes-dir",
+        str(EXAMPLE_NOTES),
+        "--themes",
+        str(EXAMPLE_THEMES),
+        "--reports-dir",
+        str(tmp_path),
+    )
+
+    assert result.returncode == 2
+    assert "citation_audit.md already exists" in result.stderr
+    assert protected.read_text(encoding="utf-8") == "existing citation audit\n"
+    assert not (tmp_path / "inventory.md").exists()
+    assert not (tmp_path / "reading_status.md").exists()
+    assert "Traceback" not in result.stderr
+
+
+def test_cli_report_all_rejects_single_out_path(tmp_path):
+    result = run_cli(
+        "report",
+        "all",
+        "--registry",
+        str(EXAMPLE_REGISTRY),
+        "--bibtex",
+        str(EXAMPLE_BIBTEX),
+        "--notes-dir",
+        str(EXAMPLE_NOTES),
+        "--themes",
+        str(EXAMPLE_THEMES),
+        "--reports-dir",
+        str(tmp_path / "reports"),
+        "--out",
+        str(tmp_path / "single.md"),
+        "--force",
+    )
+
+    assert result.returncode == 2
+    assert "--out is not supported with report all" in result.stderr
+    assert not (tmp_path / "single.md").exists()
+    assert not (tmp_path / "reports").exists()
+    assert "Traceback" not in result.stderr
+
+
 def test_cli_inventory_report_uses_registry_validation_context(tmp_path):
     registry = tmp_path / "papers.csv"
     notes_dir = tmp_path / "notes"

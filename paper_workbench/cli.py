@@ -728,6 +728,9 @@ def cmd_report(args: argparse.Namespace) -> int:
     }
     theme_report_types = {"section-outline", "evidence-matrix", "claim-bank", "citation-bank", "paragraph-plan", "subsection-readiness"}
     selected = [name for name in builders if name not in theme_report_types] if args.report_type == "all" else [args.report_type]
+    if args.report_type == "all" and args.out:
+        print("--out is not supported with report all; use --reports-dir for multi-report output.", file=sys.stderr)
+        return 2
     for name in selected:
         if name in theme_report_types and not args.theme:
             print(f"--theme is required for {name}", file=sys.stderr)
@@ -738,6 +741,11 @@ def cmd_report(args: argparse.Namespace) -> int:
         if name != "evidence-matrix" and (getattr(args, "csv_out", "") or getattr(args, "json_out", "")):
             print("--csv-out and --json-out are only supported for evidence-matrix", file=sys.stderr)
             return 2
+    if len(selected) > 1:
+        _preflight_output_paths([reports_dir / f"{name.replace('-', '_')}.md" for name in selected], force=args.force)
+    elif selected and selected[0] != "evidence-matrix":
+        _preflight_output_paths([args.out or (reports_dir / f"{selected[0].replace('-', '_')}.md")], force=args.force)
+    for name in selected:
         if name == "evidence-matrix":
             matrix_output_paths: list[str | Path] = [
                 args.out if args.out and len(selected) == 1 else reports_dir / "evidence_matrix.md"

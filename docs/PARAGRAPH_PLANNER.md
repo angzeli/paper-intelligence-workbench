@@ -14,7 +14,7 @@ Default purposes are:
 For each paragraph, the report lists claim IDs, papers to cite, claims to avoid, missing evidence, and caveats.
 
 ```bash
-paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_paragraph_plan.md --force
+paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_paragraph_plan.md --force
 ```
 
 The output is not polished prose. It is a planning checklist for the user.

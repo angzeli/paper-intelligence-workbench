@@ -1,6 +1,6 @@
-# CLI Surface v1.0-rc
+# CLI Surface v1.1
 
-The stable external interface for Paper Intelligence Workbench v1.0-rc is the
+The stable external interface for Paper Intelligence Workbench v1.1 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -42,7 +42,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.0-rc.
+No commands are deprecated in v1.1.
 
 ## Write Safety Contract
 

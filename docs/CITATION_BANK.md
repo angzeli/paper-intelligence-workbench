@@ -16,7 +16,7 @@ Groups include:
 Each row includes the paper title, year, venue, BibTeX key, reading status, linked claims, evidence strength, and warnings.
 
 ```bash
-paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_citation_bank.md --force
+paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_citation_bank.md --force
 ```
 
 The grouping is a local completeness aid. It does not invent a citation role for a paper without a tracked claim.

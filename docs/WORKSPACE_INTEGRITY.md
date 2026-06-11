@@ -3,7 +3,7 @@
 v0.9 adds a local integrity check for workspace consistency before risky operations such as migration or restore.
 
 ```bash
-paperwb integrity check --project zis_photocatalysis --out reports/workspace_integrity_v0_9.md --force
+paperwb integrity check --project zis_photocatalysis --out scratch/workspace_integrity_v0_9.md --force
 ```
 
 The check is read-only. It reports missing folders, missing registry/BibTeX/theme inputs, notes that reference unknown paper IDs, path containment problems, local-file warnings, tracked cache databases, and tracked PDFs in repository data.

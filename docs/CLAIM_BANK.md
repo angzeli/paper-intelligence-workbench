@@ -15,7 +15,7 @@ Sections include:
 Generate one with:
 
 ```bash
-paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_claim_bank.md --force
+paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_claim_bank.md --force
 ```
 
 Use the report to decide which claims can support a subsection and which claims need more reading before citation.

@@ -37,7 +37,13 @@ def load_project_inputs(project_path=ZIS_PROJECT):
 def test_extract_citations_supports_markdown_and_latex_patterns():
     text = "Mix [@smith2024; @lee2023] with \\citep{zhao2022,kim2021} and @solo2020."
     keys = [citation.key for citation in extract_citations(text)]
-    assert keys == ["zhao2022", "kim2021", "smith2024", "lee2023", "solo2020"]
+    assert keys == ["smith2024", "lee2023", "zhao2022", "kim2021", "solo2020"]
+
+
+def test_extract_citations_preserves_mixed_syntax_source_order():
+    text = "First @alpha2024, then \\cite{beta2025,gamma2026}, then [@delta2027]."
+    keys = [citation.key for citation in extract_citations(text)]
+    assert keys == ["alpha2024", "beta2025", "gamma2026", "delta2027"]
 
 
 def test_parse_markdown_draft_extracts_sections_paragraphs_and_citations():

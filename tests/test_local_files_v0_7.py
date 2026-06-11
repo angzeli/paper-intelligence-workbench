@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from conftest import EXAMPLE_REGISTRY
+import paper_workbench.files as files_module
 from paper_workbench.files import (
     duplicate_files_report,
     link_file_to_paper,
@@ -201,6 +202,64 @@ def test_link_refuses_to_overwrite_existing_pdf_path_without_force(tmp_path):
     assert "already has local_pdf_path" in result.stderr
     assert not files_csv.exists()
     assert load_registry(registry)[1].local_pdf_path == "papers/existing.pdf"
+
+
+def test_link_rolls_back_file_registry_when_registry_write_fails(tmp_path, monkeypatch):
+    root, registry, files_csv = make_file_workspace(tmp_path)
+    linked_pdf = root / "papers" / "paper_beta.pdf"
+    linked_pdf.write_bytes(b"%PDF-1.4 beta synthetic placeholder\n")
+
+    def fail_save_registry(*_args, **_kwargs):
+        raise RuntimeError("simulated registry write failure")
+
+    monkeypatch.setattr(files_module, "save_registry", fail_save_registry)
+
+    try:
+        link_file_to_paper(
+            paper_id="paper_beta",
+            file_path="papers/paper_beta.pdf",
+            root=root,
+            registry_path=registry,
+            file_registry_path=files_csv,
+        )
+    except RuntimeError as exc:
+        assert "simulated registry write failure" in str(exc)
+    else:
+        raise AssertionError("link_file_to_paper should have raised")
+
+    assert not files_csv.exists()
+    assert load_registry(registry)[1].local_pdf_path == ""
+
+
+def test_unlink_rolls_back_file_registry_when_registry_write_fails(tmp_path, monkeypatch):
+    root, registry, files_csv = make_file_workspace(tmp_path)
+    linked_pdf = root / "papers" / "paper_beta.pdf"
+    linked_pdf.write_bytes(b"%PDF-1.4 beta synthetic placeholder\n")
+    link_file_to_paper(
+        paper_id="paper_beta",
+        file_path="papers/paper_beta.pdf",
+        root=root,
+        registry_path=registry,
+        file_registry_path=files_csv,
+    )
+    before_files = files_csv.read_text(encoding="utf-8")
+    before_registry = registry.read_text(encoding="utf-8")
+
+    def fail_save_registry(*_args, **_kwargs):
+        raise RuntimeError("simulated registry write failure")
+
+    monkeypatch.setattr(files_module, "save_registry", fail_save_registry)
+
+    try:
+        unlink_file_from_paper(paper_id="paper_beta", root=root, registry_path=registry, file_registry_path=files_csv)
+    except RuntimeError as exc:
+        assert "simulated registry write failure" in str(exc)
+    else:
+        raise AssertionError("unlink_file_from_paper should have raised")
+
+    assert files_csv.read_text(encoding="utf-8") == before_files
+    assert registry.read_text(encoding="utf-8") == before_registry
+    assert load_registry(registry)[1].local_pdf_path == "papers/paper_beta.pdf"
 
 
 def test_cli_files_scan_status_audit_hash_and_sidecars(tmp_path):

@@ -54,3 +54,26 @@ def test_report_index_groups_current_historical_and_next_reports(tmp_path):
     assert "[inventory.md]" in index
     assert "[hostile_review_latest.md]" in index
     assert "hostile_review_v0_2.md" not in index
+
+
+def test_report_index_treats_v1_reports_as_current(tmp_path):
+    reports_dir = tmp_path / "reports"
+    reports_dir.mkdir()
+    for name in (
+        "release_readiness_v1_1.md",
+        "draft_audit_v1_1.md",
+        "release_readiness_v1_0_rc.md",
+        "release_readiness_v0_10.md",
+        "v1_2_recommended_patch_plan.md",
+        "hostile_review_latest.md",
+    ):
+        (reports_dir / name).write_text(f"# {name}\n", encoding="utf-8")
+
+    index = report_index_markdown(reports_dir, output_path=tmp_path / "index.md")
+
+    assert "## Current v1.1 Release Reports" in index
+    assert "[release_readiness_v1_1.md]" in index
+    assert "[draft_audit_v1_1.md]" in index
+    assert "## Next Patch Plan" in index
+    assert "[v1_2_recommended_patch_plan.md]" in index
+    assert "release_readiness_v1_0_rc.md" in index

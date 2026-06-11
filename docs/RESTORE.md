@@ -22,7 +22,7 @@ Restore never deletes unrelated files. It copies files from the backup back to t
 Use `--out` to write a restore plan/report:
 
 ```bash
-paperwb backup restore BACKUP_ID --project zis_photocatalysis --dry-run --out reports/restore_dry_run_v0_9.md --force-report
+paperwb backup restore BACKUP_ID --project zis_photocatalysis --dry-run --out scratch/restore_dry_run_v0_9.md --force-report
 ```
 
 Review overwrite counts before using `--force`.

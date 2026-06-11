@@ -30,7 +30,7 @@ Indexed search prints:
 Markdown export includes matched field and snippet:
 
 ```bash
-paperwb search "charge separation" --project zis_photocatalysis --indexed --out reports/search_charge_separation.md --force
+paperwb search "charge separation" --project zis_photocatalysis --indexed --out scratch/search_charge_separation.md --force
 ```
 
 ## Source Filters

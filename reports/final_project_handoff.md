@@ -1,7 +1,7 @@
 # Final Project Handoff: Paper Intelligence Workbench
 
 Date: 2026-06-11
-Stage: v1.0-rc handoff
+Stage: v1.1 post-review handoff
 
 ## Project Purpose
 
@@ -48,6 +48,7 @@ Core modules:
 - `paper_workbench.migration`: non-destructive legacy `data/` to project-profile migration planning/copying.
 - `paper_workbench.auditlog`: ignored local JSONL audit log.
 - `paper_workbench.synthetic`: deterministic synthetic stress project generation.
+- `paper_workbench.drafts`: Markdown draft parsing, citation extraction, paragraph evidence matching, and revision checklist reports.
 - `paper_workbench.errors` and `paper_workbench.safety`: diagnostic formatting and tracked-file data-safety checks.
 - `paper_workbench.cli`: argparse command surface. It is large and should be refactored only after release blockers are cleared.
 
@@ -66,6 +67,7 @@ Authoritative user data remains local CSV, Markdown, BibTeX, RIS, JSON, and opti
 - v0.9: workspace integrity model, audit log, backup snapshots, restore planning, non-destructive legacy migration workflow, safe-write documentation, and migration/safety simulation.
 - v0.10: adversarial fixture library, error taxonomy, malformed data tests, CLI failure-path coverage, warning snapshots, and recovery docs.
 - v1.0-rc: API and CLI surface inventories, command-contract docs/tests, clean-room/current-environment release checks, release report index, external-user simulation, data-safety report, and final release-readiness reports.
+- v1.1: draft citation auditor and manuscript evidence checker for local Markdown drafts, plus targeted post-review fixes for report-all write safety, v1.1 surface docs, local-file rollback, and draft citation ordering.
 
 ## CLI Command Map
 
@@ -86,6 +88,7 @@ Top-level commands:
 - `paperwb report ...`: generate inventory, reading-status, tag, BibTeX, claims, evidence, citation, missing-notes, weak-claims, dashboard, workspace-health, section-outline, and authoring reports.
 - `paperwb writing-packet`: generate a combined theme-specific writing planning packet.
 - `paperwb checklist`: generate a theme review checklist.
+- `paperwb draft parse/citations/audit/checklist/evidence-matrix`: audit Markdown drafts against local citation keys and tracked evidence without rewriting prose.
 - `paperwb doctor`: run workspace health diagnostics.
 - `paperwb integrity check`: run read-only workspace integrity checks.
 - `paperwb audit-log show/clear`: inspect or explicitly clear ignored local audit logs.
@@ -94,7 +97,7 @@ Top-level commands:
 - `paperwb export ...`: export claims, registry JSON, reading lists, Obsidian vaults, bundles, project summaries, and report indexes.
 - `paperwb synthetic generate`: generate deterministic synthetic stress projects.
 
-Important current CLI caveat: the latest hostile review found that `paperwb audit-log clear` without `--force` exposes an uncaught traceback. Fix that before public release.
+Important current CLI caveat: `paperwb report all` now preflights all output paths before writing and rejects `--out`; use `--reports-dir` for multi-report output. `paperwb audit-log clear` without `--force` now returns a clean user-facing error.
 
 ## Data Model Summary
 
@@ -174,7 +177,7 @@ Release and quality reports:
 
 ## Test Suite Summary
 
-The current test collection reports 153 tests across:
+The current test collection reports 167 tests across:
 
 - registry validation and duplicate detection;
 - BibTeX parser and validation behavior;
@@ -192,7 +195,8 @@ The current test collection reports 153 tests across:
 - v0.8 release engineering and hygiene;
 - v0.9 integrity, backup, migration, and audit-log workflows;
 - v0.10 adversarial data and failure-path coverage;
-- v1.0-rc command-contract coverage.
+- v1.0-rc command-contract coverage;
+- v1.1 draft audit, report-all write safety, report-index, and post-review regression coverage.
 
 Release scripts include:
 
@@ -207,14 +211,11 @@ CI runs Python 3.10, 3.11, and 3.12, installs `.[dev]`, runs tests, notebook che
 
 ## Known Limitations
 
-- The latest hostile review reports one release blocker: `paperwb audit-log clear` without `--force` raises a traceback.
-- `paperwb report all` can leave partial outputs when a later report path collides.
-- `paperwb report all --out ...` is accepted but ignored.
-- Some active docs still show examples writing to tracked `reports/` paths.
-- Package build was not locally verified in the review environment, though CI is configured to run it after installing development extras.
-- Some local file link/unlink behavior should be hardened against partial multi-file write failures.
+- The latest hostile review should be read as the pre-fix risk register; the targeted post-review pass fixed its release-blocking and high-priority findings except for broader architectural polish.
+- Package build now succeeds after installing declared development extras, but setuptools emits license metadata deprecation warnings that should be cleaned up before the 2027 deadline.
 - BibTeX parsing is intentionally lightweight and does not implement a full BibTeX macro engine.
 - Markdown note parsing is conservative and template-oriented.
+- Markdown draft parsing is conservative and does not fully handle complex tables, footnotes, comments, or every citation processor syntax.
 - Indexed search is lexical/local and can become stale until rebuilt.
 - Authoring readiness scores measure local evidence-tracking completeness, not truth.
 - The tool does not parse full PDF text by default and does not perform OCR.

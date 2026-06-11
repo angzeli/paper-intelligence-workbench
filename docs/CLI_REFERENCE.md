@@ -1,6 +1,6 @@
 # CLI Reference
 
-For the v1.0-rc stability inventory, see [CLI Surface](CLI_SURFACE.md) and
+For the v1.1 stability inventory, see [CLI Surface](CLI_SURFACE.md) and
 [Command Contracts](COMMAND_CONTRACTS.md). The CLI is the stable external
 interface; direct Python imports are documented separately in
 [API Surface](API_SURFACE.md).
@@ -23,7 +23,7 @@ paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb index status --project zis_photocatalysis --check-files
 paperwb search "charge separation" --project zis_photocatalysis --indexed
 paperwb files scan --project zis_photocatalysis
-paperwb files audit --project zis_photocatalysis --force
+paperwb files audit --project zis_photocatalysis --reports-dir scratch/file_reports --force
 paperwb doctor --out scratch/workspace_health.md
 ```
 
@@ -62,18 +62,18 @@ paperwb report subsection-readiness --theme photocorrosion
 paperwb report all
 ```
 
-Report commands refuse to overwrite an existing output file unless `--force` is provided. The same no-overwrite behavior applies to `claims --output`, `doctor --out`, `validate-bib --report`, and `validate-registry --json`.
+Report commands refuse to overwrite an existing output file unless `--force` is provided. `paperwb report all` writes multiple files under `--reports-dir`, preflights every output before writing, and rejects `--out` because it is a single-report destination. The same no-overwrite behavior applies to `claims --output`, `doctor --out`, `validate-bib --report`, and `validate-registry --json`.
 
 Authoring reports:
 
 ```bash
-paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_evidence_matrix.md --force
-paperwb report evidence-matrix --project zis_photocatalysis --theme charge_separation --csv-out reports/charge_matrix.csv --json-out reports/charge_matrix.json --force
-paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_claim_bank.md --force
-paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_citation_bank.md --force
-paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_paragraph_plan.md --force
-paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_readiness.md --force
-paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_writing_packet.md --force
+paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_evidence_matrix.md --force
+paperwb report evidence-matrix --project zis_photocatalysis --theme charge_separation --csv-out scratch/charge_matrix.csv --json-out scratch/charge_matrix.json --force
+paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_claim_bank.md --force
+paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_citation_bank.md --force
+paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_paragraph_plan.md --force
+paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_readiness.md --force
+paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_writing_packet.md --force
 ```
 
 These commands generate evidence-based planning aids, not final prose.
@@ -98,15 +98,15 @@ paperwb export registry-csv --out data/processed/registry.csv
 paperwb export registry-json --out data/processed/registry.json
 paperwb export claims --out data/processed/claims.csv
 paperwb export claims-json --out data/processed/claims.json
-paperwb export reading-list --tag photocorrosion --out reports/reading_list.md
-paperwb export unread --out reports/unread.md
+paperwb export reading-list --tag photocorrosion --out scratch/reading_list.md
+paperwb export unread --out scratch/unread.md
 paperwb export theme-claims --theme photocorrosion --out data/processed/photocorrosion_claims.json
-paperwb export reading-list --theme photocorrosion --out reports/photocorrosion.md
-paperwb export reading-list --high-priority --format csv --out reports/high_priority.csv
+paperwb export reading-list --theme photocorrosion --out scratch/photocorrosion.md
+paperwb export reading-list --high-priority --format csv --out scratch/high_priority.csv
 paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
 paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
-paperwb export project-summary --project zis_photocatalysis --out reports/project_summary.md
-paperwb export report-index --project zis_photocatalysis --out reports/index.md
+paperwb export project-summary --project zis_photocatalysis --out scratch/project_summary.md
+paperwb export report-index --project zis_photocatalysis --out scratch/report_index.md
 ```
 
 Export commands refuse to overwrite an existing output file unless `--force` is provided. Directory exports such as `obsidian` and `bundle` require a new or empty output directory; they do not merge into or clean non-empty directories.
@@ -115,11 +115,11 @@ Indexed search:
 
 ```bash
 paperwb index rebuild --project zis_photocatalysis --include-text
-paperwb index status --project zis_photocatalysis --include-text --check-files --out reports/index_status.md --force
+paperwb index status --project zis_photocatalysis --include-text --check-files --out scratch/index_status.md --force
 paperwb index clear --project zis_photocatalysis
 paperwb search photocorrosion --project zis_photocatalysis --indexed
 paperwb search photocorrosion --project zis_photocatalysis --indexed --text
-paperwb search "charge separation" --project zis_photocatalysis --indexed --out reports/search_charge_separation.md --force
+paperwb search "charge separation" --project zis_photocatalysis --indexed --out scratch/search_charge_separation.md --force
 ```
 
 The original substring search remains the default unless `--indexed` is provided. Cache databases live under `.paperwb/` and should not be committed.
@@ -130,7 +130,7 @@ Local files:
 paperwb files scan --project zis_photocatalysis
 paperwb files scan --project zis_photocatalysis --write-registry
 paperwb files status --project zis_photocatalysis
-paperwb files audit --project zis_photocatalysis --force
+paperwb files audit --project zis_photocatalysis --reports-dir scratch/file_reports --force
 paperwb files link PAPER_ID projects/zis_photocatalysis/papers/PAPER_ID.pdf --project zis_photocatalysis
 paperwb files unlink PAPER_ID --project zis_photocatalysis
 paperwb files hash projects/zis_photocatalysis/text/PAPER_ID.txt

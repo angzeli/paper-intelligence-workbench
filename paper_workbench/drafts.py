@@ -186,13 +186,16 @@ def _split_citation_keys(raw: str) -> list[str]:
 
 
 def extract_citations(text: str, *, paragraph_id: str = "", line_number: int = 0) -> list[DraftCitation]:
+    citation_matches: list[tuple[int, int, str, str, list[str]]] = []
+    for order, match in enumerate(CITE_COMMAND_RE.finditer(text)):
+        citation_matches.append((match.start(), order, match.group(0), "cite-command", _split_citation_keys(match.group(1))))
+    offset = len(citation_matches)
+    for order, match in enumerate(AT_CITATION_RE.finditer(text), start=offset):
+        citation_matches.append((match.start(), order, match.group(0), "at-key", [match.group(1).rstrip(".,;:!?")]))
     citations: list[DraftCitation] = []
-    for match in CITE_COMMAND_RE.finditer(text):
-        raw = match.group(0)
-        for key in _split_citation_keys(match.group(1)):
-            citations.append(DraftCitation(key=key, raw_text=raw, pattern="cite-command", paragraph_id=paragraph_id, line_number=line_number))
-    for match in AT_CITATION_RE.finditer(text):
-        citations.append(DraftCitation(key=match.group(1).rstrip(".,;:!?"), raw_text=match.group(0), pattern="at-key", paragraph_id=paragraph_id, line_number=line_number))
+    for _start, _order, raw, pattern, keys in sorted(citation_matches, key=lambda item: (item[0], item[1])):
+        for key in keys:
+            citations.append(DraftCitation(key=key, raw_text=raw, pattern=pattern, paragraph_id=paragraph_id, line_number=line_number))
     return citations
 
 

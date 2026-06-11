@@ -11,6 +11,28 @@ feature is usable on synthetic Markdown drafts and project-profile evidence.
 This is not a final prose writer. It does not fabricate citations, claims,
 quotes, or evidence.
 
+The targeted post-review hardening pass on 2026-06-11 addressed the
+release-blocking and high-priority issues from `reports/hostile_review_latest.md`:
+
+- `paperwb report all` now preflights every output path before writing any
+  report, so a later collision no longer leaves a partial report set.
+- `paperwb report all --out ...` now fails with a clear user-facing error
+  because `--out` is a single-report destination and `--reports-dir` controls
+  multi-report output.
+- Active API, CLI, and command-contract docs now describe v1.1 rather than
+  v1.0-rc.
+- User-facing documentation examples now write tutorial outputs to ignored
+  `scratch/` paths rather than checked-in `reports/` paths.
+- Local file link/unlink metadata updates now restore prior metadata files if
+  a later write fails.
+- Draft citation extraction now preserves citation source order across mixed
+  Markdown and LaTeX-style citation syntaxes.
+- The report index generator now recognizes v1.x report names when grouping
+  current release reports.
+- Local package build verification succeeded after installing the declared
+  development extra; setuptools emitted non-blocking license metadata
+  deprecation warnings for future cleanup.
+
 ## Implemented Features
 
 - Added `paper_workbench.drafts` with Markdown draft parsing, citation
@@ -48,10 +70,22 @@ quotes, or evidence.
 ## Tests Run
 
 - `python -m pytest -q`: passed.
-- Targeted draft and command-contract tests passed.
+- `python -m pytest --collect-only -q`: 167 tests collected.
+- Targeted report-all, draft-citation-order, local-file rollback,
+  report-index, docs-safety, and command-contract tests passed.
 - `python -c "import paper_workbench; print(paper_workbench.__version__)"`: passed, `1.1.0`.
 - `python scripts/validate_notebooks.py`: passed, 8 notebooks validated.
 - `python examples/draft_citation_audit_workflow.py`: passed and wrote ignored scratch outputs.
+- `python -m build --sdist --wheel`: passed after installing `.[dev]`.
+
+## Additional CLI Smoke Checks
+
+- `python -m paper_workbench.cli --help`: passed.
+- `python -m paper_workbench.cli files --help`: passed.
+- `python -m paper_workbench.cli draft citations drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis`: passed.
+- `python -m paper_workbench.cli report all ... --reports-dir <tmp>/paperwb_report_all_smoke --force`: passed and wrote a complete temporary report set.
+- `python -m paper_workbench.cli report all ... --out <tmp>/paperwb_report_all_single.md --force`: returned exit code 2 with a clear `--out is not supported with report all` message.
+- `python -m paper_workbench.cli report all ... --reports-dir <tmp>/paperwb_report_all_collision`: returned exit code 2 before writing partial outputs when a later report path already existed.
 
 ## Generated Reports
 
@@ -96,6 +130,9 @@ Report language uses terms such as "possible unsupported claim" and
   themes. Weak upstream evidence tracking produces weak audit quality.
 - Paragraphs in tables, footnotes, or complex Markdown constructs are not
   deeply parsed.
+- Package builds currently pass, but setuptools warns that the TOML license
+  table and license classifier should be modernized before the 2027 deprecation
+  deadline.
 
 ## Recommended v1.2 Scope
 

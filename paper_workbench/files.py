@@ -142,6 +142,24 @@ def save_file_registry(records: list[LocalFileRecord], path: str | Path, *, forc
     return write_csv_rows(path, rows, LOCAL_FILE_FIELDS, force=force)
 
 
+def _snapshot_metadata_files(paths: list[str | Path]) -> dict[Path, bytes | None]:
+    snapshots: dict[Path, bytes | None] = {}
+    for raw_path in paths:
+        path = Path(raw_path)
+        snapshots[path] = path.read_bytes() if path.exists() else None
+    return snapshots
+
+
+def _restore_metadata_files(snapshots: dict[Path, bytes | None]) -> None:
+    for path, content in snapshots.items():
+        if content is None:
+            if path.exists():
+                path.unlink()
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+
+
 def merge_file_registry_records(scanned: list[LocalFileRecord], existing: list[LocalFileRecord]) -> list[LocalFileRecord]:
     """Merge a fresh scan with existing user-maintained file-registry rows."""
     existing_by_key = {(record.paper_id, record.relative_path): record for record in existing}
@@ -356,10 +374,18 @@ def link_file_to_paper(
     )
     records = [item for item in load_file_registry(file_registry_path) if not (item.paper_id == paper_id and item.relative_path == rel)]
     records.append(record)
-    save_file_registry(records, file_registry_path, force=True)
+    snapshot_paths = [file_registry_path]
     if file_type == "pdf":
-        paper.local_pdf_path = rel
-        save_registry(papers, registry_path)
+        snapshot_paths.append(registry_path)
+    snapshots = _snapshot_metadata_files(snapshot_paths)
+    try:
+        save_file_registry(records, file_registry_path, force=True)
+        if file_type == "pdf":
+            paper.local_pdf_path = rel
+            save_registry(papers, registry_path)
+    except Exception:
+        _restore_metadata_files(snapshots)
+        raise
     return record
 
 
@@ -374,16 +400,24 @@ def unlink_file_from_paper(
     records = load_file_registry(file_registry_path)
     kept = [record for record in records if record.paper_id != paper_id]
     removed = len(records) - len(kept)
-    save_file_registry(kept, file_registry_path, force=True)
-    if removed and clear_pdf and Path(registry_path).exists():
-        papers = load_registry(registry_path)
-        changed = False
-        for paper in papers:
-            if paper.paper_id == paper_id and paper.local_pdf_path:
-                paper.local_pdf_path = ""
-                changed = True
-        if changed:
-            save_registry(papers, registry_path)
+    snapshot_paths = [file_registry_path]
+    if clear_pdf and Path(registry_path).exists():
+        snapshot_paths.append(registry_path)
+    snapshots = _snapshot_metadata_files(snapshot_paths)
+    try:
+        save_file_registry(kept, file_registry_path, force=True)
+        if removed and clear_pdf and Path(registry_path).exists():
+            papers = load_registry(registry_path)
+            changed = False
+            for paper in papers:
+                if paper.paper_id == paper_id and paper.local_pdf_path:
+                    paper.local_pdf_path = ""
+                    changed = True
+            if changed:
+                save_registry(papers, registry_path)
+    except Exception:
+        _restore_metadata_files(snapshots)
+        raise
     return removed
 
 

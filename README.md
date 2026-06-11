@@ -20,7 +20,7 @@ v0.9 adds data-integrity safeguards for real local use: workspace integrity chec
 
 v0.10 adds an adversarial torture suite, fuzz-style fixtures, clearer error taxonomy, CLI failure-path tests, and regression checks for malformed local data.
 
-v1.0-rc adds release-candidate hardening: API and CLI surface inventories, command-contract checks, current-environment release checks, external-user simulation reports, data-safety review, and a final release-readiness verdict before tagging.
+v1.0-rc added release-candidate hardening: API and CLI surface inventories, command-contract checks, current-environment release checks, external-user simulation reports, data-safety review, and a final release-readiness verdict before tagging.
 
 v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown literature-review drafts. It extracts citation keys, checks local BibTeX/registry/note/claim coverage, flags weak or review-only support, and generates revision checklists without rewriting prose or inventing evidence.
 
@@ -45,7 +45,7 @@ v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown 
 - Generates theme-specific writing aids from tracked local claims and citations.
 - Checks workspace integrity, writes local audit events, creates local backup snapshots, plans safe restores, and plans/copies non-destructive legacy-to-project migrations.
 - Stress-tests malformed local data with synthetic adversarial fixtures and clear error-message expectations.
-- Documents the v1.0-rc API and CLI surface so external users can see what is stable, experimental, and internal.
+- Documents the v1.1 API and CLI surface so external users can see what is stable, experimental, and internal.
 - Audits Markdown drafts against local citation keys, structured notes, extracted claims, and theme evidence.
 
 ## What It Does Not Do
@@ -139,7 +139,7 @@ paperwb search photocorrosion --project zis_photocatalysis
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb search photocorrosion --project zis_photocatalysis --indexed
 paperwb files scan --project zis_photocatalysis
-paperwb files audit --project zis_photocatalysis --force
+paperwb files audit --project zis_photocatalysis --reports-dir scratch/zis_file_reports --force
 paperwb report evidence-map --project zis_photocatalysis --out scratch/zis_evidence_map.md --force
 paperwb export claims-json --project zis_photocatalysis --out scratch/zis_claims.json --force
 ```
@@ -181,7 +181,7 @@ Export local writing and backup artifacts:
 ```bash
 paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
 paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
-paperwb export reading-list --theme photocorrosion --project zis_photocatalysis --out reports/reading_list_photocorrosion.md --force
+paperwb export reading-list --theme photocorrosion --project zis_photocatalysis --out scratch/reading_list_photocorrosion.md --force
 ```
 
 Imports preserve existing registry rows. `--fill-missing` fills only blank fields on matched records; it does not overwrite non-empty user fields.
@@ -200,7 +200,7 @@ Search indexed registry, BibTeX, note, claim, theme, tag, and sidecar records:
 ```bash
 paperwb search "charge separation" --project zis_photocatalysis --indexed
 paperwb search photocorrosion --project zis_photocatalysis --indexed --text
-paperwb search "charge separation" --project zis_photocatalysis --indexed --out reports/search_charge_separation.md --force
+paperwb search "charge separation" --project zis_photocatalysis --indexed --out scratch/search_charge_separation.md --force
 ```
 
 The index is a local cache under `.paperwb/` and is ignored by git. Full-text sidecars are plain `.txt` files supplied by the user, such as `projects/zis_photocatalysis/text/PAPER_ID.txt`; the tool does not parse PDFs by default.
@@ -210,12 +210,12 @@ The index is a local cache under `.paperwb/` and is ignored by git. Full-text si
 Generate local planning aids for a theme:
 
 ```bash
-paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_evidence_matrix.md --force
-paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_claim_bank.md --force
-paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_citation_bank.md --force
-paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_paragraph_plan.md --force
-paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_readiness.md --force
-paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_writing_packet.md --force
+paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_evidence_matrix.md --force
+paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_claim_bank.md --force
+paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_citation_bank.md --force
+paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_paragraph_plan.md --force
+paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_readiness.md --force
+paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_writing_packet.md --force
 ```
 
 See [docs/AUTHORING_WORKBENCH.md](docs/AUTHORING_WORKBENCH.md).
@@ -225,7 +225,7 @@ See [docs/AUTHORING_WORKBENCH.md](docs/AUTHORING_WORKBENCH.md).
 Check integrity and create a local backup before risky changes:
 
 ```bash
-paperwb integrity check --project zis_photocatalysis --out reports/workspace_integrity_v0_9.md --force
+paperwb integrity check --project zis_photocatalysis --out scratch/workspace_integrity_v0_9.md --force
 paperwb backup create --project zis_photocatalysis --notes "Before major note cleanup"
 paperwb backup list --project zis_photocatalysis
 ```
@@ -234,13 +234,13 @@ Restore is dry-run by default unless `--force` is passed:
 
 ```bash
 paperwb backup plan-restore BACKUP_ID --project zis_photocatalysis
-paperwb backup restore BACKUP_ID --project zis_photocatalysis --dry-run --out reports/restore_dry_run_v0_9.md --force-report
+paperwb backup restore BACKUP_ID --project zis_photocatalysis --dry-run --out scratch/restore_dry_run_v0_9.md --force-report
 ```
 
 Plan a non-destructive legacy `data/` migration:
 
 ```bash
-paperwb migrate plan --from legacy --to-project migrated_lit_review --out reports/migration_plan_v0_9.md --force
+paperwb migrate plan --from legacy --to-project migrated_lit_review --out scratch/migration_plan_v0_9.md --force
 paperwb migrate run --from legacy --to-project migrated_lit_review --dry-run
 ```
 

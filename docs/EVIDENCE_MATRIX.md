@@ -20,9 +20,9 @@ Generate Markdown, CSV, and JSON:
 paperwb report evidence-matrix \
   --project zis_photocatalysis \
   --theme charge_separation \
-  --out reports/charge_separation_evidence_matrix.md \
-  --csv-out reports/charge_separation_evidence_matrix.csv \
-  --json-out reports/charge_separation_evidence_matrix.json \
+  --out scratch/charge_separation_evidence_matrix.md \
+  --csv-out scratch/charge_separation_evidence_matrix.csv \
+  --json-out scratch/charge_separation_evidence_matrix.json \
   --force
 ```
 

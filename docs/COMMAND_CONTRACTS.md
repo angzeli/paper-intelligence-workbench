@@ -1,6 +1,6 @@
-# Command Contracts v1.0-rc
+# Command Contracts v1.1
 
-This page defines the release-candidate behavior expected by tests and external
+This page defines the v1.1 behavior expected by tests and external
 users. The contract is intentionally practical: it describes command behavior,
 not internal implementation details.
 
@@ -33,7 +33,7 @@ not internal implementation details.
 | `search` | yes | substring and indexed examples | missing index with `--indexed` | read-only unless `--out` |
 | `index` | yes | temp SQLite index rebuild/status | stale or missing index | cache is rebuildable and ignored |
 | `files` | yes | scan/audit/hash sidecars | missing files or overwrite refusal | no delete/move/copy |
-| `report` | yes | inventory/evidence/citation/authoring reports | missing theme or overwrite refusal | no overwrite without `--force` |
+| `report` | yes | inventory/evidence/citation/authoring reports | missing theme, invalid `report all --out`, or overwrite refusal | no overwrite without `--force`; `report all` preflights every output before writing |
 | `writing-packet` | yes | synthetic theme packet | unknown theme | planning aid only |
 | `draft` | yes | parse/audit/checklist synthetic drafts | unknown citations or overwrite refusal | no draft rewrite; reports only |
 | `doctor` | yes | workspace-health report | missing inputs | read-only unless `--out` |
