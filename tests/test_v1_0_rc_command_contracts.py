@@ -30,6 +30,7 @@ def test_major_cli_help_contracts_are_available():
         (("files", "--help"), "{scan,status,link"),
         (("report", "--help"), "evidence-matrix"),
         (("writing-packet", "--help"), "--theme"),
+        (("draft", "--help"), "{parse,citations,audit,checklist,evidence-matrix}"),
         (("doctor", "--help"), "--strict"),
         (("integrity", "--help"), "{check}"),
         (("audit-log", "--help"), "{show,clear}"),
@@ -89,6 +90,11 @@ def test_command_contract_no_overwrite_and_failure_paths(tmp_path):
     assert missing_backup.returncode == 2
     assert "Next step:" in missing_backup.stderr
     assert "Traceback" not in missing_backup.stderr
+
+    audit_clear = run_cli("audit-log", "clear")
+    assert audit_clear.returncode == 2
+    assert "--force" in audit_clear.stderr
+    assert "Traceback" not in audit_clear.stderr
 
 
 def test_import_dry_run_contract_does_not_modify_registry(tmp_path):
