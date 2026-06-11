@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
-import os
 from pathlib import Path
 import re
 import shutil
 
 from .claims import claim_to_row, save_claims_csv
 from .io import write_csv_rows, write_json, write_text
+from .paths import display_path
 from .registry import REGISTRY_FIELDS, filter_papers, parse_boolish, paper_to_row, save_registry, save_registry_json
 from .schema import Claim, Paper, PaperNote, ProjectTheme, dataclass_to_plain
-from .tags import format_tags, parse_tags, theme_by_tag, themes_for_tags
+from .tags import format_tags, normalize_theme_id, parse_tags, theme_by_tag, themes_for_tags
 
 
 def _relativize_note_file(row: dict) -> dict:
@@ -59,7 +59,7 @@ def _filtered_reading_list(
 ) -> list[Paper]:
     filtered = filter_papers(papers, tag=tag, status=status)
     if theme and themes:
-        wanted = theme.strip().lower().replace(" ", "-").replace("_", "-")
+        wanted = normalize_theme_id(theme)
         filtered = [
             paper
             for paper in filtered
@@ -179,11 +179,11 @@ def export_reading_list(
 
 
 def export_theme_claims(claims: list[Claim], out: str | Path, *, theme: str, force: bool = True) -> Path:
-    wanted = theme.strip().lower().replace(" ", "-").replace("_", "-")
+    wanted = normalize_theme_id(theme)
     selected = [
         claim
         for claim in claims
-        if wanted == claim.supports_theme.strip().lower().replace(" ", "-").replace("_", "-")
+        if wanted == normalize_theme_id(claim.supports_theme)
         or wanted in claim.tags
     ]
     return write_json(out, [_relativize_note_file(claim_to_row(claim)) for claim in selected], force=force)
@@ -311,7 +311,7 @@ def _themes_page(papers: list[Paper], claims: list[Claim], themes: list[ProjectT
         theme_claims = [
             claim
             for claim in claims
-            if theme.theme_id == claim.supports_theme.strip().lower().replace(" ", "-").replace("_", "-")
+            if theme.theme_id == normalize_theme_id(claim.supports_theme)
             or any(theme_map.get(tag) and theme_map[tag].theme_id == theme.theme_id for tag in parse_tags(claim.tags))
         ]
         lines.extend([f"## {theme.name}", "", f"- Papers: {len(theme_papers)}", f"- Claims: {len(theme_claims)}", ""])
@@ -483,11 +483,7 @@ def export_project_summary(papers: list[Paper], claims: list[Claim], themes: lis
 
 
 def _display_path(path: Path, *, base: Path | None = None) -> str:
-    start = base if base is not None else Path.cwd()
-    try:
-        return Path(os.path.relpath(path, start=start)).as_posix()
-    except ValueError:
-        return path.as_posix()
+    return display_path(path, base_path=base)
 
 
 def _report_version(path: Path) -> tuple[int, int] | None:

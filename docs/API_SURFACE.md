@@ -1,7 +1,7 @@
-# API Surface v1.7
+# API Surface v1.8
 
 Paper Intelligence Workbench is a local-first command-line project. The Python
-package is usable by tests and scripts, but v1.7 does not promise a broad
+package is usable by tests and scripts, but v1.8 does not promise a broad
 stable library API. The stable user interface is the `paperwb` CLI plus the
 documented local file formats.
 
@@ -9,9 +9,9 @@ The package does not use cloud APIs, LLM APIs, publisher scraping, or remote
 metadata lookup. API helpers operate on user-provided local CSV, JSON,
 Markdown, BibTeX, RIS, text sidecar, and project-profile files.
 
-## Stable For v1.7
+## Stable For v1.8
 
-The stable external API for v1.7 is the CLI plus documented file formats.
+The stable external API for v1.8 is the CLI plus documented file formats.
 For Python callers, only these small entry points are treated as stable enough
 for local automation:
 
@@ -47,7 +47,7 @@ The dataclasses in `paper_workbench.schema` are stable enough for local scripts:
 - `ValidationFinding`
 - enum-like constants for reading status, claim strength, and evidence type
 
-Fields may grow in future releases, but v1.7 aims to preserve existing field
+Fields may grow in future releases, but v1.8 aims to preserve existing field
 names and meanings.
 
 ## Semi-Stable And Experimental Modules
@@ -90,13 +90,16 @@ These modules are implementation details:
 
 - `paper_workbench.cli`
 - `paper_workbench.io`
-- `paper_workbench.paths`
+
+The `paper_workbench.paths.display_path` helper is shared internally to keep
+report path rendering consistent, but `paper_workbench.paths` as a module
+remains low-level and should not be treated as a plugin surface.
 
 They can be imported by tests, but they are not a stable extension API.
 
 ## Compatibility Notes
 
-- v1.7 keeps the legacy `data/` workflow and the `projects/` workflow.
+- v1.8 keeps the legacy `data/` workflow and the `projects/` workflow.
 - CSV, JSON, Markdown notes, BibTeX, RIS, and theme JSON remain authoritative
   inputs.
 - SQLite indexes, audit logs, caches, backups, and generated reports are

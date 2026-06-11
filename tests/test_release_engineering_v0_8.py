@@ -16,7 +16,7 @@ def test_package_metadata_matches_import_version_and_cli_entrypoint():
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert f'version = "{__version__}"' in content
-    assert __version__ == "1.7.0"
+    assert __version__ == "1.8.0"
     assert 'requires-python = ">=3.10"' in content
     assert "dependencies = []" in content
     assert 'paperwb = "paper_workbench.cli:main"' in content
@@ -80,7 +80,7 @@ def test_smoke_cli_workflow_quick_generates_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "CLI Smoke Workflow v1.7" in content
+    assert "CLI Smoke Workflow v1.8" in content
     assert "Failures: 0" in content
     assert "validate registry" in content
     assert "dashboard next actions" in content

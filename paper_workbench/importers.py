@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import csv
 import json
-import os
 from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import date
@@ -14,6 +13,7 @@ import re
 from .bibtex import parse_bibtex_file
 from .errors import format_error_message
 from .io import load_json, read_text, write_text
+from .paths import display_path
 from .registry import REGISTRY_FIELDS, generate_paper_id, normalize_doi, normalize_title, parse_authors, paper_from_row, paper_to_row
 from .schema import Author, Paper, SourceType, ValidationFinding, enum_values
 from .tags import format_tags, parse_tags
@@ -650,19 +650,7 @@ def import_report(result: ImportResult) -> str:
 
 
 def _display_path(path: str | Path) -> str:
-    if not path:
-        return ""
-    target = Path(path)
-    base = Path.cwd()
-    try:
-        if target.is_absolute():
-            return target.relative_to(base.resolve()).as_posix()
-    except ValueError:
-        pass
-    try:
-        return Path(os.path.relpath(target, start=base)).as_posix()
-    except (OSError, ValueError):
-        return target.as_posix()
+    return display_path(path)
 
 
 def write_import_report(result: ImportResult, out: str | Path, *, force: bool = False) -> Path:

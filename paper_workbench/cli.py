@@ -175,7 +175,7 @@ from .sync import (
     sync_plan_report,
     write_registry_apply_result,
 )
-from .tags import load_themes, normalize_tag
+from .tags import load_themes, normalize_tag, normalize_theme_id
 from .templates import create_project_from_template, inspect_template, list_templates, template_summary
 
 
@@ -1085,13 +1085,13 @@ def cmd_writing_packet(args: argparse.Namespace) -> int:
 def cmd_checklist(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes"))
     papers, notes, claims, entries, themes, paths = _report_inputs(args)
-    theme_id = args.theme.lower().replace(" ", "-").replace("_", "-")
+    theme_id = normalize_theme_id(args.theme)
     relevant = [theme for theme in themes if theme.theme_id == theme_id or theme.name.lower() == args.theme.lower()]
     if not relevant:
         print(f"Unknown theme: {args.theme}", file=sys.stderr)
         return 2
     theme = relevant[0]
-    mapped_claims = [claim for claim in claims if theme.theme_id in claim.supports_theme.lower().replace(" ", "-") or theme.theme_id in claim.tags]
+    mapped_claims = [claim for claim in claims if theme.theme_id in normalize_theme_id(claim.supports_theme) or theme.theme_id in claim.tags]
     note_ids = {note.paper_id for note in notes}
     print(f"# Review Checklist: {theme.name}")
     print()

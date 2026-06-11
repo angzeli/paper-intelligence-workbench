@@ -36,6 +36,8 @@ v1.6 adds a dependency-free terminal dashboard and next-action workflow. It summ
 
 v1.7 adds reusable project templates and dogfooding scaffolds for photocatalysis, finance/valuation, ML methods, and generic literature-review projects. Templates create empty local project structures with themes, rule examples, note templates, and checklists; they do not include real paper metadata or claims.
 
+v1.8 is an architecture cleanup release. It centralizes duplicated internal path-display and theme-normalization helpers, clarifies the Python API boundary, and adds release-readiness reports without changing the public CLI workflow.
+
 ## What It Does
 
 - Maintains a CSV paper registry.

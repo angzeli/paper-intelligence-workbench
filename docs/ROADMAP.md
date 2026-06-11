@@ -134,7 +134,14 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Empty project scaffolds with themes, rule examples, note templates, report checklists, manuscript QA checklists, reading queue config, and dashboard expectations.
 - Dogfooding workflow docs and template overview reports.
 
-## Near-Term Patches for v1.8
+## v1.8 Completed
+
+- Centralized duplicated internal path-display helpers.
+- Centralized theme ID normalization for theme-aware exports and checklists.
+- Clarified that the CLI and documented local file formats are the stable public surface.
+- Added architecture cleanup tests and release-readiness reports.
+
+## Near-Term Patches for v1.9
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -188,7 +195,7 @@ Possible future commands:
 - unresolved question summaries
 - safer BibTeX key normalization commands
 
-## v1.8 Candidate Scope
+## v1.9 Candidate Scope
 
 - Harden dashboard prioritization with more real project fixtures.
 - Add rule-finding export formats and optional filters to avoid noisy all-in reports.

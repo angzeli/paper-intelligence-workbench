@@ -20,6 +20,10 @@ def normalize_tag(tag: str) -> str:
     return value
 
 
+def normalize_theme_id(value: str) -> str:
+    return normalize_tag(value)
+
+
 def parse_tags(value: str | list[str] | None) -> list[str]:
     if value is None:
         return []
@@ -72,7 +76,7 @@ def load_themes(path: str | Path) -> list[ProjectTheme]:
     for row in rows:
         themes.append(
             ProjectTheme(
-                theme_id=normalize_tag(row.get("theme_id") or row.get("name", "")),
+                theme_id=normalize_theme_id(row.get("theme_id") or row.get("name", "")),
                 name=row.get("name", row.get("theme_id", "")),
                 tags=parse_tags(row.get("tags", [])),
                 min_claims=int(row.get("min_claims", 2) or 2),

@@ -1,6 +1,6 @@
-# CLI Surface v1.7
+# CLI Surface v1.8
 
-The stable external interface for Paper Intelligence Workbench v1.7 is the
+The stable external interface for Paper Intelligence Workbench v1.8 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -49,7 +49,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.7.
+No commands are deprecated in v1.8.
 
 ## Write Safety Contract
 

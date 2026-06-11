@@ -1,6 +1,6 @@
-# Command Contracts v1.7
+# Command Contracts v1.8
 
-This page defines the v1.7 behavior expected by tests and external
+This page defines the v1.8 behavior expected by tests and external
 users. The contract is intentionally practical: it describes command behavior,
 not internal implementation details.
 

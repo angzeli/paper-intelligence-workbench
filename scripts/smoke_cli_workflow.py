@@ -149,7 +149,7 @@ def run_step(step: SmokeStep) -> SmokeResult:
     return SmokeResult(step.name, step.args, result.returncode, result.stdout, result.stderr)
 
 
-def report_markdown(results: list[SmokeResult], tmp: Path, *, title: str = "CLI Smoke Workflow v1.7") -> str:
+def report_markdown(results: list[SmokeResult], tmp: Path, *, title: str = "CLI Smoke Workflow v1.8") -> str:
     lines = [
         f"# {title}",
         "",
@@ -184,7 +184,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run a non-destructive Paper Workbench CLI smoke workflow.")
     parser.add_argument("--out", default="", help="Optional Markdown report path.")
     parser.add_argument("--quick", action="store_true", help="Run a shorter smoke set for unit tests.")
-    parser.add_argument("--title", default="CLI Smoke Workflow v1.7", help="Markdown report title.")
+    parser.add_argument("--title", default="CLI Smoke Workflow v1.8", help="Markdown report title.")
     args = parser.parse_args(argv)
 
     with tempfile.TemporaryDirectory(prefix="paperwb_smoke_") as tmp_name:

@@ -6,7 +6,6 @@ from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hashlib
-import os
 from pathlib import Path
 import re
 import sqlite3
@@ -14,6 +13,7 @@ import sqlite3
 from .bibtex import parse_bibtex_file
 from .claims import collect_notes
 from .io import read_text, write_text
+from .paths import display_path as _shared_display_path
 from .registry import display_authors, load_registry, normalize_doi, normalize_title
 from .schema import BibTeXEntry, Claim, Paper, PaperNote, ProjectTheme
 from .tags import format_tags, load_themes, parse_tags
@@ -683,19 +683,7 @@ def _snippet(text: str, query: str, *, width: int = 180) -> str:
 
 
 def display_path(path: str | Path, *, base_path: str | Path | None = None) -> str:
-    if not path:
-        return ""
-    target = Path(path)
-    base = Path(base_path) if base_path is not None else Path.cwd()
-    try:
-        if target.is_absolute():
-            return Path(target).relative_to(base.resolve()).as_posix()
-    except ValueError:
-        pass
-    try:
-        return Path(os.path.relpath(target, start=base)).as_posix()
-    except (OSError, ValueError):
-        return target.as_posix()
+    return _shared_display_path(path, base_path=base_path)
 
 
 def search_results_markdown(results: list[SearchResult], query: str, *, base_path: str | Path | None = None) -> str:

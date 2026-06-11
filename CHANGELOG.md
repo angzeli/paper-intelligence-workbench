@@ -2,6 +2,13 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.8.0 - Architecture Cleanup and Internal API Stabilization
+
+- Centralized internal path display logic used by search, indexed search, imports, and report indexes.
+- Centralized theme-id normalization for theme-aware exports and checklist filtering.
+- Clarified API surface docs: the CLI remains stable; low-level helpers remain internal unless explicitly listed.
+- Added architecture cleanup regression tests and release-readiness reports.
+
 ## v1.7.0 - Project Templates and Dogfooding
 
 - Added `paperwb template list/inspect/create` for reusable project scaffolds.

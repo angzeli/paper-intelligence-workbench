@@ -86,23 +86,15 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v1.7 Release Reports" in content
-    assert "[template_photocatalysis_overview.md]" in content
-    assert "[template_finance_overview.md]" in content
-    assert "[template_ml_methods_overview.md]" in content
-    assert "[dogfooding_workflow_v1_7.md]" in content
-    assert "[release_readiness_v1_7.md]" in content
-    assert "## Next Patch Plan" in content
-    assert "[v1_8_recommended_patch_plan.md]" in content
-    current_section = content.split("## Current v1.7 Release Reports", 1)[1].split("## Next Patch Plan", 1)[0]
-    legacy_section = content.split("## Legacy Unversioned Reports", 1)[1]
-    for report in (
-        "template_photocatalysis_overview.md",
-        "template_finance_overview.md",
-        "template_ml_methods_overview.md",
-    ):
-        assert f"[{report}]" in current_section
-        assert f"[{report}]" not in legacy_section
+    assert "## Current v1.8 Release Reports" in content
+    assert "[architecture_review_v1_8.md]" in content
+    assert "[release_readiness_v1_8.md]" in content
+    current_section = content.split("## Current v1.8 Release Reports", 1)[1]
+    current_section = current_section.split("## Next Patch Plan", 1)[0]
+    current_section = current_section.split("## Historical Versioned Reports", 1)[0]
+    assert "[hostile_review_latest.md]" in current_section
+    assert "[architecture_review_v1_8.md]" in current_section
+    assert "[release_readiness_v1_8.md]" in current_section
 
 
 def test_local_build_artifacts_do_not_claim_stale_versions():

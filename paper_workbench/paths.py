@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 
@@ -63,3 +64,20 @@ def default_projects_dir(root: str | Path = ".") -> Path:
 
 def default_processed_dir(root: str | Path = ".") -> Path:
     return project_root(root) / "data" / "processed"
+
+
+def display_path(path: str | Path, *, base_path: str | Path | None = None) -> str:
+    """Display a filesystem path relative to a stable base when possible."""
+    if not path:
+        return ""
+    target = Path(path)
+    base = Path(base_path) if base_path is not None else Path.cwd()
+    try:
+        if target.is_absolute():
+            return target.relative_to(base.resolve()).as_posix()
+    except ValueError:
+        pass
+    try:
+        return Path(os.path.relpath(target, start=base)).as_posix()
+    except (OSError, ValueError):
+        return target.as_posix()
