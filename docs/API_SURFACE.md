@@ -68,6 +68,8 @@ the CLI when possible unless a script specifically needs Python objects:
 - `paper_workbench.auditlog`: local JSONL audit log events.
 - `paper_workbench.synthetic`: deterministic stress fixtures and generated
   synthetic projects.
+- `paper_workbench.drafts`: Markdown draft parsing, citation extraction,
+  paragraph evidence matching, and draft-audit report helpers.
 - `paper_workbench.errors`: user-facing diagnostic taxonomy helpers.
 - `paper_workbench.doctor`: workspace-health aggregation.
 

@@ -20,6 +20,8 @@ Use these docs as static Markdown source. No site generator is required for v0.8
 - [Local Search](local-search.md)
 - [Import / Export](import-export.md)
 - [Authoring Workbench](authoring-workbench.md)
+- [Draft Citation Audit](DRAFT_CITATION_AUDIT.md)
+- [Manuscript Evidence Checker](MANUSCRIPT_EVIDENCE_CHECKER.md)
 - [Local Files](local-files.md)
 - [Safety and Boundaries](safety-and-boundaries.md)
 

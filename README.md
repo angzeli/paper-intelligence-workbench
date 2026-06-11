@@ -22,6 +22,8 @@ v0.10 adds an adversarial torture suite, fuzz-style fixtures, clearer error taxo
 
 v1.0-rc adds release-candidate hardening: API and CLI surface inventories, command-contract checks, current-environment release checks, external-user simulation reports, data-safety review, and a final release-readiness verdict before tagging.
 
+v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown literature-review drafts. It extracts citation keys, checks local BibTeX/registry/note/claim coverage, flags weak or review-only support, and generates revision checklists without rewriting prose or inventing evidence.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -44,6 +46,7 @@ v1.0-rc adds release-candidate hardening: API and CLI surface inventories, comma
 - Checks workspace integrity, writes local audit events, creates local backup snapshots, plans safe restores, and plans/copies non-destructive legacy-to-project migrations.
 - Stress-tests malformed local data with synthetic adversarial fixtures and clear error-message expectations.
 - Documents the v1.0-rc API and CLI surface so external users can see what is stable, experimental, and internal.
+- Audits Markdown drafts against local citation keys, structured notes, extracted claims, and theme evidence.
 
 ## What It Does Not Do
 
@@ -56,6 +59,7 @@ v1.0-rc adds release-candidate hardening: API and CLI surface inventories, comma
 - It does not decide whether a scientific claim is true.
 - It does not write polished literature-review prose as if it were user-authored.
 - It does not silently migrate, restore, or overwrite user data without explicit force flags.
+- It does not rewrite user drafts or generate final manuscript prose.
 
 ## Installation
 
@@ -258,6 +262,21 @@ Review the guidance:
 - [docs/ERROR_TAXONOMY.md](docs/ERROR_TAXONOMY.md)
 - [docs/ERROR_MESSAGE_GUIDE.md](docs/ERROR_MESSAGE_GUIDE.md)
 - [docs/RECOVERING_FROM_BAD_DATA.md](docs/RECOVERING_FROM_BAD_DATA.md)
+
+## v1.1 Draft Citation Audit Workflow
+
+Audit a synthetic Markdown draft against local project evidence:
+
+```bash
+paperwb draft parse drafts/synthetic_photocorrosion_section.md
+paperwb draft audit drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_audit.md --force
+paperwb draft checklist drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_checklist.md --force
+paperwb draft evidence-matrix drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_paragraph_matrix.md --force
+```
+
+The audit uses transparent local keyword, tag, theme, and citation-key overlap.
+It reports possible gaps for manual revision; it does not judge scientific truth
+or write polished prose.
 - [docs/CLI_FAILURE_MODES.md](docs/CLI_FAILURE_MODES.md)
 
 ## Data Folder Convention

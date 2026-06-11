@@ -35,6 +35,7 @@ not internal implementation details.
 | `files` | yes | scan/audit/hash sidecars | missing files or overwrite refusal | no delete/move/copy |
 | `report` | yes | inventory/evidence/citation/authoring reports | missing theme or overwrite refusal | no overwrite without `--force` |
 | `writing-packet` | yes | synthetic theme packet | unknown theme | planning aid only |
+| `draft` | yes | parse/audit/checklist synthetic drafts | unknown citations or overwrite refusal | no draft rewrite; reports only |
 | `doctor` | yes | workspace-health report | missing inputs | read-only unless `--out` |
 | `integrity` | yes | project integrity check | unsafe path/missing project | read-only unless `--out` |
 | `audit-log` | yes | show ignored logs | clear without force | clear requires `--force` |
@@ -50,6 +51,9 @@ readiness checks, and writing packets. They must not produce polished literature
 review prose as if it were user-authored, and they must not infer claims from
 papers without user-entered notes.
 
+Draft commands audit manuscript text and emit reports, matrices, and checklists.
+They must not rewrite the user draft or invent missing citations.
+
 ## Test Mapping
 
 Representative contract tests live in:
@@ -63,6 +67,7 @@ Representative contract tests live in:
 - `tests/test_integrity_backup_migration_v0_9.py`
 - `tests/test_adversarial_v0_10.py`
 - `tests/test_v1_0_rc_command_contracts.py`
+- `tests/test_drafts_v1_1.py`
 
 Release scripts used by the contract:
 

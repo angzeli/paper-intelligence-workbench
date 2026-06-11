@@ -126,3 +126,10 @@ Possible future commands:
 - note completeness scoring
 - unresolved question summaries
 - safer BibTeX key normalization commands
+
+## v1.2 Candidate Scope
+
+- Tighten draft-audit false-positive controls after real user feedback.
+- Add optional report diffs for draft-audit changes between revisions.
+- Improve citation-pattern fixtures without becoming a full citation processor.
+- Keep draft tooling limited to audit reports, matrices, and revision checklists.

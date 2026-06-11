@@ -78,6 +78,19 @@ paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out
 
 These commands generate evidence-based planning aids, not final prose.
 
+Draft citation audit:
+
+```bash
+paperwb draft parse drafts/synthetic_photocorrosion_section.md
+paperwb draft citations drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_citations.md --force
+paperwb draft audit drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_audit.md --force
+paperwb draft checklist drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_checklist.md --force
+paperwb draft evidence-matrix drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_paragraph_matrix.md --force
+```
+
+Draft commands audit user-written Markdown against local citations, notes, and
+claims. They do not rewrite final prose or infer unsupported claims.
+
 Exports:
 
 ```bash

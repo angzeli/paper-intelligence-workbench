@@ -22,6 +22,7 @@ release line unless a release note explicitly says otherwise.
 | `paperwb report` | stable | Generate Markdown reports and refuse output overwrite unless `--force` is used |
 | `paperwb writing-packet` | stable | Generate a theme-specific writing planning packet, not final prose |
 | `paperwb checklist` | stable | Generate a theme review checklist |
+| `paperwb draft parse/citations/audit/checklist/evidence-matrix` | stable | Audit Markdown drafts against local citations and tracked evidence without rewriting prose |
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
 | `paperwb project init/list/validate` | stable | Manage local project profiles under `projects/` |
 | `paperwb import zotero-csv/csv/bibtex/ris` | stable | Import local bibliography data with dry-run and no silent field overwrite |
@@ -73,3 +74,6 @@ user input errors.
 Reports and authoring commands organize user-entered local evidence. They do not
 judge scientific truth, invent claims, invent citations, fabricate quotes, or
 write polished final prose.
+
+Draft commands use transparent local heuristics. They flag possible support
+gaps for manual checking; they do not certify whether a paragraph is true.

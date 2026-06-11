@@ -53,3 +53,7 @@ Instructions for future agents working in this repository:
 - Test destructive-action safeguards and force/dry-run behavior when changing write paths.
 - Preserve the v1.0-rc API and CLI surface docs when changing public behavior.
 - Update command-contract tests when adding, removing, or changing stable CLI commands.
+- Preserve user drafts; draft workflows may audit and annotate, but must not rewrite final prose.
+- Do not fabricate citations or paper claims when auditing manuscripts.
+- Keep draft evidence matching heuristic, local, and transparent.
+- Add tests for new draft citation patterns or strong-wording heuristics.
