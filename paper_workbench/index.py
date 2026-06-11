@@ -170,6 +170,7 @@ def clear_index(index_path: str | Path, *, project_id: str | None = None) -> Non
 
 
 def rebuild_index(index_path: str | Path, records: list[IndexedRecord], *, project_id: str) -> IndexStatus:
+    records = unique_indexed_records(records)
     fts_enabled = init_index(index_path)
     now = datetime.now(timezone.utc).isoformat()
     with _connect(index_path) as connection:
@@ -221,6 +222,33 @@ def _record_hash(*parts: str) -> str:
         digest.update((part or "").encode("utf-8"))
         digest.update(b"\0")
     return digest.hexdigest()
+
+
+def unique_indexed_records(records: list[IndexedRecord]) -> list[IndexedRecord]:
+    """Return records with deterministic unique IDs for SQLite primary keys."""
+    seen: Counter[str] = Counter()
+    unique: list[IndexedRecord] = []
+    for record in records:
+        seen[record.record_id] += 1
+        if seen[record.record_id] == 1:
+            unique.append(record)
+            continue
+        unique.append(
+            IndexedRecord(
+                record_id=f"{record.record_id}:dup{seen[record.record_id]}",
+                project_id=record.project_id,
+                source_type=record.source_type,
+                source_path=record.source_path,
+                paper_id=record.paper_id,
+                title=record.title,
+                body_text=record.body_text,
+                tags=record.tags,
+                year=record.year,
+                reading_status=record.reading_status,
+                content_hash=record.content_hash,
+            )
+        )
+    return unique
 
 
 def _record(
@@ -369,7 +397,7 @@ def build_index_records(
                     reading_status=paper.reading_status if paper else "",
                 )
             )
-    return records
+    return unique_indexed_records(records)
 
 
 def _match_entry_to_paper(

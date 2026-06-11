@@ -14,6 +14,7 @@ from paper_workbench.index import (
 )
 from paper_workbench.search import search_papers
 from paper_workbench.registry import load_registry
+from paper_workbench.synthetic import generate_synthetic_project
 
 from conftest import EXAMPLE_REGISTRY, ROOT, ZIS_PROJECT
 
@@ -181,6 +182,33 @@ def test_cli_index_rebuild_status_search_and_clear(tmp_path):
     assert cleared.returncode == 0, cleared.stderr
     after = run_cli("index", "status", "--project", "zis_photocatalysis", "--index", str(index_path))
     assert "Total records: 0" in after.stdout
+
+
+def test_index_rebuild_handles_duplicate_synthetic_bibtex_keys(tmp_path):
+    generate_synthetic_project(
+        name="duplicate_key_project",
+        root=tmp_path,
+        papers=8,
+        claims=12,
+        themes=4,
+        domain="zis",
+    )
+    project = tmp_path / "projects" / "duplicate_key_project"
+    records = build_index_records(
+        project_id="duplicate_key_project",
+        registry_path=project / "registry.csv",
+        bibtex_path=project / "bibtex" / "library.bib",
+        notes_dir=project / "notes",
+        themes_path=project / "themes.json",
+        text_dir=project / "text",
+        include_text=True,
+    )
+
+    assert len({record.record_id for record in records}) == len(records)
+    status = rebuild_index(tmp_path / "index.sqlite", records, project_id="duplicate_key_project")
+
+    assert status.total_records == len(records)
+    assert search_index(tmp_path / "index.sqlite", "photocorrosion", project_id="duplicate_key_project")
 
 
 def test_cli_indexed_search_missing_index_suggests_rebuild(tmp_path):
