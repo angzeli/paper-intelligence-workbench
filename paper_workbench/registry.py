@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import unicodedata
 
+from .errors import format_error_message
 from .io import read_csv_rows, write_csv_rows, write_json
 from .schema import Author, Claim, Paper, ReadingStatus, SourceType, ValidationFinding, dataclass_to_plain, enum_values
 from .tags import format_tags, parse_tags
@@ -44,6 +45,7 @@ BOOLEAN_TRUE = {"true", "yes", "y", "1", "included"}
 BOOLEAN_FALSE = {"false", "no", "n", "0", "excluded"}
 READ_STATUSES_WITH_NOTES = {ReadingStatus.READ.value, ReadingStatus.DEEPLY_READ.value}
 DOI_RE = re.compile(r"^10\.\d{4,9}/\S+$", re.IGNORECASE)
+REQUIRED_REGISTRY_HEADERS = {"paper_id", "title", "authors", "year"}
 
 
 def normalize_doi(value: str) -> str:
@@ -176,6 +178,46 @@ def load_registry(path: str | Path) -> list[Paper]:
     if not target.exists():
         raise FileNotFoundError(target)
     return [paper_from_row(row) for row in read_csv_rows(target)]
+
+
+def validate_registry_headers(path: str | Path) -> list[ValidationFinding]:
+    target = Path(path)
+    if not target.exists():
+        raise FileNotFoundError(target)
+    first_line = target.read_text(encoding="utf-8").splitlines()
+    if not first_line:
+        return [
+            ValidationFinding(
+                severity="error",
+                code="missing_header",
+                message=format_error_message(
+                    what="Registry CSV is empty.",
+                    where=str(target),
+                    why="The registry loader needs a header row before it can validate paper records.",
+                    next_step="Create the registry with `paperwb init` or add the documented registry columns.",
+                ),
+                identifier=str(target),
+                suggestion="Add a header row with paper_id, title, authors, and year.",
+            )
+        ]
+    headers = [header.strip() for header in first_line[0].split(",")]
+    missing = sorted(REQUIRED_REGISTRY_HEADERS - set(headers))
+    if not missing:
+        return []
+    return [
+        ValidationFinding(
+            severity="error",
+            code="missing_required_column",
+            message=format_error_message(
+                what="Registry CSV is missing required columns.",
+                where=str(target),
+                why="Rows cannot be validated reliably when core fields are absent.",
+                next_step=f"Add missing columns: {', '.join(missing)}.",
+            ),
+            identifier=str(target),
+            suggestion="Use the registry schema documented in docs/REGISTRY_SCHEMA.md.",
+        )
+    ]
 
 
 def save_registry(papers: list[Paper], path: str | Path) -> Path:
@@ -480,26 +522,78 @@ def validate_registry(
                         suggestion="Prefer workspace-relative paths for portability.",
                     )
                 )
-            elif root_path is not None and not (root_path / pdf_path).exists():
+            elif root_path is not None:
+                resolved_pdf_path = (root_path / pdf_path).resolve(strict=False)
+                try:
+                    resolved_pdf_path.relative_to(root_path.resolve(strict=False))
+                except ValueError:
+                    findings.append(
+                        ValidationFinding(
+                            severity="error",
+                            code="path_escapes_workspace",
+                            message=f"{paper.paper_id} local_pdf_path escapes the workspace: {paper.local_pdf_path}.",
+                            identifier=paper.paper_id,
+                            suggestion="Use a path inside the selected workspace or leave local_pdf_path blank.",
+                        )
+                    )
+                else:
+                    if not resolved_pdf_path.exists():
+                        findings.append(
+                            ValidationFinding(
+                                severity="warning",
+                                code="missing_local_pdf_path",
+                                message=f"{paper.paper_id} local_pdf_path does not exist: {paper.local_pdf_path}.",
+                                identifier=paper.paper_id,
+                                suggestion="Fix the path or leave local_pdf_path blank; do not download copyrighted PDFs.",
+                            )
+                        )
+        if root_path is not None and paper.notes_path:
+            notes_path = Path(paper.notes_path)
+            resolved_notes_path = (root_path / notes_path).resolve(strict=False) if not notes_path.is_absolute() else notes_path.resolve(strict=False)
+            if notes_path.is_absolute():
                 findings.append(
                     ValidationFinding(
                         severity="warning",
-                        code="missing_local_pdf_path",
-                        message=f"{paper.paper_id} local_pdf_path does not exist: {paper.local_pdf_path}.",
+                        code="absolute_notes_path",
+                        message=f"{paper.paper_id} uses an absolute notes_path.",
                         identifier=paper.paper_id,
-                        suggestion="Fix the path or leave local_pdf_path blank; do not download copyrighted PDFs.",
+                        suggestion="Prefer workspace-relative notes_path values for portability.",
                     )
                 )
-        if root_path is not None and paper.notes_path and not (root_path / paper.notes_path).exists() and not Path(paper.notes_path).exists():
-            findings.append(
-                ValidationFinding(
-                    severity="warning",
-                    code="notes_path_missing_file",
-                    message=f"{paper.paper_id} notes_path does not exist: {paper.notes_path}.",
-                    identifier=paper.paper_id,
-                    suggestion="Generate the note file or correct notes_path.",
-                )
-            )
+                if not resolved_notes_path.exists():
+                    findings.append(
+                        ValidationFinding(
+                            severity="warning",
+                            code="notes_path_missing_file",
+                            message=f"{paper.paper_id} notes_path does not exist: {paper.notes_path}.",
+                            identifier=paper.paper_id,
+                            suggestion="Generate the note file or correct notes_path.",
+                        )
+                    )
+            else:
+                try:
+                    resolved_notes_path.relative_to(root_path.resolve(strict=False))
+                except ValueError:
+                    findings.append(
+                        ValidationFinding(
+                            severity="error",
+                            code="path_escapes_workspace",
+                            message=f"{paper.paper_id} notes_path escapes the workspace: {paper.notes_path}.",
+                            identifier=paper.paper_id,
+                            suggestion="Use a notes_path inside the selected workspace.",
+                        )
+                    )
+                else:
+                    if not resolved_notes_path.exists() and not Path(paper.notes_path).exists():
+                        findings.append(
+                            ValidationFinding(
+                                severity="warning",
+                                code="notes_path_missing_file",
+                                message=f"{paper.paper_id} notes_path does not exist: {paper.notes_path}.",
+                                identifier=paper.paper_id,
+                                suggestion="Generate the note file or correct notes_path.",
+                            )
+                        )
     for doi, paper_ids in detect_duplicate_doi(papers).items():
         findings.append(
             ValidationFinding(

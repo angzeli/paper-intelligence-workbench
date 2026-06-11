@@ -1,0 +1,2 @@
+Synthetic sidecar text that does not match any paper_id.
+It is intentionally small and contains no copyrighted source text.

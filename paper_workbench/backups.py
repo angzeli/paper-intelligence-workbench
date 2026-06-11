@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+import json
 from pathlib import Path
 import shutil
 
 from . import __version__
+from .errors import format_error_message
 from .io import load_json, write_json, write_text
 from .projects import profile_config
 from .schema import ProjectProfile
@@ -173,7 +175,27 @@ def list_backups(root: str | Path = ".", *, project: str = "", backups_dir: str 
 
 def load_backup_manifest(backup_path: str | Path) -> BackupManifest:
     path = Path(backup_path)
-    data = load_json(path / "manifest.json")
+    manifest_path = path / "manifest.json"
+    try:
+        data = load_json(manifest_path)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            format_error_message(
+                what="Backup manifest is not valid JSON.",
+                where=str(manifest_path),
+                why="Restore is blocked because the tool cannot know which files belong to the backup.",
+                next_step=f"Inspect or recreate the backup. Parser detail: {exc.msg}",
+            )
+        ) from exc
+    if not isinstance(data, dict):
+        raise ValueError(
+            format_error_message(
+                what="Backup manifest has the wrong shape.",
+                where=str(manifest_path),
+                why="Restore needs a JSON object with backup metadata and included files.",
+                next_step="Recreate the backup or repair manifest.json manually.",
+            )
+        )
     return _manifest_from_dict(data)
 
 

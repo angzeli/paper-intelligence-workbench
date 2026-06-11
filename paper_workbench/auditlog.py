@@ -86,12 +86,12 @@ def load_audit_events(path: str | Path) -> list[dict[str, object]]:
                     "timestamp": "",
                     "command": "",
                     "project": "",
-                    "action": "parse_error",
+                    "action": "audit_log_parse_warning",
                     "affected_paths": [],
                     "dry_run": False,
                     "success": False,
                     "warnings": [f"Could not parse audit log line: {line[:80]}"],
-                    "summary": "",
+                    "summary": "Skipped malformed audit log line; later valid events remain readable.",
                 }
             )
     return events

@@ -86,7 +86,7 @@ from .migration import migration_plan_report, plan_legacy_migration, run_legacy_
 from .notes import write_note_template
 from .paths import default_bibtex_path, default_notes_dir, default_registry_path, default_reports_dir, default_themes_path
 from .projects import create_project_profile, list_project_profiles, profile_summary, resolve_project_profile
-from .registry import add_paper, create_empty_registry, display_authors, filter_papers, load_registry, save_registry, save_registry_json, validate_registry
+from .registry import add_paper, create_empty_registry, display_authors, filter_papers, load_registry, save_registry, save_registry_json, validate_registry, validate_registry_headers
 from .reporting import (
     bibtex_audit_report,
     citation_audit_report,
@@ -288,7 +288,7 @@ def cmd_init(args: argparse.Namespace) -> int:
 
 def cmd_validate_registry(args: argparse.Namespace) -> int:
     papers = load_registry(args.registry)
-    findings = validate_registry(papers, root=_registry_validation_root(args.registry))
+    findings = validate_registry_headers(args.registry) + validate_registry(papers, root=_registry_validation_root(args.registry))
     _print_findings(findings)
     if args.json:
         save_registry_json(papers, args.json)

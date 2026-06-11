@@ -1,0 +1,9 @@
+{
+  "name": "broken_project",
+  "description": "Synthetic broken project profile",
+  "registry_path": "../outside.csv",
+  "bibtex_path": "bibtex/library.bib",
+  "notes_dir": "notes",
+  "themes_path": "themes.json",
+  "reports_dir": "reports"
+}

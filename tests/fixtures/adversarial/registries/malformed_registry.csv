@@ -1,0 +1,4 @@
+paper_id,title,authors,year,doi,tags,reading_status,notes_path,included_in_lit_review,exclude_reason,local_pdf_path,bibtex_key
+adv_dup,Synthetic Edge Case Paper,"Example, Ada",20X6,https://doi.org/10.9999/ADV.001,"photocorrosion| stability",read,notes/missing.md,true,,../outside.pdf,Adv2026A
+adv_dup,Synthetic Edge Case Paper,"Example, Ada",2026,doi:10.9999/adv.001,"photocorrosion;stability",invalid_status,,false,,papers/same.pdf,Adv2026B
+adv_empty,,,"not a year",10.bad doi,"",deeply_read,,yes,,,

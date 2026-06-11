@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import date
@@ -10,6 +11,7 @@ from pathlib import Path
 import re
 
 from .bibtex import parse_bibtex_file
+from .errors import format_error_message
 from .io import load_json, read_text, write_text
 from .registry import REGISTRY_FIELDS, generate_paper_id, normalize_doi, normalize_title, parse_authors, paper_from_row, paper_to_row
 from .schema import Author, Paper, SourceType, ValidationFinding, enum_values
@@ -90,6 +92,8 @@ class ImportResult:
 
 
 def _header_key(value: str) -> str:
+    if value is None:
+        return ""
     return re.sub(r"[^a-z0-9]+", "", value.strip().lower())
 
 
@@ -126,9 +130,38 @@ def _year(value: str) -> str:
 def _unmapped_fields(row: dict[str, str], known_keys: set[str]) -> list[str]:
     fields: list[str] = []
     for key, value in row.items():
-        if value and _header_key(key) not in known_keys:
+        if key is not None and value and _header_key(key) not in known_keys:
             fields.append(key)
     return sorted(set(fields))
+
+
+def _reader_or_error(handle, source: Path) -> csv.DictReader:
+    try:
+        reader = csv.DictReader(handle)
+    except csv.Error as exc:
+        raise ValueError(
+            format_error_message(
+                what="Could not read CSV input.",
+                where=str(source),
+                why="The import cannot safely map rows when the CSV structure is malformed.",
+                next_step=f"Fix the CSV syntax locally and retry. Parser detail: {exc}",
+            )
+        ) from exc
+    if reader.fieldnames is None:
+        raise ValueError(
+            format_error_message(
+                what="CSV input has no header row.",
+                where=str(source),
+                why="The importer needs named columns to map records into registry fields.",
+                next_step="Add a header row such as Title, Author, Publication Year, DOI.",
+            )
+        )
+    return reader
+
+
+def _missing_columns(reader: csv.DictReader, required: set[str]) -> set[str]:
+    available = {_header_key(field) for field in reader.fieldnames or []}
+    return {column for column in required if column not in available}
 
 
 def _paper_from_fields(
@@ -313,7 +346,17 @@ def import_zotero_csv(
     existing_ids = {paper.paper_id for paper in existing_papers}
     candidates: list[ImportCandidate] = []
     with source.open(newline="", encoding="utf-8") as handle:
-        reader = csv.DictReader(handle)
+        reader = _reader_or_error(handle, source)
+        missing = _missing_columns(reader, {"title"})
+        if missing:
+            raise ValueError(
+                format_error_message(
+                    what="Zotero CSV import is missing required columns.",
+                    where=str(source),
+                    why="Rows without a Title column cannot become reliable registry records.",
+                    next_step=f"Export Title from Zotero or rename the title column. Missing: {', '.join(sorted(missing))}.",
+                )
+            )
         for row_number, row in enumerate(reader, start=2):
             normalized = {_header_key(key): value for key, value in row.items()}
             warnings: list[ValidationFinding] = []
@@ -355,14 +398,38 @@ def import_zotero_csv(
 
 
 def _mapping_columns(path: str | Path) -> dict[str, str]:
-    data = load_json(path)
+    try:
+        data = load_json(path)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            format_error_message(
+                what="Import mapping is not valid JSON.",
+                where=str(path),
+                why="The generic CSV importer cannot determine how to map columns.",
+                next_step=f"Fix the JSON mapping file and retry. Parser detail: {exc.msg}",
+            )
+        ) from exc
     mapping = data.get("columns", data.get("mapping", data))
     if not isinstance(mapping, dict):
-        raise ValueError("mapping file must be a JSON object or contain a columns object")
+        raise ValueError(
+            format_error_message(
+                what="Import mapping has the wrong shape.",
+                where=str(path),
+                why="The generic CSV importer expects a JSON object or a `columns` object.",
+                next_step='Use a mapping like {"columns": {"Title": "title"}}.',
+            )
+        )
     normalized: dict[str, str] = {}
     for source, target in mapping.items():
         if target not in REGISTRY_FIELDS:
-            raise ValueError(f"mapping target {target!r} is not a registry field")
+            raise ValueError(
+                format_error_message(
+                    what=f"Import mapping target {target!r} is not a registry field.",
+                    where=str(path),
+                    why="Writing to unknown fields would silently drop user data.",
+                    next_step=f"Use one of: {', '.join(REGISTRY_FIELDS)}.",
+                )
+            )
         normalized[str(source)] = str(target)
     return normalized
 
@@ -383,7 +450,17 @@ def import_generic_csv(
     known_headers = {_header_key(key) for key in mapping}
     candidates: list[ImportCandidate] = []
     with source.open(newline="", encoding="utf-8") as handle:
-        reader = csv.DictReader(handle)
+        reader = _reader_or_error(handle, source)
+        missing = [column for column in mapping if column not in (reader.fieldnames or [])]
+        if missing:
+            raise ValueError(
+                format_error_message(
+                    what="Generic CSV mapping references missing source columns.",
+                    where=str(source),
+                    why="The importer cannot safely map fields that are not present in the CSV header.",
+                    next_step=f"Fix the mapping or CSV header. Missing columns: {', '.join(missing)}.",
+                )
+            )
         for row_number, row in enumerate(reader, start=2):
             warnings: list[ValidationFinding] = []
             fields = {registry_field: row.get(source_field, "") for source_field, registry_field in mapping.items()}

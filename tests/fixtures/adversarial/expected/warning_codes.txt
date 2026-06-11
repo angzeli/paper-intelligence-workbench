@@ -1,0 +1,13 @@
+missing_required_column
+duplicate_paper_id
+duplicate_doi
+invalid_reading_status
+invalid_year
+path_escapes_workspace
+bibtex_parse_warning
+missing_title
+missing_year
+note_parse_warning
+claim_missing_evidence_location
+corrupt_backup_manifest
+audit_log_parse_warning
