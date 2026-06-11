@@ -55,7 +55,13 @@ Validation performed:
 - Focused v1.3 sync tests passed.
 - Command-contract and release-engineering metadata tests passed after adding
   the sync command and bumping package metadata.
-- Full `pytest` suite is required before final release response.
+- Full `pytest` suite passed.
+- Package import check returned version `1.3.0`.
+- `paperwb --help` and `paperwb sync --help` passed.
+- Representative sync plan, conflict report, dry-run apply, and Obsidian
+  round-trip CLI smoke checks passed.
+- Notebook JSON structure check passed.
+- Data-safety audit strict mode completed with 0 errors.
 
 ## Known Limitations
 
@@ -75,4 +81,3 @@ Validation performed:
 - Add report diffs for sync plans.
 - Add project-to-project sync planning.
 - Keep all sync behavior local-first and non-destructive by default.
-
