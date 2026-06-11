@@ -10,6 +10,8 @@ v0.4 adds local import/export interoperability for Zotero-style CSV, generic CSV
 
 v0.5 adds an optional local SQLite search index, FTS5-backed search when available, substring fallback behavior, index diagnostics, and synthetic full-text sidecar fixtures.
 
+v0.6 adds a literature-review authoring workbench with evidence matrices, claim banks, citation banks, paragraph plans, subsection readiness scoring, and writing packets. These are planning aids only; the tool still does not write final prose or invent evidence.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -27,6 +29,7 @@ v0.5 adds an optional local SQLite search index, FTS5-backed search when availab
 - Generates clearly synthetic stress corpora for local regression testing.
 - Imports local Zotero-style CSV, generic CSV, BibTeX, and RIS files into registries with duplicate reports.
 - Exports Obsidian-friendly Markdown vaults and local backup bundles.
+- Generates theme-specific writing aids from tracked local claims and citations.
 
 ## What It Does Not Do
 
@@ -36,6 +39,7 @@ v0.5 adds an optional local SQLite search index, FTS5-backed search when availab
 - It does not fabricate paper metadata, quotes, claims, summaries, or conclusions.
 - It does not use cloud services, LLM APIs, or embeddings.
 - It does not decide whether a scientific claim is true.
+- It does not write polished literature-review prose as if it were user-authored.
 
 ## Installation
 
@@ -175,6 +179,21 @@ paperwb search "charge separation" --project zis_photocatalysis --indexed --out 
 
 The index is a local cache under `.paperwb/` and is ignored by git. Full-text sidecars are plain `.txt` files supplied by the user, such as `projects/zis_photocatalysis/text/PAPER_ID.txt`; the tool does not parse PDFs by default.
 
+## v0.6 Authoring Workflow
+
+Generate local planning aids for a theme:
+
+```bash
+paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_evidence_matrix.md --force
+paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_claim_bank.md --force
+paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_citation_bank.md --force
+paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_paragraph_plan.md --force
+paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_readiness.md --force
+paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_writing_packet.md --force
+```
+
+See [docs/AUTHORING_WORKBENCH.md](docs/AUTHORING_WORKBENCH.md).
+
 ## Data Folder Convention
 
 ```text
@@ -227,6 +246,11 @@ Reports are Markdown files written to `reports/` by default for the legacy `data
 - `missing_notes.md`
 - `weak_claims.md`
 - `theme_dashboard.md`
+- `evidence_matrix.md`
+- `claim_bank.md`
+- `citation_bank.md`
+- `paragraph_plan.md`
+- `subsection_readiness.md`
 
 ## CLI Reference
 
@@ -253,6 +277,12 @@ paperwb report evidence-map
 paperwb report citation-audit
 paperwb report reading-status
 paperwb report section-outline --theme photocorrosion
+paperwb report evidence-matrix --theme photocorrosion
+paperwb report claim-bank --theme photocorrosion
+paperwb report citation-bank --theme photocorrosion
+paperwb report paragraph-plan --theme photocorrosion
+paperwb report subsection-readiness --theme photocorrosion
+paperwb writing-packet --theme photocorrosion
 paperwb doctor
 paperwb export claims --out data/processed/claims.csv
 paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis

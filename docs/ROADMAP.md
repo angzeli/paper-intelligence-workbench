@@ -28,7 +28,17 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Stale-index diagnostics using content hashes.
 - Synthetic full-text sidecar fixtures.
 
-## Near-Term Patches for v0.6
+## v0.6 Completed
+
+- Literature-review authoring workbench for local planning aids.
+- Evidence matrix reports with optional CSV and JSON exports.
+- Claim banks that separate strong, weak, missing-evidence, review-statement, and not-ready claims.
+- Citation banks that group papers by background, method, primary evidence, mechanism, limitation, review context, comparison, and not-yet-usable roles.
+- Paragraph plans that propose evidence-aware paragraph purposes without drafting prose.
+- Subsection readiness reports with a transparent local completeness score.
+- Writing packets that combine authoring artifacts for one theme.
+
+## Near-Term Patches for v0.7
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -39,6 +49,7 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add note repair diagnostics for malformed claim blocks.
 - Add non-destructive workspace migration reports for moving legacy `data/` work into profiles.
 - Add import preview tables and conflict-resolution commands for ambiguous matches.
+- Add writer-facing filters for authoring reports, such as minimum claim strength and evidence type.
 
 ## Project Profiles
 

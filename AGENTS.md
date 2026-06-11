@@ -32,3 +32,6 @@ Instructions for future agents working in this repository:
 - Keep search ranking transparent and explain any ranking changes in docs.
 - Preserve old substring search behavior when adding indexed search features.
 - Test both indexed and non-indexed search paths before release.
+- Do not write final literature-review prose as if it were user-authored.
+- Authoring reports must remain planning aids: outlines, matrices, citation banks, paragraph plans, readiness reports, and checklists.
+- Do not fabricate citations or infer claims from papers without user-entered notes.

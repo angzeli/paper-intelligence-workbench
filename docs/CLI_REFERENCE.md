@@ -47,10 +47,29 @@ paperwb report theme-dashboard
 paperwb report missing-evidence
 paperwb report workspace-health
 paperwb report section-outline --theme photocorrosion
+paperwb report evidence-matrix --theme photocorrosion
+paperwb report claim-bank --theme photocorrosion
+paperwb report citation-bank --theme photocorrosion
+paperwb report paragraph-plan --theme photocorrosion
+paperwb report subsection-readiness --theme photocorrosion
 paperwb report all
 ```
 
 Report commands refuse to overwrite an existing output file unless `--force` is provided. The same no-overwrite behavior applies to `doctor --out` and `validate-bib --report`.
+
+Authoring reports:
+
+```bash
+paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_evidence_matrix.md --force
+paperwb report evidence-matrix --project zis_photocatalysis --theme charge_separation --csv-out reports/charge_matrix.csv --json-out reports/charge_matrix.json --force
+paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_claim_bank.md --force
+paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_citation_bank.md --force
+paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_paragraph_plan.md --force
+paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_readiness.md --force
+paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out reports/photocorrosion_writing_packet.md --force
+```
+
+These commands generate evidence-based planning aids, not final prose.
 
 Exports:
 
