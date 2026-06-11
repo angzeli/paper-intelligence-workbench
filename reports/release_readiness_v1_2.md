@@ -54,6 +54,23 @@ Validation performed:
 - Notebook JSON structure check passed.
 - Data-safety audit strict mode completed with 0 errors.
 
+## Post-review Fixes
+
+- `reading start --out EXISTING` now preflights the output report path before
+  creating notes, sessions, or registry updates.
+- `reading finish --out EXISTING` now preflights the output report path before
+  changing session or registry state.
+- Reading session IDs now remain unique when the same paper is started more
+  than once in the same second.
+- `reading review --as-of` provides reproducible review windows for generated
+  reports and tests.
+- Malformed reading-session JSONL lines and corrupt follow-up completion state
+  now produce CLI warnings instead of being silently ignored.
+- `followups done` now validates action IDs against actions found in the
+  selected notes and session logs before writing completion state.
+- Active generated import/stress reports no longer expose maintainer-local
+  absolute paths.
+
 ## Safety Assessment
 
 - Reading sessions default to ignored `.paperwb/reading_sessions.jsonl` files.
@@ -69,7 +86,8 @@ Validation performed:
 - Multiple active sessions for the same paper are allowed.
 - Follow-up action IDs from notes depend on note action ordering.
 - Queue ranking is simple and transparent, not adaptive.
-- Weekly review periods are based on session timestamps only.
+- Weekly review periods are based on session timestamps only; use `--as-of` for
+  reproducible historical windows.
 - Session storage is JSONL, not a transactional database.
 
 ## Recommended v1.3 Scope

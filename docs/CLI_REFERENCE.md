@@ -103,6 +103,7 @@ paperwb reading start zis_charge_2025 --project zis_photocatalysis --goal "Check
 paperwb reading finish SESSION_ID --project zis_photocatalysis --status deeply_read --duration-minutes 45 --claims-added 1 --follow-up "Add missing section/page evidence"
 paperwb reading status --project zis_photocatalysis
 paperwb reading review --project zis_photocatalysis --out scratch/weekly_reading_review.md --force
+paperwb reading review --project zis_photocatalysis --as-of 2026-06-11 --out scratch/reproducible_reading_review.md --force
 paperwb followups list --project zis_photocatalysis
 paperwb followups export --project zis_photocatalysis --out scratch/followups.md --force
 paperwb followups done note:zis_charge_2025:1 --project zis_photocatalysis
@@ -111,7 +112,9 @@ paperwb followups done note:zis_charge_2025:1 --project zis_photocatalysis
 Reading commands do not read papers automatically or fabricate notes. `reading
 start` preserves an existing note by default and requires `--force-note` to
 overwrite it. Session logs and follow-up completion state default to ignored
-local `.paperwb/` files.
+local `.paperwb/` files. `reading review --as-of` makes the review window
+reproducible. `followups done` validates the action ID against actions found in
+the selected notes and session logs before updating completion state.
 
 Exports:
 

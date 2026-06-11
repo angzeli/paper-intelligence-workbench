@@ -2,7 +2,7 @@
 
 Paper Intelligence Workbench is a local-first command-line workbench for academic paper registries, structured notes, user-entered claims, citation audits, evidence maps, local search, import/export workflows, and writing preparation.
 
-Use these docs as static Markdown source. No site generator is required for v0.8.
+Use these docs as static Markdown source. No site generator is required.
 
 ## Start Here
 

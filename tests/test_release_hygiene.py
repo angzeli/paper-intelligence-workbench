@@ -77,3 +77,18 @@ def test_report_index_treats_v1_reports_as_current(tmp_path):
     assert "## Next Patch Plan" in index
     assert "[v1_2_recommended_patch_plan.md]" in index
     assert "release_readiness_v1_0_rc.md" in index
+
+
+def test_active_generated_reports_do_not_leak_maintainer_absolute_paths():
+    checked_reports = [
+        "reports/import_zotero_csv_v0_4.md",
+        "reports/import_generic_csv_v0_4.md",
+        "reports/import_bibtex_v0_4.md",
+        "reports/import_ris_v0_4.md",
+        "reports/stress_workspace_health_v0_3.md",
+    ]
+
+    for relative in checked_reports:
+        content = (ROOT / relative).read_text(encoding="utf-8")
+        assert "/Users/" not in content, relative
+        assert "/private/tmp" not in content, relative

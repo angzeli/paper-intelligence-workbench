@@ -7,7 +7,7 @@
 - Records imported: 2
 - Records updated: 0
 - Records skipped: 1
-- Output registry path: /Users/liangze/Desktop/paper-intelligence-workbench/projects/finance_reading/registry.csv
+- Output registry path: projects/finance_reading/registry.csv
 
 ## Imported Paper IDs
 

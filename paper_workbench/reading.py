@@ -99,19 +99,37 @@ def make_session_id(paper_id: str, now: datetime | None = None) -> str:
     return f"read_{safe_paper_id}_{stamp}"
 
 
-def load_reading_sessions(path: str | Path) -> list[ReadingSession]:
+def make_unique_session_id(paper_id: str, existing_sessions: Iterable[ReadingSession], now: datetime | None = None) -> str:
+    base = make_session_id(paper_id, now=now)
+    existing_ids = {session.session_id for session in existing_sessions}
+    if base not in existing_ids:
+        return base
+    counter = 2
+    while f"{base}_{counter}" in existing_ids:
+        counter += 1
+    return f"{base}_{counter}"
+
+
+def load_reading_sessions_with_warnings(path: str | Path) -> tuple[list[ReadingSession], list[str]]:
     target = Path(path)
     if not target.exists():
-        return []
+        return [], []
     sessions: list[ReadingSession] = []
-    for line in target.read_text(encoding="utf-8").splitlines():
+    warnings: list[str] = []
+    for line_number, line in enumerate(target.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip():
             continue
         try:
             data = json.loads(line)
-        except json.JSONDecodeError:
+            sessions.append(_session_from_dict(data))
+        except (json.JSONDecodeError, TypeError, ValueError) as exc:
+            warnings.append(f"{target}: line {line_number} could not be parsed as a reading session; skipped. Detail: {exc}")
             continue
-        sessions.append(_session_from_dict(data))
+    return sessions, warnings
+
+
+def load_reading_sessions(path: str | Path) -> list[ReadingSession]:
+    sessions, _warnings = load_reading_sessions_with_warnings(path)
     return sessions
 
 
@@ -382,8 +400,9 @@ def start_reading_session(
         changed_registry = True
     if changed_registry:
         save_registry(papers, registry_path)
+    existing_sessions = load_reading_sessions(sessions_path)
     session = ReadingSession(
-        session_id=make_session_id(paper_id, now=now),
+        session_id=make_unique_session_id(paper_id, existing_sessions, now=now),
         project=project,
         paper_id=paper_id,
         started_at=(now or datetime.now(timezone.utc)).isoformat(),
@@ -394,7 +413,7 @@ def start_reading_session(
         user_comment=user_comment,
         note_path=_relative_to_root(note_path, root),
     )
-    append_reading_session(session, sessions_path)
+    save_reading_sessions(existing_sessions + [session], sessions_path)
     return session, note_path, notes_created, warnings
 
 
@@ -514,14 +533,32 @@ def session_status_report(sessions: list[ReadingSession]) -> str:
 
 
 def load_followup_state(path: str | Path) -> dict[str, dict[str, str]]:
+    state, _warnings = load_followup_state_with_warnings(path)
+    return state
+
+
+def load_followup_state_with_warnings(path: str | Path) -> tuple[dict[str, dict[str, str]], list[str]]:
     target = Path(path)
     if not target.exists():
-        return {}
+        return {}, []
     try:
         data = json.loads(target.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return {}
-    return {str(key): dict(value) for key, value in data.items()}
+    except json.JSONDecodeError as exc:
+        return {}, [f"{target}: follow-up completion state is not valid JSON; ignored. Detail: {exc}"]
+    if not isinstance(data, dict):
+        return {}, [f"{target}: follow-up completion state must be a JSON object; ignored."]
+    state: dict[str, dict[str, str]] = {}
+    warnings: list[str] = []
+    for key, value in data.items():
+        if not isinstance(value, dict):
+            warnings.append(f"{target}: follow-up state for {key!r} is not an object; ignored.")
+            continue
+        state[str(key)] = {str(item_key): str(item_value) for item_key, item_value in value.items()}
+    return state, warnings
+
+
+def action_ids(actions: Iterable[FollowUpAction]) -> set[str]:
+    return {action.action_id for action in actions}
 
 
 def save_followup_state(state: dict[str, dict[str, str]], path: str | Path) -> Path:
@@ -637,8 +674,12 @@ def build_weekly_review(
     sessions: list[ReadingSession],
     followups: list[FollowUpAction],
     period_days: int = 7,
+    as_of: datetime | None = None,
 ) -> WeeklyReadingReview:
-    cutoff = datetime.now(timezone.utc).timestamp() - max(period_days, 0) * 24 * 60 * 60
+    current_time = as_of or datetime.now(timezone.utc)
+    if current_time.tzinfo is None:
+        current_time = current_time.replace(tzinfo=timezone.utc)
+    cutoff = current_time.timestamp() - max(period_days, 0) * 24 * 60 * 60
     recent_sessions = [session for session in sessions if _session_timestamp(session) >= cutoff]
     theme_counts: dict[str, int] = {}
     for theme in themes:

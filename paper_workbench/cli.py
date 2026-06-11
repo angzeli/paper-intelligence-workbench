@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, time, timezone
 import os
 from pathlib import Path
 import sys
@@ -98,6 +99,7 @@ from .paths import default_bibtex_path, default_notes_dir, default_registry_path
 from .projects import create_project_profile, list_project_profiles, profile_summary, resolve_project_profile
 from .registry import add_paper, create_empty_registry, display_authors, filter_papers, load_registry, save_registry, save_registry_json, validate_registry, validate_registry_headers
 from .reading import (
+    action_ids,
     build_reading_queue,
     build_weekly_review,
     collect_followups,
@@ -106,8 +108,9 @@ from .reading import (
     filter_followups,
     finish_reading_session,
     followups_report,
-    load_followup_state,
+    load_followup_state_with_warnings,
     load_reading_sessions,
+    load_reading_sessions_with_warnings,
     mark_followup_done,
     reading_queue_report,
     reading_session_report,
@@ -319,6 +322,26 @@ def _print_findings(findings) -> None:
         suffix = f" [{identifier}]" if identifier else ""
         suggestion = f" Suggestion: {finding.suggestion}" if getattr(finding, "suggestion", "") else ""
         print(f"{finding.severity.upper()} {finding.code}{suffix}: {finding.message}{suggestion}")
+
+
+def _print_warnings(warnings: list[str] | tuple[str, ...]) -> None:
+    for warning in warnings:
+        print(f"Warning: {warning}", file=sys.stderr)
+
+
+def _parse_as_of(value: str) -> datetime | None:
+    if not value:
+        return None
+    try:
+        if "T" in value:
+            parsed = datetime.fromisoformat(value)
+        else:
+            parsed = datetime.combine(datetime.fromisoformat(value).date(), time.max)
+    except ValueError as exc:
+        raise ValueError(f"invalid --as-of date: {value}; expected YYYY-MM-DD or ISO datetime") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
 
 
 def cmd_init(args: argparse.Namespace) -> int:
@@ -945,6 +968,8 @@ def cmd_reading_queue(args: argparse.Namespace) -> int:
 def cmd_reading_start(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "notes_dir"))
     paths = _paths_from_args(args)
+    if args.out:
+        _preflight_output_paths([args.out], force=args.force)
     papers = _load_registry(paths["registry"])
     sessions_path = _reading_sessions_path_from_args(args, paths)
     session, note_path, notes_created, warnings = start_reading_session(
@@ -983,6 +1008,8 @@ def cmd_reading_start(args: argparse.Namespace) -> int:
 def cmd_reading_finish(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry",))
     paths = _paths_from_args(args)
+    if args.out:
+        _preflight_output_paths([args.out], force=args.force)
     papers = _load_registry(paths["registry"])
     sessions_path = _reading_sessions_path_from_args(args, paths)
     session = finish_reading_session(
@@ -1016,7 +1043,8 @@ def cmd_reading_finish(args: argparse.Namespace) -> int:
 
 def cmd_reading_status(args: argparse.Namespace) -> int:
     paths = _paths_from_args(args)
-    sessions = load_reading_sessions(_reading_sessions_path_from_args(args, paths))
+    sessions, warnings = load_reading_sessions_with_warnings(_reading_sessions_path_from_args(args, paths))
+    _print_warnings(warnings)
     if args.paper_id:
         sessions = [session for session in sessions if session.paper_id == args.paper_id]
     content = session_status_report(sessions)
@@ -1031,14 +1059,16 @@ def cmd_reading_status(args: argparse.Namespace) -> int:
 def cmd_reading_review(args: argparse.Namespace) -> int:
     papers, notes, claims, themes, paths = _reading_inputs(args)
     sessions_path = _reading_sessions_path_from_args(args, paths)
-    sessions = load_reading_sessions(sessions_path)
+    sessions, session_warnings = load_reading_sessions_with_warnings(sessions_path)
+    followup_state, followup_warnings = load_followup_state_with_warnings(_followups_state_path_from_args(args, paths))
+    _print_warnings(session_warnings + followup_warnings)
     followups = collect_followups(
         project=_project_id_from_paths(paths),
         papers=papers,
         notes=notes,
         sessions=sessions,
         themes=themes,
-        state=load_followup_state(_followups_state_path_from_args(args, paths)),
+        state=followup_state,
     )
     review = build_weekly_review(
         project=_project_id_from_paths(paths),
@@ -1049,6 +1079,7 @@ def cmd_reading_review(args: argparse.Namespace) -> int:
         sessions=sessions,
         followups=followups,
         period_days=args.days,
+        as_of=_parse_as_of(args.as_of),
     )
     content = weekly_reading_review_report(review)
     output = args.out or (Path(paths["reports_dir"]) / "weekly_reading_review.md")
@@ -1058,18 +1089,25 @@ def cmd_reading_review(args: argparse.Namespace) -> int:
     return 0
 
 
-def _followup_inputs(args: argparse.Namespace):
+def _collect_followup_actions(args: argparse.Namespace):
     papers, notes, _claims, themes, paths = _reading_inputs(args)
-    sessions = load_reading_sessions(_reading_sessions_path_from_args(args, paths))
+    sessions, session_warnings = load_reading_sessions_with_warnings(_reading_sessions_path_from_args(args, paths))
     state_path = _followups_state_path_from_args(args, paths)
+    state, followup_warnings = load_followup_state_with_warnings(state_path)
     actions = collect_followups(
         project=_project_id_from_paths(paths),
         papers=papers,
         notes=notes,
         sessions=sessions,
         themes=themes,
-        state=load_followup_state(state_path),
+        state=state,
     )
+    return actions, paths, state_path, session_warnings + followup_warnings
+
+
+def _followup_inputs(args: argparse.Namespace):
+    actions, paths, state_path, warnings = _collect_followup_actions(args)
+    _print_warnings(warnings)
     actions = filter_followups(actions, theme=args.theme, include_done=args.include_done)
     return actions, paths, state_path
 
@@ -1095,8 +1133,17 @@ def cmd_followups_export(args: argparse.Namespace) -> int:
 
 
 def cmd_followups_done(args: argparse.Namespace) -> int:
-    paths = _paths_from_args(args)
-    state_path = _followups_state_path_from_args(args, paths)
+    actions, paths, state_path, warnings = _collect_followup_actions(args)
+    _print_warnings(warnings)
+    if args.action_id not in action_ids(actions):
+        raise ValueError(
+            format_error_message(
+                what="Unknown follow-up action.",
+                where=args.action_id,
+                why="The completion state should only reference actions currently found in local notes or reading sessions.",
+                next_step="Run `paperwb followups list` with the same project/path options and copy an action ID from that output.",
+            )
+        )
     mark_followup_done(args.action_id, state_path)
     _record_audit_event(paths, command="followups done", action="mark_followup_done", affected_paths=[state_path], summary=f"Marked follow-up done: {args.action_id}")
     print(f"Marked done: {args.action_id}")
@@ -1981,6 +2028,7 @@ def build_parser() -> argparse.ArgumentParser:
     add_reading_session_args(reading_review)
     reading_review.add_argument("--state", default="", help="Follow-up completion state JSON path. Defaults to .paperwb/followups_state.json.")
     reading_review.add_argument("--days", type=int, default=7, help="Review period length in days.")
+    reading_review.add_argument("--as-of", default="", help="Deterministic review date/time as YYYY-MM-DD or ISO datetime. Defaults to now.")
     reading_review.add_argument("--out", default="", help="Markdown review report path. Defaults to the selected reports directory.")
     reading_review.add_argument("--force", action="store_true", help="Overwrite an existing review report.")
     reading_review.set_defaults(func=cmd_reading_review)
@@ -2008,7 +2056,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     followups_done = followups_sub.add_parser("done", help="Mark a follow-up action as done without editing the source note.")
     followups_done.add_argument("action_id", help="Action ID from `paperwb followups list`.")
-    followups_done.add_argument("--project", default="", help="Use a project profile follow-up state file.")
+    add_reading_source_args(followups_done)
+    add_reading_session_args(followups_done)
     followups_done.add_argument("--state", default="", help="Explicit follow-up completion state JSON path.")
     followups_done.set_defaults(func=cmd_followups_done)
 

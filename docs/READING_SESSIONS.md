@@ -29,7 +29,9 @@ paperwb reading status --project zis_photocatalysis
 
 `reading start` creates a local session record and generates a note template
 only when the note is missing. Existing notes are preserved unless
-`--force-note` is explicitly provided.
+`--force-note` is explicitly provided. If an explicit `--out` report path
+already exists, `reading start` and `reading finish` fail before changing the
+registry, note, or session log unless `--force` is supplied.
 
 Session logs default to:
 
@@ -48,4 +50,6 @@ tests, pass an explicit `--sessions` path.
 - Keep session summaries user-written.
 - Treat `claims_added` as a user-supplied count, not proof that claims are
   complete.
-
+- Treat warnings about malformed session logs or corrupt follow-up completion
+  state as data-cleanup prompts. The CLI skips unreadable records instead of
+  guessing.

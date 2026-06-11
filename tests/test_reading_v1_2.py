@@ -7,6 +7,7 @@ import sys
 
 from conftest import ROOT
 from paper_workbench.reading import (
+    ReadingSession,
     build_reading_queue,
     build_weekly_review,
     collect_followups,
@@ -117,6 +118,38 @@ def test_start_reading_session_creates_template_and_preserves_existing_notes(tmp
     assert note_path.read_text(encoding="utf-8") == "preserve existing note\n"
 
 
+def test_start_reading_session_generates_unique_ids_for_same_second(tmp_path):
+    registry = tmp_path / "registry.csv"
+    notes_dir = tmp_path / "notes"
+    sessions = tmp_path / "sessions.jsonl"
+    save_registry([_paper("collision_probe")], registry)
+    now = datetime(2026, 6, 10, 12, 0, tzinfo=timezone.utc)
+
+    first, _note_path, _created, _warnings = start_reading_session(
+        paper_id="collision_probe",
+        project="default",
+        root=tmp_path,
+        papers=load_registry(registry),
+        registry_path=registry,
+        notes_dir=notes_dir,
+        sessions_path=sessions,
+        now=now,
+    )
+    second, _note_path, _created, _warnings = start_reading_session(
+        paper_id="collision_probe",
+        project="default",
+        root=tmp_path,
+        papers=load_registry(registry),
+        registry_path=registry,
+        notes_dir=notes_dir,
+        sessions_path=sessions,
+        now=now,
+    )
+
+    assert first.session_id == "read_collision_probe_20260610T120000Z"
+    assert second.session_id == "read_collision_probe_20260610T120000Z_2"
+
+
 def test_followups_collect_filter_and_done_state(tmp_path):
     note = PaperNote(paper_id="paper_a", follow_up_actions=["Add page number", "Check limitation"], source_path="notes/paper_a.md")
     paper = _paper("paper_a", tags=["photocorrosion"])
@@ -187,6 +220,46 @@ def test_weekly_reading_review_report_summarizes_sessions(tmp_path):
     report = weekly_reading_review_report(review)
     assert "Papers marked read/deeply read: 1" in report
     assert "Find primary evidence" in report
+
+
+def test_weekly_reading_review_accepts_deterministic_as_of_date():
+    papers = [_paper("paper_a", status="read")]
+    sessions = [
+        ReadingSession(
+            session_id="recent",
+            project="demo",
+            paper_id="paper_a",
+            started_at="2026-06-08T10:00:00+00:00",
+            completed_at="2026-06-08T10:30:00+00:00",
+            status_after="read",
+        )
+    ]
+
+    included = build_weekly_review(
+        project="demo",
+        papers=papers,
+        notes=[],
+        claims=[],
+        themes=[],
+        sessions=sessions,
+        followups=[],
+        period_days=7,
+        as_of=datetime(2026, 6, 11, 23, 59, tzinfo=timezone.utc),
+    )
+    excluded = build_weekly_review(
+        project="demo",
+        papers=papers,
+        notes=[],
+        claims=[],
+        themes=[],
+        sessions=sessions,
+        followups=[],
+        period_days=7,
+        as_of=datetime(2026, 6, 20, 23, 59, tzinfo=timezone.utc),
+    )
+
+    assert [session.session_id for session in included.sessions] == ["recent"]
+    assert excluded.sessions == []
 
 
 def test_reading_cli_start_finish_and_followups(tmp_path):
@@ -265,3 +338,122 @@ def test_reading_cli_start_finish_and_followups(tmp_path):
     export = run_cli("followups", "export", "--registry", str(registry), "--notes-dir", str(notes_dir), "--sessions", str(sessions), "--out", str(exported))
     assert export.returncode == 0, export.stderr
     assert "Follow-up Actions" in exported.read_text(encoding="utf-8")
+
+
+def test_reading_start_out_collision_does_not_mutate_sources(tmp_path):
+    registry = tmp_path / "papers.csv"
+    notes_dir = tmp_path / "notes"
+    sessions = tmp_path / "sessions.jsonl"
+    out = tmp_path / "existing.md"
+    save_registry([_paper("safe_start_probe", status="unread")], registry)
+    before_registry = registry.read_text(encoding="utf-8")
+    out.write_text("keep\n", encoding="utf-8")
+
+    result = run_cli(
+        "reading",
+        "start",
+        "safe_start_probe",
+        "--registry",
+        str(registry),
+        "--notes-dir",
+        str(notes_dir),
+        "--sessions",
+        str(sessions),
+        "--out",
+        str(out),
+    )
+
+    assert result.returncode == 2
+    assert registry.read_text(encoding="utf-8") == before_registry
+    assert not notes_dir.exists()
+    assert not sessions.exists()
+    assert out.read_text(encoding="utf-8") == "keep\n"
+
+
+def test_reading_finish_out_collision_does_not_mutate_sources(tmp_path):
+    registry = tmp_path / "papers.csv"
+    sessions = tmp_path / "sessions.jsonl"
+    out = tmp_path / "existing.md"
+    save_registry([_paper("safe_finish_probe", status="unread")], registry)
+    sessions.write_text(
+        json.dumps(
+            {
+                "session_id": "session_safe_finish",
+                "project": "default",
+                "paper_id": "safe_finish_probe",
+                "started_at": "2026-06-10T12:00:00+00:00",
+                "session_status": "active",
+                "status_before": "unread",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    before_registry = registry.read_text(encoding="utf-8")
+    before_sessions = sessions.read_text(encoding="utf-8")
+    out.write_text("keep\n", encoding="utf-8")
+
+    result = run_cli(
+        "reading",
+        "finish",
+        "session_safe_finish",
+        "--registry",
+        str(registry),
+        "--sessions",
+        str(sessions),
+        "--status",
+        "read",
+        "--out",
+        str(out),
+    )
+
+    assert result.returncode == 2
+    assert registry.read_text(encoding="utf-8") == before_registry
+    assert sessions.read_text(encoding="utf-8") == before_sessions
+    assert out.read_text(encoding="utf-8") == "keep\n"
+
+
+def test_reading_cli_reports_malformed_session_and_followup_state(tmp_path):
+    registry = tmp_path / "papers.csv"
+    notes_dir = tmp_path / "notes"
+    sessions = tmp_path / "sessions.jsonl"
+    state = tmp_path / "followups.json"
+    save_registry([_paper("malformed_probe")], registry)
+    notes_dir.mkdir()
+    sessions.write_text("{bad json\n", encoding="utf-8")
+    state.write_text("{bad json", encoding="utf-8")
+
+    status = run_cli("reading", "status", "--sessions", str(sessions))
+    assert status.returncode == 0
+    assert "could not be parsed as a reading session" in status.stderr
+
+    followups = run_cli("followups", "list", "--registry", str(registry), "--notes-dir", str(notes_dir), "--sessions", str(sessions), "--state", str(state))
+    assert followups.returncode == 0
+    assert "follow-up completion state is not valid JSON" in followups.stderr
+
+
+def test_followups_done_rejects_unknown_action_id(tmp_path):
+    registry = tmp_path / "papers.csv"
+    notes_dir = tmp_path / "notes"
+    sessions = tmp_path / "sessions.jsonl"
+    state = tmp_path / "followups.json"
+    save_registry([_paper("unknown_followup_probe")], registry)
+    notes_dir.mkdir()
+
+    result = run_cli(
+        "followups",
+        "done",
+        "note:missing:1",
+        "--registry",
+        str(registry),
+        "--notes-dir",
+        str(notes_dir),
+        "--sessions",
+        str(sessions),
+        "--state",
+        str(state),
+    )
+
+    assert result.returncode == 2
+    assert "Unknown follow-up action" in result.stderr
+    assert not state.exists()
