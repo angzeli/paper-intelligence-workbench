@@ -1,287 +1,304 @@
-# Hostile Maintainer Review: v1.1 Current Repository
+# Hostile Maintainer Review: v1.2 Current Repository
 
 Date: 2026-06-11
 
 ## Release Verdict
 
-**Verdict: do not ship v1.1 to external users until the `paperwb report all` write-path bugs are fixed.**
+**Verdict: do not ship v1.2 to external users until the new reading-session
+write-path blockers are fixed.**
 
-The repository is now a broad local-first research workbench with registry validation, BibTeX validation, structured notes, claim extraction, evidence maps, citation audits, project profiles, import/export, indexed search, local file audits, authoring reports, draft citation audits, backup/migration workflows, adversarial tests, CI, docs, synthetic projects, and release reports.
+The repository is substantially more mature than the older v1.1 hostile review
+suggested. The previous `paperwb report all` blockers are fixed: output paths
+are preflighted and `report all --out` is rejected cleanly. The package remains
+local-first, has no runtime dependencies, and the full test suite currently
+passes.
 
-The v1.1 draft-audit feature is directionally sound and stays inside the project boundary: it audits Markdown drafts with local citations and tracked evidence, does not use cloud or LLM APIs, and does not rewrite prose.
-
-The current release candidate still has release-grade CLI safety problems in `paperwb report all`. The command can leave a partially generated report set after a later output collision, and it silently accepts `--out` while ignoring it. These violate the documented command contract for safe, predictable generated outputs.
+The current release blocker is narrower but serious: `paperwb reading start`
+and `paperwb reading finish` can mutate user data before failing on an existing
+`--out` report path. That violates the safe-write contract and is especially
+bad because `reading finish` updates the authoritative registry reading status.
 
 Validation performed during this review:
 
+- `git status --short --branch --ignored=matching`: tracked worktree clean;
+  ignored IDE/cache/build/scratch artifacts present.
 - `python -m pytest -q`: passed.
-- `python -m pytest --collect-only -q`: 160 tests collected.
-- `python scripts/data_safety_audit.py --out <tmp-report> --title "Hostile Review Data Safety" --strict`: passed with 0 errors and 11 warnings.
-- `python scripts/check_notebooks.py`: passed, 8 notebooks checked.
-- `python scripts/validate_notebooks.py`: passed, 8 notebooks validated.
-- `python scripts/clean_room_install_check.py --quick --out <tmp-report>`: passed, 7 current-environment steps, 0 failures.
-- `python -m paper_workbench.cli --help`: passed.
-- `python -m paper_workbench.cli draft --help`: passed.
-- `python -m paper_workbench.cli draft audit drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out <tmp-report> --force`: passed.
-- `python -m paper_workbench.cli audit-log clear`: returned exit code 2 with a clean user-facing error and no traceback.
-- `python -m build --sdist --wheel`: could not be verified in the active local environment because the current Python environment does not expose an executable `build.__main__`.
+- `python -m pytest --collect-only -q`: collected the current suite across 22
+  test modules.
+- `python scripts/check_notebooks.py`: passed; 8 notebooks checked
+  structurally.
+- `python scripts/data_safety_audit.py --out scratch/hostile_review_data_safety.md --strict`:
+  passed with 0 errors and 11 warnings.
+- `paperwb --help`: passed.
+- `paperwb reading --help`: passed.
+- `paperwb draft audit drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/hostile_draft_audit.md --force`:
+  passed.
+- `paperwb report all` with a seeded later output collision: failed before
+  writing partial reports, as expected.
+- `paperwb report all --out ...`: returned exit code 2 and wrote nothing, as
+  expected.
+- `paperwb reading start` and `paperwb reading finish` output-collision probes:
+  both revealed partial writes before failure.
 
 ## Release Blockers
 
-### 1. `paperwb report all` leaves partial output after a later collision
+### 1. `paperwb reading start --out EXISTING` mutates state before failing
 
-Probe:
+Probe setup used a scratch-only registry and pre-existing output file:
 
 ```bash
-paperwb report all \
-  --registry data/registries/example_papers.csv \
-  --bibtex data/bibtex/example_library.bib \
-  --notes-dir data/notes \
-  --themes data/examples/themes.json \
-  --reports-dir <tmp-reports-dir>
+paperwb reading start probe \
+  --registry scratch/hostile_reading_probe/registry.csv \
+  --notes-dir scratch/hostile_reading_probe/notes \
+  --sessions scratch/hostile_reading_probe/sessions.jsonl \
+  --out scratch/hostile_reading_probe/existing.md
 ```
-
-Setup: `<tmp-reports-dir>/citation_audit.md` existed before the command.
 
 Observed behavior:
 
 - exit code: `2`
-- the protected `citation_audit.md` was not overwritten;
-- earlier reports were already written before failure:
-  - `inventory.md`
-  - `reading_status.md`
-  - `papers_by_tag.md`
-  - `bibtex_audit.md`
-  - `claims_by_theme.md`
-  - `evidence_map.md`
+- error: output report already exists
+- nevertheless, the command created:
+  - `scratch/hostile_reading_probe/notes/probe.md`
+  - `scratch/hostile_reading_probe/sessions.jsonl`
+- it also updated `notes_path` in the registry.
 
 Why this blocks release:
 
-- The command contract says generated outputs should be safe and predictable.
-- A failed `report all` run should not leave a half-current report directory.
-- Users can reasonably mistake partial generated reports for a complete audit run.
+- A failed command should not silently start a reading session.
+- A failed command should not create a note or update registry metadata.
+- This breaks the documented no-overwrite/safe-write model.
 
 Required fix:
 
-- Preflight every output path for `report all` before writing the first report.
-- Fail before writing anything if any selected output exists and `--force` is not passed.
-- Add a regression test that seeds a later output path and asserts no earlier report file is created.
+- Preflight `--out` before calling `start_reading_session()`.
+- Add a regression test that seeds an existing `--out`, runs `reading start`,
+  and asserts the registry, note directory, and session log remain unchanged.
 
-### 2. `paperwb report all --out ...` silently ignores `--out`
+### 2. `paperwb reading finish --out EXISTING` updates registry/session state before failing
 
 Probe:
 
 ```bash
-paperwb report all \
-  --registry data/registries/example_papers.csv \
-  --bibtex data/bibtex/example_library.bib \
-  --notes-dir data/notes \
-  --themes data/examples/themes.json \
-  --reports-dir <tmp-reports-dir> \
-  --out <tmp-single-report> \
-  --force
+paperwb reading finish read_probe_20260611T163128Z \
+  --registry scratch/hostile_reading_probe/registry.csv \
+  --sessions scratch/hostile_reading_probe/sessions.jsonl \
+  --status read \
+  --out scratch/hostile_reading_probe/existing.md
 ```
 
 Observed behavior:
 
-- exit code: `0`
-- `<tmp-single-report>` was not created;
-- 12 report files were written under `--reports-dir`;
-- stderr was empty.
+- exit code: `2`
+- error: output report already exists
+- nevertheless, the session was marked completed in the JSONL log
+- the registry `reading_status` changed from `unread` to `read`
+- `last_reviewed_date` was set.
 
 Why this blocks release:
 
-- Silently accepting and ignoring an explicit output path is a serious CLI contract violation.
-- `--out` has a clear meaning for other report types.
-- This creates misplaced outputs without warning.
+- This is an authoritative data mutation hidden behind a failed report write.
+- A user can reasonably retry the command and create inconsistent or duplicate
+  outcomes.
+- It contradicts the project's data-integrity positioning.
 
 Required fix:
 
-- Reject `--out` when `report_type == "all"` with a clear message explaining that `--reports-dir` controls multi-report output, or implement a documented single index output.
-- Add a CLI regression test for the chosen behavior.
+- Preflight `--out` before calling `finish_reading_session()`.
+- Add a regression test that asserts an output collision leaves the registry
+  and session log byte-for-byte unchanged.
 
 ## High-Priority Issues
 
-### 1. Active version/surface docs are stale after the v1.1 bump
+### 1. Weekly reading reports are time-dependent without an `--as-of` control
 
-`pyproject.toml` and `paper_workbench.__version__` now report `1.1.0`, but active surface documents still present themselves as v1.0-rc:
-
-- `docs/API_SURFACE.md`
-- `docs/CLI_SURFACE.md`
-- `docs/COMMAND_CONTRACTS.md`
-- related tests under `tests/test_v1_0_rc_command_contracts.py`
+`build_weekly_review()` uses `datetime.now(timezone.utc)` internally. The
+committed synthetic v1.2 session fixture is dated 2026-06-08 and 2026-06-09.
+The generated `reports/weekly_reading_review_v1_2.md` is reproducible only
+while those dates fall inside the default 7-day window.
 
 Why this matters:
 
-- These are not just historical release notes; they describe the active command/API contract.
-- Tests currently codify the stale `v1.0-rc` text.
-- External users will not know whether the v1.1 `draft` command is part of the stable surface or a bolted-on addendum.
+- Generated reports are supposed to be reproducible from local inputs.
+- Regenerating v1.2 reports after the fixture ages out will change counts to
+  zero unless `--days` is expanded manually.
 
 Required fix:
 
-- Either rename these documents as historical v1.0-rc artifacts and create v1.1 surfaces, or update their titles/content/tests to v1.1.
-- Keep historical v1.0-rc reports under `reports/`, but do not let active docs advertise the wrong release surface.
+- Add an explicit `--as-of YYYY-MM-DD` or equivalent deterministic clock input
+  for `paperwb reading review`.
+- Regenerate v1.2 reports using that deterministic date.
+- Add a test for deterministic review-window behavior.
 
-### 2. Active docs still encourage writing into tracked `reports/` paths
+### 2. Reading session IDs can collide for same-paper starts in the same second
 
-Multiple user-facing docs and README sections still show commands writing directly to checked-in `reports/` files, often with `--force`.
+`make_session_id()` uses `paper_id` plus a UTC timestamp with second
+precision. Two starts for the same paper in the same second produce identical
+IDs. `finish_reading_session()` then finds the first matching session, so a
+duplicate ID can update the wrong record.
 
-Examples include authoring reports, workspace integrity, restore dry-runs, migration plans, export examples, stress workflows, and CLI reference examples.
+Required fix:
+
+- Add a collision-resistant suffix or retry loop.
+- Add a test that starts two same-paper sessions with the same injected time.
+
+### 3. Corrupt reading-session and follow-up state is silently ignored
+
+`load_reading_sessions()` skips invalid JSONL lines without surfacing a warning.
+`load_followup_state()` returns `{}` on invalid JSON. That avoids crashes, but
+it can make status/review/follow-up reports silently undercount user state.
+
+Required fix:
+
+- Return parse warnings, or add diagnostic commands that report corrupted local
+  reading/follow-up state.
+- Add failure-path CLI tests for malformed session JSONL and follow-up state.
+
+### 4. `paperwb followups done ACTION_ID` accepts arbitrary action IDs
+
+The command writes completion state for any string without verifying that the
+action currently exists in notes or session logs. A typo can create a "done"
+record that does not correspond to any action and is not obvious to the user.
+
+Required fix:
+
+- Validate the action ID against collected follow-ups when registry/notes/session
+  context is available, or at least warn when marking an unknown action.
+- Add a CLI failure-path test.
+
+### 5. Tracked historical reports still contain local absolute paths
+
+Examples found by scan:
+
+- `reports/import_zotero_csv_v0_4.md`
+- `reports/import_generic_csv_v0_4.md`
+- `reports/import_bibtex_v0_4.md`
+- `reports/import_ris_v0_4.md`
+- `reports/stress_workspace_health_v0_3.md`
 
 Why this matters:
 
-- A new user following docs can dirty a fresh checkout.
-- The examples normalize `--force` before users understand what is being overwritten.
-- This contradicts the safe-write narrative and the external quickstart's safer `scratch/` convention.
+- They are not secrets, but they leak maintainer machine paths and look
+  unprofessional in a public release.
+- They undermine recent work to relativize report paths.
 
 Required fix:
 
-- Move tutorial output examples to `scratch/`, project-local temporary paths, or clearly ignored output directories.
-- Reserve checked-in `reports/` paths for maintainer-generated release artifacts.
-- Add a docs smoke check that fails on unsafe tutorial examples unless explicitly marked as maintainer report regeneration.
-
-### 3. Current release reports disagree with the latest risk state
-
-`reports/release_readiness_v1_1.md` reports the v1.1 draft feature as usable but does not mention the known `report all` blockers. `reports/final_project_handoff.md` is now stale in the opposite direction: it still says the latest hostile review found the `audit-log clear` traceback blocker, which has been fixed.
-
-Why this matters:
-
-- A maintainer reading the report directory gets contradictory release verdicts.
-- `reports/hostile_review_latest.md` should be the current risk register, but the report index and release readiness files do not make that relationship obvious enough.
-
-Required fix:
-
-- Regenerate release readiness after fixing the blockers.
-- Update report index language so `hostile_review_latest.md` is the canonical current risk register.
-- Treat older readiness and handoff reports as historical snapshots.
-
-### 4. Package build is still not locally verified in this review environment
-
-`python -m build --sdist --wheel` failed because the active Python environment does not expose `build.__main__`.
-
-CI installs `.[dev]` and has a build step, so this may pass in CI. The local release review still cannot prove the distribution artifacts.
-
-Required fix:
-
-- Run the build in CI or a true clean environment with development extras installed.
-- Record the successful build check in the next release-readiness report.
-
-### 5. Local file link/unlink still appear non-transactional across metadata writes
-
-`files link` and `files unlink` update file-registry and paper-registry state. The implementation still appears to perform multi-file metadata updates without an explicit rollback strategy if a later write fails.
-
-Why this matters:
-
-- Local file reconciliation is data-integrity sensitive.
-- A partial write can leave file registry and paper registry metadata disagreeing.
-
-Required fix:
-
-- Add simulated write-failure tests for `files link` and `files unlink`.
-- Preflight all writable paths before mutation.
-- Prefer write-to-temp-and-rename or a compensating consistency check if a later write fails.
-
-### 6. Draft citation extraction does not preserve source-order across mixed citation syntaxes
-
-`extract_citations()` collects LaTeX-style `\cite...{}` matches first and `@key` matches second. In a paragraph where bracketed `[@key]` appears before a later `\cite{other}`, the reported citation order will not match source order.
-
-Why this matters:
-
-- The draft auditor's first promise is "which citation keys appear in the draft."
-- Order matters for paragraph-level diagnostics and user trust.
-
-Required fix:
-
-- Collect citation regex matches with spans, sort by source position, and then split grouped keys.
-- Add a test for mixed syntax in source order.
+- Regenerate or normalize historical generated reports that remain in the
+  public report gallery/index.
+- Add a report hygiene test that flags `/Users/`, `/private/tmp`, and similar
+  paths in active generated reports, allowing explicitly historical simulation
+  reports only when labelled.
 
 ## Medium-Priority Issues
 
-- `paper_workbench/cli.py` remains very large and continues to accumulate command orchestration.
-- The v1.1 draft parser is intentionally conservative but does not yet handle footnotes, tables, definition lists, reference-style links, or citations in HTML comments.
-- Draft-audit false positives are visible in synthetic reports: introductory fixture paragraphs are flagged as uncited claims.
-- `files hash` on a missing path returns no traceback, but the message is a raw filesystem error rather than the project's structured "what/where/why/next step" diagnostic format.
-- The canonical `zis_photocatalysis` project still fails `project validate --strict` because it intentionally contains weak evidence and missing locations; docs need to keep warning users that these are synthetic audit fixtures.
-- Historical data-safety warnings remain in reports/tests. They are warning-class, but the warning budget should not grow.
-- Notebook validation is structural only; notebooks are not executed in CI.
-- The `draft` command is covered by tests, but the general CLI smoke script does not yet exercise draft workflows.
-- Build and clean-room naming remain slightly overstated: the checked script is a current-environment release check, not a full fresh virtual environment by default.
+- `paper_workbench/cli.py` is still a very large command orchestration file.
+  It is now carrying init, project, validation, import, export, report,
+  authoring, draft, file, backup, migration, search, reading, and follow-up
+  behavior in one module.
+- `paperwb reading start` permits multiple active sessions for the same paper
+  without warning. That may be acceptable, but it should be explicit.
+- The reading queue currently ranks already `deeply_read` papers highly when
+  they have high priority and weak-theme signals. That is transparent but
+  surprising for a "what to read next" workflow.
+- Draft citation matching remains lexical and useful, but it still has known
+  false-positive/false-negative risks around tables, footnotes, and unusual
+  Markdown structures.
+- BibTeX parsing is intentionally lightweight; macro/string handling and broken
+  entry recovery are still limited.
+- Local file link/unlink workflows touch multiple metadata files. I did not see
+  write-failure simulation proving they cannot leave partially updated state.
+- Notebook validation is structural only. The project has notebook examples,
+  but CI/release validation does not execute them by default.
+- Some generated release reports are historical but live beside active release
+  reports with little separation.
 
 ## Low-Priority Polish
 
-- `reports/` is crowded with versioned artifacts; users can easily open stale reports.
-- `docs/CLI_REFERENCE.md` and `docs/CLI_SURFACE.md` overlap and can drift.
-- Uppercase reference docs and lowercase docs-site pages duplicate several topics.
-- The v1.1 draft docs are present, but there is no notebook for the draft workflow; an example script exists instead.
-- Some active CLI help still uses old release labels such as v0.7 and v0.9 in command descriptions.
-- The draft reports use many warning rows; a compact summary by severity/code would improve scanability.
+- CLI help still embeds old version labels in places, for example "v0.7
+  local-file audit reports" and "v0.9 workspace integrity checks".
+- `docs/index.md` still says "No site generator is required for v0.8", which is
+  stale wording in a v1.2 repository.
+- Uppercase reference docs and lowercase docs-site pages overlap heavily.
+- `reports/` is crowded enough that new users can easily open stale risk or
+  readiness reports.
+- Ignored build artifacts are present locally, including a stale
+  `dist/paper_intelligence_workbench-1.1.0.tar.gz`; it is ignored and untracked
+  but should not be included in any release archive.
 
 ## Missing Tests
 
-Add focused tests for:
-
-- `paperwb report all` preflights all outputs before writing any file.
-- `paperwb report all --out <path>` fails clearly or produces a documented single output.
-- docs examples do not write to tracked `reports/` paths unless marked as maintainer report regeneration.
-- v1.1 API/CLI surface docs match package version or are explicitly marked historical.
-- `files link` and `files unlink` under simulated partial write failure.
-- backup creation under simulated copy/write failure.
-- draft citation extraction preserves source order across mixed `[@key]` and `\cite{key}` syntax.
-- draft parser handling of footnotes, tables, and comments.
-- draft CLI commands in `scripts/smoke_cli_workflow.py` or a dedicated draft smoke script.
-- local package build success in a clean release environment.
+- `reading start` output-collision no-mutation regression.
+- `reading finish` output-collision no-mutation regression.
+- duplicate reading-session ID handling.
+- duplicate active-session warning or documented behavior.
+- malformed reading-session JSONL diagnostics.
+- malformed follow-up state diagnostics.
+- `followups done` unknown action behavior.
+- deterministic `reading review` window behavior.
+- report hygiene checks for absolute local paths in active generated reports.
+- write-failure simulation for multi-file local-file link/unlink metadata
+  updates.
 
 ## Documentation Mismatches
 
-- Active surface docs say v1.0-rc while package metadata says v1.1.0.
-- `reports/release_readiness_v1_1.md` omits the known `report all` blockers.
-- `reports/final_project_handoff.md` says `audit-log clear` is still the latest blocker, which is now stale.
-- README and docs still contain many commands writing to `reports/` with `--force`.
-- `docs/COMMAND_CONTRACTS.md` says generated files should be safe and predictable; `report all` violates this through partial writes and ignored `--out`.
+- `docs/index.md` has stale v0.8 wording.
+- `docs/CLI_SURFACE.md` and `docs/COMMAND_CONTRACTS.md` describe no-overwrite
+  behavior broadly, but `reading start/finish` currently violate it when `--out`
+  collides.
+- The report directory contains historical release-readiness reports that
+  disagree with the current v1.2 risk state unless the reader knows to treat
+  `hostile_review_latest.md` as canonical.
+- The reading workflow docs correctly warn about no fabrication and note
+  preservation, but they do not warn that session logs currently lack malformed
+  state diagnostics.
 
 ## CLI Usability Problems
 
-- `paperwb report all --out` is accepted and ignored.
-- `paperwb report all` can fail after writing partial output.
-- `files hash` missing-path errors are terse.
-- `project validate --strict zis_photocatalysis` fails on intentional fixture issues without always making clear that this is expected synthetic data.
-- `draft citations` prints useful coverage, but it always exits 0 even when citations are unknown. This may be fine for report generation, but a `--strict` mode would be useful later.
+- `reading start` and `reading finish` report output collisions only after
+  state mutation.
+- `followups done` can succeed for a typo.
+- `reading review` has no deterministic clock option.
+- `reading queue` can recommend already deeply read papers without a clear
+  "why still recommended" distinction.
+- Some command help labels still reference old version milestones rather than
+  feature names.
 
 ## Data-Safety Risks
 
-No tracked PDFs, SQLite cache databases, `.paperwb` directories, backup archives, `scratch/` outputs, IDE folders, Python cache files, or obvious secret files were found in tracked files.
-
-No cloud API, LLM API, publisher scraping, PDF download, OCR, or copyrighted example PDF behavior was found.
-
-Remaining data-safety risks:
-
-- Docs still encourage writing generated artifacts into tracked `reports/` paths.
-- `report all` can leave partial generated outputs after a failure.
-- Multi-file local-file metadata writes need stronger failure simulation.
-- Historical absolute-path warnings remain visible in generated reports/tests.
-- Text sidecar and draft content copyright safety cannot be proven automatically; examples are synthetic and clearly labelled.
+- No tracked PDFs, SQLite caches, pyc files, `.paperwb` caches, backup archives,
+  or IDE files were found.
+- Runtime dependencies remain empty and there is no evidence of cloud/LLM API
+  dependencies.
+- Ignored local artifacts are present and should be excluded from release
+  archives.
+- Tracked generated reports still contain local absolute paths.
+- The reading-finish output-collision bug can silently change authoritative
+  registry state despite a failed command.
 
 ## Overengineering Risks
 
-The project now includes many local subsystems: registry, BibTeX, notes, claims, themes, reports, authoring, draft auditing, indexed search, imports, exports, local files, integrity, backups, migration, audit logs, synthetic corpora, adversarial fixtures, docs-site pages, and release reports.
-
-The main risk is no longer feature absence. It is consistency:
-
-- write safety must be uniform across every command;
-- active docs must match the package version and command behavior;
-- release reports must not contradict the latest hostile review;
-- heuristic draft-audit reports must not drift into pseudo-semantic claims;
-- monolithic CLI orchestration makes safety review harder.
-
-Do not expand the feature surface until the `report all` blockers and stale surface docs are fixed.
+- The tool has grown into many workflows while keeping all orchestration in one
+  CLI module. More feature growth without modular command groups will make
+  safety reviews harder.
+- There are many generated reports and overlapping docs. More reports without a
+  clearer active/historical split will increase user confusion.
+- Reading workflows should stay simple and local; avoid turning them into a TUI,
+  scheduler, or automatic recommendation engine before the current safe-write
+  issues are fixed.
 
 ## Recommended Fix Sequence
 
-1. Fix `paperwb report all` preflight behavior and add no-partial-output tests.
-2. Reject or implement `paperwb report all --out`; add CLI regression tests.
-3. Update v1.1 API/CLI surface docs and tests so they no longer claim v1.0-rc as the active surface.
-4. Move unsafe tutorial examples from tracked `reports/` paths to `scratch/` or another ignored location.
-5. Regenerate release-readiness and report-index artifacts so they point to the current hostile review as the risk register.
-6. Add partial-write failure tests for local file linking/unlinking and backup creation.
-7. Fix draft citation source-order extraction and add mixed-syntax tests.
-8. Verify package build in CI or a true clean release environment.
+1. Fix `reading start` and `reading finish` by preflighting `--out` before any
+   note, session, or registry mutation.
+2. Add regression tests proving output collisions leave all source files
+   unchanged.
+3. Add deterministic `reading review --as-of` support and regenerate v1.2
+   reading reports with it.
+4. Add duplicate session ID protection and tests.
+5. Add warnings or diagnostics for malformed reading/follow-up state files.
+6. Validate or warn on unknown `followups done` IDs.
+7. Normalize local absolute paths in active generated reports and add a report
+   hygiene test.
+8. Clean stale ignored build artifacts before any public source archive or tag.
+
