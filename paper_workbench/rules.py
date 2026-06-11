@@ -7,6 +7,7 @@ types only. This module never executes user-provided Python code.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from decimal import Decimal, InvalidOperation
 from enum import Enum
 import json
 from pathlib import Path
@@ -511,7 +512,51 @@ def _validate_condition_shape(rule: Rule, *, source: str = "") -> list[RuleFindi
                 source=source,
             )
         )
+    for field_name in _integer_condition_fields(rule):
+        if field_name in condition and not _is_int_like(condition.get(field_name)):
+            findings.append(
+                _config_finding(
+                    "error",
+                    "config.invalid_integer",
+                    f"{rule.rule_id} condition.{field_name} must be an integer.",
+                    identifier=rule.rule_id,
+                    source=source,
+                    suggested_action=f"Set condition.{field_name} to a whole number such as 1.",
+                )
+            )
     return findings
+
+
+def _integer_condition_fields(rule: Rule) -> tuple[str, ...]:
+    if rule.rule_type == "min_count":
+        return ("min", "minimum")
+    if rule.rule_type == "max_count":
+        return ("max", "maximum")
+    if rule.rule_type == "theme_min_papers":
+        return ("min_papers",)
+    if rule.rule_type == "theme_min_strong_claims":
+        return ("min_strong_claims",)
+    return ()
+
+
+def _is_int_like(value: Any) -> bool:
+    if isinstance(value, bool) or value in (None, ""):
+        return False
+    try:
+        int(str(value).strip())
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
+def _condition_int(rule: Rule, *field_names: str, default: int) -> int:
+    for field_name in field_names:
+        if field_name in rule.condition and rule.condition.get(field_name) not in (None, ""):
+            try:
+                return int(str(rule.condition[field_name]).strip())
+            except (TypeError, ValueError):
+                return default
+    return default
 
 
 def _run_rule(rule: Rule, context: RuleContext) -> list[RuleFinding]:
@@ -592,8 +637,8 @@ def _rule_regex_match(rule: Rule, context: RuleContext) -> list[RuleFinding]:
 
 def _rule_count(rule: Rule, context: RuleContext) -> list[RuleFinding]:
     count = len(_filtered_items(rule, context))
-    minimum = int(rule.condition.get("min", rule.condition.get("minimum", 0)) or 0)
-    maximum = int(rule.condition.get("max", rule.condition.get("maximum", 0)) or 0)
+    minimum = _condition_int(rule, "min", "minimum", default=0)
+    maximum = _condition_int(rule, "max", "maximum", default=0)
     if rule.rule_type == "min_count" and count < minimum:
         return [_rule_finding(rule, context, count=count, minimum=minimum, identifier=rule.target)]
     if rule.rule_type == "max_count" and maximum and count > maximum:
@@ -648,7 +693,7 @@ def _rule_citation_key_required(rule: Rule, context: RuleContext) -> list[RuleFi
 
 def _rule_theme_min_papers(rule: Rule, context: RuleContext) -> list[RuleFinding]:
     theme_id = normalize_tag(str(rule.condition.get("theme", "")))
-    minimum = int(rule.condition.get("min_papers", 1) or 1)
+    minimum = _condition_int(rule, "min_papers", default=1)
     claims = group_claims_by_theme(context.claims, context.themes).get(theme_id, [])
     count = len({claim.paper_id for claim in claims if claim.paper_id})
     if count < minimum:
@@ -658,7 +703,7 @@ def _rule_theme_min_papers(rule: Rule, context: RuleContext) -> list[RuleFinding
 
 def _rule_theme_min_strong_claims(rule: Rule, context: RuleContext) -> list[RuleFinding]:
     theme_id = normalize_tag(str(rule.condition.get("theme", "")))
-    minimum = int(rule.condition.get("min_strong_claims", 1) or 1)
+    minimum = _condition_int(rule, "min_strong_claims", default=1)
     claims = group_claims_by_theme(context.claims, context.themes).get(theme_id, [])
     count = len([claim for claim in claims if claim.strength == "strong"])
     if count < minimum:
@@ -670,21 +715,30 @@ def _rule_manuscript_no_unknown_citations(rule: Rule, context: RuleContext) -> l
     if context.manuscript_audit is None:
         return []
     unknown_codes = {"citation_key_not_in_bibtex", "citation_key_not_in_registry"}
-    findings = [
-        finding
-        for finding in context.manuscript_audit.findings
-        if finding.code in unknown_codes
-    ]
-    return [
-        _rule_finding(
-            rule,
-            context,
-            identifier=finding.citation_key,
-            citation_key=finding.citation_key,
-            paragraph_id=finding.paragraph_id,
+    grouped: dict[tuple[str, str], set[str]] = {}
+    for finding in context.manuscript_audit.findings:
+        if finding.code not in unknown_codes:
+            continue
+        key = (finding.citation_key, finding.paragraph_id)
+        grouped.setdefault(key, set()).add(finding.code)
+    results: list[RuleFinding] = []
+    for (citation_key, paragraph_id), codes in grouped.items():
+        missing_sources = []
+        if "citation_key_not_in_bibtex" in codes:
+            missing_sources.append("BibTeX")
+        if "citation_key_not_in_registry" in codes:
+            missing_sources.append("registry")
+        results.append(
+            _rule_finding(
+                rule,
+                context,
+                identifier=citation_key,
+                citation_key=citation_key,
+                paragraph_id=paragraph_id,
+                missing_sources=", ".join(missing_sources),
+            )
         )
-        for finding in findings
-    ]
+    return results
 
 
 def _filtered_items(rule: Rule, context: RuleContext, *, apply_tag_filter: bool = True) -> list[Any]:
@@ -692,7 +746,8 @@ def _filtered_items(rule: Rule, context: RuleContext, *, apply_tag_filter: bool 
     field_filter = rule.condition.get("where_field")
     expected = rule.condition.get("where_equals")
     if field_filter and expected is not None:
-        items = [item for item in items if str(_field_value(item, str(field_filter))) == str(expected)]
+        expected_key = _comparison_key(expected)
+        items = [item for item in items if _comparison_key(_field_value(item, str(field_filter))) == expected_key]
     if apply_tag_filter and rule.condition.get("tag"):
         tag = normalize_tag(str(rule.condition["tag"]))
         items = [item for item in items if tag in parse_tags(_field_value(item, "tags"))]
@@ -773,6 +828,34 @@ def _as_list(value: Any) -> list[Any]:
     if isinstance(value, list):
         return value
     return [value]
+
+
+def _comparison_key(value: Any) -> tuple[str, Any]:
+    if value is None:
+        return ("empty", "")
+    if isinstance(value, bool):
+        return ("bool", value)
+    if isinstance(value, (int, float)):
+        return ("number", _number_key(str(value)))
+    text = str(value).strip()
+    if not text:
+        return ("empty", "")
+    lower = text.lower()
+    if lower in {"true", "false"}:
+        return ("bool", lower == "true")
+    if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", lower):
+        return ("number", _number_key(lower))
+    return ("string", lower)
+
+
+def _number_key(value: str) -> str:
+    try:
+        number = Decimal(value)
+    except (InvalidOperation, ValueError):
+        return value
+    if number == 0:
+        return "0"
+    return format(number.normalize(), "f")
 
 
 def _is_empty(value: Any) -> bool:

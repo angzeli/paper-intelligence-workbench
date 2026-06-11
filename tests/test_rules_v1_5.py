@@ -77,6 +77,126 @@ def test_invalid_rule_config_reports_errors(tmp_path: Path) -> None:
     }
 
 
+def test_invalid_numeric_rule_config_reports_errors(tmp_path: Path) -> None:
+    path = _write_rules(
+        tmp_path / "bad_numeric_rules.json",
+        [
+            {
+                "rule_id": "bad.min_count",
+                "target": "claim",
+                "severity": "warning",
+                "condition": {"type": "min_count", "min": "many"},
+            },
+            {
+                "rule_id": "bad.max_count",
+                "target": "claim",
+                "severity": "warning",
+                "condition": {"type": "max_count", "max": []},
+            },
+            {
+                "rule_id": "bad.theme_min_papers",
+                "target": "theme",
+                "severity": "warning",
+                "condition": {"type": "theme_min_papers", "theme": "photocorrosion", "min_papers": "three"},
+            },
+            {
+                "rule_id": "bad.theme_min_strong_claims",
+                "target": "theme",
+                "severity": "warning",
+                "condition": {"type": "theme_min_strong_claims", "theme": "photocorrosion", "min_strong_claims": False},
+            },
+        ],
+    )
+
+    rule_set = load_rule_set(path)
+    findings = validate_rule_set(rule_set)
+    result = run_rule_set(rule_set, _context(ZIS_PROJECT, "zis_photocatalysis"), include_builtins=False)
+
+    invalid_integer_findings = [finding for finding in findings if finding.rule_id == "config.invalid_integer"]
+    assert len(invalid_integer_findings) == 4
+    assert result.findings == findings
+    assert all("must be an integer" in finding.message for finding in invalid_integer_findings)
+
+
+def test_invalid_numeric_rule_config_cli_does_not_crash(tmp_path: Path) -> None:
+    path = _write_rules(
+        tmp_path / "bad_numeric_rules.json",
+        [
+            {
+                "rule_id": "bad.theme_min_papers",
+                "target": "theme",
+                "severity": "warning",
+                "condition": {"type": "theme_min_papers", "theme": "photocorrosion", "min_papers": "three"},
+            }
+        ],
+    )
+
+    validate = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "paper_workbench.cli",
+            "rules",
+            "validate-config",
+            str(path),
+            "--strict",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    run = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "paper_workbench.cli",
+            "rules",
+            "run",
+            "--project",
+            "zis_photocatalysis",
+            "--rules-file",
+            str(path),
+            "--no-builtins",
+            "--strict",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert validate.returncode == 1
+    assert run.returncode == 1
+    assert "config.invalid_integer" in validate.stdout
+    assert "condition.min_papers must be an integer" in validate.stdout
+    assert "config.invalid_integer" in run.stdout
+    assert "invalid literal" not in run.stderr
+
+
+def test_where_equals_json_boolean_matches_registry_string_values(tmp_path: Path) -> None:
+    path = _write_rules(
+        tmp_path / "bool_filter_rules.json",
+        [
+            {
+                "rule_id": "included.need_pdf",
+                "target": "registry",
+                "severity": "warning",
+                "condition": {
+                    "type": "required_field",
+                    "field": "local_pdf_path",
+                    "where_field": "included_in_lit_review",
+                    "where_equals": True,
+                },
+            }
+        ],
+    )
+
+    result = run_rule_set(load_rule_set(path), _context(ZIS_PROJECT, "zis_photocatalysis"), include_builtins=False)
+
+    assert [finding.identifier for finding in result.findings] == ["zis_charge_2025", "zis_stability_2024"]
+
+
 def test_required_field_allowed_values_and_regex_rules(tmp_path: Path) -> None:
     path = _write_rules(
         tmp_path / "rules.json",
@@ -274,7 +394,9 @@ def test_manuscript_unknown_citation_rule(tmp_path: Path) -> None:
 
     result = run_rule_set(load_rule_set(path), context, include_builtins=False)
 
-    assert any(finding.rule_id == "manuscript.no_unknown" for finding in result.findings)
+    unknown_findings = [finding for finding in result.findings if finding.rule_id == "manuscript.no_unknown"]
+    assert len(unknown_findings) == 2
+    assert {finding.identifier for finding in unknown_findings} == {"unknownSynthetic2027", "anotherMissing2028"}
     assert any(finding.severity == "error" for finding in result.findings)
 
 

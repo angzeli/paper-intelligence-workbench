@@ -64,3 +64,16 @@ Validate every rules file before relying on it:
 paperwb rules validate-config --project zis_photocatalysis --strict
 ```
 
+## Filter Comparison
+
+Rules that use `where_field` and `where_equals` compare values after simple
+normalization:
+
+- JSON booleans such as `true` and `false` match equivalent string values such
+  as `"true"` and `"false"` from CSV registries.
+- Numeric JSON values match equivalent numeric strings.
+- Other strings are compared case-insensitively after trimming whitespace.
+
+Numeric thresholds such as `min`, `max`, `min_papers`, and
+`min_strong_claims` must be whole numbers. Invalid numeric values are reported
+by `paperwb rules validate-config` before rules are executed.

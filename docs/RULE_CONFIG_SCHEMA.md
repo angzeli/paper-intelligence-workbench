@@ -40,3 +40,13 @@ Message templates may use simple placeholders such as:
 Unsupported condition types are reported as config errors. They are not
 executed.
 
+Numeric condition fields must be whole numbers:
+
+- `min` or `minimum` for `min_count`
+- `max` or `maximum` for `max_count`
+- `min_papers` for `theme_min_papers`
+- `min_strong_claims` for `theme_min_strong_claims`
+
+`where_equals` comparisons are normalized for JSON booleans, numeric values,
+empty values, and case-insensitive strings. This allows JSON `true` to match a
+CSV registry value of `true` without requiring users to quote boolean filters.
