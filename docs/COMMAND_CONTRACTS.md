@@ -1,6 +1,6 @@
-# Command Contracts v1.6
+# Command Contracts v1.7
 
-This page defines the v1.6 behavior expected by tests and external
+This page defines the v1.7 behavior expected by tests and external
 users. The contract is intentionally practical: it describes command behavior,
 not internal implementation details.
 
@@ -23,6 +23,7 @@ not internal implementation details.
 | --- | --- | --- | --- | --- |
 | `init` | yes | temp workspace init | existing files preserved | folder creation only |
 | `project` | yes | list and validate synthetic projects | missing project | no legacy data mutation |
+| `template` | yes | list, inspect, and create temp project scaffolds | existing project path or unknown template | refuses existing project paths; generated scaffolds contain no real papers |
 | `validate-registry` | yes | example registry | missing/malformed registry | JSON export refuses overwrite without `--force` |
 | `validate-bib` | yes | example BibTeX | broken/missing BibTeX | report preflight |
 | `import` | yes | dry-run Zotero/generic/BibTeX/RIS | bad mapping/missing columns | registry unchanged on dry-run |
@@ -80,6 +81,7 @@ Representative contract tests live in:
 - `tests/test_manuscript_v1_4.py`
 - `tests/test_rules_v1_5.py`
 - `tests/test_dashboard_v1_6.py`
+- `tests/test_templates_v1_7.py`
 
 Release scripts used by the contract:
 

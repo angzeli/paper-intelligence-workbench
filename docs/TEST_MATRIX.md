@@ -8,6 +8,7 @@
 | BibTeX validation | Common entry types parse and audit findings are emitted | `tests/test_bibtex.py`, parser edge tests | `docs/BIBTEX_AUDIT.md` | Not a complete BibTeX macro engine |
 | Notes and claims | Structured notes parse conservatively with warnings | `tests/test_notes_claims.py`, parser edge tests | `docs/NOTE_FORMAT.md` | Free-form notes are not fully parsed |
 | Project profiles | Project paths resolve without breaking legacy `data/` workflow | `tests/test_projects_doctor_exports.py` | `docs/project-profiles.md` | No destructive migration workflow |
+| Project templates | Template list/inspect/create workflows generate empty non-destructive scaffolds | `tests/test_templates_v1_7.py` | `docs/PROJECT_TEMPLATES.md`, domain template docs | No template update/diff workflow yet |
 | Reports | Markdown reports render from local inputs | report tests, golden report tests | `docs/reports.md`, `docs/REPORT_GALLERY.md` | Historical reports are not all golden-snapshotted |
 | Import/export | Local imports are non-destructive and exports are reproducible | `tests/test_import_export_v0_4.py` | `docs/import-export.md` | Ambiguous import conflict UI is basic |
 | Sync planning | Local sources produce dry-run plans, conflict reports, and safe registry applies | `tests/test_sync_v1_3.py` | `docs/SYNC.md`, `docs/SAFE_SYNC_WORKFLOW.md` | Non-empty metadata conflict resolution is manual |

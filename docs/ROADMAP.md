@@ -127,7 +127,14 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Optional manuscript QA warning aggregation in dashboard views.
 - Read-only aggregation of reading queues, follow-ups, audit events, generated reports, rule findings, citation audits, and workspace health.
 
-## Near-Term Patches for v1.7
+## v1.7 Completed
+
+- Reusable project templates for photocatalysis, finance/valuation, ML methods, and generic literature reviews.
+- Non-destructive `paperwb template list/inspect/create` workflow.
+- Empty project scaffolds with themes, rule examples, note templates, report checklists, manuscript QA checklists, reading queue config, and dashboard expectations.
+- Dogfooding workflow docs and template overview reports.
+
+## Near-Term Patches for v1.8
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -181,9 +188,10 @@ Possible future commands:
 - unresolved question summaries
 - safer BibTeX key normalization commands
 
-## v1.7 Candidate Scope
+## v1.8 Candidate Scope
 
 - Harden dashboard prioritization with more real project fixtures.
 - Add rule-finding export formats and optional filters to avoid noisy all-in reports.
 - Add documentation examples for teams maintaining several project profiles.
 - Decide whether a read-only interactive terminal mode is worth maintaining.
+- Add template update/diff planning without overwriting user projects.

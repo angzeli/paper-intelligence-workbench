@@ -76,3 +76,6 @@ Instructions for future agents working in this repository:
 - Dashboard commands must not modify user data; only explicit `--out` report writes are allowed.
 - Next actions must be explainable from local findings and must not run automatically.
 - Do not add heavy terminal UI dependencies for dashboard workflows without explicit approval.
+- Project templates must create empty/synthetic scaffolds only; do not add real paper metadata, real claims, or copyrighted content.
+- Template creation must remain non-destructive and must refuse existing project paths unless a future explicit safety-reviewed force workflow is added.
+- Finance templates and reports must not provide investment advice.

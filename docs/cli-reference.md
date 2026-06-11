@@ -7,6 +7,8 @@ This page is a site-friendly entry point. The fuller reference is [CLI_REFERENCE
 ```text
 paperwb init
 paperwb project list
+paperwb template list
+paperwb template create photocatalysis --project PROJECT
 paperwb validate-registry PATH
 paperwb validate-bib PATH --registry PATH
 paperwb add-paper --title "..." --year 2026

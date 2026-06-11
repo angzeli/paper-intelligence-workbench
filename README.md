@@ -34,6 +34,8 @@ v1.5 adds a local declarative rule engine. Projects can define JSON rules for re
 
 v1.6 adds a dependency-free terminal dashboard and next-action workflow. It summarizes project health, reading queues, weak evidence, missing notes, citation/rule/manuscript warnings, follow-ups, and recent local audit events without modifying user data.
 
+v1.7 adds reusable project templates and dogfooding scaffolds for photocatalysis, finance/valuation, ML methods, and generic literature-review projects. Templates create empty local project structures with themes, rule examples, note templates, and checklists; they do not include real paper metadata or claims.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -62,6 +64,7 @@ v1.6 adds a dependency-free terminal dashboard and next-action workflow. It summ
 - Audits manuscript drafts and generates citation QA, context, traceability, and revision reports from local evidence only.
 - Runs project-specific JSON rules and built-in validation adapters through a local rule engine.
 - Shows a read-only terminal dashboard with project health, next actions, reading queue, follow-ups, and optional manuscript QA warnings.
+- Creates non-destructive project scaffolds from reusable templates for common literature-review workflows.
 
 ## What It Does Not Do
 
@@ -110,6 +113,15 @@ Initialize a workspace:
 
 ```bash
 paperwb init
+```
+
+Create a project from a template:
+
+```bash
+paperwb template list
+paperwb template inspect photocatalysis
+paperwb template create photocatalysis --project my_photocatalysis_review
+paperwb dashboard --project my_photocatalysis_review --no-audit-log
 ```
 
 Validate the synthetic example registry:

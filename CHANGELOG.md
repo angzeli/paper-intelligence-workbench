@@ -2,6 +2,13 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.7.0 - Project Templates and Dogfooding
+
+- Added `paperwb template list/inspect/create` for reusable project scaffolds.
+- Added photocatalysis, finance/valuation, ML methods, and generic literature-review templates.
+- Generated empty project structures with themes, rules, note templates, report checklists, manuscript QA checklists, reading queue config, and dashboard expectations.
+- Kept templates synthetic, local-only, non-destructive, and free of real paper metadata, investment advice, and copyrighted content.
+
 ## v1.6.0 - Terminal Dashboard
 
 - Added `paperwb dashboard` for dependency-free terminal summaries of project health, evidence gaps, reading queues, follow-ups, rule findings, manuscript QA warnings, and recent audit events.

@@ -2,21 +2,19 @@
 
 Reports directory: .
 
-Markdown reports indexed: 130
+Markdown reports indexed: 136
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v1.6 Release Reports
+## Current v1.7 Release Reports
 
-- [dashboard_v1_6.md](dashboard_v1_6.md)
+- [dogfooding_workflow_v1_7.md](dogfooding_workflow_v1_7.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [next_actions_v1_6.md](next_actions_v1_6.md)
-- [project_health_summary_v1_6.md](project_health_summary_v1_6.md)
-- [release_readiness_v1_6.md](release_readiness_v1_6.md)
+- [release_readiness_v1_7.md](release_readiness_v1_7.md)
 
 ## Next Patch Plan
 
-- [v1_7_recommended_patch_plan.md](v1_7_recommended_patch_plan.md)
+- [v1_8_recommended_patch_plan.md](v1_8_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -32,6 +30,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [claim_bank_v0_6.md](claim_bank_v0_6.md)
 - [claim_traceability_v1_4.md](claim_traceability_v1_4.md)
 - [clean_room_install_check_v1_0_rc.md](clean_room_install_check_v1_0_rc.md)
+- [dashboard_v1_6.md](dashboard_v1_6.md)
 - [data_safety_audit_v0_10.md](data_safety_audit_v0_10.md)
 - [data_safety_audit_v0_8.md](data_safety_audit_v0_8.md)
 - [data_safety_v1_0_rc.md](data_safety_v1_0_rc.md)
@@ -58,6 +57,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [manuscript_revision_checklist_v1_4.md](manuscript_revision_checklist_v1_4.md)
 - [migration_plan_v0_9.md](migration_plan_v0_9.md)
 - [missing_files_v0_7.md](missing_files_v0_7.md)
+- [next_actions_v1_6.md](next_actions_v1_6.md)
 - [obsidian_export_summary_v0_4.md](obsidian_export_summary_v0_4.md)
 - [obsidian_roundtrip_v1_3.md](obsidian_roundtrip_v1_3.md)
 - [paragraph_evidence_matrix_v1_1.md](paragraph_evidence_matrix_v1_1.md)
@@ -65,6 +65,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [performance_sanity_v0_3.md](performance_sanity_v0_3.md)
 - [photocorrosion_section_outline_v0_3.md](photocorrosion_section_outline_v0_3.md)
 - [post_v1_0_roadmap.md](post_v1_0_roadmap.md)
+- [project_health_summary_v1_6.md](project_health_summary_v1_6.md)
 - [project_rules_zis_v1_5.md](project_rules_zis_v1_5.md)
 - [project_summary_v0_4.md](project_summary_v0_4.md)
 - [reading_list_photocorrosion_v0_4.md](reading_list_photocorrosion_v0_4.md)
@@ -88,6 +89,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v1_3.md](release_readiness_v1_3.md)
 - [release_readiness_v1_4.md](release_readiness_v1_4.md)
 - [release_readiness_v1_5.md](release_readiness_v1_5.md)
+- [release_readiness_v1_6.md](release_readiness_v1_6.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [restore_dry_run_v0_9.md](restore_dry_run_v0_9.md)
 - [revision_checklist_v1_1.md](revision_checklist_v1_1.md)
@@ -122,6 +124,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v1_4_recommended_patch_plan.md](v1_4_recommended_patch_plan.md)
 - [v1_5_recommended_patch_plan.md](v1_5_recommended_patch_plan.md)
 - [v1_6_recommended_patch_plan.md](v1_6_recommended_patch_plan.md)
+- [v1_7_recommended_patch_plan.md](v1_7_recommended_patch_plan.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
 - [workspace_integrity_v0_9.md](workspace_integrity_v0_9.md)
@@ -144,6 +147,9 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [reading_status.md](reading_status.md)
 - [release_readiness.md](release_readiness.md)
 - [repo_cleanup_recommendations.md](repo_cleanup_recommendations.md)
+- [template_finance_overview.md](template_finance_overview.md)
+- [template_ml_methods_overview.md](template_ml_methods_overview.md)
+- [template_photocatalysis_overview.md](template_photocatalysis_overview.md)
 - [theme_dashboard.md](theme_dashboard.md)
 - [weak_claims.md](weak_claims.md)
 - [workspace_health.md](workspace_health.md)

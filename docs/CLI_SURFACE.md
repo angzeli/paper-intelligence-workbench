@@ -1,6 +1,6 @@
-# CLI Surface v1.6
+# CLI Surface v1.7
 
-The stable external interface for Paper Intelligence Workbench v1.6 is the
+The stable external interface for Paper Intelligence Workbench v1.7 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -30,6 +30,7 @@ release line unless a release note explicitly says otherwise.
 | `paperwb followups list/export/done` | stable | Collect follow-up actions from notes/sessions and track completion outside source notes |
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
 | `paperwb project init/list/validate` | stable | Manage local project profiles under `projects/` |
+| `paperwb template list/inspect/create` | stable | Create non-destructive empty project scaffolds from local templates |
 | `paperwb import zotero-csv/csv/bibtex/ris` | stable | Import local bibliography data with dry-run and no silent field overwrite |
 | `paperwb sync plan/apply/conflicts/plan-obsidian` | stable | Plan and dry-run local sync changes before safe registry apply |
 | `paperwb export` | stable | Export registries, claims, reading lists, Obsidian vaults, bundles, summaries, and report indexes |
@@ -48,7 +49,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.6.
+No commands are deprecated in v1.7.
 
 ## Write Safety Contract
 
@@ -72,6 +73,9 @@ No commands are deprecated in v1.6.
 - File workflows do not delete, move, copy, download, OCR, or summarize user
   documents.
 - Project-profile commands keep `data/` workflow compatibility.
+- Template creation refuses existing project paths and creates empty scaffolds
+  only; templates must not include real paper metadata, claims, PDFs, or copied
+  paper text.
 
 ## Command Exit Contract
 

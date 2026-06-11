@@ -15,6 +15,8 @@ Use these docs as static Markdown source. No site generator is required.
 ## Core Areas
 
 - [Project Profiles](project-profiles.md)
+- [Project Templates](PROJECT_TEMPLATES.md)
+- [Dogfooding Workflow](DOGFOODING_WORKFLOW.md)
 - [Reports](reports.md)
 - [Report Gallery](REPORT_GALLERY.md)
 - [Local Search](local-search.md)

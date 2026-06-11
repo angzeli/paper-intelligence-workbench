@@ -25,6 +25,17 @@ paperwb claims data/notes --output scratch/example_claims.csv
 
 The example data is synthetic and intentionally includes duplicates, missing fields, weak claims, and incomplete evidence so reports have something to audit.
 
+## Start A Real Project Scaffold
+
+```bash
+paperwb template list
+paperwb template create photocatalysis --project my_review
+paperwb dashboard --project my_review --no-audit-log
+```
+
+Templates create empty scaffolds only. Add verified paper metadata and notes
+yourself.
+
 ## First Report
 
 ```bash
@@ -36,6 +47,7 @@ Read the report as an audit of your own tracked evidence, not as a truth judgmen
 ## Next Steps
 
 - Use [Project Profiles](project-profiles.md) for independent review projects.
+- Use [Project Templates](PROJECT_TEMPLATES.md) to start an empty domain scaffold.
 - Use [Import / Export](import-export.md) to bring in local CSV, BibTeX, or RIS data.
 - Use [Authoring Workbench](authoring-workbench.md) when preparing a literature-review subsection.
 - Use [Local Files](local-files.md) to reconcile user-provided files and text sidecars.

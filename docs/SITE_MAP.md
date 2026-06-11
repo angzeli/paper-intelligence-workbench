@@ -10,6 +10,8 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/cli-reference.md`
 - `docs/reports.md`
 - `docs/project-profiles.md`
+- `docs/PROJECT_TEMPLATES.md`
+- `docs/DOGFOODING_WORKFLOW.md`
 - `docs/local-search.md`
 - `docs/import-export.md`
 - `docs/authoring-workbench.md`
@@ -37,6 +39,11 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/CITATION_AUDIT.md`
 - `docs/EVIDENCE_MAPS.md`
 - `docs/PROJECT_PROFILES.md`
+- `docs/PROJECT_TEMPLATES.md`
+- `docs/PHOTOCATALYSIS_TEMPLATE.md`
+- `docs/FINANCE_TEMPLATE.md`
+- `docs/ML_METHODS_TEMPLATE.md`
+- `docs/DOGFOODING_WORKFLOW.md`
 - `docs/LOCAL_SEARCH.md`
 - `docs/IMPORTS.md`
 - `docs/EXPORTS.md`

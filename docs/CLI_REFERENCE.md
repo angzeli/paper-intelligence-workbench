@@ -1,6 +1,6 @@
 # CLI Reference
 
-For the v1.2 stability inventory, see [CLI Surface](CLI_SURFACE.md) and
+For the current stability inventory, see [CLI Surface](CLI_SURFACE.md) and
 [Command Contracts](COMMAND_CONTRACTS.md). The CLI is the stable external
 interface; direct Python imports are documented separately in
 [API Surface](API_SURFACE.md).
@@ -12,6 +12,9 @@ paperwb init
 paperwb project init NAME
 paperwb project list
 paperwb project validate NAME
+paperwb template list
+paperwb template inspect photocatalysis
+paperwb template create photocatalysis --project my_project
 paperwb validate-registry data/registries/papers.csv
 paperwb validate-bib data/bibtex/library.bib --registry data/registries/papers.csv
 paperwb add-paper --title "..." --year 2026
@@ -31,6 +34,11 @@ paperwb reading start PAPER_ID --project zis_photocatalysis
 paperwb followups list --project zis_photocatalysis
 paperwb rules list --project zis_photocatalysis --builtins
 ```
+
+Template creation is non-destructive. It refuses an existing project path and
+creates empty project scaffolds with themes, rules, note templates, report
+checklists, manuscript QA checklists, reading queue config, and dashboard
+expectations.
 
 Imports:
 
