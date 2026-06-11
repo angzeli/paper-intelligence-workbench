@@ -51,3 +51,5 @@ Instructions for future agents working in this repository:
 - Preserve error-message clarity: explain what happened, where, why it matters, and the next step.
 - Avoid crashing on imperfect local data; warnings are preferred when conservative recovery is possible.
 - Test destructive-action safeguards and force/dry-run behavior when changing write paths.
+- Preserve the v1.0-rc API and CLI surface docs when changing public behavior.
+- Update command-contract tests when adding, removing, or changing stable CLI commands.

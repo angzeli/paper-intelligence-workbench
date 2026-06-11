@@ -2,6 +2,27 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.0-rc - Release Candidate Hardening
+
+- Added API and CLI surface inventories that mark stable, experimental, and internal surfaces.
+- Added command-contract documentation and release-candidate tests for help output, safe writes, dry-run imports, and common failure paths.
+- Added a local clean-room install check script that exercises package import, CLI help, temporary workspace initialization, project creation, validation, reports, indexed search, integrity checks, and notebook structure checks.
+- Added v1.0-rc release reports for clean-room checks, external-user simulation, data safety, limitations, release notes, and post-v1.0 roadmap planning.
+- Kept the release candidate local-first, unpublished, untagged, and free of cloud, LLM, scraping, or copyrighted example content.
+
+## v0.10.0 - Adversarial Testing
+
+- Added adversarial synthetic fixtures for malformed registries, BibTeX, notes, imports, projects, backups, audit logs, sidecars, and local paths.
+- Added error taxonomy and error-message guidance.
+- Hardened CLI failure paths so normal bad inputs produce actionable errors without Python tracebacks.
+- Added v0.10 release-readiness, failure-mode, and adversarial summary reports.
+
+## v0.9.0 - Data Integrity
+
+- Added workspace integrity checks, local audit logs, backup snapshots, non-destructive restore planning, and migration planning.
+- Added safe-write documentation and workflow examples.
+- Added v0.9 release-readiness, migration, backup, restore, and audit-log reports.
+
 ## v0.8.0 - External Release Engineering
 
 - Hardened package metadata and aligned package version metadata.

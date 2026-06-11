@@ -25,6 +25,9 @@ Use these docs as static Markdown source. No site generator is required for v0.8
 
 ## Release Engineering
 
+- [API Surface](API_SURFACE.md)
+- [CLI Surface](CLI_SURFACE.md)
+- [Command Contracts](COMMAND_CONTRACTS.md)
 - [Test Matrix](TEST_MATRIX.md)
 - [CLI Behavior Matrix](CLI_BEHAVIOR_MATRIX.md)
 - [Report Matrix](REPORT_MATRIX.md)

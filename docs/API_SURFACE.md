@@ -1,0 +1,87 @@
+# API Surface v1.0-rc
+
+Paper Intelligence Workbench is a local-first command-line project. The Python
+package is usable by tests and scripts, but v1.0-rc does not promise a broad
+stable library API. The stable user interface is the `paperwb` CLI plus the
+documented local file formats.
+
+The package does not use cloud APIs, LLM APIs, publisher scraping, or remote
+metadata lookup. API helpers operate on user-provided local CSV, JSON,
+Markdown, BibTeX, RIS, text sidecar, and project-profile files.
+
+## Stable For v1.0-rc
+
+These modules are treated as stable enough for local automation in v1.0-rc:
+
+| Module | Stable entry points | Purpose |
+| --- | --- | --- |
+| `paper_workbench.registry` | `load_registry`, `save_registry`, `save_registry_json`, `validate_registry`, `filter_papers`, `add_paper` | Registry loading, validation, filtering, and appending |
+| `paper_workbench.bibtex` | `parse_bibtex_file`, `validate_bibtex` | Lightweight BibTeX parsing and audit findings |
+| `paper_workbench.notes` | `write_note_template`, `parse_note_file` | Structured note template writing and conservative note parsing |
+| `paper_workbench.claims` | `collect_notes`, `collect_claims`, `save_claims_csv` | Claim extraction from local structured notes |
+| `paper_workbench.tags` | `normalize_tag`, `load_themes`, `map_claims_to_themes` | Tag normalization and theme mapping |
+| `paper_workbench.reporting` | report Markdown helpers | Inventory, reading-status, tag, BibTeX, evidence, and authoring reports |
+| `paper_workbench.audit` | `citation_audit` | Citation-readiness findings from registry, notes, claims, themes, and BibTeX |
+| `paper_workbench.projects` | `create_project_profile`, `list_project_profiles`, `resolve_project_profile` | Project-profile path resolution |
+| `paper_workbench.importers` | `import_zotero_csv`, `import_generic_csv`, `import_bibtex`, `import_ris` | Local import workflows with reports and dry-run support |
+| `paper_workbench.exports` | export helpers | CSV, JSON, Markdown, Obsidian, bundle, reading-list, and report-index exports |
+| `paper_workbench.index` | `rebuild_index`, `index_status`, `search_index`, `clear_index` | Rebuildable local SQLite search cache |
+| `paper_workbench.files` | scan/link/hash/audit helpers | Local file registry, sidecar, hash, duplicate, and missing-file checks |
+| `paper_workbench.authoring` | evidence matrix, claim bank, citation bank, paragraph plan, readiness, writing packet helpers | Writing planning aids from tracked local evidence |
+| `paper_workbench.integrity` | `check_workspace_integrity`, `workspace_integrity_report` | Structural consistency checks |
+| `paper_workbench.backups` | `create_backup`, `list_backups`, `plan_restore`, `restore_backup` | Local backup snapshots and non-destructive restore planning |
+| `paper_workbench.migration` | `plan_legacy_migration`, `run_legacy_migration` | Legacy `data/` to project-profile migration planning/copying |
+| `paper_workbench.auditlog` | `append_audit_event`, `load_audit_events`, `clear_audit_log` | Local JSONL audit log events |
+| `paper_workbench.safety` | `audit_data_safety`, `safety_audit_markdown` | Tracked-file data-safety audit |
+
+## Stable Data Models
+
+The dataclasses in `paper_workbench.schema` are stable enough for local scripts:
+
+- `Paper`
+- `Author`
+- `BibTeXEntry`
+- `PaperNote`
+- `Claim`
+- `EvidenceLink`
+- `Tag`
+- `ProjectTheme`
+- `CitationAuditFinding`
+- `ValidationFinding`
+- enum-like constants for reading status, claim strength, and evidence type
+
+Fields may grow in future releases, but v1.0-rc aims to preserve existing field
+names and meanings.
+
+## Experimental Modules
+
+These modules are public in the package but remain more likely to change:
+
+- `paper_workbench.synthetic`: deterministic stress fixtures and generated
+  synthetic projects.
+- `paper_workbench.errors`: user-facing diagnostic taxonomy helpers.
+- `paper_workbench.doctor`: workspace-health aggregation.
+
+They are useful for tests and release checks, but downstream automation should
+prefer CLI commands unless it needs direct Python objects.
+
+## Internal Or Low-Level Modules
+
+These modules are implementation details:
+
+- `paper_workbench.cli`
+- `paper_workbench.io`
+- `paper_workbench.paths`
+
+They can be imported by tests, but they are not a stable extension API.
+
+## Compatibility Notes
+
+- v1.0-rc keeps the legacy `data/` workflow and the `projects/` workflow.
+- CSV, JSON, Markdown notes, BibTeX, RIS, and theme JSON remain authoritative
+  inputs.
+- SQLite indexes, audit logs, caches, backups, and generated reports are
+  rebuildable or local release artifacts, not remote services.
+- The tool audits evidence completeness and local data consistency. It does not
+  evaluate scientific truth or fabricate claims, citations, quotes, summaries,
+  or polished prose.

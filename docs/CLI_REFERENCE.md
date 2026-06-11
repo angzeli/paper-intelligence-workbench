@@ -1,5 +1,10 @@
 # CLI Reference
 
+For the v1.0-rc stability inventory, see [CLI Surface](CLI_SURFACE.md) and
+[Command Contracts](COMMAND_CONTRACTS.md). The CLI is the stable external
+interface; direct Python imports are documented separately in
+[API Surface](API_SURFACE.md).
+
 Core commands:
 
 ```bash

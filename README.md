@@ -20,6 +20,8 @@ v0.9 adds data-integrity safeguards for real local use: workspace integrity chec
 
 v0.10 adds an adversarial torture suite, fuzz-style fixtures, clearer error taxonomy, CLI failure-path tests, and regression checks for malformed local data.
 
+v1.0-rc adds release-candidate hardening: API and CLI surface inventories, command-contract checks, clean-room install checks, external-user simulation reports, data-safety review, and a final release-readiness verdict before tagging.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -41,6 +43,7 @@ v0.10 adds an adversarial torture suite, fuzz-style fixtures, clearer error taxo
 - Generates theme-specific writing aids from tracked local claims and citations.
 - Checks workspace integrity, writes local audit events, creates local backup snapshots, plans safe restores, and plans/copies non-destructive legacy-to-project migrations.
 - Stress-tests malformed local data with synthetic adversarial fixtures and clear error-message expectations.
+- Documents the v1.0-rc API and CLI surface so external users can see what is stable, experimental, and internal.
 
 ## What It Does Not Do
 
@@ -375,6 +378,9 @@ paperwb checklist --theme photocorrosion
 - [docs/CLI_WALKTHROUGH.md](docs/CLI_WALKTHROUGH.md)
 - [docs/PROJECT_PROFILES.md](docs/PROJECT_PROFILES.md)
 - [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
+- [docs/API_SURFACE.md](docs/API_SURFACE.md)
+- [docs/CLI_SURFACE.md](docs/CLI_SURFACE.md)
+- [docs/COMMAND_CONTRACTS.md](docs/COMMAND_CONTRACTS.md)
 - [docs/EVIDENCE_MAPS.md](docs/EVIDENCE_MAPS.md)
 - [docs/WORKFLOW_EXAMPLES.md](docs/WORKFLOW_EXAMPLES.md)
 - [docs/IMPORTS.md](docs/IMPORTS.md)

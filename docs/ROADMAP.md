@@ -73,7 +73,15 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Parser/import/backup hardening for recoverable bad inputs.
 - Warning snapshot-style assertions for representative diagnostics.
 
-## Near-Term Patches for v1.0-rc
+## v1.0-rc Completed
+
+- API and CLI surface inventories.
+- Command-contract documentation and tests.
+- Current-environment clean-room install and workflow check.
+- External-user simulation and data-safety reports.
+- Final release-readiness and known-limitations reports.
+
+## Near-Term Patches for v1.0.0
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
