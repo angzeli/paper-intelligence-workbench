@@ -1,171 +1,181 @@
-# Hostile Maintainer Review: Latest v0.6 State
+# Hostile Maintainer Review: Latest v0.7 State
 
 ## Release Verdict
 
-**Verdict: conditional release candidate, not a polished external release.**
+**Verdict: do not ship v0.7 broadly until the release blockers below are fixed.**
 
-The repository is materially useful and the core test suite is green. The local-first boundary is mostly respected: no cloud APIs, LLM APIs, publisher scraping, tracked PDFs, or tracked SQLite caches were found. The CLI covers the advertised workflows and the v0.6 authoring workbench keeps the right conceptual boundary: planning aids, not final prose.
+The repository is substantially useful and the local-first boundary is still intact. I found no tracked PDFs, no tracked SQLite/cache artifacts, no cloud/LLM dependencies, and no publisher scraping code. The test suite and notebook JSON validation pass, and the major CLI paths I sampled are functional.
 
-However, I would not tag this for broad external users until the high-priority issues below are fixed. The biggest problems are not catastrophic data loss; they are non-atomic multi-output writes, weak CI/release automation, authoring-report regression gaps, and confusing/stale generated-report history.
+That said, the new v0.7 local-file ingestion surface has two release-blocking defects: multi-file audit output is not atomic, and the scanner fails to detect the explicit case where the same local file path is linked to multiple registry papers. These are not cosmetic problems; they undermine the safety and reconciliation guarantees that v0.7 advertises.
 
 Validation performed during review:
 
 - `python -m pytest -q` passed.
 - `python scripts/validate_notebooks.py` passed.
-- `python -m paper_workbench.cli report evidence-matrix --project zis_photocatalysis --theme charge-separation --out /private/tmp/hostile_matrix.md --csv-out /private/tmp/hostile_matrix.csv --json-out /private/tmp/hostile_matrix.json --force` passed.
-- `python -m paper_workbench.cli report all --project zis_photocatalysis --reports-dir /private/tmp/should_be_rejected` correctly failed with a project-path override error.
-- `python -m paper_workbench.cli writing-packet --project zis_photocatalysis --theme photocorrosion --out /private/tmp/hostile_packet.md --force` passed.
-- Tracked-file scan found no tracked `.paperwb/`, SQLite DBs, PDFs, Python caches, `.DS_Store`, `.idea`, or notebook checkpoints.
+- `python -m paper_workbench.cli --help` passed.
+- `python -m paper_workbench.cli files --help` passed.
+- `python -m paper_workbench.cli validate-registry data/registries/example_papers.csv` passed with expected synthetic findings.
+- `python -m paper_workbench.cli validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv` passed with expected synthetic findings.
+- `python -m paper_workbench.cli project list` passed.
+- `python -m paper_workbench.cli files scan --project zis_photocatalysis` passed.
+- `python -m paper_workbench.cli files audit --project zis_photocatalysis --reports-dir /private/tmp/paperwb_review_files --force` passed.
+- `python -m paper_workbench.cli import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --report /private/tmp/paperwb_review_import.md --force` passed.
+- `python -m paper_workbench.cli report evidence-matrix --project zis_photocatalysis --theme charge-separation --out /private/tmp/paperwb_review_matrix.md --force` passed.
+- `python -m paper_workbench.cli export report-index --out /private/tmp/paperwb_review_index.md --force` passed.
+- `python -m paper_workbench.cli index rebuild --project zis_photocatalysis --include-text --index /private/tmp/paperwb_review_index.sqlite` passed and reported FTS5 availability.
+- `python -m paper_workbench.cli search photocorrosion --project zis_photocatalysis --indexed --text --index /private/tmp/paperwb_review_index.sqlite` passed.
+- `python -m paper_workbench.cli writing-packet --project zis_photocatalysis --theme photocorrosion --out /private/tmp/paperwb_review_packet.md --force` passed.
+- `python examples/local_file_audit_workflow.py` passed.
+- Tracked-file hygiene scan found no tracked `.paperwb/`, SQLite DBs, Python caches, `.DS_Store`, `.idea`, notebook checkpoints, or PDFs.
 
 ## Release Blockers
 
-None found that would require halting a source-code preview release.
+1. **`files audit` can leave partial report output after a failed overwrite check.**
 
-This is not the same as “ready for broad users.” The high-priority issues below are still serious enough that I would fix them before announcing v0.6 externally.
+   `cmd_files_audit` writes each audit report sequentially with `write_text`. If an earlier target is writable and a later target already exists, the command exits with an error after leaving the earlier generated files behind. I reproduced this by pre-creating `duplicate_files_v0_7.md`: the command returned code 2, preserved the old duplicate report, but still created `local_files_audit_v0_7.md`.
+
+   Relevant code: `paper_workbench/cli.py` lines 506-519.
+
+   Risk: users see a failed command but get a partially refreshed audit set. This is misleading for a data-safety report and breaks the expectation that generated reports are reproducible snapshots.
+
+   Required fix: preflight every target path before writing any audit report, or render to temporary files and atomically move them only after all overwrite checks pass. Add a CLI regression test proving an existing later report prevents all writes unless `--force` is set.
+
+2. **`files scan` does not detect one local file path linked to multiple registry papers.**
+
+   `_paper_path_map` stores `relative_path -> paper_id` in a plain dict, so duplicate `local_pdf_path` values silently overwrite earlier paper IDs. A registry with `paper_a` and `paper_b` both pointing to `papers/same.pdf` produces one `linked_registry_path` record for `paper_b`, zero warnings, and zero duplicates.
+
+   Relevant code: `paper_workbench/files.py` lines 141-147 and 193-253.
+
+   Risk: v0.7 explicitly promises detection of the same PDF linked to multiple papers. The current scanner misses that reconciliation failure, which can lead users to believe their local-file registry is clean when it is not.
+
+   Required fix: track `relative_path -> list[paper_id]`, preserve all linked paper IDs in diagnostics, and emit a warning such as `Local file path linked to multiple papers: papers/same.pdf -> paper_a, paper_b`. Add a unit test for duplicate registry `local_pdf_path` values.
 
 ## High-Priority Issues
 
-1. **Evidence-matrix multi-output writes are not atomic.**
+1. **CI does not run any local-file CLI smoke tests.**
 
-   `paperwb report evidence-matrix` writes the Markdown report before attempting `--csv-out` and `--json-out` writes. If a later output path already exists and `--force` is not set, the command exits with code 2 after leaving the earlier Markdown file behind. I reproduced this with `/private/tmp/hostile_partial_matrix_seq.md` and an existing CSV path: stderr reported the CSV overwrite error after stdout had already printed `Wrote /private/tmp/hostile_partial_matrix_seq.md`.
+   `.github/workflows/ci.yml` runs pytest, notebook validation, import, CLI help, and tracked-artifact hygiene, but it does not smoke `paperwb files --help`, `files scan`, or `files audit`. v0.7's headline feature is local file ingestion; CI should exercise at least one non-destructive local-file workflow.
 
-   Relevant code: `paper_workbench/cli.py` lines 496-509.
+2. **`files scan` and `files status` hide warning details from the terminal.**
 
-   Risk: users see a failed command but still get partial generated output. This undermines the project’s non-destructive/reproducible-output story.
+   `cmd_files_status` prints only `Warnings: N`. `cmd_files_scan` prints records but not warning text. Users must generate a full audit report to learn why a scan is suspicious.
 
-   Fix: preflight every requested output path before writing any of them, or write all outputs to temp files and atomically replace only after all renders succeed. Add a CLI regression test where existing `--csv-out` prevents Markdown creation.
+   Relevant code: `paper_workbench/cli.py` lines 482-504.
 
-2. **No CI configuration is present.**
+   Risk: missing folders, large files, sidecars without matching papers, duplicate hashes, and malformed link states are too easy to miss in day-to-day CLI use.
 
-   There is no `.github/` directory or visible CI workflow. Local tests pass, but external users and maintainers have no automated gate for pytest, notebook validation, packaging import, CLI smoke tests, or tracked-artifact hygiene.
+   Fix: print warning lines after the summary for scan/status, while keeping existing output shape intact enough for tests.
 
-   Risk: parser/report regressions can land silently, especially with this many generated fixtures and CLI workflows.
+3. **`files unlink PAPER_ID` can clear registry metadata even when no file-registry records were removed.**
 
-   Fix: add a minimal CI workflow that runs `python -m pytest -q`, `python scripts/validate_notebooks.py`, package import, `python -m paper_workbench.cli --help`, and a tracked-file hygiene scan.
+   `unlink_file_from_paper` removes file-registry rows and then clears `local_pdf_path` for the paper if `clear_pdf` is true. If the file registry contains zero rows for that paper, the command still clears the registry field.
 
-3. **Authoring reports lack golden/regression coverage.**
+   Relevant code: `paper_workbench/files.py` lines 310-327 and `paper_workbench/cli.py` lines 540-552.
 
-   v0.6 adds evidence matrices, claim banks, citation banks, paragraph plans, subsection readiness, and writing packets, but the existing golden report suite only covers older stress reports under `tests/golden/stress_zis_photocatalysis/`. The new authoring outputs have focused unit/CLI tests, not stability snapshots or robust section/count regression checks.
+   Risk: users may intend to remove a file-registry link but accidentally erase a manually curated `local_pdf_path`. This is not destructive to the file itself, but it is a metadata mutation that should be more explicit.
 
-   Risk: writing-facing reports can silently change semantics or omit warnings while tests still pass.
+   Fix: either clear `local_pdf_path` only when a file-registry row was removed or print a clear warning when only registry metadata changed. Preserve `--keep-pdf-path`.
 
-   Fix: add authoring golden snapshots or stable count/section tests for at least one strong theme, one weak theme, and one missing-evidence theme.
+4. **Forced file-registry writes can discard curated file-registry notes.**
 
-4. **Current working tree contains an untracked old hostile review report.**
+   `files scan --write-registry --force` saves only the current scan result. If an existing `files.csv` includes curated `notes`, custom metadata, or records for temporarily unavailable files, those rows are replaced by the scan snapshot.
 
-   `git status --short --branch` shows `?? reports/hostile_review_v0_2.md`. This file is not tracked, but it is also not ignored. It is easy to accidentally stage during release cleanup.
+   Relevant code: `paper_workbench/cli.py` lines 482-488 and `paper_workbench/files.py` lines 108-137.
 
-   Risk: stale or irrelevant review artifacts get committed and confuse users.
+   Risk: this is a data-loss vector for the local file registry itself. The command is guarded by `--force`, but users may reasonably expect force to permit overwriting the output file, not to discard manually enriched rows.
 
-   Fix: decide whether to track it, delete it, or ignore old hostile-review drafts. Do not leave it floating in a release workspace.
+   Fix: document this behavior prominently or implement merge preservation for matching `paper_id + relative_path` records. At minimum, add a test that captures the current behavior so it is not accidental.
 
-5. **Generated report history is confusing and partly stale.**
+5. **Local-file audit reports do not reconcile against existing `files.csv` records.**
 
-   `reports/v0_6_recommended_patch_plan.md` still describes the old search/indexing-oriented v0.6 plan, while current v0.6 is the authoring workbench and `reports/v0_7_recommended_patch_plan.md` is the active next plan. Keeping historical generated reports is reasonable, but the top-level reports directory now mixes current release artifacts with old phase artifacts without a clear index or “current vs historical” marker.
+   `files audit` is primarily a live scan. `files status` counts file-registry records, but the audit reports do not list stale `files.csv` rows, missing files referenced only by `files.csv`, or registry-file records whose hashes no longer match.
 
-   Risk: external users can read an old report and misunderstand the current product direction.
+   Risk: users can have a stale local-file registry and still get a clean-looking scan report if the stale path is not represented in `paper.local_pdf_path`.
 
-   Fix: update `reports/index.md` after v0.6, add “historical” labels to older patch plans, or move historical release reports into versioned subdirectories.
+   Fix: include a file-registry reconciliation section in the audit, or clearly rename the reports as live-scan reports and add a separate registry reconciliation report.
 
 ## Medium-Priority Issues
 
-1. **`paperwb report all --out ...` silently ignores `--out`.**
+1. **Top-level text-sidecar semantics are easy to misunderstand.**
 
-   The implementation only uses `--out` when exactly one report is selected. With `report all`, it writes multiple files to the reports directory. That is defensible, but the CLI does not reject or explain `--out` for multi-report generation.
+   The sidecar report says only top-level `.txt` sidecars are audited, while the scanner uses recursive directory traversal and then only marks files whose parent directory name is exactly `text` as sidecars. Nested text files under `text/subdir/` are scanned as normal `.txt` files but not reported as sidecars.
 
-   Relevant code: `paper_workbench/cli.py` lines 485-500.
+   Fix: document this precisely or make sidecar detection intentionally recursive by project policy.
 
-   Fix: reject `--out` with `report all`, or document and print that it is ignored.
+2. **`files audit --project ... --reports-dir ...` allows an output override unlike most project report commands.**
 
-2. **Readiness scoring can look more authoritative than it is.**
+   This is not unsafe by itself, but it is inconsistent with the stricter project-path override checks used elsewhere. Users can accidentally generate project audit reports into the root `reports/` directory.
 
-   The v0.6 docs correctly say the score is not a truth score, but the report still emits a numeric `Score: N/100` and statuses such as `ready_to_outline`. The rubric is transparent, but users may over-trust it, especially when missing BibTeX only costs five points and missing citations do not block readiness.
+3. **Stale ignored review artifacts are still visible in the workspace.**
 
-   Relevant code: `paper_workbench/authoring.py` lines 560-619.
+   `reports/hostile_review_v0_2.md` is ignored but still present locally. It will not be staged by normal `git add`, but users browsing the folder directly can confuse it with current review material.
 
-   Fix: consider renaming to “Completeness score,” make missing BibTeX a blocker for included papers, and add a stronger warning in generated readiness reports.
+4. **`reports/index.md` under-emphasizes authoring reports after v0.7.**
 
-3. **Citation-bank roles are rule-based but presented as categorical groups.**
+   The index marks v0.6 authoring reports as historical even though authoring remains a core feature. This is an information architecture problem, not a functional bug.
 
-   Citation-bank grouping depends entirely on evidence-type labels and missing-note checks. A mislabeled claim can move a paper into “primary evidence” or “mechanism,” and the report does not show the exact rule used per paper.
+5. **Generated reports can include absolute roots when custom paths are used.**
 
-   Relevant code: `paper_workbench/authoring.py` lines 350-419.
-
-   Fix: include “role reason” text in citation-bank rows, such as `experimental_result claim with location` or `no linked claims`.
-
-4. **Search sidecar indexing is shallow by design, but docs and UX should be clearer.**
-
-   `build_index_records` uses `Path(text_dir).glob("*.txt")`, not recursive discovery. That is acceptable if intentional, but users may expect project text folders to support subdirectories.
-
-   Relevant code: `paper_workbench/index.py` lines 345-360.
-
-   Fix: document “top-level `.txt` only” wherever sidecars are described, or add an explicit `--recursive-text` flag later.
-
-5. **Notebook execution is validated manually, not by the repository test suite.**
-
-   Notebook JSON validation is scripted, but executed notebooks are not part of pytest or CI. The v0.6 notebooks were fixed to run from notebook CWD, but future notebook regressions can still slip in unless CI executes them or a smoke subset.
-
-   Fix: either add a lightweight notebook execution smoke script or CI job for the newest workflow notebooks.
+   The default committed reports use relative roots, but custom audit/index reports can include absolute paths. That is acceptable for local diagnostics but should remain out of committed example reports.
 
 ## Low-Priority Polish
 
-- `cmd_report` computes BibTeX audit, citation audit, and workspace health before knowing which report will be rendered. This is inefficient for simple reports and makes unrelated malformed files capable of breaking a report that does not need them.
-- Report naming is inconsistent across eras: root reports, v0.2 reports, v0.3 stress reports, v0.4 import reports, v0.5 search reports, and v0.6 authoring reports all live together.
-- `paperwb checklist` has older theme-matching logic than the v0.6 authoring reports and may behave differently for aliases or normalized names.
-- The project still has no packaged console smoke after editable install in CI because no CI exists.
-- `exports.py` directory exports reject non-empty output directories even with `--force`; this is safe but the word “force” can mislead users.
+- `files scan` output is tabular but has no header row, making it less friendly for first-time users.
+- `files sidecars` only lists sidecars; it does not show unmatched nested text files that users may have expected to count.
+- `files hash` has no friendly error handling for missing paths; the raw exception is acceptable for developers but rough for external users.
+- The reports directory is crowded with versioned release artifacts. This is useful historically but intimidating for new users.
+- The CLI now has many report/export modes under one parser. Help text is serviceable, but examples are more important than the generated argparse output.
 
 ## Missing Tests
 
-- Multi-output preflight/atomicity test for `report evidence-matrix --out --csv-out --json-out`.
-- `report all --out` behavior test.
-- Authoring golden or stable regression tests for v0.6 reports.
-- Citation-bank role-reason tests covering each evidence type.
-- Readiness-score tests for missing BibTeX on included papers.
-- Notebook execution smoke in automated validation, not just JSON validation.
-- CLI smoke test confirming no old substring search behavior changed after authoring additions.
-- Test that sidecar indexing is intentionally top-level-only, or test recursive behavior if added.
-- CI workflow itself is missing.
+- Regression test for `files audit` all-or-nothing overwrite preflight.
+- Unit test for duplicate registry `local_pdf_path` values pointing to the same file.
+- CLI smoke test for `paperwb files --help`.
+- CLI smoke test for `paperwb files scan --project zis_photocatalysis`.
+- CLI smoke test for `paperwb files audit` writing all four reports.
+- Test for `files unlink` behavior when zero file-registry rows are removed but `local_pdf_path` exists.
+- Test documenting whether `files scan --write-registry --force` preserves or replaces curated file-registry notes.
+- Test for nested `.txt` sidecar semantics.
+- Audit test that existing `files.csv` records are reconciled or explicitly ignored.
+- CI assertion that no tracked PDFs, text sidecar full-text fixtures, cache DBs, or notebook checkpoints are present.
 
 ## Documentation Mismatches
 
-- `reports/v0_6_recommended_patch_plan.md` is historical but reads like the next plan for v0.6, while the current v0.6 release is already authoring-focused.
-- `reports/index.md` appears to predate v0.6 authoring reports and does not clearly distinguish current reports from historical artifacts.
-- Sidecar indexing docs should be explicit about top-level-only `.txt` discovery.
-- CLI docs should state that `report all` ignores/rejects `--out` once the behavior is decided.
-- README describes the workbench as for roughly 10 to 100 papers; stress fixtures demonstrate 100+ papers total but not necessarily one polished real 100-paper user project with CI-backed release automation.
+- `docs/TEXT_SIDECARS.md` and `docs/LOCAL_FILES.md` need sharper wording around top-level `.txt` sidecars versus recursively scanned text files.
+- `docs/FILE_AUDIT.md` describes the audit as a local-file audit, but the implementation is closer to a live folder scan plus registry `local_pdf_path` check. It does not fully audit stale `files.csv` records.
+- `README.md` mentions file scanning and local file audits, but it does not warn that `files scan --write-registry --force` replaces the file registry output.
+- The report index does not clearly separate current user-facing reports from historical release-readiness artifacts.
 
 ## CLI Usability Problems
 
-- Multi-output evidence matrix can partially succeed after a failing later output.
-- `report all --out` does not have clear semantics.
-- `--force` means overwrite for file exports but still refuses non-empty directory exports; safe, but not obvious.
-- `paperwb report ... --project ... --out reports/foo.md` writes to the caller’s `reports/`, not the project reports directory. This is consistent with explicit `--out`, but users may expect project-relative paths.
-- `paperwb search --indexed` error does include a rebuild hint, which is good.
+- `files scan` and `files status` suppress warning details.
+- `files audit` can partially write outputs before failing.
+- `files unlink` does not tell the user whether `local_pdf_path` metadata was cleared.
+- `files scan --write-registry --force` does not warn that existing file-registry rows may be replaced.
+- `files audit` has no single-report mode, so a collision on any one output currently affects a four-report command.
 
 ## Data-Safety Risks
 
-- No cloud, LLM, scraping, tracked PDFs, or tracked SQLite DBs found.
-- Ignored `.paperwb/index.sqlite`, `.pytest_cache`, and `__pycache__` are present locally but not tracked.
-- Backup bundles default to not including PDFs, which is correct.
-- Importers preserve non-empty registry fields unless `--fill-missing` is used, and even then only blank fields are filled.
-- The main data-safety issue found is partial multi-output writes for evidence matrices.
-- The untracked `reports/hostile_review_v0_2.md` is a release hygiene risk.
+- No tracked PDFs, no tracked full-text copyrighted sidecars, no cloud/LLM APIs, and no scraping code were found.
+- The largest data-safety problem is metadata/report safety, not file deletion: `files unlink` can clear registry metadata, `files scan --write-registry --force` can replace curated `files.csv` rows, and `files audit` can leave partial report snapshots.
+- Backup bundle behavior remains conservative: PDFs are not included by default.
+- The SQLite index remains a rebuildable cache and is ignored locally.
 
 ## Overengineering Risks
 
-- The authoring workbench is close to becoming a writing-assistant surface. Keep it as matrices, banks, checklists, and planning reports. Do not add polished prose generation.
-- Readiness scoring can become pseudo-objective. Keep the scoring small, transparent, and explicitly non-scientific.
-- SQLite index should remain rebuildable cache, not source-of-truth storage.
-- Import conflict resolution could become complex quickly; keep dry-run reports and explicit user review as the default.
+- Local-file ingestion should stay a reconciliation layer, not a document management system. Avoid adding copying/moving/deleting workflows without very explicit safety gates.
+- Optional PDF metadata should remain explicitly non-authoritative. Do not allow extracted metadata to overwrite user registry metadata silently.
+- Search/indexing should remain a rebuildable local cache, not a source of truth.
+- Authoring reports should remain planning aids. Do not drift into generated polished literature-review prose.
 
 ## Recommended Fix Sequence
 
-1. Fix evidence-matrix multi-output atomicity and add tests.
-2. Add a minimal CI workflow with pytest, notebook JSON validation, package import, CLI help, and tracked-artifact hygiene.
-3. Add v0.6 authoring report regression coverage.
-4. Resolve the untracked `reports/hostile_review_v0_2.md` workspace hygiene issue.
-5. Refresh `reports/index.md` and label/move historical reports.
-6. Decide and document/reject `report all --out`.
-7. Clarify sidecar discovery semantics.
-8. Add role-reason text to citation banks and strengthen readiness-score language.
+1. Make `files audit` preflight all output paths before writing any report; add the regression test.
+2. Detect duplicate registry `local_pdf_path` values pointing to the same local file; add the regression test.
+3. Add `paperwb files --help`, `files scan`, and `files audit` smoke coverage to CI or pytest.
+4. Print local-file warning details in `files scan` and `files status`.
+5. Tighten `files unlink` semantics or at least report when registry metadata is cleared without row removal.
+6. Decide whether `files scan --write-registry --force` should merge curated records or document that it replaces them.
+7. Clarify top-level sidecar semantics in docs and tests.
+8. Extend file audit reports to reconcile existing `files.csv` records, or rename/document the reports as live-scan reports.
+9. Refresh `reports/index.md` so current authoring and v0.7 file reports are easy for external users to identify.
