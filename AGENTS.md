@@ -39,3 +39,7 @@ Instructions for future agents working in this repository:
 - Local file workflows must store paths relatively where possible.
 - Do not delete, move, or copy user files in local-file commands unless the user explicitly asks for that behavior.
 - Treat PDF metadata as advisory only; do not use it as authoritative paper metadata.
+- Keep release scripts local-only and free of network, cloud, or secret requirements.
+- Do not commit build artifacts under `build/`, `dist/`, `*.egg-info/`, `exports/`, `scratch/`, or `tmp/`.
+- Update release matrices and smoke scripts when changing public CLI workflows.
+- Keep documentation-site pages as Markdown source unless a future static-site generator is explicitly introduced.

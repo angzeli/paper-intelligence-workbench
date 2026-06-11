@@ -8,5 +8,11 @@ __pycache__/
 .idea/
 .paperwb/
 **/.paperwb/
+build/
+dist/
+*.egg-info/
+exports/
+scratch/
+tmp/
 reports/hostile_review_v0_*.md
 *.pdf

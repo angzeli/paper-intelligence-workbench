@@ -27,17 +27,26 @@ jobs:
       - name: Validate notebooks
         run: python scripts/validate_notebooks.py
 
+      - name: Check notebooks
+        run: python scripts/check_notebooks.py
+
       - name: Import package
         run: python -c "import paper_workbench"
 
       - name: CLI smoke test
         run: python -m paper_workbench.cli --help
 
+      - name: CLI workflow smoke test
+        run: python scripts/smoke_cli_workflow.py --quick
+
       - name: Local file CLI smoke tests
         run: |
           python -m paper_workbench.cli files --help
           python -m paper_workbench.cli files scan --project zis_photocatalysis
           python -m paper_workbench.cli files audit --project zis_photocatalysis --reports-dir /tmp/paperwb_ci_file_reports --force
+
+      - name: Data safety audit
+        run: python scripts/data_safety_audit.py --out /tmp/paperwb_data_safety_audit.md --strict
 
       - name: Tracked artifact hygiene
         run: |
