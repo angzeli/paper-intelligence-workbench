@@ -6,7 +6,11 @@ Root: .
 Files found: 5
 Unlinked files: 4
 Missing registry file references: 0
+Duplicate registry file paths: 0
 Duplicate file hashes: 0
+File registry missing files: 0
+File registry records outside scan folders: 0
+File registry hash mismatches: 0
 Text sidecars: 1
 Unsupported files: 0
 

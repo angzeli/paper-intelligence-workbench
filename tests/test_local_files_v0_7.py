@@ -17,7 +17,7 @@ from paper_workbench.files import (
     unlink_file_from_paper,
 )
 from paper_workbench.registry import load_registry, save_registry
-from paper_workbench.schema import Author, Paper
+from paper_workbench.schema import Author, LocalFileRecord, Paper
 
 
 def run_cli(*args: str):
@@ -72,6 +72,28 @@ def test_scan_local_files_detects_sidecars_duplicates_missing_and_unsupported(tm
     assert any("Text sidecar has no matching paper_id" in warning for warning in result.warnings)
 
 
+def test_scan_local_files_warns_when_registry_reuses_same_local_path(tmp_path):
+    root = tmp_path / "project"
+    (root / "papers").mkdir(parents=True)
+    registry = root / "registry.csv"
+    shared_pdf = root / "papers" / "same.pdf"
+    shared_pdf.write_bytes(b"%PDF synthetic shared placeholder\n")
+    save_registry(
+        [
+            Paper(paper_id="paper_a", title="Synthetic A", local_pdf_path="papers/same.pdf"),
+            Paper(paper_id="paper_b", title="Synthetic B", local_pdf_path="papers/same.pdf"),
+        ],
+        registry,
+    )
+
+    result = scan_local_files(root=root, registry_path=registry, scan_dirs=("papers",))
+
+    assert result.duplicate_registry_paths == {"papers/same.pdf": ["paper_a", "paper_b"]}
+    assert result.records[0].paper_id == "paper_a;paper_b"
+    assert result.records[0].linked_registry_status == "linked_multiple_registry_paths"
+    assert any("Local file path linked to multiple papers: papers/same.pdf -> paper_a, paper_b" == warning for warning in result.warnings)
+
+
 def test_file_registry_save_load_and_reports(tmp_path):
     root, registry, files_csv = make_file_workspace(tmp_path)
     result = scan_local_files(root=root, registry_path=registry, file_registry_path=files_csv)
@@ -85,6 +107,37 @@ def test_file_registry_save_load_and_reports(tmp_path):
     assert "Duplicate Files v0.7" in duplicate_files_report(result)
     assert "paper_alpha: papers/missing_alpha.pdf" in missing_files_report(result)
     assert "Text Sidecars v0.7" in text_sidecars_report(result)
+
+
+def test_file_audit_reconciles_existing_file_registry_records(tmp_path):
+    root, registry, files_csv = make_file_workspace(tmp_path)
+    archive_dir = root / "archive"
+    archive_dir.mkdir()
+    archived = archive_dir / "kept.txt"
+    archived.write_text("Synthetic archived sidecar.\n", encoding="utf-8")
+    save_file_registry(
+        [
+            LocalFileRecord(
+                paper_id="paper_alpha",
+                relative_path="text/paper_alpha.txt",
+                file_type="txt",
+                sha256="bad-hash",
+                notes="curated note",
+            ),
+            LocalFileRecord(paper_id="paper_beta", relative_path="archive/kept.txt", file_type="txt", sha256=sha256_file(archived)),
+            LocalFileRecord(paper_id="paper_gamma", relative_path="papers/missing_gamma.pdf", file_type="pdf", sha256="missing"),
+        ],
+        files_csv,
+    )
+
+    result = scan_local_files(root=root, registry_path=registry, file_registry_path=files_csv, scan_dirs=("text",))
+    report = local_files_audit_report(result)
+
+    assert "paper_gamma: papers/missing_gamma.pdf" in result.file_registry_missing_files
+    assert [record.relative_path for record in result.file_registry_unscanned_records] == ["archive/kept.txt"]
+    assert "paper_alpha: text/paper_alpha.txt" in result.file_registry_hash_mismatches
+    assert "File Registry Reconciliation" in report
+    assert "Hash Mismatches" in report
 
 
 def test_link_and_unlink_file_preserve_files_and_store_relative_paths(tmp_path):
@@ -111,6 +164,18 @@ def test_link_and_unlink_file_preserve_files_and_store_relative_paths(tmp_path):
     assert linked_pdf.exists()
     assert load_registry(registry)[1].local_pdf_path == ""
     assert load_file_registry(files_csv) == []
+
+
+def test_unlink_without_file_registry_record_does_not_clear_manual_pdf_path(tmp_path):
+    root, registry, files_csv = make_file_workspace(tmp_path)
+    papers = load_registry(registry)
+    papers[1].local_pdf_path = "papers/manual_beta.pdf"
+    save_registry(papers, registry)
+
+    removed = unlink_file_from_paper(paper_id="paper_beta", root=root, registry_path=registry, file_registry_path=files_csv)
+
+    assert removed == 0
+    assert load_registry(registry)[1].local_pdf_path == "papers/manual_beta.pdf"
 
 
 def test_link_refuses_to_overwrite_existing_pdf_path_without_force(tmp_path):
@@ -141,15 +206,33 @@ def test_link_refuses_to_overwrite_existing_pdf_path_without_force(tmp_path):
 def test_cli_files_scan_status_audit_hash_and_sidecars(tmp_path):
     root, registry, files_csv = make_file_workspace(tmp_path)
     reports_dir = root / "reports"
+    save_file_registry(
+        [
+            LocalFileRecord(
+                paper_id="paper_alpha",
+                relative_path="text/paper_alpha.txt",
+                file_type="txt",
+                sha256=sha256_file(root / "text" / "paper_alpha.txt"),
+                notes="curated sidecar note",
+            ),
+            LocalFileRecord(paper_id="paper_beta", relative_path="archive/old.txt", file_type="txt", notes="preserve unmatched row"),
+        ],
+        files_csv,
+    )
 
-    scan = run_cli("files", "scan", "--registry", str(registry), "--file-registry", str(files_csv), "--scan-dir", str(root / "text"), "--write-registry")
+    scan = run_cli("files", "scan", "--registry", str(registry), "--file-registry", str(files_csv), "--scan-dir", str(root / "text"), "--write-registry", "--force")
     assert scan.returncode == 0, scan.stderr
     assert files_csv.exists()
     assert "paper_alpha" in scan.stdout
+    assert "Warning: Text sidecar has no matching paper_id" in scan.stdout
+    loaded_records = load_file_registry(files_csv)
+    assert next(record for record in loaded_records if record.relative_path == "text/paper_alpha.txt").notes == "curated sidecar note"
+    assert any(record.relative_path == "archive/old.txt" for record in loaded_records)
 
     status = run_cli("files", "status", "--registry", str(registry), "--file-registry", str(files_csv), "--scan-dir", str(root / "text"))
     assert status.returncode == 0
     assert "Text sidecars: 2" in status.stdout
+    assert "Warning: Text sidecar has no matching paper_id" in status.stdout
 
     sidecars = run_cli("files", "sidecars", "--registry", str(registry), "--scan-dir", str(root / "text"))
     assert sidecars.returncode == 0
@@ -163,6 +246,28 @@ def test_cli_files_scan_status_audit_hash_and_sidecars(tmp_path):
     hashed = run_cli("files", "hash", str(root / "text" / "paper_alpha.txt"))
     assert hashed.returncode == 0
     assert sha256_file(root / "text" / "paper_alpha.txt") in hashed.stdout
+
+
+def test_cli_files_audit_preflights_all_outputs_before_writing(tmp_path):
+    root, registry, _files_csv = make_file_workspace(tmp_path)
+    reports_dir = root / "reports"
+    protected = reports_dir / "duplicate_files_v0_7.md"
+    protected.write_text("existing duplicate report\n", encoding="utf-8")
+
+    audit = run_cli("files", "audit", "--registry", str(registry), "--scan-dir", str(root / "text"), "--reports-dir", str(reports_dir))
+
+    assert audit.returncode == 2
+    assert "already exists" in audit.stderr
+    assert protected.read_text(encoding="utf-8") == "existing duplicate report\n"
+    assert not (reports_dir / "local_files_audit_v0_7.md").exists()
+
+
+def test_cli_files_help_smoke():
+    result = run_cli("files", "--help")
+
+    assert result.returncode == 0
+    assert "scan" in result.stdout
+    assert "audit" in result.stdout
 
 
 def test_cli_files_scan_default_workspace_uses_data_folders():

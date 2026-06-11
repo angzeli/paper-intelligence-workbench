@@ -126,6 +126,8 @@ paperwb report evidence-map --project zis_photocatalysis --force
 paperwb export claims-json --project zis_photocatalysis --out data/processed/zis_claims.json --force
 ```
 
+`files scan` is read-only unless `--write-registry` is provided. When it writes `files.csv`, it merges with existing file-registry rows so curated notes and older unmatched rows are preserved for review. `files audit` preflights all report paths before writing and reconciles live scan results with existing `files.csv` records.
+
 The legacy `data/` workflow remains supported.
 
 ## v0.3 Stress Workflow

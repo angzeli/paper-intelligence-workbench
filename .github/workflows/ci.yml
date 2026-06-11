@@ -33,6 +33,12 @@ jobs:
       - name: CLI smoke test
         run: python -m paper_workbench.cli --help
 
+      - name: Local file CLI smoke tests
+        run: |
+          python -m paper_workbench.cli files --help
+          python -m paper_workbench.cli files scan --project zis_photocatalysis
+          python -m paper_workbench.cli files audit --project zis_photocatalysis --reports-dir /tmp/paperwb_ci_file_reports --force
+
       - name: Tracked artifact hygiene
         run: |
           python - <<'PY'

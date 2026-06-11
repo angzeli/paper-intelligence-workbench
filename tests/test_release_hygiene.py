@@ -12,6 +12,9 @@ def test_ci_workflow_runs_release_gates():
     assert "python scripts/validate_notebooks.py" in content
     assert 'python -c "import paper_workbench"' in content
     assert "python -m paper_workbench.cli --help" in content
+    assert "python -m paper_workbench.cli files --help" in content
+    assert "python -m paper_workbench.cli files scan --project zis_photocatalysis" in content
+    assert "python -m paper_workbench.cli files audit --project zis_photocatalysis" in content
     assert '["git", "ls-files"]' in content
 
 

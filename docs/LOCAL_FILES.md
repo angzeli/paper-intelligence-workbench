@@ -58,6 +58,8 @@ paperwb files hash projects/zis_photocatalysis/text/zis_charge_2025.txt
 
 `scan` is read-only unless `--write-registry` is provided. `audit` writes Markdown reports only.
 
+When `--write-registry` is used, scan results are merged with the existing local file registry instead of replacing it wholesale. Matching rows preserve curated notes and metadata, and older rows that are not present in the current scan are retained for review.
+
 ## Linking
 
 ```bash
@@ -66,6 +68,8 @@ paperwb files unlink PAPER_ID --project zis_photocatalysis
 ```
 
 Linking does not copy or delete files. PDF links fill `local_pdf_path` in the paper registry. Existing `local_pdf_path` values are not replaced unless `--force` is used.
+
+Unlinking removes file-registry rows for a paper ID without deleting files. By default it clears `local_pdf_path` only when at least one file-registry row was actually removed; use `--keep-pdf-path` to preserve registry PDF metadata.
 
 ## Safety
 

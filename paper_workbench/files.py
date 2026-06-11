@@ -39,6 +39,10 @@ class FileScanResult:
     file_registry_path: str
     records: list[LocalFileRecord] = field(default_factory=list)
     missing_registry_files: list[str] = field(default_factory=list)
+    duplicate_registry_paths: dict[str, list[str]] = field(default_factory=dict)
+    file_registry_missing_files: list[str] = field(default_factory=list)
+    file_registry_unscanned_records: list[LocalFileRecord] = field(default_factory=list)
+    file_registry_hash_mismatches: list[str] = field(default_factory=list)
     duplicate_hashes: dict[str, list[LocalFileRecord]] = field(default_factory=dict)
     unsupported_files: list[str] = field(default_factory=list)
     unlinked_files: list[LocalFileRecord] = field(default_factory=list)
@@ -138,13 +142,36 @@ def save_file_registry(records: list[LocalFileRecord], path: str | Path, *, forc
     return write_csv_rows(path, rows, LOCAL_FILE_FIELDS, force=force)
 
 
-def _paper_path_map(papers: list[Paper], root: str | Path) -> dict[str, str]:
-    linked: dict[str, str] = {}
+def merge_file_registry_records(scanned: list[LocalFileRecord], existing: list[LocalFileRecord]) -> list[LocalFileRecord]:
+    """Merge a fresh scan with existing user-maintained file-registry rows."""
+    existing_by_key = {(record.paper_id, record.relative_path): record for record in existing}
+    merged: list[LocalFileRecord] = []
+    seen: set[tuple[str, str]] = set()
+    for record in scanned:
+        key = (record.paper_id, record.relative_path)
+        previous = existing_by_key.get(key)
+        if previous:
+            record.notes = previous.notes or record.notes
+            record.added_date = previous.added_date or record.added_date
+            record.text_sidecar_path = previous.text_sidecar_path or record.text_sidecar_path
+            if previous.extracted_metadata_status and previous.extracted_metadata_status != "not_attempted":
+                record.extracted_metadata_status = previous.extracted_metadata_status
+        merged.append(record)
+        seen.add(key)
+    for record in existing:
+        key = (record.paper_id, record.relative_path)
+        if key not in seen:
+            merged.append(record)
+    return merged
+
+
+def _paper_path_map(papers: list[Paper], root: str | Path) -> dict[str, list[str]]:
+    linked: dict[str, list[str]] = defaultdict(list)
     for paper in papers:
         if not paper.local_pdf_path:
             continue
-        linked[relative_path(resolve_relative(paper.local_pdf_path, root), root)] = paper.paper_id
-    return linked
+        linked[relative_path(resolve_relative(paper.local_pdf_path, root), root)].append(paper.paper_id)
+    return dict(linked)
 
 
 def _paper_id_from_filename(path: Path, paper_ids: set[str]) -> str:
@@ -164,13 +191,16 @@ def _metadata_status(file_type: str) -> str:
     return "not_applicable"
 
 
-def _record_for_file(path: Path, root: str | Path, papers: list[Paper], linked_paths: dict[str, str]) -> LocalFileRecord:
+def _record_for_file(path: Path, root: str | Path, papers: list[Paper], linked_paths: dict[str, list[str]]) -> LocalFileRecord:
     rel = relative_path(path, root)
     file_type = file_type_for_path(path)
     digest = sha256_file(path)
     paper_ids = {paper.paper_id for paper in papers}
-    inferred_paper_id = linked_paths.get(rel) or _paper_id_from_filename(path, paper_ids)
-    if linked_paths.get(rel):
+    linked_paper_ids = linked_paths.get(rel, [])
+    inferred_paper_id = ";".join(linked_paper_ids) if linked_paper_ids else _paper_id_from_filename(path, paper_ids)
+    if len(linked_paper_ids) > 1:
+        status = "linked_multiple_registry_paths"
+    elif linked_paper_ids:
         status = "linked_registry_path"
     elif inferred_paper_id:
         status = "possible_filename_match"
@@ -203,9 +233,12 @@ def scan_local_files(
     papers = load_registry(registry) if registry.exists() else []
     resolved_file_registry = file_registry_path or default_file_registry_path(root_path, project=registry.name == "registry.csv" and registry.parent == root_path)
     linked_paths = _paper_path_map(papers, root_path)
+    duplicate_registry_paths = {path: paper_ids for path, paper_ids in linked_paths.items() if len(paper_ids) > 1}
     records: list[LocalFileRecord] = []
     unsupported: list[str] = []
     warnings: list[str] = []
+    for rel, paper_ids in sorted(duplicate_registry_paths.items()):
+        warnings.append(f"Local file path linked to multiple papers: {rel} -> {', '.join(paper_ids)}")
 
     for dirname in scan_dirs:
         directory = root_path / dirname
@@ -244,11 +277,38 @@ def scan_local_files(
         paths = ", ".join(record.relative_path for record in grouped)
         warnings.append(f"Duplicate file hash {digest[:12]}: {paths}")
 
+    existing_file_records = load_file_registry(resolved_file_registry)
+    scanned_paths = {record.relative_path for record in records}
+    file_registry_missing: list[str] = []
+    file_registry_unscanned: list[LocalFileRecord] = []
+    file_registry_hash_mismatches: list[str] = []
+    for record in existing_file_records:
+        resolved = resolve_relative(record.relative_path, root_path)
+        if not resolved.exists():
+            file_registry_missing.append(f"{record.paper_id or '[unlinked]'}: {record.relative_path}")
+            continue
+        if record.relative_path not in scanned_paths:
+            file_registry_unscanned.append(record)
+        if record.sha256:
+            actual_hash = sha256_file(resolved)
+            if actual_hash != record.sha256:
+                file_registry_hash_mismatches.append(f"{record.paper_id or '[unlinked]'}: {record.relative_path}")
+    if file_registry_missing:
+        warnings.append(f"File registry references missing files: {len(file_registry_missing)}")
+    if file_registry_unscanned:
+        warnings.append(f"File registry records outside current scan folders: {len(file_registry_unscanned)}")
+    if file_registry_hash_mismatches:
+        warnings.append(f"File registry hash mismatches: {len(file_registry_hash_mismatches)}")
+
     return FileScanResult(
         root=str(root_path),
         file_registry_path=str(resolved_file_registry),
         records=records,
         missing_registry_files=missing,
+        duplicate_registry_paths=duplicate_registry_paths,
+        file_registry_missing_files=file_registry_missing,
+        file_registry_unscanned_records=file_registry_unscanned,
+        file_registry_hash_mismatches=file_registry_hash_mismatches,
         duplicate_hashes=duplicates,
         unsupported_files=unsupported,
         unlinked_files=unlinked,
@@ -315,7 +375,7 @@ def unlink_file_from_paper(
     kept = [record for record in records if record.paper_id != paper_id]
     removed = len(records) - len(kept)
     save_file_registry(kept, file_registry_path, force=True)
-    if clear_pdf and Path(registry_path).exists():
+    if removed and clear_pdf and Path(registry_path).exists():
         papers = load_registry(registry_path)
         changed = False
         for paper in papers:
@@ -337,7 +397,11 @@ def local_files_audit_report(result: FileScanResult) -> str:
         f"Files found: {len(result.records)}",
         f"Unlinked files: {len(result.unlinked_files)}",
         f"Missing registry file references: {len(result.missing_registry_files)}",
+        f"Duplicate registry file paths: {len(result.duplicate_registry_paths)}",
         f"Duplicate file hashes: {len(result.duplicate_hashes)}",
+        f"File registry missing files: {len(result.file_registry_missing_files)}",
+        f"File registry records outside scan folders: {len(result.file_registry_unscanned_records)}",
+        f"File registry hash mismatches: {len(result.file_registry_hash_mismatches)}",
         f"Text sidecars: {len(result.sidecars)}",
         f"Unsupported files: {len(result.unsupported_files)}",
         "",
@@ -350,6 +414,24 @@ def local_files_audit_report(result: FileScanResult) -> str:
         lines.append("|  |  | 0 | none | No supported files found. |  |")
     for record in result.records:
         lines.append(f"| {record.paper_id or '[unlinked]'} | {record.file_type} | {record.size_bytes} | {record.linked_registry_status} | {record.relative_path} | {record.sha256[:12]} |")
+    if result.duplicate_registry_paths:
+        lines.extend(["", "## Duplicate Registry File Paths", ""])
+        for rel, paper_ids in sorted(result.duplicate_registry_paths.items()):
+            lines.append(f"- `{rel}` is linked by: {', '.join(paper_ids)}")
+    if result.file_registry_missing_files or result.file_registry_unscanned_records or result.file_registry_hash_mismatches:
+        lines.extend(["", "## File Registry Reconciliation", ""])
+        if result.file_registry_missing_files:
+            lines.append("### Missing Files Referenced By files.csv")
+            lines.extend(f"- {item}" for item in result.file_registry_missing_files)
+            lines.append("")
+        if result.file_registry_unscanned_records:
+            lines.append("### Records Outside Current Scan Folders")
+            lines.extend(f"- {record.paper_id or '[unlinked]'}: {record.relative_path}" for record in result.file_registry_unscanned_records)
+            lines.append("")
+        if result.file_registry_hash_mismatches:
+            lines.append("### Hash Mismatches")
+            lines.extend(f"- {item}" for item in result.file_registry_hash_mismatches)
+            lines.append("")
     if result.warnings:
         lines.extend(["", "## Warnings", ""])
         lines.extend(f"- {warning}" for warning in result.warnings)
@@ -369,11 +451,22 @@ def duplicate_files_report(result: FileScanResult) -> str:
 
 
 def missing_files_report(result: FileScanResult) -> str:
-    lines = ["# Missing Local Files v0.7", "", f"Missing registry file references: {len(result.missing_registry_files)}", ""]
-    if not result.missing_registry_files:
+    lines = [
+        "# Missing Local Files v0.7",
+        "",
+        f"Missing registry file references: {len(result.missing_registry_files)}",
+        f"File registry missing files: {len(result.file_registry_missing_files)}",
+        "",
+    ]
+    if not result.missing_registry_files and not result.file_registry_missing_files:
         lines.append("No missing registry file references detected.")
     else:
-        lines.extend(f"- {item}" for item in result.missing_registry_files)
+        if result.missing_registry_files:
+            lines.append("## Registry local_pdf_path References")
+            lines.extend(f"- {item}" for item in result.missing_registry_files)
+        if result.file_registry_missing_files:
+            lines.extend(["", "## File Registry References"])
+            lines.extend(f"- {item}" for item in result.file_registry_missing_files)
     return "\n".join(lines).rstrip() + "\n"
 
 

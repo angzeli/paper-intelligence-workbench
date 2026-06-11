@@ -119,6 +119,6 @@ paperwb files hash projects/zis_photocatalysis/text/PAPER_ID.txt
 paperwb files sidecars --project zis_photocatalysis
 ```
 
-Local-file commands do not download, scrape, OCR, copy, move, or delete documents. PDF links update `local_pdf_path`; existing values require `--force` to replace.
+Local-file commands do not download, scrape, OCR, copy, move, or delete documents. PDF links update `local_pdf_path`; existing values require `--force` to replace. `files scan --write-registry` merges with existing `files.csv` rows so curated notes are preserved. `files unlink` clears `local_pdf_path` only when it removed at least one matching file-registry row, unless `--keep-pdf-path` is used.
 
 Most workflow commands accept `--project NAME` to use profile paths. When `--project` is used, registry, notes, BibTeX, themes, and reports path flags are rejected to avoid silently ignoring user input. Use `--out` for an explicit single report or export destination.

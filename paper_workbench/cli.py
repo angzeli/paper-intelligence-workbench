@@ -47,6 +47,7 @@ from .files import (
     link_file_to_paper,
     load_file_registry,
     local_files_audit_report,
+    merge_file_registry_records,
     missing_files_report,
     save_file_registry,
     scan_local_files,
@@ -479,12 +480,19 @@ def _file_scan_from_args(args: argparse.Namespace):
 def cmd_files_scan(args: argparse.Namespace) -> int:
     result, _paths = _file_scan_from_args(args)
     if args.write_registry:
-        path = save_file_registry(result.records, result.file_registry_path, force=args.force)
+        existing_records = load_file_registry(result.file_registry_path)
+        merged_records = merge_file_registry_records(result.records, existing_records)
+        path = save_file_registry(merged_records, result.file_registry_path, force=args.force)
+        preserved = len(merged_records) - len(result.records)
         print(f"Wrote file registry to {path}")
+        if preserved:
+            print(f"Preserved {preserved} existing file registry record(s) not present in the current scan.")
     for record in result.records:
         print(f"{record.paper_id or '[unlinked]'}\t{record.file_type}\t{record.size_bytes}\t{record.linked_registry_status}\t{record.relative_path}")
     if not result.records:
         print("No supported local files found.")
+    for warning in result.warnings:
+        print(f"Warning: {warning}")
     return 0
 
 
@@ -497,9 +505,15 @@ def cmd_files_status(args: argparse.Namespace) -> int:
     print(f"Files found: {len(result.records)}")
     print(f"Unlinked files: {len(result.unlinked_files)}")
     print(f"Missing registry file references: {len(result.missing_registry_files)}")
+    print(f"Duplicate registry file paths: {len(result.duplicate_registry_paths)}")
     print(f"Duplicate file hashes: {len(result.duplicate_hashes)}")
+    print(f"File registry missing files: {len(result.file_registry_missing_files)}")
+    print(f"File registry records outside scan folders: {len(result.file_registry_unscanned_records)}")
+    print(f"File registry hash mismatches: {len(result.file_registry_hash_mismatches)}")
     print(f"Text sidecars: {len(result.sidecars)}")
     print(f"Warnings: {len(result.warnings)}")
+    for warning in result.warnings:
+        print(f"Warning: {warning}")
     return 0
 
 
@@ -512,6 +526,7 @@ def cmd_files_audit(args: argparse.Namespace) -> int:
         "missing_files_v0_7.md": missing_files_report(result),
         "text_sidecars_v0_7.md": text_sidecars_report(result),
     }
+    _preflight_output_paths([reports_dir / filename for filename in outputs], force=args.force)
     written: list[Path] = []
     for filename, content in outputs.items():
         path = write_text(reports_dir / filename, content, force=args.force)
