@@ -2,7 +2,7 @@
 
 Reports directory: .
 
-Markdown reports indexed: 138
+Markdown reports indexed: 139
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
@@ -137,6 +137,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [evidence_map.md](evidence_map.md)
 - [external_user_simulation_final.md](external_user_simulation_final.md)
 - [final_project_handoff.md](final_project_handoff.md)
+- [final_release_verdict.md](final_release_verdict.md)
 - [index.md](index.md)
 - [inventory.md](inventory.md)
 - [missing_evidence.md](missing_evidence.md)

@@ -12,6 +12,8 @@ user-facing features and preserves existing CLI behavior.
 - Centralized path display through `paper_workbench.paths.display_path`.
 - Kept `paper_workbench.index.display_path` as a compatibility wrapper.
 - Centralized theme ID normalization through `paper_workbench.tags.normalize_theme_id`.
+- Hardened indexed-search rebuilds so duplicate local source keys produce
+  deterministic internal record IDs rather than SQLite primary-key crashes.
 - Updated API/CLI surface docs from v1.7 to v1.8 where the old release label
   would be inaccurate.
 - Added architecture cleanup tests.
@@ -19,15 +21,15 @@ user-facing features and preserves existing CLI behavior.
 
 ## Validation Run
 
-- `python -m pytest -q`: passed, 239 tests.
-- `python scripts/smoke_cli_workflow.py --quick --out /private/tmp/paperwb_smoke_v1_8.md`: passed, 14 smoke steps.
-- `python scripts/data_safety_audit.py --out /private/tmp/paperwb_data_safety_v1_8.md --strict`: passed, 0 errors and 8 warnings.
+- `python -m pytest -q`: passed, 240 tests.
+- `python scripts/smoke_cli_workflow.py --quick --out <tmp>/paperwb_smoke_v1_8.md`: passed, 14 smoke steps.
+- `python scripts/data_safety_audit.py --out <tmp>/paperwb_data_safety_v1_8.md --strict`: passed, 0 errors and 7 warnings.
 - `python scripts/check_notebooks.py`: passed, 8 notebooks structurally checked.
 - `python -m paper_workbench.cli --help`: passed.
 - `python -m paper_workbench.cli template --help`: passed.
 - `python -m paper_workbench.cli search photocorrosion --project zis_photocatalysis`: passed.
 - `python -m paper_workbench.cli checklist --project zis_photocatalysis --theme charge_separation`: passed.
-- `python -m paper_workbench.cli export report-index --out /private/tmp/paperwb_report_index_v1_8.md --force`: passed.
+- `python -m paper_workbench.cli export report-index --out <tmp>/paperwb_report_index_v1_8.md --force`: passed.
 - `python -c "import paper_workbench; print(paper_workbench.__version__)"`: passed and reported `1.8.0`.
 - `git diff --check`: passed.
 - `git ls-files "*.pdf" "*.sqlite" "*.db" ".paperwb/*" "*/.paperwb/*" "__pycache__/*" "*/__pycache__/*" ".pytest_cache/*" "build/*" "dist/*" "*.egg-info/*"`: passed with no tracked unsafe files.
@@ -40,6 +42,8 @@ user-facing features and preserves existing CLI behavior.
 - Theme matching accepts the same spelling variants while using one shared
   normalizer internally.
 - Existing generated reports remain historical artifacts.
+- Indexed search preserves user-facing paper IDs and citation keys while
+  deduplicating only internal cache record IDs.
 
 ## Known Limitations
 
