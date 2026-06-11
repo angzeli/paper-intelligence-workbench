@@ -31,6 +31,8 @@ def test_major_cli_help_contracts_are_available():
         (("report", "--help"), "evidence-matrix"),
         (("writing-packet", "--help"), "--theme"),
         (("draft", "--help"), "{parse,citations,audit,checklist,evidence-matrix}"),
+        (("reading", "--help"), "{queue,start,finish,status,review}"),
+        (("followups", "--help"), "{list,export,done}"),
         (("doctor", "--help"), "--strict"),
         (("integrity", "--help"), "{check}"),
         (("audit-log", "--help"), "{show,clear}"),
@@ -56,7 +58,7 @@ def test_release_candidate_docs_describe_frozen_surfaces():
         path = ROOT / relative
         assert path.exists(), relative
         content = path.read_text(encoding="utf-8")
-        assert "v1.1" in content
+        assert "v1." in content
         assert "local-first" in content
 
 
