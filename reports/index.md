@@ -2,21 +2,21 @@
 
 Reports directory: .
 
-Markdown reports indexed: 125
+Markdown reports indexed: 130
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v1.5 Release Reports
+## Current v1.6 Release Reports
 
+- [dashboard_v1_6.md](dashboard_v1_6.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [project_rules_zis_v1_5.md](project_rules_zis_v1_5.md)
-- [release_readiness_v1_5.md](release_readiness_v1_5.md)
-- [rule_config_audit_v1_5.md](rule_config_audit_v1_5.md)
-- [rule_report_v1_5.md](rule_report_v1_5.md)
+- [next_actions_v1_6.md](next_actions_v1_6.md)
+- [project_health_summary_v1_6.md](project_health_summary_v1_6.md)
+- [release_readiness_v1_6.md](release_readiness_v1_6.md)
 
 ## Next Patch Plan
 
-- [v1_6_recommended_patch_plan.md](v1_6_recommended_patch_plan.md)
+- [v1_7_recommended_patch_plan.md](v1_7_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -65,6 +65,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [performance_sanity_v0_3.md](performance_sanity_v0_3.md)
 - [photocorrosion_section_outline_v0_3.md](photocorrosion_section_outline_v0_3.md)
 - [post_v1_0_roadmap.md](post_v1_0_roadmap.md)
+- [project_rules_zis_v1_5.md](project_rules_zis_v1_5.md)
 - [project_summary_v0_4.md](project_summary_v0_4.md)
 - [reading_list_photocorrosion_v0_4.md](reading_list_photocorrosion_v0_4.md)
 - [reading_queue_v1_2.md](reading_queue_v1_2.md)
@@ -86,9 +87,12 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v1_2.md](release_readiness_v1_2.md)
 - [release_readiness_v1_3.md](release_readiness_v1_3.md)
 - [release_readiness_v1_4.md](release_readiness_v1_4.md)
+- [release_readiness_v1_5.md](release_readiness_v1_5.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [restore_dry_run_v0_9.md](restore_dry_run_v0_9.md)
 - [revision_checklist_v1_1.md](revision_checklist_v1_1.md)
+- [rule_config_audit_v1_5.md](rule_config_audit_v1_5.md)
+- [rule_report_v1_5.md](rule_report_v1_5.md)
 - [search_demo_v0_5.md](search_demo_v0_5.md)
 - [stress_bibtex_audit_v0_3.md](stress_bibtex_audit_v0_3.md)
 - [stress_citation_audit_v0_3.md](stress_citation_audit_v0_3.md)
@@ -117,6 +121,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v1_3_recommended_patch_plan.md](v1_3_recommended_patch_plan.md)
 - [v1_4_recommended_patch_plan.md](v1_4_recommended_patch_plan.md)
 - [v1_5_recommended_patch_plan.md](v1_5_recommended_patch_plan.md)
+- [v1_6_recommended_patch_plan.md](v1_6_recommended_patch_plan.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
 - [workspace_integrity_v0_9.md](workspace_integrity_v0_9.md)

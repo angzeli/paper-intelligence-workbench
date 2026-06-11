@@ -73,3 +73,6 @@ Instructions for future agents working in this repository:
 - Keep rule configs declarative JSON and local-only.
 - Add tests for every new rule type or rule adapter.
 - Preserve existing validation behavior when adding custom rules.
+- Dashboard commands must not modify user data; only explicit `--out` report writes are allowed.
+- Next actions must be explainable from local findings and must not run automatically.
+- Do not add heavy terminal UI dependencies for dashboard workflows without explicit approval.

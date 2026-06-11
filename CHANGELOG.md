@@ -2,6 +2,13 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v1.6.0 - Terminal Dashboard
+
+- Added `paperwb dashboard` for dependency-free terminal summaries of project health, evidence gaps, reading queues, follow-ups, rule findings, manuscript QA warnings, and recent audit events.
+- Added Markdown dashboard, next-action, and project-health summary exports.
+- Added explainable next-action generation without automatically running commands or modifying user data.
+- Kept the dashboard local-only and read-only except for explicit `--out` report writes.
+
 ## v1.5.0 - Local Rule Engine
 
 - Added `paperwb rules` commands for listing, validating, running, reporting, and explaining local declarative validation rules.

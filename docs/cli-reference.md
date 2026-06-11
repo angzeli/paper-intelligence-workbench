@@ -15,6 +15,7 @@ paperwb note-template PAPER_ID
 paperwb claims NOTES_DIR
 paperwb search QUERY
 paperwb report REPORT_TYPE
+paperwb dashboard
 paperwb rules run
 paperwb doctor
 ```
@@ -26,6 +27,8 @@ Most workflows accept `--project NAME`:
 ```bash
 paperwb search photocorrosion --project zis_photocatalysis
 paperwb report evidence-map --project zis_photocatalysis --force
+paperwb dashboard --project zis_photocatalysis
+paperwb dashboard --project zis_photocatalysis --view next-actions
 paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/writing_packet.md --force
 paperwb rules report --project zis_photocatalysis --out scratch/rule_report.md --force
 ```

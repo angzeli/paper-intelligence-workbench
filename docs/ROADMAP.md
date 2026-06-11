@@ -120,7 +120,14 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Project-specific synthetic rules for ZIS photocatalysis and finance reading profiles.
 - Rule config audit and rule report commands.
 
-## Near-Term Patches for v1.6
+## v1.6 Completed
+
+- Dependency-free terminal dashboard for project health and next actions.
+- Markdown dashboard, next-action, and project-health summary exports.
+- Optional manuscript QA warning aggregation in dashboard views.
+- Read-only aggregation of reading queues, follow-ups, audit events, generated reports, rule findings, citation audits, and workspace health.
+
+## Near-Term Patches for v1.7
 
 - Add report diff tooling that explains golden snapshot changes.
 - Add optional fixture-size profiles such as small, medium, and large.
@@ -139,6 +146,9 @@ The MVP is intentionally CLI-first, dependency-light, and local-only.
 - Add optional calendar-style session summaries while keeping all state local.
 - Add rule severity filters and rule-category filters.
 - Add CSV/JSON export for rule findings if users need spreadsheet review.
+- Add optional interactive dashboard selection only if it remains read-only and dependency-light.
+- Add dashboard filters for theme, tag, status, and priority.
+- Add a compact terminal mode for narrow panes.
 - Add more custom rule types only when a real local workflow needs them.
 
 ## Project Profiles
@@ -171,9 +181,9 @@ Possible future commands:
 - unresolved question summaries
 - safer BibTeX key normalization commands
 
-## v1.6 Candidate Scope
+## v1.7 Candidate Scope
 
-- Harden the rule engine with more real project fixtures.
-- Add rule-finding export formats.
-- Add optional rule filters to avoid noisy all-in reports.
+- Harden dashboard prioritization with more real project fixtures.
+- Add rule-finding export formats and optional filters to avoid noisy all-in reports.
 - Add documentation examples for teams maintaining several project profiles.
+- Decide whether a read-only interactive terminal mode is worth maintaining.

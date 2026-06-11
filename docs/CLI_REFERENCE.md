@@ -24,6 +24,7 @@ paperwb index status --project zis_photocatalysis --check-files
 paperwb search "charge separation" --project zis_photocatalysis --indexed
 paperwb files scan --project zis_photocatalysis
 paperwb files audit --project zis_photocatalysis --reports-dir scratch/file_reports --force
+paperwb dashboard --project zis_photocatalysis
 paperwb doctor --out scratch/workspace_health.md
 paperwb reading queue --project zis_photocatalysis
 paperwb reading start PAPER_ID --project zis_photocatalysis
@@ -82,6 +83,21 @@ paperwb report all
 ```
 
 Report commands refuse to overwrite an existing output file unless `--force` is provided. `paperwb report all` writes multiple files under `--reports-dir`, preflights every output before writing, and rejects `--out` because it is a single-report destination. The same no-overwrite behavior applies to `claims --output`, `doctor --out`, `validate-bib --report`, and `validate-registry --json`.
+
+Terminal dashboard:
+
+```bash
+paperwb dashboard
+paperwb dashboard --project zis_photocatalysis
+paperwb dashboard --project zis_photocatalysis --view next-actions
+paperwb dashboard --project zis_photocatalysis --view health --manuscript drafts/synthetic_unknown_citations.md
+paperwb dashboard --project zis_photocatalysis --out scratch/dashboard.md --force
+```
+
+The dashboard is read-only unless `--out` is supplied. It summarizes local
+project health, weak evidence, missing notes, BibTeX/citation/rule findings,
+reading queue items, follow-ups, recent audit events, and optional manuscript
+QA warnings. It does not run suggested next-action commands automatically.
 
 Authoring reports:
 

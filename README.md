@@ -32,6 +32,8 @@ v1.4 adds manuscript citation QA and review packet reports. It audits Markdown o
 
 v1.5 adds a local declarative rule engine. Projects can define JSON rules for registry rows, notes, claims, themes, manuscript drafts, and workspace checks without changing core code or executing arbitrary plugins.
 
+v1.6 adds a dependency-free terminal dashboard and next-action workflow. It summarizes project health, reading queues, weak evidence, missing notes, citation/rule/manuscript warnings, follow-ups, and recent local audit events without modifying user data.
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -59,6 +61,7 @@ v1.5 adds a local declarative rule engine. Projects can define JSON rules for re
 - Plans local sync and conflict-resolution workflows before writing registry changes.
 - Audits manuscript drafts and generates citation QA, context, traceability, and revision reports from local evidence only.
 - Runs project-specific JSON rules and built-in validation adapters through a local rule engine.
+- Shows a read-only terminal dashboard with project health, next actions, reading queue, follow-ups, and optional manuscript QA warnings.
 
 ## What It Does Not Do
 
@@ -151,6 +154,8 @@ Project profiles keep independent registry, notes, BibTeX, themes, and reports u
 paperwb project list
 paperwb project init demo_review
 paperwb project validate zis_photocatalysis
+paperwb dashboard --project zis_photocatalysis
+paperwb dashboard --project zis_photocatalysis --view next-actions
 paperwb search photocorrosion --project zis_photocatalysis
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb search photocorrosion --project zis_photocatalysis --indexed
