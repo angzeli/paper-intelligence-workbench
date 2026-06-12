@@ -1,95 +1,53 @@
-# paper-intelligence-workbench
+# 📚 paper-intelligence-workbench
 
 `paper-intelligence-workbench` is a local-first CLI tool for small academic literature-review projects. It manages paper metadata, structured Markdown notes, user-recorded claims, evidence links, BibTeX validation, project profiles, theme coverage, citation-audit reports, and an optional SQLite search cache without cloud services, publisher scraping, or LLM APIs.
 
-The MVP is designed for projects with roughly 10 to 100 papers where a student or researcher wants to know which papers are read, which claims are supported, which citations are incomplete, and which literature-review themes still need stronger evidence.
+Start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABLE_SURFACE_V2.md](docs/STABLE_SURFACE_V2.md), and [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md).
 
-v0.3 adds deterministic synthetic stress projects, report-regression snapshots, parser edge fixtures, CLI stress tests, and performance sanity reporting to make the repository easier to evaluate before using it on a real 100-paper review.
+## 🧭 What It Does
 
-v0.4 adds local import/export interoperability for Zotero-style CSV, generic CSV mappings, BibTeX, RIS, Obsidian-friendly Markdown vaults, backup bundles, richer reading lists, project summaries, and report indexes.
+- Maintains local paper registries, BibTeX files, notes, themes, rules, and reports.
+- Generates structured Markdown note templates and extracts user-entered claims.
+- Validates registry rows, BibTeX entries, citations, notes, themes, and evidence links.
+- Builds evidence maps, citation audits, claim banks, writing packets, and manuscript QA reports.
+- Supports project profiles, reusable project templates, reading queues, follow-up actions, and dashboards.
+- Imports and exports local CSV, BibTeX, RIS, JSON, Markdown, Obsidian-style vaults, and backup bundles.
+- Provides local search, optional SQLite indexing, file audits, backup planning, migration checks, sync plans, and rule reports.
 
-v0.5 adds an optional local SQLite search index, FTS5-backed search when available, substring fallback behavior, index diagnostics, and synthetic full-text sidecar fixtures.
+## 🚫 What It Does Not Do
 
-v0.6 adds a literature-review authoring workbench with evidence matrices, claim banks, citation banks, paragraph plans, subsection readiness scoring, and writing packets. These are planning aids only; the tool still does not write final prose or invent evidence.
+- No cloud APIs, LLM APIs, embeddings, publisher scraping, PDF downloading, OCR, or web app.
+- No copyrighted PDFs or copied full-text papers in examples.
+- No fabricated paper metadata, citations, claims, quotes, summaries, or conclusions.
+- No scientific-truth judgment and no polished final prose generation.
+- No silent overwrites, migrations, restores, or sync writes without explicit command flags.
+- No arbitrary code execution from custom rule files.
 
-v0.7 adds local document ingestion and metadata reconciliation: file scans, SHA256 hashes, PDF path linking, duplicate-file detection, missing-file reports, and text-sidecar audits. It does not download, scrape, OCR, or summarize documents.
+## 🗃️ Repository File Tree
 
-v0.8 adds release-engineering and onboarding hardening: package metadata, install docs, CI smoke checks, notebook checks, data-safety audits, docs-site Markdown pages, test/report matrices, and external-user quickstart reports.
+```text
+paper-intelligence-workbench/
+├── paper_workbench/        # Python package and CLI implementation
+├── data/                   # legacy synthetic examples and registries
+│   ├── bibtex/
+│   ├── examples/
+│   ├── notes/
+│   └── registries/
+├── projects/               # project-profile workspaces and synthetic fixtures
+├── drafts/                 # synthetic draft/manuscript examples
+├── docs/                   # user docs, workflow guides, schema docs, API/CLI surfaces
+├── reports/                # generated Markdown audits, readiness reports, and examples
+├── notebooks/              # lightweight workflow notebooks using synthetic data
+├── examples/               # runnable local workflow scripts
+├── scripts/                # smoke checks, notebook checks, safety audits, performance checks
+├── tests/                  # unit, CLI, regression, adversarial, and workflow tests
+├── pyproject.toml          # package metadata and CLI entry point
+├── README.md               # public project overview
+├── CHANGELOG.md            # version history
+└── AGENTS.md               # repository rules for future agents
+```
 
-v0.9 adds data-integrity safeguards for real local use: workspace integrity checks, local audit logs, backup snapshots, non-destructive restore planning, and legacy `data/` to project-profile migration plans.
-
-v0.10 adds an adversarial torture suite, fuzz-style fixtures, clearer error taxonomy, CLI failure-path tests, and regression checks for malformed local data.
-
-v1.0-rc added release-candidate hardening: API and CLI surface inventories, command-contract checks, current-environment release checks, external-user simulation reports, data-safety review, and a final release-readiness verdict before tagging.
-
-v1.1 adds a draft citation auditor and manuscript evidence checker for Markdown literature-review drafts. It extracts citation keys, checks local BibTeX/registry/note/claim coverage, flags weak or review-only support, and generates revision checklists without rewriting prose or inventing evidence.
-
-v1.2 adds a reading-session workflow loop: transparent reading queues, local session logs, session checklists, safe reading-status updates, follow-up action exports, and weekly reading reviews. It helps plan and track reading; it does not read papers automatically or fabricate notes.
-
-v1.3 adds two-way sync planning and conflict detection for local import/export workflows. It compares registry data with Zotero-style CSV, BibTeX, RIS, generic CSV, and Obsidian-style Markdown exports, then writes dry-run plans and conflict reports before any safe registry apply.
-
-v1.4 adds manuscript citation QA and review packet reports. It audits Markdown or LaTeX-ish drafts against local citations, notes, claims, evidence, and themes, then generates reviewer-style QA reports, citation context tables, claim traceability reports, and revision checklists without writing final prose.
-
-v1.5 adds a local declarative rule engine. Projects can define JSON rules for registry rows, notes, claims, themes, manuscript drafts, and workspace checks without changing core code or executing arbitrary plugins.
-
-v1.6 adds a dependency-free terminal dashboard and next-action workflow. It summarizes project health, reading queues, weak evidence, missing notes, citation/rule/manuscript warnings, follow-ups, and recent local audit events without modifying user data.
-
-v1.7 adds reusable project templates and dogfooding scaffolds for photocatalysis, finance/valuation, ML methods, and generic literature-review projects. Templates create empty local project structures with themes, rule examples, note templates, and checklists; they do not include real paper metadata or claims.
-
-v1.8 is an architecture cleanup release. It centralizes duplicated internal path-display and theme-normalization helpers, clarifies the Python API boundary, and adds release-readiness reports without changing the public CLI workflow.
-
-v2.0rc is a release-candidate stabilization pass. It classifies stable versus experimental workflows, freezes the documented v2 command and schema surfaces, refreshes release-readiness reports, and keeps the project local-first without adding broad new features.
-
-For v2 release-candidate orientation, start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABLE_SURFACE_V2.md](docs/STABLE_SURFACE_V2.md), and [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md).
-
-## What It Does
-
-- Maintains a CSV paper registry.
-- Generates structured Markdown note templates.
-- Parses notes and extracts user-entered claims.
-- Validates registry records and BibTeX entries.
-- Maps tags to review themes.
-- Searches registry rows, note bodies, and claims.
-- Builds a local project-aware SQLite index for larger workspaces.
-- Indexes optional user-provided plain-text sidecars without parsing PDFs.
-- Scans and audits local user-provided files, hashes, missing file references, duplicate files, and text sidecars.
-- Generates Markdown reports for inventory, reading status, BibTeX audit, evidence maps, citation audits, missing notes, and weak claims.
-- Manages multiple project profiles under `projects/`.
-- Runs workspace health diagnostics with `paperwb doctor`.
-- Exports claims, registries, reading lists, and theme-specific claim data.
-- Generates clearly synthetic stress corpora for local regression testing.
-- Imports local Zotero-style CSV, generic CSV, BibTeX, and RIS files into registries with duplicate reports.
-- Exports Obsidian-friendly Markdown vaults and local backup bundles.
-- Generates theme-specific writing aids from tracked local claims and citations.
-- Checks workspace integrity, writes local audit events, creates local backup snapshots, plans safe restores, and plans/copies non-destructive legacy-to-project migrations.
-- Stress-tests malformed local data with synthetic adversarial fixtures and clear error-message expectations.
-- Documents the current API and CLI surface so external users can see what is stable, experimental, and internal.
-- Audits Markdown drafts against local citation keys, structured notes, extracted claims, and theme evidence.
-- Manages local reading queues, session records, follow-up actions, and weekly reading-review reports.
-- Plans local sync and conflict-resolution workflows before writing registry changes.
-- Audits manuscript drafts and generates citation QA, context, traceability, and revision reports from local evidence only.
-- Runs project-specific JSON rules and built-in validation adapters through a local rule engine.
-- Shows a read-only terminal dashboard with project health, next actions, reading queue, follow-ups, and optional manuscript QA warnings.
-- Creates non-destructive project scaffolds from reusable templates for common literature-review workflows.
-
-## What It Does Not Do
-
-- It does not scrape publishers.
-- It does not download or include copyrighted PDFs.
-- It does not copy, move, delete, OCR, or summarize user documents.
-- It does not replace Zotero or CSL formatting tools.
-- It does not fabricate paper metadata, quotes, claims, summaries, or conclusions.
-- It does not use cloud services, LLM APIs, or embeddings.
-- It does not decide whether a scientific claim is true.
-- It does not write polished literature-review prose as if it were user-authored.
-- It does not silently migrate, restore, or overwrite user data without explicit force flags.
-- It does not rewrite user drafts or generate final manuscript prose.
-- It does not mark papers as read, create session outcomes, or add follow-up actions unless the user runs the relevant local command.
-- It does not sync with cloud services or overwrite non-empty user data during sync.
-- Manuscript QA remains audit-only: it flags local evidence gaps rather than rewriting the draft.
-- Custom rules are declarative JSON only; the tool does not execute arbitrary Python code from rule files.
-
-## Installation
+## ⚙️ Installation
 
 From the repository root:
 
@@ -113,7 +71,7 @@ In offline or restricted-network environments, `pip` may be unable to fetch buil
 
 See [docs/INSTALLATION.md](docs/INSTALLATION.md) for release-check commands and troubleshooting.
 
-## Quickstart
+## 🚀 Quickstart
 
 Initialize a workspace:
 
@@ -157,338 +115,122 @@ paperwb report evidence-map --registry data/registries/example_papers.csv --bibt
 paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/citation_audit.md --force
 ```
 
-Run v0.2 diagnostics and a section outline:
+Run diagnostics and a section outline:
 
 ```bash
 paperwb doctor --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/workspace_health.md --force
 paperwb report section-outline --theme photocorrosion --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/photocorrosion_section_outline.md --force
 ```
 
-## Project Profile Workflow
+## 🧪 Project Profile Workflow
 
-Project profiles keep independent registry, notes, BibTeX, themes, and reports under `projects/`.
+Project profiles are the recommended v2 workflow. They keep each literature
+review in its own local folder under `projects/`, with separate registry,
+BibTeX, notes, themes, rules, reports, and safety artifacts.
 
 ```bash
-paperwb project list
-paperwb project init demo_review
-paperwb project validate zis_photocatalysis
-paperwb dashboard --project zis_photocatalysis
-paperwb dashboard --project zis_photocatalysis --view next-actions
+paperwb template list
+paperwb template inspect photocatalysis
+paperwb template create photocatalysis --project my_review
+paperwb project validate my_review
+paperwb dashboard --project my_review --no-audit-log
+```
+
+After adding verified paper metadata and user-written notes, use the same
+project flag across the main daily workflow:
+
+```bash
+paperwb note-template PAPER_ID --project my_review
+paperwb claims --project my_review --output scratch/my_review_claims.csv --force
+paperwb report evidence-map --project my_review --out scratch/my_review_evidence_map.md --force
+paperwb report citation-audit --project my_review --out scratch/my_review_citation_audit.md --force
+paperwb manuscript qa drafts/synthetic_good_section.md --project my_review --out scratch/my_review_manuscript_qa.md --force
+paperwb reading queue --project my_review --out scratch/my_review_reading_queue.md --force
+paperwb integrity check --project my_review --out scratch/my_review_integrity.md --force
+paperwb backup create --project my_review --notes "Before major note cleanup"
+```
+
+Templates create empty scaffolds only. They do not include real paper metadata,
+claims, quotes, or copyrighted documents. Existing project files are not
+overwritten unless a command exposes and receives an explicit force flag.
+
+## 🔧 Common Workflows
+
+```bash
+# Import/export
+paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --force
+paperwb export reading-list --theme photocorrosion --project zis_photocatalysis --out scratch/reading_list.md --force
+
+# Search and index
 paperwb search photocorrosion --project zis_photocatalysis
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb search photocorrosion --project zis_photocatalysis --indexed
-paperwb files scan --project zis_photocatalysis
-paperwb files audit --project zis_photocatalysis --reports-dir scratch/zis_file_reports --force
-paperwb report evidence-map --project zis_photocatalysis --out scratch/zis_evidence_map.md --force
-paperwb export claims-json --project zis_photocatalysis --out scratch/zis_claims.json --force
-```
 
-`files scan` is read-only unless `--write-registry` is provided. When it writes `files.csv`, it merges with existing file-registry rows so curated notes and older unmatched rows are preserved for review. `files audit` preflights all report paths before writing and reconciles live scan results with existing `files.csv` records.
-
-The legacy `data/` workflow remains supported.
-
-## v0.3 Stress Workflow
-
-Generate a deterministic synthetic stress project:
-
-```bash
-paperwb synthetic generate --project stress_demo --papers 100 --claims 220 --themes 6 --domain zis
-```
-
-Run the checked-in stress tests and performance sanity report:
-
-```bash
-python -m pytest tests/test_synthetic_stress.py tests/test_cli_stress.py tests/test_golden_reports.py
-python scripts/performance_sanity.py --force
-```
-
-The checked-in stress projects under `projects/stress_*` are synthetic fixtures only. They intentionally include duplicate metadata, weak claims, missing evidence locations, orphan notes, and unlinked BibTeX entries so validation and reports can be regression-tested.
-
-## v0.4 Import / Export Workflow
-
-Run a dry-run import before writing to a registry:
-
-```bash
-paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --force
-paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run --force
-paperwb import bibtex data/examples/library_import.bib --dry-run --force
-paperwb import ris data/examples/library.ris --dry-run --force
-```
-
-Export local writing and backup artifacts:
-
-```bash
-paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
-paperwb export bundle --project zis_photocatalysis --out exports/zis_bundle
-paperwb export reading-list --theme photocorrosion --project zis_photocatalysis --out scratch/reading_list_photocorrosion.md --force
-```
-
-Imports preserve existing registry rows. `--fill-missing` fills only blank fields on matched records; it does not overwrite non-empty user fields.
-
-## v0.5 Indexed Search Workflow
-
-Build a rebuildable local index:
-
-```bash
-paperwb index rebuild --project zis_photocatalysis --include-text
-paperwb index status --project zis_photocatalysis --include-text --check-files
-```
-
-Search indexed registry, BibTeX, note, claim, theme, tag, and sidecar records:
-
-```bash
-paperwb search "charge separation" --project zis_photocatalysis --indexed
-paperwb search photocorrosion --project zis_photocatalysis --indexed --text
-paperwb search "charge separation" --project zis_photocatalysis --indexed --out scratch/search_charge_separation.md --force
-```
-
-The index is a local cache under `.paperwb/` and is ignored by git. Full-text sidecars are plain `.txt` files supplied by the user, such as `projects/zis_photocatalysis/text/PAPER_ID.txt`; the tool does not parse PDFs by default.
-
-## v0.6 Authoring Workflow
-
-Generate local planning aids for a theme:
-
-```bash
-paperwb report evidence-matrix --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_evidence_matrix.md --force
-paperwb report claim-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_claim_bank.md --force
-paperwb report citation-bank --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_citation_bank.md --force
-paperwb report paragraph-plan --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_paragraph_plan.md --force
-paperwb report subsection-readiness --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_readiness.md --force
-paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/photocorrosion_writing_packet.md --force
-```
-
-See [docs/AUTHORING_WORKBENCH.md](docs/AUTHORING_WORKBENCH.md).
-
-## v0.9 Safety Workflow
-
-Check integrity and create a local backup before risky changes:
-
-```bash
-paperwb integrity check --project zis_photocatalysis --out scratch/workspace_integrity_v0_9.md --force
-paperwb backup create --project zis_photocatalysis --notes "Before major note cleanup"
-paperwb backup list --project zis_photocatalysis
-```
-
-Restore is dry-run by default unless `--force` is passed:
-
-```bash
-paperwb backup plan-restore BACKUP_ID --project zis_photocatalysis
-paperwb backup restore BACKUP_ID --project zis_photocatalysis --dry-run --out scratch/restore_dry_run_v0_9.md --force-report
-```
-
-Plan a non-destructive legacy `data/` migration:
-
-```bash
-paperwb migrate plan --from legacy --to-project migrated_lit_review --out scratch/migration_plan_v0_9.md --force
-paperwb migrate run --from legacy --to-project migrated_lit_review --dry-run
-```
-
-Audit logs are local JSONL files under `.paperwb/` and are ignored by git.
-
-See [docs/WORKSPACE_INTEGRITY.md](docs/WORKSPACE_INTEGRITY.md), [docs/BACKUPS.md](docs/BACKUPS.md), [docs/RESTORE.md](docs/RESTORE.md), [docs/MIGRATION.md](docs/MIGRATION.md), and [docs/AUDIT_LOG.md](docs/AUDIT_LOG.md).
-
-## v0.10 Failure-Path Workflow
-
-Run the adversarial regression suite:
-
-```bash
-python -m pytest tests/test_adversarial_v0_10.py
-```
-
-Review the guidance:
-
-- [docs/ADVERSARIAL_TESTING.md](docs/ADVERSARIAL_TESTING.md)
-- [docs/ERROR_TAXONOMY.md](docs/ERROR_TAXONOMY.md)
-- [docs/ERROR_MESSAGE_GUIDE.md](docs/ERROR_MESSAGE_GUIDE.md)
-- [docs/RECOVERING_FROM_BAD_DATA.md](docs/RECOVERING_FROM_BAD_DATA.md)
-
-## v1.1 Draft Citation Audit Workflow
-
-Audit a synthetic Markdown draft against local project evidence:
-
-```bash
-paperwb draft parse drafts/synthetic_photocorrosion_section.md
-paperwb draft audit drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_audit.md --force
-paperwb draft checklist drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_checklist.md --force
-paperwb draft evidence-matrix drafts/synthetic_photocorrosion_section.md --project zis_photocatalysis --out scratch/draft_paragraph_matrix.md --force
-```
-
-The audit uses transparent local keyword, tag, theme, and citation-key overlap.
-It reports possible gaps for manual revision; it does not judge scientific truth
-or write polished prose.
-- [docs/CLI_FAILURE_MODES.md](docs/CLI_FAILURE_MODES.md)
-
-## v1.2 Reading Workflow
-
-Generate a local reading queue, start a session, finish it with user-provided
-outcomes, and review follow-up actions:
-
-```bash
-paperwb reading queue --project zis_photocatalysis
-paperwb reading start zis_charge_2025 --project zis_photocatalysis --goal "Check evidence locations"
-paperwb reading finish SESSION_ID --project zis_photocatalysis --status deeply_read --duration-minutes 45 --follow-up "Add missing section/page evidence"
-paperwb followups list --project zis_photocatalysis
-paperwb reading review --project zis_photocatalysis --out scratch/weekly_reading_review.md --force
-```
-
-Reading sessions are stored locally under `.paperwb/` by default and are ignored
-by git. Existing notes are preserved unless `reading start --force-note` is
-explicitly used. See [docs/READING_SESSIONS.md](docs/READING_SESSIONS.md).
-
-## v1.3 Sync Workflow
-
-Generate a local sync plan before applying import/export changes:
-
-```bash
-paperwb sync plan --project zis_photocatalysis \
-  --source data/examples/zotero_export.csv \
-  --source-type zotero-csv \
-  --out scratch/sync_plan.md \
-  --json-out scratch/sync_plan.json \
-  --force
-
-paperwb sync conflicts scratch/sync_plan.json --out scratch/sync_conflicts.md --force
-paperwb sync apply scratch/sync_plan.json --dry-run --out scratch/sync_apply_dry_run.md --force-report
-```
-
-Forced sync applies create a local backup by default and only create missing
-registry rows or fill blank fields when the plan has no high-risk conflicts and
-the source/registry files still match the plan. Note and metadata conflicts are
-reported for manual review. See [docs/SYNC.md](docs/SYNC.md).
-
-## v1.4 Manuscript QA Workflow
-
-Audit a synthetic manuscript draft against local project evidence:
-
-```bash
-paperwb manuscript parse drafts/synthetic_overconfident_section.md
+# Writing and manuscript QA
+paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/writing_packet.md --force
 paperwb manuscript qa drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_qa.md --force
-paperwb manuscript context-table drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/citation_context_table.md --force
-paperwb manuscript trace-claims drafts/synthetic_overconfident_section.md --project zis_photocatalysis --theme photocorrosion --out scratch/claim_traceability.md --force
-paperwb manuscript checklist drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_revision_checklist.md --force
+
+# Reading and safety
+paperwb reading queue --project zis_photocatalysis
+paperwb followups list --project zis_photocatalysis
+paperwb integrity check --project zis_photocatalysis --out scratch/integrity.md --force
+paperwb backup create --project zis_photocatalysis --notes "Before major note cleanup"
 ```
 
-Manuscript QA uses transparent local citation, keyword, tag, and theme overlap.
-It flags possible problems for manual revision; it does not judge scientific
-truth, fabricate support, or write polished prose. See
-[docs/MANUSCRIPT_QA.md](docs/MANUSCRIPT_QA.md).
+Use `--dry-run` for imports, sync, restore, and migration planning before writing
+changes. Use `--force` only when you intend to overwrite an output file.
 
-## v1.5 Rule Engine Workflow
+## 🗂️ Data Model
 
-Run project-specific rules without changing core code:
+- Registry: CSV rows with stable `paper_id` values, metadata, BibTeX keys, tags, reading status, note paths, priorities, and user comments.
+- Notes: structured Markdown files with metadata, summaries, methods, claims, evidence, open questions, follow-ups, and personal notes.
+- Claims: user-entered statements extracted from notes, with evidence type, location, confidence, strength, tags, themes, and comments.
+- Themes: local JSON definitions used for evidence maps, dashboards, rules, and writing packets.
+- Reports: generated Markdown or CSV/JSON outputs; they are audit artifacts, not authoritative source data.
 
-```bash
-paperwb rules list --project zis_photocatalysis --builtins
-paperwb rules validate-config --project zis_photocatalysis --strict
-paperwb rules run --project zis_photocatalysis
-paperwb rules report --project zis_photocatalysis --out scratch/rule_report.md --force
-paperwb rules explain zis.theme.photocorrosion.min_papers --project zis_photocatalysis
-```
+Schema docs:
+[registry](docs/REGISTRY_SCHEMA.md),
+[notes](docs/NOTE_FORMAT.md),
+[BibTeX audit](docs/BIBTEX_AUDIT.md),
+and [v2 schema freeze](docs/SCHEMA_FREEZE_V2.md).
 
-Rules are local JSON data such as `projects/zis_photocatalysis/rules.json`.
-They can enforce project policies around theme coverage, evidence locations,
-reading status, and manuscript citation keys. They do not execute arbitrary code
-or rewrite user data. See [docs/RULE_ENGINE.md](docs/RULE_ENGINE.md).
+## 📊 Report Examples
 
-## Data Folder Convention
+Reports are written to `reports/` for legacy `data/` workflows or to a
+project's `reports/` folder when `--project` is used. Existing outputs are not
+overwritten unless `--force` is provided.
 
-```text
-data/
-  papers/       # user-provided local references; no copyrighted PDFs are included
-  notes/        # structured Markdown paper notes
-  bibtex/       # BibTeX libraries
-  registries/   # CSV paper registries
-  examples/     # synthetic themes and fixtures
-reports/        # generated Markdown reports
-notebooks/      # lightweight workflow notebooks
-docs/           # workflow documentation
-projects/       # optional independent review profiles
-.paperwb/       # local ignored SQLite cache when indexed search is used
-```
+Common reports include inventory, reading status, BibTeX audit, citation audit,
+evidence map, theme dashboard, missing notes, weak claims, evidence matrix,
+claim bank, citation bank, paragraph plan, subsection readiness, manuscript QA,
+workspace integrity, and dashboard summaries.
 
-## Registry Schema
-
-The registry is a CSV with stable, human-readable `paper_id` values. Core fields include title, authors, year, journal, DOI, URL, local PDF path, BibTeX key, tags, reading status, notes path, dates, priority, and user comments.
-
-See [docs/REGISTRY_SCHEMA.md](docs/REGISTRY_SCHEMA.md).
-
-## Note Format
-
-Notes are Markdown files with fixed headings for metadata, summaries, method notes, claims, evidence, open questions, and follow-up actions. The parser is conservative and returns warnings for incomplete notes rather than crashing.
-
-See [docs/NOTE_FORMAT.md](docs/NOTE_FORMAT.md).
-
-## BibTeX Audit Workflow
-
-The BibTeX parser is lightweight and intentionally does not auto-correct entries. It reports missing fields, duplicate keys or DOIs, invalid years, inconsistent field names, unlinked entries, and registry papers without matching citation keys.
-
-See [docs/BIBTEX_AUDIT.md](docs/BIBTEX_AUDIT.md).
-
-## Claim and Evidence Workflow
-
-Claims come from structured note blocks. Each claim can include evidence type, section/page location, quote or paraphrase, confidence, tags, theme support, and strength. Reports highlight weak claims and missing evidence locations before the user drafts a literature-review section.
-
-## Report Examples
-
-Reports are Markdown files written to `reports/` by default for the legacy `data/` workflow, or to the selected project profile's `reports/` directory when `--project` is used. Existing report and export files are not overwritten unless `--force` is provided.
-
-- `inventory.md`
-- `reading_status.md`
-- `papers_by_tag.md`
-- `bibtex_audit.md`
-- `claims_by_theme.md`
-- `evidence_map.md`
-- `citation_audit.md`
-- `missing_notes.md`
-- `weak_claims.md`
-- `theme_dashboard.md`
-- `evidence_matrix.md`
-- `claim_bank.md`
-- `citation_bank.md`
-- `paragraph_plan.md`
-- `subsection_readiness.md`
-
-## CLI Reference
+## ⌨️ CLI Reference
 
 ```text
 paperwb init
-paperwb validate-registry data/registries/papers.csv
-paperwb validate-bib data/bibtex/library.bib
-paperwb add-paper --title "..." --year 2026
+paperwb template list
+paperwb template create photocatalysis --project my_review
+paperwb project validate my_review
+paperwb validate-registry data/registries/example_papers.csv
+paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv
 paperwb list
-paperwb list --tag TAG
-paperwb list --status unread
 paperwb note-template PAPER_ID
 paperwb claims data/notes/
 paperwb search QUERY
-paperwb search QUERY --indexed
-paperwb index rebuild --project zis_photocatalysis --include-text
-paperwb index status --project zis_photocatalysis --check-files
-paperwb index clear --project zis_photocatalysis
-paperwb search QUERY --claims
-paperwb search QUERY --notes
-paperwb report inventory
-paperwb report bibtex-audit
 paperwb report evidence-map
 paperwb report citation-audit
-paperwb report reading-status
-paperwb report section-outline --theme photocorrosion
-paperwb report evidence-matrix --theme photocorrosion
-paperwb report claim-bank --theme photocorrosion
-paperwb report citation-bank --theme photocorrosion
-paperwb report paragraph-plan --theme photocorrosion
-paperwb report subsection-readiness --theme photocorrosion
 paperwb writing-packet --theme photocorrosion
 paperwb doctor
-paperwb export claims --out scratch/claims.csv
-paperwb export obsidian --project zis_photocatalysis --out exports/obsidian_zis
 paperwb import zotero-csv data/examples/zotero_export.csv --dry-run
-paperwb project list
-paperwb synthetic generate --project stress_demo --papers 100 --claims 220
-paperwb checklist --theme photocorrosion
+paperwb export claims --out scratch/claims.csv
+paperwb dashboard --project zis_photocatalysis
 ```
 
-## Limitations
+Run `paperwb --help` or see [docs/CLI_REFERENCE_V2.md](docs/CLI_REFERENCE_V2.md)
+for the full command map.
+
+## ⚠️ Limitations
 
 - BibTeX parsing targets common local entries, not every BibTeX edge case.
 - Markdown note parsing expects the provided template headings.
@@ -497,43 +239,21 @@ paperwb checklist --theme photocorrosion
 - SQLite indexing is a rebuildable cache, not an authoritative database.
 - Citation audit checks completeness of user notes, not scientific correctness.
 
-## More Documentation
+## 📘 More Documentation
 
-- [docs/index.md](docs/index.md)
-- [docs/EXTERNAL_USER_QUICKSTART.md](docs/EXTERNAL_USER_QUICKSTART.md)
-- [docs/INSTALLATION.md](docs/INSTALLATION.md)
-- [docs/QUICKSTART_EXTERNAL_USER.md](docs/QUICKSTART_EXTERNAL_USER.md)
-- [docs/EXAMPLE_LITERATURE_REVIEW_WORKFLOW.md](docs/EXAMPLE_LITERATURE_REVIEW_WORKFLOW.md)
-- [docs/REPORT_GALLERY.md](docs/REPORT_GALLERY.md)
-- [docs/CLI_WALKTHROUGH.md](docs/CLI_WALKTHROUGH.md)
-- [docs/PROJECT_PROFILES.md](docs/PROJECT_PROFILES.md)
-- [docs/CLI_REFERENCE.md](docs/CLI_REFERENCE.md)
-- [docs/API_SURFACE.md](docs/API_SURFACE.md)
-- [docs/CLI_SURFACE.md](docs/CLI_SURFACE.md)
-- [docs/COMMAND_CONTRACTS.md](docs/COMMAND_CONTRACTS.md)
-- [docs/EVIDENCE_MAPS.md](docs/EVIDENCE_MAPS.md)
-- [docs/WORKFLOW_EXAMPLES.md](docs/WORKFLOW_EXAMPLES.md)
-- [docs/IMPORTS.md](docs/IMPORTS.md)
-- [docs/EXPORTS.md](docs/EXPORTS.md)
-- [docs/ZOTERO_WORKFLOW.md](docs/ZOTERO_WORKFLOW.md)
-- [docs/OBSIDIAN_EXPORT.md](docs/OBSIDIAN_EXPORT.md)
-- [docs/BACKUP_BUNDLES.md](docs/BACKUP_BUNDLES.md)
-- [docs/ROUND_TRIP_TESTING.md](docs/ROUND_TRIP_TESTING.md)
-- [docs/LOCAL_SEARCH.md](docs/LOCAL_SEARCH.md)
-- [docs/SQLITE_INDEX.md](docs/SQLITE_INDEX.md)
-- [docs/FULL_TEXT_SIDECARS.md](docs/FULL_TEXT_SIDECARS.md)
-- [docs/SEARCH_RANKING.md](docs/SEARCH_RANKING.md)
-- [docs/INDEX_MAINTENANCE.md](docs/INDEX_MAINTENANCE.md)
-- [docs/SYNTHETIC_CORPUS.md](docs/SYNTHETIC_CORPUS.md)
-- [docs/STRESS_TESTING.md](docs/STRESS_TESTING.md)
-- [docs/GOLDEN_REPORTS.md](docs/GOLDEN_REPORTS.md)
-- [docs/REPORT_REGRESSION_TESTING.md](docs/REPORT_REGRESSION_TESTING.md)
-- [docs/CLI_STRESS_WORKFLOWS.md](docs/CLI_STRESS_WORKFLOWS.md)
-- [docs/TEST_MATRIX.md](docs/TEST_MATRIX.md)
-- [docs/CLI_BEHAVIOR_MATRIX.md](docs/CLI_BEHAVIOR_MATRIX.md)
-- [docs/REPORT_MATRIX.md](docs/REPORT_MATRIX.md)
-- [docs/DATA_SAFETY_MATRIX.md](docs/DATA_SAFETY_MATRIX.md)
+- [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md)
+- [docs/STABLE_SURFACE_V2.md](docs/STABLE_SURFACE_V2.md)
+- [docs/EXPERIMENTAL_FEATURES_V2.md](docs/EXPERIMENTAL_FEATURES_V2.md)
+- [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md)
+- [docs/CLI_REFERENCE_V2.md](docs/CLI_REFERENCE_V2.md)
+- [docs/REPORTS_V2.md](docs/REPORTS_V2.md)
+- [docs/DATA_SAFETY_V2.md](docs/DATA_SAFETY_V2.md)
+- [docs/KNOWN_LIMITATIONS_V2.md](docs/KNOWN_LIMITATIONS_V2.md)
 
-## Roadmap
+## 🧭 Roadmap
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for proposed extensions such as optional HTML report export, project profiles, citation-key suggestions, richer dashboards, and checklist workflows.
+See [docs/ROADMAP_V2.md](docs/ROADMAP_V2.md) for the current maintenance roadmap.
+
+## 👤 Author
+
+Angze Li
