@@ -46,8 +46,8 @@ python scripts/clean_room_install_check.py --quick
 ```
 
 The script uses the current Python environment and `python -m
-paper_workbench.cli`, so it also works before the console entry point is
-installed.
+paper_workbench.cli` from the repository root, so it also works before the
+console entry point is installed.
 
 ## Local-Only Boundary
 
@@ -55,6 +55,6 @@ Installation does not configure cloud services, API keys, publisher scraping, PD
 
 ## Troubleshooting
 
-- If `paperwb` is not found, use `python -m paper_workbench.cli ...` or check that the editable install ran in the active Python environment.
+- If `paperwb` is not found, use `python -m paper_workbench.cli ...` from the repository root or check that the editable install ran in the active Python environment. Inside initialized workspaces, prefer `paperwb` so local data folders do not shadow the package.
 - If `pip install -e ".[test]"` cannot fetch packages, install local build/test tools first or use no-install CLI mode.
 - If tests fail after running workflows, check for generated files outside ignored folders such as `scratch/` or `exports/`.

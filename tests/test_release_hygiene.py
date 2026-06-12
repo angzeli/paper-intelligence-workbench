@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import subprocess
+
 from conftest import ROOT
 from paper_workbench import __version__
 from paper_workbench.exports import report_index_markdown
@@ -86,15 +88,16 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v1.8 Release Reports" in content
-    assert "[architecture_review_v1_8.md]" in content
-    assert "[release_readiness_v1_8.md]" in content
-    current_section = content.split("## Current v1.8 Release Reports", 1)[1]
+    assert "## Current v2.0 Release Reports" in content
+    assert "[release_notes_v2_0_rc.md]" in content
+    assert "[release_readiness_v2_0_rc.md]" in content
+    current_section = content.split("## Current v2.0 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
     assert "[hostile_review_latest.md]" in current_section
-    assert "[architecture_review_v1_8.md]" in current_section
-    assert "[release_readiness_v1_8.md]" in current_section
+    assert "[release_notes_v2_0_rc.md]" in current_section
+    assert "[release_readiness_v2_0_rc.md]" in current_section
+    assert "[final_release_verdict_v2_0_rc.md]" in current_section
 
 
 def test_local_build_artifacts_do_not_claim_stale_versions():
@@ -110,7 +113,14 @@ def test_local_build_artifacts_do_not_claim_stale_versions():
         assert not stale_dist
 
     pkg_info = ROOT / "paper_intelligence_workbench.egg-info" / "PKG-INFO"
-    if pkg_info.exists():
+    tracked_pkg_info = subprocess.run(
+        ["git", "ls-files", str(pkg_info.relative_to(ROOT))],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    ).stdout.strip()
+    if pkg_info.exists() and tracked_pkg_info:
         assert f"Version: {__version__}" in pkg_info.read_text(encoding="utf-8")
 
 

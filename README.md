@@ -38,6 +38,10 @@ v1.7 adds reusable project templates and dogfooding scaffolds for photocatalysis
 
 v1.8 is an architecture cleanup release. It centralizes duplicated internal path-display and theme-normalization helpers, clarifies the Python API boundary, and adds release-readiness reports without changing the public CLI workflow.
 
+v2.0rc is a release-candidate stabilization pass. It classifies stable versus experimental workflows, freezes the documented v2 command and schema surfaces, refreshes release-readiness reports, and keeps the project local-first without adding broad new features.
+
+For v2 release-candidate orientation, start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABLE_SURFACE_V2.md](docs/STABLE_SURFACE_V2.md), and [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md).
+
 ## What It Does
 
 - Maintains a CSV paper registry.
@@ -99,13 +103,13 @@ The CLI entry point is:
 paperwb --help
 ```
 
-You can also run it without installing:
+You can also run it without installing from the repository root:
 
 ```bash
 python -m paper_workbench.cli --help
 ```
 
-In offline or restricted-network environments, `pip` may be unable to fetch build dependencies for editable install. In that case, use the no-install `python -m paper_workbench.cli ...` form from the repository root, or install after local build dependencies such as `setuptools` and `pytest` are available.
+In offline or restricted-network environments, `pip` may be unable to fetch build dependencies for editable install. In that case, use the no-install `python -m paper_workbench.cli ...` form from the repository root, or install after local build dependencies such as `setuptools` and `pytest` are available. For normal work inside initialized workspaces, use `paperwb`; workspace data folders can shadow the Python package when using `python -m`.
 
 See [docs/INSTALLATION.md](docs/INSTALLATION.md) for release-check commands and troubleshooting.
 

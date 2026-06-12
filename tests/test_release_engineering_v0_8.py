@@ -16,7 +16,7 @@ def test_package_metadata_matches_import_version_and_cli_entrypoint():
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert f'version = "{__version__}"' in content
-    assert __version__ == "1.8.0"
+    assert __version__ == "2.0.0rc1"
     assert 'requires-python = ">=3.10"' in content
     assert "dependencies = []" in content
     assert 'paperwb = "paper_workbench.cli:main"' in content
@@ -51,6 +51,21 @@ def test_release_docs_site_and_matrices_exist():
         "docs/API_SURFACE.md",
         "docs/CLI_SURFACE.md",
         "docs/COMMAND_CONTRACTS.md",
+        "docs/STABLE_SURFACE_V2.md",
+        "docs/EXPERIMENTAL_FEATURES_V2.md",
+        "docs/DEPRECATION_POLICY.md",
+        "docs/COMMAND_CONTRACTS_V2.md",
+        "docs/SCHEMA_FREEZE_V2.md",
+        "docs/MIGRATION_GUIDE_V2.md",
+        "docs/BACKWARD_COMPATIBILITY_V2.md",
+        "docs/GETTING_STARTED_V2.md",
+        "docs/WORKFLOWS_V2.md",
+        "docs/CLI_REFERENCE_V2.md",
+        "docs/REPORTS_V2.md",
+        "docs/DATA_SAFETY_V2.md",
+        "docs/KNOWN_LIMITATIONS_V2.md",
+        "docs/ROADMAP_V2.md",
+        "docs/TEST_MATRIX_V2.md",
     ]
 
     for relative in expected:
@@ -80,7 +95,7 @@ def test_smoke_cli_workflow_quick_generates_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "CLI Smoke Workflow v1.8" in content
+    assert "CLI Smoke Workflow v2.0rc" in content
     assert "Failures: 0" in content
     assert "validate registry" in content
     assert "dashboard next actions" in content

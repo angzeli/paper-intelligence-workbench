@@ -2,6 +2,17 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v2.0.0rc1 - Release Candidate Stabilization
+
+- Promoted local package metadata to `2.0.0rc1` for release-candidate testing.
+- Added v2 stable, experimental, deprecated, schema, migration, command-contract,
+  data-safety, and known-limitation documentation.
+- Added v2 release notes, report inventory, test-suite summary, notebook/example
+  validation, migration-readiness, data-safety, external-user simulation, and
+  final release-verdict reports.
+- Kept v2.0rc focused on stabilization: no cloud APIs, no LLM APIs, no scraping,
+  no fabricated paper data, and no broad feature expansion.
+
 ## v1.8.0 - Architecture Cleanup and Internal API Stabilization
 
 - Centralized internal path display logic used by search, indexed search, imports, and report indexes.

@@ -6,6 +6,10 @@ Use these docs as static Markdown source. No site generator is required.
 
 ## Start Here
 
+- [Getting Started v2](GETTING_STARTED_V2.md)
+- [Stable Surface v2](STABLE_SURFACE_V2.md)
+- [Experimental Features v2](EXPERIMENTAL_FEATURES_V2.md)
+- [Known Limitations v2](KNOWN_LIMITATIONS_V2.md)
 - [Getting Started](getting-started.md)
 - [External User Quickstart](EXTERNAL_USER_QUICKSTART.md)
 - [Installation](INSTALLATION.md)
@@ -49,6 +53,14 @@ Use these docs as static Markdown source. No site generator is required.
 
 ## Release Engineering
 
+- [Command Contracts v2](COMMAND_CONTRACTS_V2.md)
+- [Schema Freeze v2](SCHEMA_FREEZE_V2.md)
+- [Migration Guide v2](MIGRATION_GUIDE_V2.md)
+- [Backward Compatibility v2](BACKWARD_COMPATIBILITY_V2.md)
+- [Reports v2](REPORTS_V2.md)
+- [Data Safety v2](DATA_SAFETY_V2.md)
+- [Test Matrix v2](TEST_MATRIX_V2.md)
+- [Roadmap v2](ROADMAP_V2.md)
 - [API Surface](API_SURFACE.md)
 - [CLI Surface](CLI_SURFACE.md)
 - [Command Contracts](COMMAND_CONTRACTS.md)
