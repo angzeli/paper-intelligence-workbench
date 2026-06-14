@@ -2,26 +2,34 @@
 
 Reports directory: .
 
-Markdown reports indexed: 152
+Markdown reports indexed: 157
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
 ## Current v2.0 Release Reports
 
 - [data_safety_v2_0_rc.md](data_safety_v2_0_rc.md)
+- [dogfooding_project_template_v2_0.md](dogfooding_project_template_v2_0.md)
 - [example_workflow_validation_v2_0_rc.md](example_workflow_validation_v2_0_rc.md)
 - [external_user_simulation_v2_0_rc.md](external_user_simulation_v2_0_rc.md)
 - [final_release_verdict_v2_0_rc.md](final_release_verdict_v2_0_rc.md)
+- [fyp_photocatalysis_theme_pack_v2_0.md](fyp_photocatalysis_theme_pack_v2_0.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
 - [index_v2_0_rc.md](index_v2_0_rc.md)
 - [migration_readiness_v2_0_rc.md](migration_readiness_v2_0_rc.md)
 - [notebook_validation_v2_0_rc.md](notebook_validation_v2_0_rc.md)
 - [post_v2_0_roadmap.md](post_v2_0_roadmap.md)
+- [real_project_onboarding_v2_0.md](real_project_onboarding_v2_0.md)
 - [release_notes_v2_0_rc.md](release_notes_v2_0_rc.md)
+- [release_readiness_v2_0.md](release_readiness_v2_0.md)
 - [release_readiness_v2_0_rc.md](release_readiness_v2_0_rc.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
 - [test_suite_summary_v2_0_rc.md](test_suite_summary_v2_0_rc.md)
+
+## Next Patch Plan
+
+- [v2_1_recommended_patch_plan.md](v2_1_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
