@@ -1,6 +1,6 @@
 # Command Contracts v2
 
-This page freezes the v2.0rc command expectations for external dogfooding. It
+This page freezes the v2.0 command expectations for external dogfooding. It
 documents command behavior, not internal implementation details.
 
 ## Global Contract
@@ -22,6 +22,7 @@ documents command behavior, not internal implementation details.
 | `init` | Create folders | optional `--root` | workspace dirs | creates missing dirs only | stable | command-contract, smoke |
 | `project` | Profiles | project name | `projects/<name>` files | non-destructive init/validate | stable | project tests |
 | `template` | Empty scaffolds | template id, project | project scaffold | refuses existing target | stable | template tests |
+| `dogfood` | Real-project onboarding | template id, project, optional local paths | empty scaffold or planning report | refuses existing target; plan-from-files is read-only unless `--out` | stable | dogfood tests |
 | `validate-registry` | Registry audit | CSV | findings, optional JSON/report | read-only unless output path | stable | registry tests |
 | `validate-bib` | BibTeX audit | `.bib`, optional registry | findings/report | read-only unless report | stable | BibTeX tests |
 | `add-paper` | Append row | CLI metadata | registry CSV | appends only selected registry | stable | CLI tests |

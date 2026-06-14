@@ -79,3 +79,6 @@ Instructions for future agents working in this repository:
 - Project templates must create empty/synthetic scaffolds only; do not add real paper metadata, real claims, or copyrighted content.
 - Template creation must remain non-destructive and must refuse existing project paths unless a future explicit safety-reviewed force workflow is added.
 - Finance templates and reports must not provide investment advice.
+- Dogfooding scaffolds must remain empty or placeholder-only until a user adds verified metadata.
+- Do not commit private dogfood reference paths, real PDF filenames, copied BibTeX metadata, or 15-paper starter lists derived from private files.
+- Dogfood file-planning commands may compare local filenames with BibTeX keys, but must not copy PDFs, parse PDF text, or write registry rows automatically.

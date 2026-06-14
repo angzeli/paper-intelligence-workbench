@@ -20,6 +20,7 @@
 | Rules | `tests/test_rules_v1_5.py` |
 | Dashboard | `tests/test_dashboard_v1_6.py` |
 | Templates | `tests/test_templates_v1_7.py` |
+| Dogfooding onboarding | `tests/test_dogfood_v2_0.py` |
 | Release contracts | `tests/test_v1_0_rc_command_contracts.py`, `tests/test_v2_release_candidate.py` |
 
 Run:
@@ -30,4 +31,3 @@ python scripts/smoke_cli_workflow.py --quick
 python scripts/check_notebooks.py
 python scripts/data_safety_audit.py --strict
 ```
-

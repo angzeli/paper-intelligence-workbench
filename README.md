@@ -88,6 +88,14 @@ paperwb template create photocatalysis --project my_photocatalysis_review
 paperwb dashboard --project my_photocatalysis_review --no-audit-log
 ```
 
+Start a real-project dogfooding scaffold:
+
+```bash
+paperwb dogfood create photocatalysis --project fyp_zis_lit_review
+paperwb dogfood status --project fyp_zis_lit_review
+paperwb dogfood checklist --project fyp_zis_lit_review
+```
+
 Validate the synthetic example registry:
 
 ```bash
@@ -132,6 +140,8 @@ BibTeX, notes, themes, rules, reports, and safety artifacts.
 paperwb template list
 paperwb template inspect photocatalysis
 paperwb template create photocatalysis --project my_review
+paperwb dogfood create photocatalysis --project fyp_zis_lit_review
+paperwb dogfood status --project fyp_zis_lit_review
 paperwb project validate my_review
 paperwb dashboard --project my_review --no-audit-log
 ```
@@ -153,6 +163,11 @@ paperwb backup create --project my_review --notes "Before major note cleanup"
 Templates create empty scaffolds only. They do not include real paper metadata,
 claims, quotes, or copyrighted documents. Existing project files are not
 overwritten unless a command exposes and receives an explicit force flag.
+
+For a first real FYP-style photocatalysis review, prefer the dogfood scaffold.
+It adds onboarding checklists, a first-week plan, evidence-tracking reminders,
+and an expanded photocatalysis theme pack while still keeping the project empty
+until you add verified metadata yourself.
 
 ## 🔧 Common Workflows
 
@@ -222,6 +237,8 @@ paperwb report evidence-map
 paperwb report citation-audit
 paperwb writing-packet --theme photocorrosion
 paperwb doctor
+paperwb dogfood create photocatalysis --project fyp_review
+paperwb dogfood plan-from-files photocatalysis --project fyp_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
 paperwb import zotero-csv data/examples/zotero_export.csv --dry-run
 paperwb export claims --out scratch/claims.csv
 paperwb dashboard --project zis_photocatalysis
@@ -243,6 +260,8 @@ for the full command map.
 
 - [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md)
 - [docs/STABLE_SURFACE_V2.md](docs/STABLE_SURFACE_V2.md)
+- [docs/REAL_PROJECT_ONBOARDING.md](docs/REAL_PROJECT_ONBOARDING.md)
+- [docs/FYP_DOGFOODING_WORKFLOW.md](docs/FYP_DOGFOODING_WORKFLOW.md)
 - [docs/EXPERIMENTAL_FEATURES_V2.md](docs/EXPERIMENTAL_FEATURES_V2.md)
 - [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md)
 - [docs/CLI_REFERENCE_V2.md](docs/CLI_REFERENCE_V2.md)

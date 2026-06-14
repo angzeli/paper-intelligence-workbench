@@ -2,7 +2,15 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
-## v2.0.0rc1 - Release Candidate Stabilization
+## v2.0 - Dogfooding Workspace and Onboarding
+
+- Promoted local package metadata to `2.0`.
+- Added `paperwb dogfood create/status/checklist/plan-from-files` for empty real-project onboarding scaffolds and read-only metadata-backed starter planning.
+- Added an expanded FYP photocatalysis dogfood theme pack with no real paper metadata, claims, PDFs, or copied paper text.
+- Added real-project onboarding docs, safe paper-intake guidance, v2.0 dogfooding reports, and dogfood workflow tests.
+- Kept v2.0 local-first: no cloud APIs, no LLM APIs, no scraping, no PDF copying, and no automatic registry writes from file plans.
+
+## v2.0rc1 - Release Candidate Stabilization
 
 - Promoted local package metadata to `2.0.0rc1` for release-candidate testing.
 - Added v2 stable, experimental, deprecated, schema, migration, command-contract,

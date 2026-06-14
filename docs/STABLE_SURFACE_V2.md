@@ -1,6 +1,6 @@
 # Stable Surface v2
 
-Paper Intelligence Workbench v2.0rc is a local-first release candidate. The
+Paper Intelligence Workbench v2.0 is a local-first release. The
 stable surface is the CLI plus documented CSV, JSON, Markdown, BibTeX, and
 project-profile file formats. The Python package remains usable for local
 scripts, but direct imports outside the documented stable helpers should be
@@ -13,6 +13,7 @@ treated as implementation detail.
 | `init` | stable | Create folder structure without overwriting user files. |
 | `project` | stable | Manage project profiles under `projects/`. |
 | `template` | stable | Create empty/synthetic non-destructive scaffolds. |
+| `dogfood` | stable | Create empty real-project onboarding scaffolds and read-only intake plans. |
 | `validate-registry` | stable | Validate CSV registries and report findings without auto-correction. |
 | `validate-bib` | stable | Validate local BibTeX files and registry links. |
 | `add-paper` | stable | Append explicit user-provided paper rows. |
@@ -40,4 +41,3 @@ treated as implementation detail.
 Stable workflows organize local evidence. They do not fabricate metadata,
 claims, citations, summaries, quotes, or final prose. They do not evaluate
 scientific truth.
-

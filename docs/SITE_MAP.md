@@ -11,6 +11,9 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/reports.md`
 - `docs/project-profiles.md`
 - `docs/PROJECT_TEMPLATES.md`
+- `docs/REAL_PROJECT_ONBOARDING.md`
+- `docs/FYP_DOGFOODING_WORKFLOW.md`
+- `docs/ADDING_REAL_PAPERS_SAFELY.md`
 - `docs/DOGFOODING_WORKFLOW.md`
 - `docs/local-search.md`
 - `docs/import-export.md`
@@ -40,6 +43,9 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/EVIDENCE_MAPS.md`
 - `docs/PROJECT_PROFILES.md`
 - `docs/PROJECT_TEMPLATES.md`
+- `docs/REAL_PROJECT_ONBOARDING.md`
+- `docs/FYP_DOGFOODING_WORKFLOW.md`
+- `docs/ADDING_REAL_PAPERS_SAFELY.md`
 - `docs/PHOTOCATALYSIS_TEMPLATE.md`
 - `docs/FINANCE_TEMPLATE.md`
 - `docs/ML_METHODS_TEMPLATE.md`

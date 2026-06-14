@@ -31,6 +31,21 @@ paperwb dashboard --project my_review --no-audit-log
 The template creates an empty scaffold. Warnings about missing papers, notes, or
 evidence are expected.
 
+For a real FYP-style photocatalysis dogfood project, use the onboarding scaffold:
+
+```bash
+paperwb dogfood create photocatalysis --project fyp_zis_lit_review
+paperwb dogfood status --project fyp_zis_lit_review
+paperwb dogfood checklist --project fyp_zis_lit_review
+```
+
+If you already have a private folder of PDFs and a local BibTeX file, generate a
+planning report without copying files or writing registry rows:
+
+```bash
+paperwb dogfood plan-from-files photocatalysis --project fyp_zis_lit_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
+```
+
 ## Try Synthetic Examples
 
 ```bash

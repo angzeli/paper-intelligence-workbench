@@ -14,6 +14,8 @@ Reports are Markdown-first artifacts generated from local inputs.
 - Weak claims
 - Workspace health
 - Dashboard
+- Dogfooding project template
+- Real-project onboarding
 
 ## Experimental Reports
 
@@ -38,4 +40,3 @@ Reports are Markdown-first artifacts generated from local inputs.
 Reports organize local user-entered evidence. They do not certify scientific
 truth, produce final prose, or validate that a citation truly supports a claim
 beyond the user's own notes and transparent lexical checks.
-

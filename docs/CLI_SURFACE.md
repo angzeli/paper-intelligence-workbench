@@ -1,6 +1,6 @@
-# CLI Surface v1.8
+# CLI Surface v2.0
 
-The stable external interface for Paper Intelligence Workbench v1.8 is the
+The stable external interface for Paper Intelligence Workbench v2.0 is the
 `paperwb` command. Commands are local-first, operate on user-provided files, and
 do not call cloud APIs, LLM APIs, or publisher scrapers.
 
@@ -31,6 +31,7 @@ release line unless a release note explicitly says otherwise.
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
 | `paperwb project init/list/validate` | stable | Manage local project profiles under `projects/` |
 | `paperwb template list/inspect/create` | stable | Create non-destructive empty project scaffolds from local templates |
+| `paperwb dogfood create/status/checklist/plan-from-files` | stable | Create empty real-project onboarding scaffolds and read-only metadata-backed starter plans |
 | `paperwb import zotero-csv/csv/bibtex/ris` | stable | Import local bibliography data with dry-run and no silent field overwrite |
 | `paperwb sync plan/apply/conflicts/plan-obsidian` | stable | Plan and dry-run local sync changes before safe registry apply |
 | `paperwb export` | stable | Export registries, claims, reading lists, Obsidian vaults, bundles, summaries, and report indexes |
@@ -49,7 +50,7 @@ release line unless a release note explicitly says otherwise.
 
 ## Deprecated Commands
 
-No commands are deprecated in v1.8.
+No commands are deprecated in v2.0.
 
 ## Write Safety Contract
 
@@ -76,6 +77,9 @@ No commands are deprecated in v1.8.
 - Template creation refuses existing project paths and creates empty scaffolds
   only; templates must not include real paper metadata, claims, PDFs, or copied
   paper text.
+- Dogfood scaffolds remain empty until users add verified metadata; file plans
+  compare filenames with BibTeX keys and do not copy PDFs, read PDF text, or
+  write registry rows.
 
 ## Command Exit Contract
 

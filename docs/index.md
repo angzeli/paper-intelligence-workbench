@@ -20,6 +20,9 @@ Use these docs as static Markdown source. No site generator is required.
 
 - [Project Profiles](project-profiles.md)
 - [Project Templates](PROJECT_TEMPLATES.md)
+- [Real Project Onboarding](REAL_PROJECT_ONBOARDING.md)
+- [FYP Dogfooding Workflow](FYP_DOGFOODING_WORKFLOW.md)
+- [Adding Real Papers Safely](ADDING_REAL_PAPERS_SAFELY.md)
 - [Dogfooding Workflow](DOGFOODING_WORKFLOW.md)
 - [Reports](reports.md)
 - [Report Gallery](REPORT_GALLERY.md)

@@ -1,13 +1,14 @@
 # CLI Reference v2
 
 Use `paperwb --help` and `paperwb COMMAND --help` for exact options. This page
-classifies command groups for v2.0rc.
+classifies command groups for v2.0.
 
 ## Stable Core
 
 - `init`
 - `project`
 - `template`
+- `dogfood`
 - `validate-registry`
 - `validate-bib`
 - `add-paper`
@@ -38,6 +39,19 @@ classifies command groups for v2.0rc.
 - `writing-packet`
 - `synthetic`
 
+## Dogfood Commands
+
+```bash
+paperwb dogfood create photocatalysis --project fyp_zis_lit_review
+paperwb dogfood status --project fyp_zis_lit_review
+paperwb dogfood checklist --project fyp_zis_lit_review
+paperwb dogfood plan-from-files photocatalysis --project fyp_zis_lit_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
+```
+
+`dogfood create` is non-destructive and refuses an existing project path.
+`plan-from-files` is a planning command only: it compares local PDF filenames
+with BibTeX keys and does not copy files, read PDF text, or write registry rows.
+
 ## Common Flags
 
 - `--project PROJECT`: use a project profile.
@@ -47,4 +61,3 @@ classifies command groups for v2.0rc.
 
 Stable commands should produce user-facing errors and avoid Python tracebacks
 for normal bad input.
-
