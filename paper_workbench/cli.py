@@ -40,6 +40,13 @@ from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_claims, collect_notes, save_claims_csv
 from .dashboard import dashboard_markdown, dashboard_terminal, next_actions_markdown, project_health_summary_markdown, build_dashboard
 from .doctor import workspace_health
+from .dogfood import (
+    build_file_plan,
+    create_dogfood_project,
+    dogfood_checklist,
+    dogfood_file_plan_markdown,
+    dogfood_status,
+)
 from .drafts import (
     audit_draft,
     citation_coverage_report as draft_citation_coverage_report,
@@ -1549,6 +1556,60 @@ def cmd_template_create(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_dogfood_create(args: argparse.Namespace) -> int:
+    result = create_dogfood_project(args.template, args.project, root=args.root)
+    _record_audit_event(
+        {"root": Path(result.profile.root), "profile": result.profile},
+        command="dogfood create",
+        action="create_dogfood_project",
+        affected_paths=[result.profile.root, *result.written_paths],
+        summary=f"Created dogfood project {result.profile.name} from {result.template_id}",
+    )
+    print(f"Created dogfood project {result.profile.name} from {result.template_id}")
+    print(profile_summary(result.profile))
+    print("Wrote:")
+    for path in result.written_paths:
+        print(f"- {path}")
+    return 0
+
+
+def cmd_dogfood_status(args: argparse.Namespace) -> int:
+    content = dogfood_status(args.project, root=args.root)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_dogfood_checklist(args: argparse.Namespace) -> int:
+    content = dogfood_checklist(args.project, root=args.root)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_dogfood_plan_from_files(args: argparse.Namespace) -> int:
+    plan = build_file_plan(
+        args.template,
+        args.project,
+        args.references_dir,
+        args.bibtex,
+        limit=args.limit,
+    )
+    content = dogfood_file_plan_markdown(plan)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
 def cmd_doctor(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     paths = _paths_from_args(args)
@@ -2169,6 +2230,35 @@ def build_parser() -> argparse.ArgumentParser:
     template_create.add_argument("--project", required=True, help="New project profile name to create.")
     template_create.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
     template_create.set_defaults(func=cmd_template_create)
+
+    dogfood_parser = subparsers.add_parser("dogfood", help="Create and inspect empty real-project dogfooding scaffolds.")
+    dogfood_sub = dogfood_parser.add_subparsers(dest="dogfood_command", required=True)
+    dogfood_create = dogfood_sub.add_parser("create", help="Create a non-destructive dogfooding project scaffold.")
+    dogfood_create.add_argument("template", help="Dogfood template ID: photocatalysis, finance, ml-methods, or generic.")
+    dogfood_create.add_argument("--project", required=True, help="New project profile name to create.")
+    dogfood_create.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+    dogfood_create.set_defaults(func=cmd_dogfood_create)
+    dogfood_status_parser = dogfood_sub.add_parser("status", help="Show empty-project-friendly dogfooding status.")
+    dogfood_status_parser.add_argument("--project", required=True, help="Project profile name.")
+    dogfood_status_parser.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+    dogfood_status_parser.add_argument("--out", help="Optional Markdown output path.")
+    dogfood_status_parser.add_argument("--force", action="store_true", help="Overwrite an existing output path.")
+    dogfood_status_parser.set_defaults(func=cmd_dogfood_status)
+    dogfood_checklist_parser = dogfood_sub.add_parser("checklist", help="Show the real-project intake checklist for a dogfood project.")
+    dogfood_checklist_parser.add_argument("--project", required=True, help="Project profile name.")
+    dogfood_checklist_parser.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+    dogfood_checklist_parser.add_argument("--out", help="Optional Markdown output path.")
+    dogfood_checklist_parser.add_argument("--force", action="store_true", help="Overwrite an existing output path.")
+    dogfood_checklist_parser.set_defaults(func=cmd_dogfood_checklist)
+    dogfood_plan = dogfood_sub.add_parser("plan-from-files", help="Plan a 15-paper starter set from local PDF filenames and BibTeX keys without writing project data.")
+    dogfood_plan.add_argument("template", help="Dogfood template ID, usually photocatalysis.")
+    dogfood_plan.add_argument("--project", required=True, help="Project profile name for the planning report.")
+    dogfood_plan.add_argument("--references-dir", required=True, help="Local directory containing user-provided PDF files.")
+    dogfood_plan.add_argument("--bibtex", required=True, help="Local BibTeX file to compare against PDF filename slugs.")
+    dogfood_plan.add_argument("--limit", type=int, default=15, help="Maximum direct matches to include in the starter shortlist.")
+    dogfood_plan.add_argument("--out", help="Optional Markdown output path.")
+    dogfood_plan.add_argument("--force", action="store_true", help="Overwrite an existing output path.")
+    dogfood_plan.set_defaults(func=cmd_dogfood_plan_from_files)
 
     validate_registry_parser = subparsers.add_parser("validate-registry", help="Validate a CSV paper registry.")
     validate_registry_parser.add_argument("registry", help="Registry CSV path.")

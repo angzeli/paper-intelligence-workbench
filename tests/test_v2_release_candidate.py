@@ -18,8 +18,8 @@ def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_v2_release_candidate_version_metadata() -> None:
-    assert __version__ == "2.0.0rc1"
-    assert 'version = "2.0.0rc1"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "2.0"
+    assert 'version = "2.0"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v2_surface_docs_exist_and_classify_core_commands() -> None:
@@ -74,6 +74,7 @@ def test_v2_stable_command_help_contracts() -> None:
         ("init", "--help"),
         ("project", "--help"),
         ("template", "--help"),
+        ("dogfood", "--help"),
         ("validate-registry", "--help"),
         ("validate-bib", "--help"),
         ("note-template", "--help"),
