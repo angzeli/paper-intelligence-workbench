@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 
+from paper_workbench import __version__
 from paper_workbench.bibtex import parse_bibtex_file
 from paper_workbench.claims import collect_notes
 from paper_workbench.registry import load_registry
@@ -408,7 +409,7 @@ def test_rule_report_generation() -> None:
     )
     report = rule_report(result)
 
-    assert "# Rule Report v1.5" in report
+    assert f"# Rule Report v{__version__}" in report
     assert "zis.theme.photocorrosion.min_papers" in report
     assert "Configured rule findings: 2" in report
 

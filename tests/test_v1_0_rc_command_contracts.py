@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from conftest import EXAMPLE_REGISTRY, ROOT
+from paper_workbench import __version__
 
 
 def run_cli(*args: str):
@@ -148,7 +149,7 @@ def test_clean_room_install_check_quick_generates_release_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "Current-Environment Release Check v1.0-rc" in content
+    assert f"Current-Environment Release Check v{__version__}" in content
     assert "Failures: 0" in content
     assert "create temp project" in content
 

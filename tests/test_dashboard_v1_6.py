@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from conftest import ROOT
+from paper_workbench import __version__
 from paper_workbench.dashboard import build_dashboard, dashboard_markdown, next_actions_markdown, project_health_summary_markdown
 from paper_workbench.schema import Author, BibTeXEntry, Claim, Paper, PaperNote, ProjectTheme, ValidationFinding
 
@@ -123,9 +124,9 @@ def test_dashboard_markdown_views_render_tables() -> None:
         limit=5,
     )
 
-    assert "# Terminal Dashboard v1.6" in dashboard_markdown(dashboard)
-    assert "# Next Actions v1.6" in next_actions_markdown(dashboard.next_actions)
-    assert "# Project Health Summary v1.6" in project_health_summary_markdown(dashboard)
+    assert f"# Terminal Dashboard v{__version__}" in dashboard_markdown(dashboard)
+    assert f"# Next Actions v{__version__}" in next_actions_markdown(dashboard.next_actions)
+    assert f"# Project Health Summary v{__version__}" in project_health_summary_markdown(dashboard)
 
 
 def test_dashboard_cli_project_smoke(tmp_path: Path) -> None:
@@ -138,7 +139,7 @@ def test_dashboard_cli_project_smoke(tmp_path: Path) -> None:
     assert "Paper Workbench Dashboard - zis_photocatalysis" in terminal.stdout
     assert "Top next actions:" in terminal.stdout
     assert written.returncode == 0
-    assert "# Terminal Dashboard v1.6" in report.read_text(encoding="utf-8")
+    assert f"# Terminal Dashboard v{__version__}" in report.read_text(encoding="utf-8")
 
 
 def test_dashboard_cli_rejects_non_positive_limits() -> None:
@@ -171,9 +172,9 @@ def test_dashboard_cli_next_actions_and_health_views(tmp_path: Path) -> None:
 
     assert action_result.returncode == 0
     assert health_result.returncode == 0
-    assert "Next Actions v1.6" in actions.read_text(encoding="utf-8")
+    assert f"Next Actions v{__version__}" in actions.read_text(encoding="utf-8")
     health_text = health.read_text(encoding="utf-8")
-    assert "Project Health Summary v1.6" in health_text
+    assert f"Project Health Summary v{__version__}" in health_text
     assert "Manuscript QA" in health_text
 
 

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from paper_workbench import __version__
 from paper_workbench.auditlog import append_audit_event, clear_audit_log, default_audit_log_path, load_audit_events
 from paper_workbench.backups import create_backup, list_backups, plan_restore, restore_backup
 from paper_workbench.integrity import check_workspace_integrity, is_path_within, workspace_integrity_report
@@ -89,7 +90,7 @@ def test_integrity_detects_path_escape_and_writes_report(tmp_path):
     )
     assert any(finding.code == "path_escapes_workspace" for finding in result.findings)
     report = workspace_integrity_report(result)
-    assert "Workspace Integrity Report v0.9" in report
+    assert f"Workspace Integrity Report v{__version__}" in report
     assert "path_escapes_workspace" in report
 
 
@@ -308,7 +309,7 @@ def test_cli_integrity_backup_migration_and_audit_log_smoke(tmp_path):
     inspect_out = tmp_path / "backup_manifest.md"
     inspect = run_cli("backup", "inspect", backup_id, "--backups-dir", str(tmp_path / "backups"), "--out", str(inspect_out))
     assert inspect.returncode == 0, inspect.stderr
-    assert "Backup Manifest Demo v0.9" in inspect_out.read_text(encoding="utf-8")
+    assert f"Backup Manifest Demo v{__version__}" in inspect_out.read_text(encoding="utf-8")
 
     restore_out = tmp_path / "restore.md"
     restore = run_cli("backup", "restore", backup_id, "--backups-dir", str(tmp_path / "backups"), "--dry-run", "--out", str(restore_out))
@@ -319,7 +320,7 @@ def test_cli_integrity_backup_migration_and_audit_log_smoke(tmp_path):
     migration_out = tmp_path / "migration.md"
     migration = run_cli("migrate", "run", "--root", str(tmp_path), "--to-project", "cli_migrated", "--dry-run", "--out", str(migration_out))
     assert migration.returncode == 0, migration.stderr
-    assert "Migration Plan v0.9" in migration_out.read_text(encoding="utf-8")
+    assert f"Migration Plan v{__version__}" in migration_out.read_text(encoding="utf-8")
 
     audit_path = tmp_path / "audit.jsonl"
     write_text(audit_path, json.dumps({"timestamp": "now", "project": "", "action": "unit", "summary": "ok"}) + "\n")

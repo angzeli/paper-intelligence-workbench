@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from conftest import ROOT
+from paper_workbench import __version__
 from paper_workbench.authoring import writing_packet_report
 from paper_workbench.claim_lifecycle import (
     ClaimLifecycleRecord,
@@ -80,7 +81,7 @@ def test_claim_status_defaults_and_queue_prioritization() -> None:
     assert queue[0].claim_id == "paper_a:c1"
     assert queue[0].priority == "high"
     assert "evidence location" in "; ".join(queue[0].reasons)
-    assert "Claim Review Queue v2.2" in claim_review_queue_report(queue, project="demo")
+    assert f"Claim Review Queue v{__version__}" in claim_review_queue_report(queue, project="demo")
 
 
 def test_mark_verified_and_deprecated_sidecar_round_trip(tmp_path: Path) -> None:

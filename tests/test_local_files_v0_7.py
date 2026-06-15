@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from conftest import EXAMPLE_REGISTRY
+from paper_workbench import __version__
 import paper_workbench.files as files_module
 from paper_workbench.files import (
     duplicate_files_report,
@@ -104,10 +105,10 @@ def test_file_registry_save_load_and_reports(tmp_path):
 
     assert len(loaded) == len(result.records)
     assert loaded[0].sha256
-    assert "Local Files Audit v0.7" in local_files_audit_report(result)
-    assert "Duplicate Files v0.7" in duplicate_files_report(result)
+    assert f"Local Files Audit v{__version__}" in local_files_audit_report(result)
+    assert f"Duplicate Files v{__version__}" in duplicate_files_report(result)
     assert "paper_alpha: papers/missing_alpha.pdf" in missing_files_report(result)
-    assert "Text Sidecars v0.7" in text_sidecars_report(result)
+    assert f"Text Sidecars v{__version__}" in text_sidecars_report(result)
 
 
 def test_file_audit_reconciles_existing_file_registry_records(tmp_path):
@@ -299,8 +300,9 @@ def test_cli_files_scan_status_audit_hash_and_sidecars(tmp_path):
 
     audit = run_cli("files", "audit", "--registry", str(registry), "--scan-dir", str(root / "text"), "--reports-dir", str(reports_dir), "--force")
     assert audit.returncode == 0, audit.stderr
-    assert (reports_dir / "local_files_audit_v0_7.md").exists()
-    assert (reports_dir / "text_sidecars_v0_7.md").exists()
+    version_slug = __version__.replace(".", "_")
+    assert (reports_dir / f"local_files_audit_v{version_slug}.md").exists()
+    assert (reports_dir / f"text_sidecars_v{version_slug}.md").exists()
 
     hashed = run_cli("files", "hash", str(root / "text" / "paper_alpha.txt"))
     assert hashed.returncode == 0
@@ -310,7 +312,7 @@ def test_cli_files_scan_status_audit_hash_and_sidecars(tmp_path):
 def test_cli_files_audit_preflights_all_outputs_before_writing(tmp_path):
     root, registry, _files_csv = make_file_workspace(tmp_path)
     reports_dir = root / "reports"
-    protected = reports_dir / "duplicate_files_v0_7.md"
+    protected = reports_dir / f"duplicate_files_v{__version__.replace('.', '_')}.md"
     protected.write_text("existing duplicate report\n", encoding="utf-8")
 
     audit = run_cli("files", "audit", "--registry", str(registry), "--scan-dir", str(root / "text"), "--reports-dir", str(reports_dir))
@@ -318,7 +320,7 @@ def test_cli_files_audit_preflights_all_outputs_before_writing(tmp_path):
     assert audit.returncode == 2
     assert "already exists" in audit.stderr
     assert protected.read_text(encoding="utf-8") == "existing duplicate report\n"
-    assert not (reports_dir / "local_files_audit_v0_7.md").exists()
+    assert not (reports_dir / f"local_files_audit_v{__version__.replace('.', '_')}.md").exists()
 
 
 def test_cli_files_help_smoke():

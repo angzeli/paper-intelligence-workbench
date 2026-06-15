@@ -91,6 +91,48 @@ def test_workflow_dry_run_does_not_write_step_outputs(tmp_path: Path) -> None:
     assert not (project / "reports" / "workflow_daily_check_dashboard.md").exists()
 
 
+def test_workflow_run_writes_opt_in_creates_guarded_backup(tmp_path: Path) -> None:
+    create_dogfood_project("generic", "demo_review", root=tmp_path)
+    report = tmp_path / "pre_backup_workflow.md"
+
+    dry = run_cli(
+        "workflow",
+        "run",
+        "pre_backup_check",
+        "--project",
+        "demo_review",
+        "--root",
+        str(tmp_path),
+        "--dry-run",
+        "--out",
+        str(tmp_path / "pre_backup_dry.md"),
+        "--force",
+    )
+    assert dry.returncode == 0, dry.stderr
+    assert "Dry run: true" in dry.stdout
+    backups_dir = tmp_path / "projects" / "demo_review" / "backups"
+    assert not list(backups_dir.glob("*/manifest.json"))
+
+    write = run_cli(
+        "workflow",
+        "run",
+        "pre_backup_check",
+        "--project",
+        "demo_review",
+        "--root",
+        str(tmp_path),
+        "--run-writes",
+        "--out",
+        str(report),
+        "--force",
+    )
+
+    assert write.returncode == 0, write.stderr
+    assert "Dry run: false" in write.stdout
+    assert report.exists()
+    assert list(backups_dir.glob("*/manifest.json"))
+
+
 def test_workflow_run_report_generation(tmp_path: Path) -> None:
     create_dogfood_project("generic", "demo_review", root=tmp_path)
     run = run_workflow(builtin_recipes()["daily_check"], project="demo_review", root=tmp_path, dry_run=True)
@@ -101,6 +143,15 @@ def test_workflow_run_report_generation(tmp_path: Path) -> None:
     assert "Workflow Run" in content
     assert "does not execute shell commands" in content
     assert "daily_check" in content
+
+
+def test_workflow_run_report_includes_project_description(tmp_path: Path) -> None:
+    create_dogfood_project("generic", "demo_review", root=tmp_path)
+
+    content = workflow_run_report(run_workflow(builtin_recipes()["daily_check"], project="demo_review", root=tmp_path, dry_run=True))
+
+    assert "Project note:" in content
+    assert "Generic Literature Review" in content
 
 
 def test_project_specific_recipe_loading(tmp_path: Path) -> None:
