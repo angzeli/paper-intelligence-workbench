@@ -386,10 +386,10 @@ def analyze_graph(graph: EvidenceGraph) -> GraphAnalytics:
         if connectivity.is_review_heavy:
             analytics.review_paper_heavy_themes.append(connectivity.theme_id)
     analytics.theme_connectivity.sort(key=lambda item: (item.is_weak is False, item.paper_count, item.claim_count, item.theme_id))
-    central = [(node_id, node.label, graph.degree(node_id)) for node_id, node in paper_nodes.items()]
+    central = [(str(node.metadata.get("paper_id", "") or node_id.removeprefix(f"{PAPER}:")), node.label, graph.degree(node_id)) for node_id, node in paper_nodes.items()]
     analytics.central_papers = [
-        (node_id.removeprefix(f"{PAPER}:"), label, degree)
-        for node_id, label, degree in sorted(central, key=lambda item: (-item[2], item[1], item[0]))
+        (paper_id, label, degree)
+        for paper_id, label, degree in sorted(central, key=lambda item: (-item[2], item[1], item[0]))
     ]
     return analytics
 
