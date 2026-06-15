@@ -16,7 +16,7 @@ def test_package_metadata_matches_import_version_and_cli_entrypoint():
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert f'version = "{__version__}"' in content
-    assert __version__ == "2.2"
+    assert __version__ == "2.3"
     assert 'requires-python = ">=3.10"' in content
     assert "dependencies = []" in content
     assert 'paperwb = "paper_workbench.cli:main"' in content
@@ -41,6 +41,10 @@ def test_release_docs_site_and_matrices_exist():
         "docs/authoring-workbench.md",
         "docs/local-files.md",
         "docs/safety-and-boundaries.md",
+        "docs/WORKFLOW_RUNNER.md",
+        "docs/REPORT_RECIPES.md",
+        "docs/BUILT_IN_WORKFLOWS.md",
+        "docs/WORKFLOW_SAFETY.md",
         "docs/SITE_MAP.md",
         "docs/EXTERNAL_USER_QUICKSTART.md",
         "docs/TEST_MATRIX.md",
@@ -195,4 +199,4 @@ def test_v2_stable_surface_uses_current_line_for_experimental_graph():
     content = (ROOT / "docs" / "STABLE_SURFACE_V2.md").read_text(encoding="utf-8")
 
     assert "experimental in v2.1" not in content
-    assert "`graph`, `claim-review`, and `contradictions` remain experimental in the v2" in content
+    assert "`graph`, `claim-review`, `contradictions`, and `workflow` remain experimental" in content

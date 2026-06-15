@@ -41,6 +41,7 @@ def test_major_cli_help_contracts_are_available():
         (("backup", "--help"), "{create,list,inspect"),
         (("migrate", "--help"), "{plan,run}"),
         (("graph", "--help"), "{build,summary,export}"),
+        (("workflow", "--help"), "{list,show,run,validate}"),
         (("synthetic", "--help"), "{generate}"),
     ]
 
