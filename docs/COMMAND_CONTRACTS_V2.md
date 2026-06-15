@@ -14,6 +14,9 @@ documents command behavior, not internal implementation details.
 - Normal bad input should return a user-facing error, not a Python traceback.
 - Report, export, note-template, backup, migration, and sync outputs must not
   overwrite user files without explicit force flags.
+- Validation and audit commands default to review mode: they print findings and
+  complete successfully unless the command itself fails. Use `--strict` in CI or
+  release checks when error-level findings should return non-zero.
 
 ## Command Map
 
@@ -54,6 +57,8 @@ documents command behavior, not internal implementation details.
 ## Exit Codes
 
 - `0`: command completed. Warnings may still indicate incomplete local data.
+- `0` with printed `ERROR` findings: validation completed in non-strict review
+  mode. Re-run with `--strict` when error-level findings should fail a script.
 - `1`: release script or smoke workflow failure.
 - `2`: user-facing error such as missing input, invalid option, overwrite
   refusal, missing project, unsafe path, or invalid backup.

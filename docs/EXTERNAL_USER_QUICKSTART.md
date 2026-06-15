@@ -23,19 +23,21 @@ paperwb init --root scratch/first_workspace
 
 This creates local folders without overwriting existing user files.
 
-## 3. Validate Example Data
+## 3. Validate A Clean Synthetic Project
 
 ```bash
-paperwb validate-registry data/registries/example_papers.csv
-paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv
+paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
+paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
 ```
 
-The synthetic examples intentionally contain validation findings.
+Use `--strict` when a validation error should fail a script or CI job. The
+legacy `data/` examples intentionally contain validation findings and are useful
+for seeing what audits catch.
 
 ## 4. Generate A Note Template
 
 ```bash
-paperwb note-template synth_charge_2024 --registry data/registries/example_papers.csv --output scratch/synth_charge_2024_note.md --force
+paperwb note-template zis_charge_2025 --project zis_photocatalysis --output scratch/zis_charge_2025_note.md --force
 ```
 
 Edit copied templates with your own verified notes. Do not fabricate claims.
@@ -43,7 +45,7 @@ Edit copied templates with your own verified notes. Do not fabricate claims.
 ## 5. Extract Claims
 
 ```bash
-paperwb claims data/notes --output scratch/example_claims.csv
+paperwb claims --project zis_photocatalysis --output scratch/zis_claims.csv --force
 ```
 
 Claims are extracted from structured note fields only.
@@ -51,8 +53,8 @@ Claims are extracted from structured note fields only.
 ## 6. Generate Evidence And Citation Reports
 
 ```bash
-paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/evidence_map.md --force
-paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/citation_audit.md --force
+paperwb report evidence-map --project zis_photocatalysis --out scratch/zis_evidence_map.md --force
+paperwb report citation-audit --project zis_photocatalysis --out scratch/zis_citation_audit.md --force
 ```
 
 Use these reports to find missing notes, weak claims, and incomplete citation links.

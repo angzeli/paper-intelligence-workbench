@@ -65,8 +65,12 @@ def test_v2_release_reports_are_current_and_sanitized() -> None:
 
     index = (ROOT / "reports" / "index.md").read_text(encoding="utf-8")
     assert "## Current v2.0 Release Reports" in index
-    assert "[release_readiness_v2_0_rc.md]" in index
-    assert "[final_release_verdict_v2_0_rc.md]" in index
+    current_section = index.split("## Current v2.0 Release Reports", 1)[1]
+    current_section = current_section.split("## Next Patch Plan", 1)[0]
+    current_section = current_section.split("## Historical Versioned Reports", 1)[0]
+    assert "[release_readiness_v2_0.md]" in current_section
+    assert "[release_readiness_v2_0_rc.md]" not in current_section
+    assert "[final_release_verdict_v2_0_rc.md]" not in current_section
 
 
 def test_v2_stable_command_help_contracts() -> None:

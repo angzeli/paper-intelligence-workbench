@@ -25,7 +25,7 @@ If dependency installation is not available, run the CLI from the repository roo
 
 ```bash
 python -m paper_workbench.cli --help
-python -m paper_workbench.cli validate-registry data/registries/example_papers.csv
+python -m paper_workbench.cli validate-registry projects/zis_photocatalysis/registry.csv --strict
 ```
 
 ## Verify The Install

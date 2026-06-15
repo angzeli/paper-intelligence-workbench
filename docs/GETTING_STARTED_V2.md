@@ -46,11 +46,25 @@ planning report without copying files or writing registry rows:
 paperwb dogfood plan-from-files photocatalysis --project fyp_zis_lit_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
 ```
 
-## Try Synthetic Examples
+## Try A Clean Synthetic Project
+
+Use `--strict` when you want validation commands to return non-zero for
+error-level findings.
 
 ```bash
-paperwb validate-registry data/registries/example_papers.csv
-paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv
+paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
+paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
+paperwb claims --project zis_photocatalysis --output scratch/zis_claims.csv --force
+paperwb report evidence-map --project zis_photocatalysis --out scratch/zis_evidence_map.md --force
+paperwb report citation-audit --project zis_photocatalysis --out scratch/zis_citation_audit.md --force
+```
+
+## Try Legacy Audit Fixtures
+
+The legacy `data/` fixtures intentionally contain duplicate and incomplete
+synthetic records so audit reports have findings to show.
+
+```bash
 paperwb claims data/notes --output scratch/example_claims.csv
 paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/evidence_map.md --force
 paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/citation_audit.md --force

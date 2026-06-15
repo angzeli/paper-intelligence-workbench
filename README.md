@@ -96,16 +96,16 @@ paperwb dogfood status --project fyp_zis_lit_review
 paperwb dogfood checklist --project fyp_zis_lit_review
 ```
 
-Validate the synthetic example registry:
+Validate a clean bundled project registry:
 
 ```bash
-paperwb validate-registry data/registries/example_papers.csv
+paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
 ```
 
-Validate the synthetic example BibTeX library:
+Validate its synthetic BibTeX library:
 
 ```bash
-paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv
+paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
 ```
 
 Extract claims from notes:
@@ -227,8 +227,8 @@ paperwb init
 paperwb template list
 paperwb template create photocatalysis --project my_review
 paperwb project validate my_review
-paperwb validate-registry data/registries/example_papers.csv
-paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv
+paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
+paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
 paperwb list
 paperwb note-template PAPER_ID
 paperwb claims data/notes/

@@ -1,0 +1,230 @@
+{
+  "themes": [
+    {
+      "theme_id": "metal-sulfide-photocatalysts",
+      "name": "Metal sulfide photocatalysts",
+      "tags": [
+        "metal-sulfide",
+        "photocatalyst"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "znin2s4-structure-phases",
+      "name": "ZnIn2S4 structure and phases",
+      "tags": [
+        "znin2s4",
+        "structure",
+        "phase"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "precursor-chemistry",
+      "name": "Precursor chemistry",
+      "tags": [
+        "precursor",
+        "chemistry",
+        "synthesis"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "xanthate-derived-thin-films",
+      "name": "Xanthate-derived thin films",
+      "tags": [
+        "xanthate",
+        "thin-film",
+        "precursor"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "thin-film-fabrication",
+      "name": "Thin-film fabrication",
+      "tags": [
+        "thin-film",
+        "fabrication",
+        "deposition"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "film-morphology",
+      "name": "Film morphology",
+      "tags": [
+        "morphology",
+        "sem",
+        "surface"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "charge-separation",
+      "name": "Charge separation",
+      "tags": [
+        "charge-separation",
+        "photocarrier",
+        "interface"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "heterojunctions",
+      "name": "Heterojunctions",
+      "tags": [
+        "heterojunction",
+        "band-alignment",
+        "interface"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "cocatalysts",
+      "name": "Cocatalysts",
+      "tags": [
+        "cocatalyst",
+        "surface-active-site",
+        "loading"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "co-pi-coox",
+      "name": "Co-Pi and CoOx",
+      "tags": [
+        "co-pi",
+        "coox",
+        "cobalt-cocatalyst"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "photocorrosion-stability",
+      "name": "Photocorrosion and stability",
+      "tags": [
+        "photocorrosion",
+        "stability",
+        "degradation"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "co2-adsorption-activation",
+      "name": "CO2 adsorption and activation",
+      "tags": [
+        "co2",
+        "adsorption",
+        "activation"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "co2-reduction-products",
+      "name": "CO2 reduction products",
+      "tags": [
+        "co2-reduction",
+        "products",
+        "co2rr"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "selectivity",
+      "name": "Selectivity",
+      "tags": [
+        "selectivity",
+        "product-distribution"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "sacrificial-agents",
+      "name": "Sacrificial agents",
+      "tags": [
+        "sacrificial-agent",
+        "hole-scavenger"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "reactor-configuration",
+      "name": "Reactor configuration",
+      "tags": [
+        "reactor",
+        "cell-design",
+        "mass-transfer"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "characterization-methods",
+      "name": "Characterization methods",
+      "tags": [
+        "xps",
+        "xrd",
+        "spectroscopy",
+        "microscopy"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "quantum-efficiency",
+      "name": "Quantum efficiency",
+      "tags": [
+        "quantum-efficiency",
+        "aqe",
+        "conversion-efficiency"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    },
+    {
+      "theme_id": "limitations-controls",
+      "name": "Limitations and controls",
+      "tags": [
+        "limitations",
+        "control-experiment",
+        "reproducibility"
+      ],
+      "min_claims": 2,
+      "min_papers": 3,
+      "description": "Empty FYP dogfooding theme. Add only user-verified papers and user-written claims."
+    }
+  ]
+}

@@ -25,37 +25,43 @@ No copyrighted PDFs are included.
 
 ## 3. Run the Safe First Workflow
 
+Start with the clean bundled project profile. Use `--strict` when validation
+errors should make a script fail.
+
 Validate the registry:
 
 ```bash
-paperwb validate-registry data/registries/example_papers.csv
+paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
 ```
 
 Validate BibTeX against the registry:
 
 ```bash
-paperwb validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv
+paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
 ```
 
 Extract claims from structured notes:
 
 ```bash
-paperwb claims data/notes --output scratch/paperwb_example_claims.csv
+paperwb claims --project zis_photocatalysis --output scratch/paperwb_zis_claims.csv --force
 ```
 
 Generate a temporary evidence map:
 
 ```bash
-paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_evidence_map.md --force
+paperwb report evidence-map --project zis_photocatalysis --out scratch/paperwb_zis_evidence_map.md --force
 ```
 
 Generate a temporary citation audit:
 
 ```bash
-paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/paperwb_citation_audit.md --force
+paperwb report citation-audit --project zis_photocatalysis --out scratch/paperwb_zis_citation_audit.md --force
 ```
 
 The `--force` flag is required only when replacing an existing report or export file.
+
+The legacy `data/` fixtures are also synthetic, but they intentionally contain
+duplicates and incomplete entries so audit commands have findings to show.
 
 ## 4. Try a Project Profile
 

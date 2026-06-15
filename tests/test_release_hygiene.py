@@ -89,15 +89,75 @@ def test_checked_in_report_index_matches_latest_generated_reports():
 
     assert content == generated
     assert "## Current v2.0 Release Reports" in content
-    assert "[release_notes_v2_0_rc.md]" in content
-    assert "[release_readiness_v2_0_rc.md]" in content
     current_section = content.split("## Current v2.0 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
     assert "[hostile_review_latest.md]" in current_section
-    assert "[release_notes_v2_0_rc.md]" in current_section
-    assert "[release_readiness_v2_0_rc.md]" in current_section
-    assert "[final_release_verdict_v2_0_rc.md]" in current_section
+    assert "[release_readiness_v2_0.md]" in current_section
+    assert "[dogfooding_project_template_v2_0.md]" in current_section
+    assert "[release_notes_v2_0_rc.md]" not in current_section
+    assert "[release_readiness_v2_0_rc.md]" not in current_section
+    historical_section = content.split("## Historical Versioned Reports", 1)[1]
+    assert "[release_notes_v2_0_rc.md]" in historical_section
+    assert "[release_readiness_v2_0_rc.md]" in historical_section
+
+
+def test_public_quickstarts_use_clean_strict_validation_examples():
+    docs = [
+        ROOT / "README.md",
+        ROOT / "docs" / "GETTING_STARTED_V2.md",
+        ROOT / "docs" / "EXTERNAL_USER_QUICKSTART.md",
+        ROOT / "docs" / "QUICKSTART_EXTERNAL_USER.md",
+    ]
+    for path in docs:
+        content = path.read_text(encoding="utf-8")
+        assert "validate-registry projects/zis_photocatalysis/registry.csv --strict" in content
+        assert (
+            "validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict"
+            in content
+        )
+
+
+def test_command_contracts_document_non_strict_validation_exit_behavior():
+    content = (ROOT / "docs" / "COMMAND_CONTRACTS_V2.md").read_text(encoding="utf-8")
+
+    assert "Validation and audit commands default to review mode" in content
+    assert "Use `--strict` in CI" in content
+    assert "`0` with printed `ERROR` findings" in content
+
+
+def test_manifest_includes_public_docs_examples_and_fixtures():
+    manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
+
+    for required in [
+        "include AGENTS.md",
+        "include CHANGELOG.md",
+        "include CONTRIBUTING.md",
+        "graft data",
+        "graft docs",
+        "graft drafts",
+        "graft examples",
+        "graft notebooks",
+        "graft projects",
+        "graft reports",
+        "graft scripts",
+        "graft tests/fixtures",
+        "include tests/conftest.py",
+    ]:
+        assert required in manifest
+    for excluded in [
+        "prune .paperwb",
+        "prune build",
+        "prune dist",
+        "prune scratch",
+        "recursive-exclude projects */.paperwb/*",
+        "global-exclude audit_log.jsonl",
+        "global-exclude *.pdf",
+        "global-exclude *.sqlite",
+        "global-exclude *.db",
+        "exclude reports/hostile_review_v0_*.md",
+    ]:
+        assert excluded in manifest
 
 
 def test_local_build_artifacts_do_not_claim_stale_versions():

@@ -491,6 +491,10 @@ def _report_version(path: Path) -> tuple[int, int] | None:
     return (int(match.group(1)), int(match.group(2))) if match else None
 
 
+def _is_release_candidate_report(path: Path) -> bool:
+    return re.search(r"_rc(?:_|$)", path.stem) is not None
+
+
 def _format_report_version(version: tuple[int, int]) -> str:
     return f"v{version[0]}.{version[1]}"
 
@@ -530,6 +534,12 @@ def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | 
     )
     link_base = Path(output_path).parent if output_path is not None else root
     latest_release = _latest_release_version(reports)
+    has_final_reports_for_latest = latest_release is not None and any(
+        _report_version(report) == latest_release
+        and not _is_release_candidate_report(report)
+        and "recommended_patch_plan" not in report.name
+        for report in reports
+    )
     current: list[Path] = []
     next_plans: list[Path] = []
     historical: list[Path] = []
@@ -539,7 +549,12 @@ def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | 
         if (
             report.name == "hostile_review_latest.md"
             or _is_current_unversioned_report(report, latest_release)
-            or (latest_release is not None and version == latest_release and "recommended_patch_plan" not in report.name)
+            or (
+                latest_release is not None
+                and version == latest_release
+                and "recommended_patch_plan" not in report.name
+                and (not has_final_reports_for_latest or not _is_release_candidate_report(report))
+            )
         ):
             current.append(report)
         elif latest_release is not None and "recommended_patch_plan" in report.name and version is not None and version > latest_release:

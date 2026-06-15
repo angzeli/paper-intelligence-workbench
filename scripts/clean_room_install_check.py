@@ -52,10 +52,20 @@ def build_steps(tmp: Path, *, quick: bool = False) -> list[CheckStep]:
         CheckStep("initialize temp workspace", _paperwb("init", "--root", str(workspace)), ROOT),
         CheckStep("create temp project", _paperwb("project", "init", "rc_demo", "--description", "Synthetic RC demo"), workspace),
         CheckStep("list temp projects", _paperwb("project", "list"), workspace),
-        CheckStep("validate example registry", _paperwb("validate-registry", "data/registries/example_papers.csv"), ROOT),
         CheckStep(
-            "validate example BibTeX",
-            _paperwb("validate-bib", "data/bibtex/example_library.bib", "--registry", "data/registries/example_papers.csv"),
+            "validate registry",
+            _paperwb("validate-registry", "projects/zis_photocatalysis/registry.csv", "--strict"),
+            ROOT,
+        ),
+        CheckStep(
+            "validate BibTeX",
+            _paperwb(
+                "validate-bib",
+                "projects/zis_photocatalysis/bibtex/library.bib",
+                "--registry",
+                "projects/zis_photocatalysis/registry.csv",
+                "--strict",
+            ),
             ROOT,
         ),
     ]

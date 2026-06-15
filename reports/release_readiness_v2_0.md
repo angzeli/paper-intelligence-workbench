@@ -27,17 +27,25 @@ Ready for local dogfooding after validation.
 - Existing `template`, `project`, validation, report, dashboard, and import/export commands are preserved.
 - Existing template creation remains non-destructive.
 - Dogfood project creation refuses existing project paths.
+- Public quickstarts now use clean project-profile validation examples with
+  `--strict`; legacy `data/` fixtures remain intentionally imperfect audit
+  examples.
+- Source distributions include public docs, synthetic examples, reports,
+  scripts, notebooks, fixtures, and project profiles needed to reproduce the
+  documented clone-based workflows.
 
-## Validation Required
+## Validation Run
 
-- `pytest`
+- `pytest -p no:cacheprovider`
 - package import
 - `paperwb --help`
 - `paperwb dogfood --help`
+- clean project registry validation with `--strict`
+- clean project BibTeX validation with `--strict`
 - dogfood project creation in a temporary workspace
 - empty dogfood status and checklist
 - synthetic metadata-backed planning report
-- registry and BibTeX validation on the generated empty project
+- source distribution content contract
 
 ## Known Limitations
 
@@ -45,6 +53,8 @@ Ready for local dogfooding after validation.
 - It does not infer metadata from PDFs.
 - It does not select papers semantically.
 - The user must manually verify every registry row and claim.
+- Validation commands remain in review mode by default. Use `--strict` when
+  error-level findings should fail a script or CI job.
 
 ## Release Boundary
 
