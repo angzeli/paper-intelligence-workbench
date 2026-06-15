@@ -52,6 +52,7 @@ documents command behavior, not internal implementation details.
 | `migrate` | Legacy-to-project | legacy data | plan/copy report | plan/dry-run first; copy-only | experimental | migration tests |
 | `rules` | Declarative checks | JSON rules | findings/report | read-only except report | experimental | rule tests |
 | `dashboard` | Summary | project/workspace | stdout/Markdown | read-only except `--out` | stable | dashboard tests |
+| `workflow` | Declarative recipes | built-in/project JSON recipes | run/validation reports | dry-run supported; no shell/Python execution; no overwrite without force | experimental | workflow tests |
 | `graph` | Evidence graph | project registry/BibTeX/notes/themes | stdout/Markdown/JSON/DOT | read-only except `--out` | experimental | graph tests |
 | `claim-review` | Claim lifecycle review | parsed claims + optional sidecar | queue/status reports | writes only lifecycle sidecar for `mark` | experimental | lifecycle tests |
 | `contradictions` | Manual tension groups | parsed claims + sidecar | group/report | writes only contradiction sidecar for create/add | experimental | lifecycle tests |

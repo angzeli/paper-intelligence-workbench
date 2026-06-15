@@ -14,6 +14,7 @@ Start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABL
 - Imports and exports local CSV, BibTeX, RIS, JSON, Markdown, Obsidian-style vaults, and backup bundles.
 - Provides local search, optional SQLite indexing, file audits, backup planning, migration checks, sync plans, and rule reports.
 - Tracks manual claim lifecycle state and contradiction/tension groups without auto-verifying claims.
+- Runs declarative local workflow recipes for repeatable validation, report, dashboard, manuscript QA, and backup-precheck routines.
 
 ## 🚫 What It Does Not Do
 
@@ -125,6 +126,14 @@ paperwb report citation-audit --registry data/registries/example_papers.csv --bi
 paperwb graph summary --project zis_photocatalysis --out scratch/evidence_graph_summary.md --force
 ```
 
+Run a repeatable workflow recipe:
+
+```bash
+paperwb workflow list
+paperwb workflow show daily_check
+paperwb workflow run daily_check --project zis_photocatalysis --dry-run --out scratch/daily_check.md --force
+```
+
 Run diagnostics and a section outline:
 
 ```bash
@@ -186,6 +195,7 @@ paperwb graph build --project zis_photocatalysis
 paperwb graph export --project zis_photocatalysis --format json --out scratch/evidence_graph.json --force
 
 # Writing and manuscript QA
+paperwb workflow run pre_writing_check --project zis_photocatalysis --theme photocorrosion --dry-run --out scratch/pre_writing_check.md --force
 paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/writing_packet.md --force
 paperwb manuscript qa drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_qa.md --force
 

@@ -88,3 +88,7 @@ Instructions for future agents working in this repository:
 - Do not auto-verify claims or decide scientific truth from claim lifecycle state.
 - Contradiction groups are user-managed or heuristic suggestions only; never present them as proven contradictions.
 - Preserve user claim review sidecars and do not silently overwrite lifecycle or contradiction state.
+- Workflow recipes must remain declarative local JSON only.
+- Do not execute arbitrary shell commands, subprocesses, or Python code from workflow recipe files.
+- Use dry-run first for workflow recipes that can write reports, rebuild indexes, or create backups.
+- Preserve user data when adding workflow steps; recipe runs must not silently overwrite outputs without an explicit force option.

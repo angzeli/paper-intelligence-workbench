@@ -2,6 +2,20 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v2.3 - Workflow Runner and Report Recipes
+
+- Promoted local package metadata to `2.3`.
+- Added `paperwb workflow list/show/run/validate` for declarative local
+  workflow recipes.
+- Added built-in recipes for daily checks, weekly review, pre-writing checks,
+  pre-manuscript checks, pre-backup checks, external-user demos, and release
+  candidate checks.
+- Added project-local workflow recipe examples under
+  `projects/zis_photocatalysis/workflows/`.
+- Kept workflow recipes local and safe: no arbitrary shell execution, no
+  arbitrary Python execution, no cloud APIs, no LLM APIs, and no silent output
+  overwrite without `--force`.
+
 ## v2.2 - Claim Lifecycle and Evidence Review
 
 - Promoted local package metadata to `2.2`.

@@ -30,6 +30,7 @@ command is stable unless the status below says so.
 | `paperwb claim-review queue/mark/verified/deprecated/used-in-drafts` | experimental | Track explicit claim review state in local sidecars without editing notes |
 | `paperwb contradictions create/add/report` | experimental | Manage manual contradiction/tension groups without deciding scientific truth |
 | `paperwb dashboard` | stable | Show a read-only terminal dashboard and optional Markdown report with local project health and next actions |
+| `paperwb workflow list/show/run/validate` | experimental | Run declarative local recipes with dry-run support and no shell or Python execution |
 | `paperwb reading queue/start/finish/status/review` | experimental | Manage local reading queues and session records without reading papers or fabricating notes |
 | `paperwb followups list/export/done` | experimental | Collect follow-up actions from notes/sessions and track completion outside source notes |
 | `paperwb doctor` | stable | Run workspace-health diagnostics |
@@ -75,6 +76,9 @@ No command groups are deprecated in v2.
   rule files are declarative JSON only.
 - `paperwb dashboard` is read-only except for optional `--out` report writes;
   use `--no-audit-log` when generating deterministic release-facing reports.
+- Workflow recipes are declarative JSON only. They can write reports, rebuild
+  indexes, or create backups through built-in steps, but they must not execute
+  shell commands or arbitrary Python code.
 - Restore and migration workflows default to planning or dry-run behavior unless
   `--force` is passed.
 - `paperwb reading start` preserves existing notes by default and requires

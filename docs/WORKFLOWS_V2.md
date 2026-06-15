@@ -73,6 +73,21 @@ paperwb backup restore BACKUP_ID --project PROJECT --dry-run
 For experimental commands, prefer dry-run, write outputs under `scratch/`, and
 review generated Markdown before applying changes.
 
+## Recipe Runner Workflow
+
+After you understand the individual commands, use the v2.3 workflow runner to
+repeat common checks:
+
+```bash
+paperwb workflow list
+paperwb workflow show daily_check
+paperwb workflow run daily_check --project PROJECT --dry-run
+paperwb workflow run pre_writing_check --project PROJECT --theme THEME --dry-run
+```
+
+Recipes are declarative JSON only. They call built-in local step types and do
+not execute shell commands or arbitrary Python code.
+
 ## Evidence Graph Workflow
 
 Use the graph workflow after registry rows, themes, and notes exist:

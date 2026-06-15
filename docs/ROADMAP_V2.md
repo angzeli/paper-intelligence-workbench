@@ -20,8 +20,25 @@
 - Dogfood the evidence graph on a real project before marking graph analytics stable.
 - Dogfood claim lifecycle review on real notes before marking lifecycle sidecar
   schema stable.
+- Dogfood workflow recipes on a real project before treating recipe schemas as
+  stable.
 - Consider a guided import-to-registry review command only after dogfooding proves
   the read-only planning report is not enough.
+
+## v2.3 Workflow Runner
+
+- Add declarative local workflow recipes for repeated validation and report
+  generation.
+- Keep recipes limited to built-in safe step types; do not allow shell or Python
+  execution from JSON.
+- Prefer dry-run before workflows that create reports, backups, or indexes.
+
+## Recommended v2.4 Scope
+
+- Consolidate recipe schema docs after dogfooding.
+- Add workflow examples for one real private project without committing private
+  metadata.
+- Improve report cleanup and archive guidance for historical generated reports.
 
 ## Not Worth Expanding Yet
 

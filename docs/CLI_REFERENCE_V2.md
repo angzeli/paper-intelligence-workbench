@@ -22,6 +22,7 @@ classifies command groups for the v2 release line.
 
 ## Experimental But Usable
 
+- `workflow`
 - `index`
 - `graph`
 - `claim-review`
@@ -65,6 +66,24 @@ with BibTeX keys and does not copy files, read PDF text, or write registry rows.
 Stable commands should produce user-facing errors and avoid Python tracebacks
 for normal bad input.
 
+## Workflow Runner Commands
+
+```bash
+paperwb workflow list
+paperwb workflow show daily_check
+paperwb workflow run daily_check --project zis_photocatalysis --dry-run
+paperwb workflow run pre_writing_check --project zis_photocatalysis --theme photocorrosion --dry-run
+paperwb workflow run pre_backup_check --project zis_photocatalysis --run-writes --force
+paperwb workflow validate projects/zis_photocatalysis/workflows/daily_check.json --strict
+```
+
+Workflow recipes are declarative JSON only. They can call built-in local steps
+such as validation, report generation, dashboard, rules, manuscript QA, and
+backup creation, but they cannot execute arbitrary shell or Python code. Use
+`--dry-run` before running recipes that write reports, backups, or indexes.
+Recipes that default to dry-run require `--run-writes` before those step writes
+are allowed from the CLI.
+
 ## Evidence Graph Commands
 
 ```bash
@@ -88,7 +107,7 @@ paperwb contradictions add contradiction_photocorrosion_1 PAPER_ID:c1 --project 
 paperwb contradictions report --project zis_photocatalysis --out scratch/contradictions.md --force
 ```
 
-The claim lifecycle commands are experimental in v2.2. They store explicit
+The claim lifecycle commands are experimental in the v2 line. They store explicit
 review state in local JSON sidecars and do not edit notes, registry rows, or
 claim CSV exports. Contradiction groups are user-managed review aids, not
 automatic truth judgments.
