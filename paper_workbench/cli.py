@@ -211,6 +211,18 @@ from .sync import (
 )
 from .tags import load_themes, normalize_tag, normalize_theme_id
 from .templates import create_project_from_template, inspect_template, list_templates, template_summary
+from .workflow import (
+    default_workflow_run_report_path,
+    find_workflow_recipe,
+    list_workflow_recipes,
+    run_workflow,
+    validate_workflow_recipe_file,
+    workflow_recipe_markdown,
+    workflow_recipe_summary,
+    workflow_run_report,
+    workflow_validation_markdown,
+    write_workflow_run_report,
+)
 
 
 def _path(value: str | Path) -> Path:
@@ -2441,6 +2453,63 @@ def cmd_migrate_run(args: argparse.Namespace) -> int:
     return 1 if plan.conflicts and args.strict else 0
 
 
+def cmd_workflow_list(args: argparse.Namespace) -> int:
+    recipes = list_workflow_recipes(args.project, root=args.root)
+    if not recipes:
+        print("No workflow recipes found.")
+        return 0
+    for recipe in recipes:
+        print(workflow_recipe_summary(recipe))
+    return 0
+
+
+def cmd_workflow_show(args: argparse.Namespace) -> int:
+    recipe = find_workflow_recipe(args.recipe, project=args.project, root=args.root)
+    print(workflow_recipe_markdown(recipe), end="")
+    return 0
+
+
+def cmd_workflow_validate(args: argparse.Namespace) -> int:
+    recipe, findings = validate_workflow_recipe_file(args.recipe)
+    content = workflow_validation_markdown(recipe, findings)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 1 if args.strict and any(finding.severity == "error" for finding in findings) else 0
+
+
+def cmd_workflow_run(args: argparse.Namespace) -> int:
+    recipe = find_workflow_recipe(args.recipe, project=args.project, root=args.root)
+    if args.dry_run and args.run_writes:
+        raise ValueError("use either --dry-run or --run-writes, not both")
+    dry_run = True if args.dry_run else False if args.run_writes else None
+    report_path = Path(args.out) if args.out else default_workflow_run_report_path(recipe, project=args.project, root=args.root)
+    if report_path.exists() and not args.force:
+        raise FileExistsError(f"{report_path} already exists")
+    run = run_workflow(
+        recipe,
+        project=args.project,
+        root=args.root,
+        dry_run=dry_run,
+        force=args.force,
+        theme=args.theme,
+        manuscript=args.manuscript,
+    )
+    path = write_workflow_run_report(run, report_path, force=args.force)
+    print(f"Wrote {path}")
+    print(f"Recipe: {recipe.recipe_id}")
+    print(f"Project: {run.project or recipe.project or 'default'}")
+    print(f"Dry run: {str(run.dry_run).lower()}")
+    print(f"Steps: {len(run.results)}")
+    print(f"Errors: {len(run.errors)}")
+    print(f"Warnings: {len(run.warnings)}")
+    if args.print_report:
+        print(workflow_run_report(run), end="")
+    return 1 if args.strict and run.errors else 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="paperwb",
@@ -2448,7 +2517,7 @@ def build_parser() -> argparse.ArgumentParser:
         epilog=(
             "Stable starting points: init, project, template, dogfood, validate-registry, "
             "validate-bib, note-template, claims, report, dashboard, doctor.\n"
-            "Experimental or safety-sensitive workflows: sync, index, files, draft, "
+            "Experimental or safety-sensitive workflows: workflow, sync, index, files, draft, "
             "manuscript, reading, backup, migrate, rules, graph, claim-review, "
             "contradictions. See docs/STABLE_SURFACE_V2.md and docs/CLI_REFERENCE_V2.md."
         ),
@@ -2514,6 +2583,40 @@ def build_parser() -> argparse.ArgumentParser:
     dogfood_plan.add_argument("--out", help="Optional Markdown output path.")
     dogfood_plan.add_argument("--force", action="store_true", help="Overwrite an existing output path.")
     dogfood_plan.set_defaults(func=cmd_dogfood_plan_from_files)
+
+    workflow_parser = subparsers.add_parser("workflow", help="List, validate, and run declarative local workflow recipes.")
+    workflow_sub = workflow_parser.add_subparsers(dest="workflow_command", required=True)
+    workflow_list = workflow_sub.add_parser("list", help="List built-in and optional project workflow recipes.")
+    workflow_list.add_argument("--project", default="", help="Also include project-local workflows from projects/<name>/workflows/.")
+    workflow_list.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+    workflow_list.set_defaults(func=cmd_workflow_list)
+
+    workflow_show = workflow_sub.add_parser("show", help="Show a built-in, project-local, or JSON workflow recipe.")
+    workflow_show.add_argument("recipe", help="Built-in recipe ID, project recipe ID, or JSON recipe path.")
+    workflow_show.add_argument("--project", default="", help="Project profile used to resolve project-local recipes.")
+    workflow_show.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+    workflow_show.set_defaults(func=cmd_workflow_show)
+
+    workflow_run = workflow_sub.add_parser("run", help="Run a declarative workflow recipe and write a workflow report.")
+    workflow_run.add_argument("recipe", help="Built-in recipe ID, project recipe ID, or JSON recipe path.")
+    workflow_run.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+    workflow_run.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+    workflow_run.add_argument("--dry-run", action="store_true", help="Plan every step without writing step outputs or backups.")
+    workflow_run.add_argument("--run-writes", action="store_true", help="Opt in to step writes for recipes that default to dry-run.")
+    workflow_run.add_argument("--force", action="store_true", help="Overwrite workflow and step report outputs when a step writes files.")
+    workflow_run.add_argument("--theme", default="", help="Theme supplied to recipe steps that declare `$theme`.")
+    workflow_run.add_argument("--manuscript", default="", help="Draft/manuscript path supplied to recipe steps that declare `$manuscript`.")
+    workflow_run.add_argument("--out", default="", help="Workflow run report path. Defaults to the selected project's reports directory.")
+    workflow_run.add_argument("--print-report", action="store_true", help="Also print the Markdown workflow report to stdout.")
+    workflow_run.add_argument("--strict", action="store_true", help="Return non-zero when workflow errors are found.")
+    workflow_run.set_defaults(func=cmd_workflow_run)
+
+    workflow_validate = workflow_sub.add_parser("validate", help="Validate a local workflow JSON file without running it.")
+    workflow_validate.add_argument("recipe", help="Workflow JSON path.")
+    workflow_validate.add_argument("--out", default="", help="Optional Markdown validation report path.")
+    workflow_validate.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    workflow_validate.add_argument("--strict", action="store_true", help="Return non-zero when recipe errors are found.")
+    workflow_validate.set_defaults(func=cmd_workflow_validate)
 
     validate_registry_parser = subparsers.add_parser("validate-registry", help="Validate a CSV paper registry.")
     validate_registry_parser.add_argument("registry", help="Registry CSV path.")

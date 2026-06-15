@@ -1,0 +1,35 @@
+{
+  "recipe_id": "zis_daily_check",
+  "name": "ZIS Daily Check",
+  "description": "Synthetic project-local daily check for registry, BibTeX, rules, and dashboard status.",
+  "project": "zis_photocatalysis",
+  "dry_run_default": false,
+  "safety_level": "writes_reports",
+  "outputs": {
+    "report": "reports/workflow_zis_daily_check_v2_3.md"
+  },
+  "steps": [
+    {
+      "step_id": "validate_registry",
+      "name": "Validate registry",
+      "step_type": "validate_registry"
+    },
+    {
+      "step_id": "validate_bibtex",
+      "name": "Validate BibTeX",
+      "step_type": "validate_bibtex"
+    },
+    {
+      "step_id": "rules",
+      "name": "Run rules",
+      "step_type": "run_rules",
+      "output": "reports/workflow_zis_daily_rules.md"
+    },
+    {
+      "step_id": "dashboard",
+      "name": "Generate dashboard",
+      "step_type": "run_dashboard",
+      "output": "reports/workflow_zis_daily_dashboard.md"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "recipe_id": "zis_pre_writing_check",
+  "name": "ZIS Pre-writing Check",
+  "description": "Synthetic project-local pre-writing workflow for evidence, citation, missing-evidence, and optional theme packet checks.",
+  "project": "zis_photocatalysis",
+  "dry_run_default": false,
+  "safety_level": "writes_reports",
+  "outputs": {
+    "report": "reports/workflow_zis_pre_writing_check_v2_3.md"
+  },
+  "steps": [
+    {
+      "step_id": "validate_registry",
+      "name": "Validate registry",
+      "step_type": "validate_registry"
+    },
+    {
+      "step_id": "validate_bibtex",
+      "name": "Validate BibTeX",
+      "step_type": "validate_bibtex"
+    },
+    {
+      "step_id": "evidence_map",
+      "name": "Generate evidence map",
+      "step_type": "generate_report",
+      "params": {
+        "report_type": "evidence-map"
+      },
+      "output": "reports/workflow_zis_pre_writing_evidence_map.md"
+    },
+    {
+      "step_id": "citation_audit",
+      "name": "Generate citation audit",
+      "step_type": "generate_report",
+      "params": {
+        "report_type": "citation-audit"
+      },
+      "output": "reports/workflow_zis_pre_writing_citation_audit.md"
+    },
+    {
+      "step_id": "missing_evidence",
+      "name": "Generate missing evidence",
+      "step_type": "generate_report",
+      "params": {
+        "report_type": "missing-evidence"
+      },
+      "output": "reports/workflow_zis_pre_writing_missing_evidence.md"
+    },
+    {
+      "step_id": "writing_packet",
+      "name": "Generate writing packet when a theme is supplied",
+      "step_type": "writing_packet",
+      "params": {
+        "theme": "$theme"
+      }
+    }
+  ]
+}
