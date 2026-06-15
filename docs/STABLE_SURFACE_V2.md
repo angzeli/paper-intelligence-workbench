@@ -42,6 +42,7 @@ Stable workflows organize local evidence. They do not fabricate metadata,
 claims, citations, summaries, quotes, or final prose. They do not evaluate
 scientific truth.
 
-`graph` is experimental in v2.1. It is read-only unless an explicit `--out`
-path is supplied, and its analytics are local connectivity checks rather than
-truth, quality, or impact scores.
+`graph`, `claim-review`, and `contradictions` remain experimental in the v2
+line. They are local and conservative; graph commands are read-only unless an
+explicit `--out` path is supplied, and their analytics are connectivity checks
+rather than truth, quality, or impact scores.

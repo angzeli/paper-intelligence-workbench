@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 from typing import Any, Iterable
 
+from . import __version__
 from .bibtex import parse_bibtex_file
 from .claim_lifecycle import ClaimLifecycleRecord, lifecycle_status_for_claim
 from .claims import collect_notes
@@ -48,6 +49,8 @@ HAS_EVIDENCE_LOCATION = "has_evidence_location"
 DERIVED_FROM_NOTE = "derived_from_note"
 HAS_FOLLOWUP = "has_followup"
 READ_IN_SESSION = "read_in_session"
+
+CURRENT_GRAPH_REPORT_LABEL = f"v{__version__}"
 
 
 @dataclass(slots=True)
@@ -437,7 +440,12 @@ def graph_to_dot(graph: EvidenceGraph) -> str:
     return "\n".join(lines) + "\n"
 
 
-def graph_summary_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | None = None, *, title: str = "Evidence Graph Summary v2.1") -> str:
+def graph_summary_markdown(
+    graph: EvidenceGraph,
+    analytics: GraphAnalytics | None = None,
+    *,
+    title: str = f"Evidence Graph Summary {CURRENT_GRAPH_REPORT_LABEL}",
+) -> str:
     analytics = analytics or analyze_graph(graph)
     node_counts = graph.node_counts()
     edge_counts = graph.edge_counts()
@@ -489,7 +497,12 @@ def graph_summary_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | Non
     return "\n".join(lines).rstrip() + "\n"
 
 
-def orphan_nodes_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | None = None, *, title: str = "Orphan Nodes v2.1") -> str:
+def orphan_nodes_markdown(
+    graph: EvidenceGraph,
+    analytics: GraphAnalytics | None = None,
+    *,
+    title: str = f"Orphan Nodes {CURRENT_GRAPH_REPORT_LABEL}",
+) -> str:
     analytics = analytics or analyze_graph(graph)
     lines = [
         f"# {title}",
@@ -507,7 +520,12 @@ def orphan_nodes_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | None
     return "\n".join(lines).rstrip() + "\n"
 
 
-def theme_connectivity_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | None = None, *, title: str = "Theme Connectivity v2.1") -> str:
+def theme_connectivity_markdown(
+    graph: EvidenceGraph,
+    analytics: GraphAnalytics | None = None,
+    *,
+    title: str = f"Theme Connectivity {CURRENT_GRAPH_REPORT_LABEL}",
+) -> str:
     analytics = analytics or analyze_graph(graph)
     return "\n".join(
         [
@@ -528,7 +546,12 @@ def theme_connectivity_markdown(graph: EvidenceGraph, analytics: GraphAnalytics 
     ).rstrip() + "\n"
 
 
-def central_papers_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | None = None, *, title: str = "Central Papers v2.1") -> str:
+def central_papers_markdown(
+    graph: EvidenceGraph,
+    analytics: GraphAnalytics | None = None,
+    *,
+    title: str = f"Central Papers {CURRENT_GRAPH_REPORT_LABEL}",
+) -> str:
     analytics = analytics or analyze_graph(graph)
     return "\n".join(
         [
@@ -541,7 +564,12 @@ def central_papers_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | No
     ).rstrip() + "\n"
 
 
-def graph_export_inventory_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | None = None, *, title: str = "Graph Export Inventory v2.1") -> str:
+def graph_export_inventory_markdown(
+    graph: EvidenceGraph,
+    analytics: GraphAnalytics | None = None,
+    *,
+    title: str = f"Graph Export Inventory {CURRENT_GRAPH_REPORT_LABEL}",
+) -> str:
     analytics = analytics or analyze_graph(graph)
     return "\n".join(
         [

@@ -2,7 +2,7 @@
 
 Reports directory: .
 
-Markdown reports indexed: 171
+Markdown reports indexed: 174
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
@@ -10,8 +10,11 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 
 - [claim_review_queue_v2_2.md](claim_review_queue_v2_2.md)
 - [claims_used_in_drafts_v2_2.md](claims_used_in_drafts_v2_2.md)
+- [cli_smoke_workflow_v2_2.md](cli_smoke_workflow_v2_2.md)
 - [contradictions_v2_2.md](contradictions_v2_2.md)
+- [data_safety_audit_v2_2.md](data_safety_audit_v2_2.md)
 - [deprecated_claims_v2_2.md](deprecated_claims_v2_2.md)
+- [evidence_graph_summary_v2_2.md](evidence_graph_summary_v2_2.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
 - [release_readiness_v2_2.md](release_readiness_v2_2.md)
 - [verified_claims_v2_2.md](verified_claims_v2_2.md)

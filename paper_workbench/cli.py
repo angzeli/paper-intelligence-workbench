@@ -2442,7 +2442,17 @@ def cmd_migrate_run(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="paperwb", description="Local-first academic paper registry, notes, claims, BibTeX, and audit workbench.")
+    parser = argparse.ArgumentParser(
+        prog="paperwb",
+        description="Local-first academic paper registry, notes, claims, BibTeX, and audit workbench.",
+        epilog=(
+            "Stable starting points: init, project, template, dogfood, validate-registry, "
+            "validate-bib, note-template, claims, report, dashboard, doctor.\n"
+            "Experimental or safety-sensitive workflows: sync, index, files, draft, "
+            "manuscript, reading, backup, migrate, rules, graph, claim-review, "
+            "contradictions. See docs/STABLE_SURFACE_V2.md and docs/CLI_REFERENCE_V2.md."
+        ),
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     init_parser = subparsers.add_parser("init", help="Create the local workbench folder structure.")

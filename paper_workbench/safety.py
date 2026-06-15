@@ -8,6 +8,8 @@ from pathlib import Path
 import re
 import subprocess
 
+from . import __version__
+
 
 FORBIDDEN_SUFFIXES = {".pdf", ".pyc", ".sqlite", ".db"}
 FORBIDDEN_PARTS = {".paperwb", ".pytest_cache", ".idea", ".ipynb_checkpoints", "__pycache__"}
@@ -27,6 +29,7 @@ SECRET_PATTERNS = [
 PUBLISHER_BYPASS_TERMS = ("sci-" + "hub",)
 PUBLIC_DEMO_PREFIX = "public/demos/"
 PUBLIC_DEMO_PDF_PATTERN = re.compile(r"\b[A-Za-z0-9][A-Za-z0-9_.-]*\.pdf\b", re.IGNORECASE)
+DEFAULT_DATA_SAFETY_TITLE = f"Data Safety Audit v{__version__}"
 
 
 @dataclass(slots=True)
@@ -171,7 +174,7 @@ def safety_audit_markdown(
     result: SafetyAuditResult,
     *,
     max_findings_per_code: int = 20,
-    title: str = "Data Safety Audit v0.10",
+    title: str = DEFAULT_DATA_SAFETY_TITLE,
 ) -> str:
     counts = Counter(finding.code for finding in result.findings)
     lines = [

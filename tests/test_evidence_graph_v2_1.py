@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from conftest import ROOT
+from paper_workbench import __version__
 from paper_workbench.dogfood import create_dogfood_project
 from paper_workbench.graph import (
     CLAIM,
@@ -112,6 +113,8 @@ def test_graph_summary_markdown_contains_boundaries() -> None:
     graph = _sample_graph()
     content = graph_summary_markdown(graph)
 
+    assert f"Evidence Graph Summary v{__version__}" in content
+    assert "v2.1" not in content
     assert "local evidence graph" in content
     assert "not a truth score" in content
     assert "Theme Connectivity" in content
@@ -135,7 +138,9 @@ def test_graph_cli_smoke_summary_and_exports(tmp_path: Path) -> None:
     assert summary_result.returncode == 0, summary_result.stderr
     assert json_result.returncode == 0, json_result.stderr
     assert dot_result.returncode == 0, dot_result.stderr
-    assert "Evidence Graph Summary" in summary.read_text(encoding="utf-8")
+    summary_content = summary.read_text(encoding="utf-8")
+    assert f"Evidence Graph Summary v{__version__}" in summary_content
+    assert "v2.1" not in summary_content
     assert json.loads(json_out.read_text(encoding="utf-8"))["project"] == "zis_photocatalysis"
     assert "digraph evidence_graph" in dot_out.read_text(encoding="utf-8")
 

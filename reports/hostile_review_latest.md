@@ -36,7 +36,7 @@ confuse external users even though the local workflows themselves are usable.
   command surface, including `graph`, `claim-review`, and `contradictions`.
 - `python -m pytest -q`: passed.
 - `python scripts/smoke_cli_workflow.py --quick`: 14 smoke steps, 0 failures.
-- `python scripts/data_safety_audit.py --strict --out /private/tmp/paperwb_data_safety_review.md`:
+- `python scripts/data_safety_audit.py --strict --out <temporary report path>`:
   checked 650 repository files, 0 errors, 7 warnings.
 - `python scripts/validate_notebooks.py`: validated 8 notebooks.
 - `python scripts/check_notebooks.py`: listed 8 notebook titles successfully.
@@ -167,7 +167,7 @@ presented to external users as stable.
 
 - Strict data-safety audit result: 0 errors, 7 warnings.
 - The 7 warnings are local absolute-path patterns in historical reports and
-  tests, including `/private/...` examples used by hygiene checks.
+  tests, including machine-local path examples used by hygiene checks.
 - No tracked PDFs, cache databases, backup archives, `.paperwb` logs, `.idea`
   files, or Python caches were found.
 - The public dogfood demo appears synthetic/public after the v2.0 cleanup, but

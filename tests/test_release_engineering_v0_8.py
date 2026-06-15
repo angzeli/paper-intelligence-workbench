@@ -95,7 +95,7 @@ def test_smoke_cli_workflow_quick_generates_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "CLI Smoke Workflow v2.0rc" in content
+    assert f"CLI Smoke Workflow v{__version__}" in content
     assert "Failures: 0" in content
     assert "validate registry" in content
     assert "dashboard next actions" in content
@@ -107,8 +107,27 @@ def test_data_safety_audit_script_generates_report(tmp_path):
 
     assert result.returncode == 0, result.stderr
     content = out.read_text(encoding="utf-8")
-    assert "Data Safety Audit v0.10" in content
+    assert f"Data Safety Audit v{__version__}" in content
     assert "Errors: 0" in content
+
+
+def test_data_safety_audit_default_writes_to_ignored_scratch(tmp_path):
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, text=True, capture_output=True)
+    (tmp_path / "README.md").write_text("# Synthetic fixture\n", encoding="utf-8")
+
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "data_safety_audit.py"), "--strict"],
+        cwd=tmp_path,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    scratch_report = tmp_path / "scratch" / "data_safety_audit.md"
+    assert scratch_report.exists()
+    assert not (tmp_path / "reports" / "data_safety_audit_v0_10.md").exists()
+    assert f"Data Safety Audit v{__version__}" in scratch_report.read_text(encoding="utf-8")
 
 
 def test_data_safety_audit_module_flags_forbidden_artifacts_without_failing_on_warnings():
@@ -117,7 +136,7 @@ def test_data_safety_audit_module_flags_forbidden_artifacts_without_failing_on_w
 
     assert result.files_checked > 0
     assert not result.errors
-    assert "Data Safety Audit v0.10" in markdown
+    assert f"Data Safety Audit v{__version__}" in markdown
 
 
 def test_data_safety_flags_real_metadata_in_public_demo_registry(tmp_path):
@@ -170,3 +189,10 @@ def test_ci_runs_v0_8_release_checks():
     assert "python scripts/data_safety_audit.py" in content
     assert "paperwb --help" in content
     assert "python -m build --sdist --wheel" in content
+
+
+def test_v2_stable_surface_uses_current_line_for_experimental_graph():
+    content = (ROOT / "docs" / "STABLE_SURFACE_V2.md").read_text(encoding="utf-8")
+
+    assert "experimental in v2.1" not in content
+    assert "`graph`, `claim-review`, and `contradictions` remain experimental in the v2" in content

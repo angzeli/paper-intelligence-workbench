@@ -17,6 +17,8 @@ def test_cli_help_smoke():
     result = run_cli("--help")
     assert result.returncode == 0
     assert "paperwb" in result.stdout
+    assert "Stable starting points" in result.stdout
+    assert "safety-sensitive workflows" in result.stdout
 
 
 def test_cli_validate_registry_smoke():

@@ -11,6 +11,12 @@ import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from paper_workbench import __version__
+
+DEFAULT_SMOKE_TITLE = f"CLI Smoke Workflow v{__version__}"
 
 
 @dataclass(slots=True)
@@ -149,7 +155,7 @@ def run_step(step: SmokeStep) -> SmokeResult:
     return SmokeResult(step.name, step.args, result.returncode, result.stdout, result.stderr)
 
 
-def report_markdown(results: list[SmokeResult], tmp: Path, *, title: str = "CLI Smoke Workflow v2.0rc") -> str:
+def report_markdown(results: list[SmokeResult], tmp: Path, *, title: str = DEFAULT_SMOKE_TITLE) -> str:
     lines = [
         f"# {title}",
         "",
@@ -184,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run a non-destructive Paper Workbench CLI smoke workflow.")
     parser.add_argument("--out", default="", help="Optional Markdown report path.")
     parser.add_argument("--quick", action="store_true", help="Run a shorter smoke set for unit tests.")
-    parser.add_argument("--title", default="CLI Smoke Workflow v2.0rc", help="Markdown report title.")
+    parser.add_argument("--title", default=DEFAULT_SMOKE_TITLE, help="Markdown report title.")
     args = parser.parse_args(argv)
 
     with tempfile.TemporaryDirectory(prefix="paperwb_smoke_") as tmp_name:
