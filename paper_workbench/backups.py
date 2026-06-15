@@ -310,7 +310,7 @@ def restore_backup(
 
 def backup_manifest_report(manifest: BackupManifest) -> str:
     lines = [
-        "# Backup Manifest Demo v0.9",
+        f"# Backup Manifest Demo v{__version__}",
         "",
         f"Backup ID: {manifest.backup_id}",
         f"Created at: {manifest.created_at}",
@@ -335,7 +335,7 @@ def backup_manifest_report(manifest: BackupManifest) -> str:
 
 def restore_plan_report(plan: RestorePlan) -> str:
     lines = [
-        "# Restore Dry Run v0.9",
+        f"# Restore Dry Run v{__version__}",
         "",
         f"Backup ID: {plan.backup_id}",
         f"Project: {plan.project or 'default data workflow'}",

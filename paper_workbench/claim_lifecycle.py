@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from . import __version__
 from .schema import Claim, Paper, ProjectTheme
 from .tags import normalize_tag, theme_by_tag
 
@@ -353,7 +354,7 @@ def suggest_tension_candidates(claims: list[Claim], themes: list[ProjectTheme]) 
     return suggestions
 
 
-def claim_review_queue_report(items: list[ClaimReviewItem], *, project: str = "default", title: str = "Claim Review Queue v2.2") -> str:
+def claim_review_queue_report(items: list[ClaimReviewItem], *, project: str = "default", title: str = f"Claim Review Queue v{__version__}") -> str:
     lines = [
         f"# {title}",
         "",
@@ -414,7 +415,7 @@ def claims_used_in_drafts_report(
     records: Mapping[str, ClaimLifecycleRecord],
     *,
     project: str = "default",
-    title: str = "Claims Used in Drafts v2.2",
+    title: str = f"Claims Used in Drafts v{__version__}",
 ) -> str:
     rows = [(claim, records.get(claim.claim_id)) for claim in claims if (records.get(claim.claim_id) and records[claim.claim_id].used_in_draft) or lifecycle_status_for_claim(claim, records) == "used_in_draft"]
     lines = [
@@ -446,7 +447,7 @@ def contradictions_report(
     themes: list[ProjectTheme],
     *,
     project: str = "default",
-    title: str = "Contradictions and Tensions v2.2",
+    title: str = f"Contradictions and Tensions v{__version__}",
 ) -> str:
     claim_by_id = {claim.claim_id: claim for claim in claims}
     suggestions = suggest_tension_candidates(claims, themes)

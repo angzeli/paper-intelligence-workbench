@@ -1,6 +1,6 @@
 # File Audit Reports
 
-The v0.7 file audit reports connect registry rows, local files, and text sidecars.
+File audit reports connect registry rows, local files, and text sidecars.
 
 ```bash
 paperwb files audit --project zis_photocatalysis --force
@@ -8,10 +8,10 @@ paperwb files audit --project zis_photocatalysis --force
 
 Generated reports:
 
-- `local_files_audit_v0_7.md`
-- `duplicate_files_v0_7.md`
-- `missing_files_v0_7.md`
-- `text_sidecars_v0_7.md`
+- `local_files_audit_v2_3.md`
+- `duplicate_files_v2_3.md`
+- `missing_files_v2_3.md`
+- `text_sidecars_v2_3.md`
 
 Reports include:
 

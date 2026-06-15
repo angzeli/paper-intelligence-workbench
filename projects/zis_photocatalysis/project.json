@@ -1,6 +1,6 @@
 {
   "name": "zis_photocatalysis",
-  "description": "Synthetic photocatalysis review profile for v0.2 workflow tests.",
+  "description": "Intentionally imperfect synthetic photocatalysis review profile for dogfooding evidence-gap, weak-claim, and citation-audit workflows.",
   "is_default": false,
   "registry_path": "registry.csv",
   "bibtex_path": "bibtex/library.bib",

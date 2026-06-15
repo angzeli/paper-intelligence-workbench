@@ -112,6 +112,7 @@ class WorkflowRun:
     project: str
     root: str
     dry_run: bool
+    project_description: str = ""
     results: list[WorkflowResult] = field(default_factory=list)
     output_paths: list[str] = field(default_factory=list)
 
@@ -377,12 +378,18 @@ def workflow_run_report(run: WorkflowRun) -> str:
         f"Root: `{_escape(run.root)}`",
         f"Dry run: `{str(run.dry_run).lower()}`",
         f"Safety level: `{recipe.safety_level}`",
-        "",
-        "## Step Results",
-        "",
-        "| Step | Type | Status | Message | Outputs |",
-        "| --- | --- | --- | --- | --- |",
     ]
+    if run.project_description:
+        lines.append(f"Project note: {_escape(run.project_description)}")
+    lines.extend(
+        [
+            "",
+            "## Step Results",
+            "",
+            "| Step | Type | Status | Message | Outputs |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
     for result in run.results:
         outputs = "<br>".join(f"`{_escape(path)}`" for path in result.output_paths) or ""
         lines.append(
@@ -429,6 +436,7 @@ def run_workflow(
         project=selected_project,
         root=display_path(data.paths.root, base_path=Path(".")),
         dry_run=run_dry,
+        project_description=data.paths.profile.description if data.paths.profile else "",
     )
     validation_findings = validate_workflow_recipe(recipe)
     if any(finding.severity == "error" for finding in validation_findings):

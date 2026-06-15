@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 from typing import Any
 
+from . import __version__
 from .audit import citation_audit
 from .doctor import workspace_health
 from .drafts import DraftAuditReport, ParagraphAuditFinding
@@ -349,7 +350,7 @@ def maybe_audit_manuscript(
 
 def rule_config_audit_report(rule_set: RuleSet, findings: list[RuleFinding]) -> str:
     lines = [
-        "# Rule Configuration Audit v1.5",
+        f"# Rule Configuration Audit v{__version__}",
         "",
         "This report validates declarative local JSON rules. Rule files are data only; they do not execute Python code.",
         "",
@@ -375,7 +376,7 @@ def rule_config_audit_report(rule_set: RuleSet, findings: list[RuleFinding]) -> 
 
 def rule_report(result: RuleRunResult) -> str:
     lines = [
-        "# Rule Report v1.5",
+        f"# Rule Report v{__version__}",
         "",
         "This report combines built-in validation adapters with optional project-specific declarative rules.",
         "It audits local metadata and evidence tracking only; it does not modify files or judge scientific truth.",

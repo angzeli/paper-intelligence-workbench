@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import shutil
 
+from . import __version__
 from .backups import BackupManifest, create_backup
 from .io import write_json, write_text
 from .paths import default_bibtex_path, default_notes_dir, default_registry_path, default_reports_dir, default_themes_path, project_root
@@ -151,7 +152,7 @@ def run_legacy_migration(
 
 def migration_plan_report(plan: MigrationPlan) -> str:
     lines = [
-        "# Migration Plan v0.9",
+        f"# Migration Plan v{__version__}",
         "",
         "This is a non-destructive plan. Migration copies files into a new project and preserves the legacy `data/` workflow.",
         "",

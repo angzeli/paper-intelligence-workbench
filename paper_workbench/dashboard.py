@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
+from . import __version__
 from .claim_lifecycle import ClaimReviewItem
 from .reading import FollowUpAction, ReadingQueueItem
 from .schema import BibTeXEntry, CitationAuditFinding, Claim, Paper, PaperNote, ProjectProfile, ProjectTheme, ValidationFinding
@@ -340,7 +341,7 @@ def dashboard_terminal(dashboard: Dashboard, *, view: str = "full", limit: int =
     return "\n".join(lines).rstrip() + "\n"
 
 
-def dashboard_markdown(dashboard: Dashboard, *, title: str = "Terminal Dashboard v1.6", limit: int = 20) -> str:
+def dashboard_markdown(dashboard: Dashboard, *, title: str = f"Terminal Dashboard v{__version__}", limit: int = 20) -> str:
     lines = [
         f"# {title}",
         "",
@@ -391,11 +392,11 @@ def dashboard_markdown(dashboard: Dashboard, *, title: str = "Terminal Dashboard
     return "\n".join(lines).rstrip() + "\n"
 
 
-def next_actions_markdown(actions: list[NextAction], *, title: str = "Next Actions v1.6") -> str:
+def next_actions_markdown(actions: list[NextAction], *, title: str = f"Next Actions v{__version__}") -> str:
     return "\n".join([f"# {title}", "", next_actions_table(actions)]).rstrip() + "\n"
 
 
-def project_health_summary_markdown(dashboard: Dashboard, *, title: str = "Project Health Summary v1.6") -> str:
+def project_health_summary_markdown(dashboard: Dashboard, *, title: str = f"Project Health Summary v{__version__}") -> str:
     lines = [
         f"# {title}",
         "",

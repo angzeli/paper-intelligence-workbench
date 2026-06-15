@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import subprocess
 
+from . import __version__
 from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_notes
 from .doctor import workspace_health
@@ -209,7 +210,7 @@ def check_workspace_integrity(
 
 def workspace_integrity_report(result: IntegrityResult) -> str:
     lines = [
-        "# Workspace Integrity Report v0.9",
+        f"# Workspace Integrity Report v{__version__}",
         "",
         "This report checks local workspace consistency. It does not modify files.",
         "",

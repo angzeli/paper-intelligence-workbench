@@ -9,7 +9,9 @@ import hashlib
 from pathlib import Path
 import re
 
+from . import __version__
 from .io import read_csv_rows, write_csv_rows
+from .paths import display_path
 from .registry import load_registry, save_registry
 from .schema import LocalFileRecord, Paper
 
@@ -423,11 +425,11 @@ def unlink_file_from_paper(
 
 def local_files_audit_report(result: FileScanResult) -> str:
     lines = [
-        "# Local Files Audit v0.7",
+        f"# Local Files Audit v{__version__}",
         "",
         "This report audits local user-provided files. It does not download, scrape, OCR, or summarize documents.",
         "",
-        f"Root: {result.root}",
+        f"Root: {display_path(result.root)}",
         f"Files found: {len(result.records)}",
         f"Unlinked files: {len(result.unlinked_files)}",
         f"Missing registry file references: {len(result.missing_registry_files)}",
@@ -473,7 +475,7 @@ def local_files_audit_report(result: FileScanResult) -> str:
 
 
 def duplicate_files_report(result: FileScanResult) -> str:
-    lines = ["# Duplicate Files v0.7", "", f"Duplicate file hashes: {len(result.duplicate_hashes)}", ""]
+    lines = [f"# Duplicate Files v{__version__}", "", f"Duplicate file hashes: {len(result.duplicate_hashes)}", ""]
     if not result.duplicate_hashes:
         lines.append("No duplicate file hashes detected.")
     for digest, records in sorted(result.duplicate_hashes.items()):
@@ -486,7 +488,7 @@ def duplicate_files_report(result: FileScanResult) -> str:
 
 def missing_files_report(result: FileScanResult) -> str:
     lines = [
-        "# Missing Local Files v0.7",
+        f"# Missing Local Files v{__version__}",
         "",
         f"Missing registry file references: {len(result.missing_registry_files)}",
         f"File registry missing files: {len(result.file_registry_missing_files)}",
@@ -506,7 +508,7 @@ def missing_files_report(result: FileScanResult) -> str:
 
 def text_sidecars_report(result: FileScanResult) -> str:
     lines = [
-        "# Text Sidecars v0.7",
+        f"# Text Sidecars v{__version__}",
         "",
         "Only user-provided top-level `.txt` sidecars are audited here. Do not add copyrighted full text unless you have the right to store it locally.",
         "",

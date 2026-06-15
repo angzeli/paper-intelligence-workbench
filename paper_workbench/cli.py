@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 import tempfile
 
+from . import __version__
 from .auditlog import append_audit_event, audit_log_markdown, clear_audit_log, default_audit_log_path, load_audit_events
 from .authoring import (
     build_claim_bank,
@@ -635,9 +636,9 @@ def cmd_claim_review_report(args: argparse.Namespace) -> int:
     records = load_claim_lifecycle(_claim_lifecycle_path_from_args(args, paths))
     project = _project_id_from_paths(paths)
     if args.claim_review_command == "verified":
-        content = lifecycle_claims_report(claims, records, project=project, status_filter={"verified", "ready_for_draft_use"}, title="Verified Claims v2.2")
+        content = lifecycle_claims_report(claims, records, project=project, status_filter={"verified", "ready_for_draft_use"}, title=f"Verified Claims v{__version__}")
     elif args.claim_review_command == "deprecated":
-        content = lifecycle_claims_report(claims, records, project=project, status_filter={"deprecated"}, title="Deprecated Claims v2.2")
+        content = lifecycle_claims_report(claims, records, project=project, status_filter={"deprecated"}, title=f"Deprecated Claims v{__version__}")
     else:
         content = claims_used_in_drafts_report(claims, records, project=project)
     if args.out:
@@ -875,11 +876,12 @@ def cmd_files_status(args: argparse.Namespace) -> int:
 def cmd_files_audit(args: argparse.Namespace) -> int:
     result, paths = _file_scan_from_args(args)
     reports_dir = Path(args.reports_dir) if args.reports_dir else Path(paths["reports_dir"])
+    version_slug = __version__.replace(".", "_")
     outputs = {
-        "local_files_audit_v0_7.md": local_files_audit_report(result),
-        "duplicate_files_v0_7.md": duplicate_files_report(result),
-        "missing_files_v0_7.md": missing_files_report(result),
-        "text_sidecars_v0_7.md": text_sidecars_report(result),
+        f"local_files_audit_v{version_slug}.md": local_files_audit_report(result),
+        f"duplicate_files_v{version_slug}.md": duplicate_files_report(result),
+        f"missing_files_v{version_slug}.md": missing_files_report(result),
+        f"text_sidecars_v{version_slug}.md": text_sidecars_report(result),
     }
     _preflight_output_paths([reports_dir / filename for filename in outputs], force=args.force)
     written: list[Path] = []
@@ -1314,11 +1316,11 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
     )
     if args.out:
         if args.view == "next-actions":
-            content = next_actions_markdown(dashboard.next_actions, title="Next Actions v1.6")
+            content = next_actions_markdown(dashboard.next_actions, title=f"Next Actions v{__version__}")
         elif args.view == "health":
-            content = project_health_summary_markdown(dashboard, title="Project Health Summary v1.6")
+            content = project_health_summary_markdown(dashboard, title=f"Project Health Summary v{__version__}")
         else:
-            content = dashboard_markdown(dashboard, title="Terminal Dashboard v1.6")
+            content = dashboard_markdown(dashboard, title=f"Terminal Dashboard v{__version__}")
         path = write_text(args.out, content, force=args.force)
         print(f"Wrote {path}")
         return 0
@@ -2927,7 +2929,7 @@ def build_parser() -> argparse.ArgumentParser:
     files_unlink.add_argument("--keep-pdf-path", action="store_true", help="Do not clear registry local_pdf_path metadata.")
     files_unlink.set_defaults(func=cmd_files_unlink)
 
-    files_audit = files_sub.add_parser("audit", help="Generate v0.7 local-file audit reports.")
+    files_audit = files_sub.add_parser("audit", help="Generate current local-file audit reports.")
     add_files_common(files_audit)
     files_audit.add_argument("--reports-dir", default="", help="Output reports directory. Defaults to the selected project/default reports directory.")
     files_audit.add_argument("--force", action="store_true", help="Overwrite existing local-file audit reports.")
@@ -3291,7 +3293,7 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser.add_argument("--strict", action="store_true", help="Return non-zero when errors are found.")
     doctor_parser.set_defaults(func=cmd_doctor)
 
-    integrity_parser = subparsers.add_parser("integrity", help="Run v0.9 workspace integrity checks.")
+    integrity_parser = subparsers.add_parser("integrity", help="Run workspace integrity checks.")
     integrity_sub = integrity_parser.add_subparsers(dest="integrity_command", required=True)
     integrity_check = integrity_sub.add_parser("check", help="Check workspace/project consistency without modifying inputs.")
     integrity_check.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
@@ -3305,7 +3307,7 @@ def build_parser() -> argparse.ArgumentParser:
     integrity_check.add_argument("--strict", action="store_true", help="Return non-zero when integrity errors are found.")
     integrity_check.set_defaults(func=cmd_integrity_check)
 
-    audit_log_parser = subparsers.add_parser("audit-log", help="Show or clear the local v0.9 audit log.")
+    audit_log_parser = subparsers.add_parser("audit-log", help="Show or clear the local audit log.")
     audit_log_sub = audit_log_parser.add_subparsers(dest="audit_log_command", required=True)
     audit_log_show = audit_log_sub.add_parser("show", help="Show audit events for the selected workspace/project.")
     audit_log_show.add_argument("--project", default="", help="Use a project profile audit log.")
@@ -3321,7 +3323,7 @@ def build_parser() -> argparse.ArgumentParser:
     audit_log_clear.add_argument("--force", action="store_true", help="Required confirmation to clear the audit log.")
     audit_log_clear.set_defaults(func=cmd_audit_log_clear)
 
-    backup_parser = subparsers.add_parser("backup", help="Create, inspect, and restore local v0.9 backups.")
+    backup_parser = subparsers.add_parser("backup", help="Create, inspect, and restore local backups.")
     backup_sub = backup_parser.add_subparsers(dest="backup_command", required=True)
 
     def add_backup_common(command_parser: argparse.ArgumentParser) -> None:
@@ -3366,7 +3368,7 @@ def build_parser() -> argparse.ArgumentParser:
     migrate_parser = subparsers.add_parser("migrate", help="Plan or run non-destructive workspace migrations.")
     migrate_sub = migrate_parser.add_subparsers(dest="migrate_command", required=True)
     migrate_plan = migrate_sub.add_parser("plan", help="Plan a legacy data/ to project-profile migration.")
-    migrate_plan.add_argument("--from", dest="from_workflow", default="legacy", choices=["legacy"], help="Source workflow. Only legacy is supported in v0.9.")
+    migrate_plan.add_argument("--from", dest="from_workflow", default="legacy", choices=["legacy"], help="Source workflow. Only legacy is currently supported.")
     migrate_plan.add_argument("--to-project", required=True, help="New project profile name to create.")
     migrate_plan.add_argument("--root", default=".", help="Workspace root.")
     migrate_plan.add_argument("--out", default="", help="Optional Markdown migration plan path.")
@@ -3374,7 +3376,7 @@ def build_parser() -> argparse.ArgumentParser:
     migrate_plan.add_argument("--strict", action="store_true", help="Return non-zero when migration conflicts are present.")
     migrate_plan.set_defaults(func=cmd_migrate_plan)
     migrate_run = migrate_sub.add_parser("run", help="Run or dry-run a legacy data/ to project-profile migration.")
-    migrate_run.add_argument("--from", dest="from_workflow", default="legacy", choices=["legacy"], help="Source workflow. Only legacy is supported in v0.9.")
+    migrate_run.add_argument("--from", dest="from_workflow", default="legacy", choices=["legacy"], help="Source workflow. Only legacy is currently supported.")
     migrate_run.add_argument("--to-project", required=True, help="New project profile name to create.")
     migrate_run.add_argument("--root", default=".", help="Workspace root.")
     migrate_run.add_argument("--dry-run", action="store_true", help="Plan the migration without copying files.")

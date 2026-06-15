@@ -17,6 +17,10 @@ import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from paper_workbench import __version__
 
 
 @dataclass(slots=True)
@@ -214,10 +218,10 @@ def report_markdown(results: list[CheckResult], *, tmp: Path, title: str) -> str
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run a local v1.0-rc current-environment install and workflow check.")
+    parser = argparse.ArgumentParser(description="Run a local v2 current-environment install and workflow check.")
     parser.add_argument("--out", default="", help="Optional Markdown report path.")
     parser.add_argument("--quick", action="store_true", help="Run a shorter check for CI and tests.")
-    parser.add_argument("--title", default="Current-Environment Release Check v1.0-rc", help="Markdown report title.")
+    parser.add_argument("--title", default=f"Current-Environment Release Check v{__version__}", help="Markdown report title.")
     args = parser.parse_args(argv)
 
     with tempfile.TemporaryDirectory(prefix="paperwb_clean_room_") as tmp_name:
