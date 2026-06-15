@@ -2,23 +2,23 @@
 
 Reports directory: .
 
-Markdown reports indexed: 164
+Markdown reports indexed: 171
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v2.1 Release Reports
+## Current v2.2 Release Reports
 
-- [central_papers_v2_1.md](central_papers_v2_1.md)
-- [evidence_graph_summary_v2_1.md](evidence_graph_summary_v2_1.md)
-- [graph_export_inventory_v2_1.md](graph_export_inventory_v2_1.md)
+- [claim_review_queue_v2_2.md](claim_review_queue_v2_2.md)
+- [claims_used_in_drafts_v2_2.md](claims_used_in_drafts_v2_2.md)
+- [contradictions_v2_2.md](contradictions_v2_2.md)
+- [deprecated_claims_v2_2.md](deprecated_claims_v2_2.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [orphan_nodes_v2_1.md](orphan_nodes_v2_1.md)
-- [release_readiness_v2_1.md](release_readiness_v2_1.md)
-- [theme_connectivity_v2_1.md](theme_connectivity_v2_1.md)
+- [release_readiness_v2_2.md](release_readiness_v2_2.md)
+- [verified_claims_v2_2.md](verified_claims_v2_2.md)
 
 ## Next Patch Plan
 
-- [v2_2_recommended_patch_plan.md](v2_2_recommended_patch_plan.md)
+- [v2_3_recommended_patch_plan.md](v2_3_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -28,6 +28,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [backup_manifest_demo_v0_9.md](backup_manifest_demo_v0_9.md)
 - [bibtex_audit_v0_2.md](bibtex_audit_v0_2.md)
 - [bundle_export_summary_v0_4.md](bundle_export_summary_v0_4.md)
+- [central_papers_v2_1.md](central_papers_v2_1.md)
 - [citation_audit_v0_2.md](citation_audit_v0_2.md)
 - [citation_bank_v0_6.md](citation_bank_v0_6.md)
 - [citation_context_table_v1_4.md](citation_context_table_v1_4.md)
@@ -45,6 +46,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [draft_audit_v1_1.md](draft_audit_v1_1.md)
 - [duplicate_files_v0_7.md](duplicate_files_v0_7.md)
 - [error_taxonomy_v0_10.md](error_taxonomy_v0_10.md)
+- [evidence_graph_summary_v2_1.md](evidence_graph_summary_v2_1.md)
 - [evidence_map_v0_2.md](evidence_map_v0_2.md)
 - [evidence_matrix_v0_6.md](evidence_matrix_v0_6.md)
 - [example_workflow_validation_v2_0_rc.md](example_workflow_validation_v2_0_rc.md)
@@ -56,6 +58,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [followups_v1_2.md](followups_v1_2.md)
 - [full_text_sidecar_demo_v0_5.md](full_text_sidecar_demo_v0_5.md)
 - [fyp_photocatalysis_theme_pack_v2_0.md](fyp_photocatalysis_theme_pack_v2_0.md)
+- [graph_export_inventory_v2_1.md](graph_export_inventory_v2_1.md)
 - [import_bibtex_v0_4.md](import_bibtex_v0_4.md)
 - [import_generic_csv_v0_4.md](import_generic_csv_v0_4.md)
 - [import_ris_v0_4.md](import_ris_v0_4.md)
@@ -75,6 +78,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [notebook_validation_v2_0_rc.md](notebook_validation_v2_0_rc.md)
 - [obsidian_export_summary_v0_4.md](obsidian_export_summary_v0_4.md)
 - [obsidian_roundtrip_v1_3.md](obsidian_roundtrip_v1_3.md)
+- [orphan_nodes_v2_1.md](orphan_nodes_v2_1.md)
 - [paragraph_evidence_matrix_v1_1.md](paragraph_evidence_matrix_v1_1.md)
 - [paragraph_plan_v0_6.md](paragraph_plan_v0_6.md)
 - [performance_sanity_v0_3.md](performance_sanity_v0_3.md)
@@ -112,6 +116,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v1_8.md](release_readiness_v1_8.md)
 - [release_readiness_v2_0.md](release_readiness_v2_0.md)
 - [release_readiness_v2_0_rc.md](release_readiness_v2_0_rc.md)
+- [release_readiness_v2_1.md](release_readiness_v2_1.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
@@ -135,6 +140,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [sync_plan_v1_3.md](sync_plan_v1_3.md)
 - [test_suite_summary_v2_0_rc.md](test_suite_summary_v2_0_rc.md)
 - [text_sidecars_v0_7.md](text_sidecars_v0_7.md)
+- [theme_connectivity_v2_1.md](theme_connectivity_v2_1.md)
 - [v0_10_recommended_patch_plan.md](v0_10_recommended_patch_plan.md)
 - [v0_3_recommended_patch_plan.md](v0_3_recommended_patch_plan.md)
 - [v0_4_recommended_patch_plan.md](v0_4_recommended_patch_plan.md)
@@ -152,6 +158,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v1_7_recommended_patch_plan.md](v1_7_recommended_patch_plan.md)
 - [v1_8_recommended_patch_plan.md](v1_8_recommended_patch_plan.md)
 - [v2_1_recommended_patch_plan.md](v2_1_recommended_patch_plan.md)
+- [v2_2_recommended_patch_plan.md](v2_2_recommended_patch_plan.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
 - [workspace_integrity_v0_9.md](workspace_integrity_v0_9.md)
