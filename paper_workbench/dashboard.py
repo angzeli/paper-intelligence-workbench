@@ -53,6 +53,10 @@ class Dashboard:
     followups: list[FollowUpAction] = field(default_factory=list)
     audit_events: list[dict[str, object]] = field(default_factory=list)
     report_paths: list[str] = field(default_factory=list)
+    graph_orphan_papers: list[str] = field(default_factory=list)
+    graph_isolated_themes: list[str] = field(default_factory=list)
+    graph_review_heavy_themes: list[str] = field(default_factory=list)
+    graph_central_papers: list[tuple[str, str, int]] = field(default_factory=list)
     next_actions: list[NextAction] = field(default_factory=list)
 
 
@@ -75,6 +79,7 @@ def build_dashboard(
     followups: list[FollowUpAction] | None = None,
     audit_events: list[dict[str, object]] | None = None,
     report_paths: Iterable[str | Path] = (),
+    graph_analytics: Any | None = None,
     limit: int = 10,
 ) -> Dashboard:
     note_ids = {note.paper_id for note in notes if note.paper_id}
@@ -107,6 +112,10 @@ def build_dashboard(
         followups=list(followups or []),
         audit_events=list(audit_events or []),
         report_paths=[str(path) for path in report_paths],
+        graph_orphan_papers=list(getattr(graph_analytics, "orphan_papers", []) if graph_analytics else []),
+        graph_isolated_themes=list(getattr(graph_analytics, "isolated_themes", []) if graph_analytics else []),
+        graph_review_heavy_themes=list(getattr(graph_analytics, "review_paper_heavy_themes", []) if graph_analytics else []),
+        graph_central_papers=list(getattr(graph_analytics, "central_papers", []) if graph_analytics else []),
     )
     dashboard.next_actions = build_next_actions(dashboard, limit=limit)
     return dashboard
@@ -183,6 +192,28 @@ def build_next_actions(dashboard: Dashboard, *, limit: int = 10) -> list[NextAct
                 reason=f"Citation audit warning: {_message(finding)}",
                 command=f"paperwb report evidence-map{project_flag}",
                 related=_identifier(finding),
+            )
+        )
+    for paper_id in dashboard.graph_orphan_papers[:3]:
+        actions.append(
+            NextAction(
+                action_id=f"graph_orphan_paper:{paper_id}",
+                project=dashboard.project,
+                priority="medium",
+                reason=f"{paper_id} has no note, claim, or theme connection in the evidence graph.",
+                command=f"paperwb graph summary{project_flag}",
+                related=paper_id,
+            )
+        )
+    for theme_id in dashboard.graph_isolated_themes[:3]:
+        actions.append(
+            NextAction(
+                action_id=f"graph_isolated_theme:{theme_id}",
+                project=dashboard.project,
+                priority="medium",
+                reason=f"{theme_id} has no paper or claim connection in the evidence graph.",
+                command=f"paperwb graph summary{project_flag}",
+                related=theme_id,
             )
         )
     for claim in dashboard.weak_claims[:3]:
@@ -271,6 +302,8 @@ def dashboard_terminal(dashboard: Dashboard, *, view: str = "full", limit: int =
             f"  - Workspace health findings: {_severity_summary(dashboard.health_findings)}",
             f"  - Rule findings: {_severity_summary(dashboard.rule_findings)}",
             f"  - Manuscript QA findings: {_severity_summary(dashboard.manuscript_findings)}",
+            f"  - Graph orphan papers: {len(dashboard.graph_orphan_papers)}",
+            f"  - Graph isolated themes: {len(dashboard.graph_isolated_themes)}",
             "",
             "Top next actions:",
         ]
@@ -313,6 +346,9 @@ def dashboard_markdown(dashboard: Dashboard, *, title: str = "Terminal Dashboard
         f"| Missing parsed notes | {len(dashboard.missing_note_papers)} |",
         f"| Weak/low-confidence claims | {len(dashboard.weak_claims)} |",
         f"| Claims missing evidence locations | {len(dashboard.missing_evidence_claims)} |",
+        f"| Graph orphan papers | {len(dashboard.graph_orphan_papers)} |",
+        f"| Graph isolated themes | {len(dashboard.graph_isolated_themes)} |",
+        f"| Graph review-heavy themes | {len(dashboard.graph_review_heavy_themes)} |",
         "",
         "## Reading Status",
         "",
@@ -363,6 +399,9 @@ def project_health_summary_markdown(dashboard: Dashboard, *, title: str = "Proje
         f"- Missing parsed notes: {len(dashboard.missing_note_papers)}",
         f"- Weak/low-confidence claims: {len(dashboard.weak_claims)}",
         f"- Claims missing evidence locations: {len(dashboard.missing_evidence_claims)}",
+        f"- Graph orphan papers: {len(dashboard.graph_orphan_papers)}",
+        f"- Graph isolated themes: {len(dashboard.graph_isolated_themes)}",
+        f"- Graph review-heavy themes: {len(dashboard.graph_review_heavy_themes)}",
         "",
         "## Highest Priority Actions",
         "",
@@ -400,6 +439,8 @@ def _terminal_health(dashboard: Dashboard) -> str:
         f"Missing notes: {len(dashboard.missing_note_papers)}",
         f"Weak claims: {len(dashboard.weak_claims)}",
         f"Missing evidence locations: {len(dashboard.missing_evidence_claims)}",
+        f"Graph orphan papers: {len(dashboard.graph_orphan_papers)}",
+        f"Graph isolated themes: {len(dashboard.graph_isolated_themes)}",
     ]
     return "\n".join(lines).rstrip() + "\n"
 

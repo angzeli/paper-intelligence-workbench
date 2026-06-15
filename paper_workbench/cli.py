@@ -85,6 +85,15 @@ from .files import (
     unlink_file_from_paper,
 )
 from .importers import import_bibtex, import_generic_csv, import_report, import_ris, import_zotero_csv
+from .graph import (
+    analyze_graph,
+    build_evidence_graph,
+    graph_summary_markdown,
+    graph_to_dot,
+    graph_to_json_text,
+    write_graph_export,
+    write_graph_report,
+)
 from .index import (
     build_index_records,
     clear_index,
@@ -916,6 +925,23 @@ def _rule_context_from_args(args: argparse.Namespace) -> RuleContext:
     return context
 
 
+def _graph_from_args(args: argparse.Namespace):
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    papers, notes, _claims, entries, themes, paths = _report_inputs(args)
+    sessions_path = _reading_sessions_path_from_args(args, paths)
+    sessions, session_warnings = load_reading_sessions_with_warnings(sessions_path)
+    graph = build_evidence_graph(
+        project=_project_id_from_paths(paths),
+        root=paths["root"],
+        papers=papers,
+        bibtex_entries=entries,
+        notes=notes,
+        themes=themes,
+        reading_sessions=sessions,
+    )
+    return graph, analyze_graph(graph), paths, session_warnings
+
+
 def cmd_rules_list(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     paths = _paths_from_args(args)
@@ -985,6 +1011,50 @@ def cmd_rules_explain(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_graph_build(args: argparse.Namespace) -> int:
+    graph, analytics, paths, session_warnings = _graph_from_args(args)
+    _print_warnings(session_warnings)
+    if args.out:
+        path = write_graph_report(graph_summary_markdown(graph, analytics), args.out, force=args.force)
+        _record_audit_event(paths, command="graph build", action="write_evidence_graph_summary", affected_paths=[path], summary=f"Wrote graph summary for {graph.project}")
+        print(f"Wrote {path}")
+        return 0
+    print(f"Built evidence graph for {graph.project}")
+    print(f"Nodes: {len(graph.nodes)}")
+    print(f"Edges: {len(graph.edges)}")
+    print(f"Orphan papers: {len(analytics.orphan_papers)}")
+    print(f"Claims missing evidence locations: {len(analytics.claims_missing_evidence_locations)}")
+    return 0
+
+
+def cmd_graph_summary(args: argparse.Namespace) -> int:
+    graph, analytics, paths, session_warnings = _graph_from_args(args)
+    _print_warnings(session_warnings)
+    content = graph_summary_markdown(graph, analytics)
+    if args.out:
+        path = write_graph_report(content, args.out, force=args.force)
+        _record_audit_event(paths, command="graph summary", action="write_evidence_graph_summary", affected_paths=[path], summary=f"Wrote graph summary for {graph.project}")
+        print(f"Wrote {path}")
+        return 0
+    print(content, end="")
+    return 0
+
+
+def cmd_graph_export(args: argparse.Namespace) -> int:
+    graph, _analytics, paths, session_warnings = _graph_from_args(args)
+    _print_warnings(session_warnings)
+    if args.out:
+        path = write_graph_export(graph, args.out, export_format=args.format, force=args.force)
+        _record_audit_event(paths, command="graph export", action=f"write_graph_{args.format}", affected_paths=[path], summary=f"Wrote graph {args.format} export for {graph.project}")
+        print(f"Wrote {path}")
+        return 0
+    if args.format == "json":
+        print(graph_to_json_text(graph), end="")
+    else:
+        print(graph_to_dot(graph), end="")
+    return 0
+
+
 def cmd_dashboard(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     if args.limit <= 0:
@@ -1041,6 +1111,15 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
     reports_dir = Path(paths["reports_dir"])
     report_paths = [display_path(path, base_path=paths["root"]) for path in sorted(reports_dir.glob("*.md"))] if reports_dir.exists() else []
     audit_events = [] if args.no_audit_log else load_audit_events(default_audit_log_path(paths["root"]))[-args.limit :]
+    graph = build_evidence_graph(
+        project=_project_id_from_paths(paths),
+        root=paths["root"],
+        papers=papers,
+        bibtex_entries=entries,
+        notes=notes,
+        themes=themes,
+        reading_sessions=sessions,
+    )
     dashboard = build_dashboard(
         project=_project_id_from_paths(paths),
         root=display_path(paths["root"], base_path=Path(".")),
@@ -1059,6 +1138,7 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         followups=followups,
         audit_events=audit_events,
         report_paths=report_paths,
+        graph_analytics=analyze_graph(graph),
         limit=args.limit,
     )
     if args.out:
@@ -2570,6 +2650,37 @@ def build_parser() -> argparse.ArgumentParser:
     dashboard_parser.add_argument("--out", default="", help="Optional Markdown dashboard report path.")
     dashboard_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out path.")
     dashboard_parser.set_defaults(func=cmd_dashboard)
+
+    graph_parser = subparsers.add_parser("graph", help="Build, summarize, and export the local evidence graph.")
+    graph_sub = graph_parser.add_subparsers(dest="graph_command", required=True)
+
+    def add_graph_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--sessions", default="", help="Reading-session JSONL path. Defaults to .paperwb/reading_sessions.jsonl.")
+
+    graph_build = graph_sub.add_parser("build", help="Build the local evidence graph and print a compact summary.")
+    add_graph_common(graph_build)
+    graph_build.add_argument("--out", default="", help="Optional Markdown summary output path.")
+    graph_build.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    graph_build.set_defaults(func=cmd_graph_build)
+
+    graph_summary = graph_sub.add_parser("summary", help="Render a Markdown evidence graph summary.")
+    add_graph_common(graph_summary)
+    graph_summary.add_argument("--out", default="", help="Optional Markdown summary output path.")
+    graph_summary.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    graph_summary.set_defaults(func=cmd_graph_summary)
+
+    graph_export = graph_sub.add_parser("export", help="Export the local evidence graph as JSON or Graphviz DOT.")
+    add_graph_common(graph_export)
+    graph_export.add_argument("--format", choices=["json", "dot"], required=True, help="Graph export format.")
+    graph_export.add_argument("--out", default="", help="Optional output path. Defaults to stdout.")
+    graph_export.add_argument("--force", action="store_true", help="Overwrite an existing --out export.")
+    graph_export.set_defaults(func=cmd_graph_export)
 
     rules_parser = subparsers.add_parser("rules", help="Run local declarative validation rules.")
     rules_sub = rules_parser.add_subparsers(dest="rules_command", required=True)
