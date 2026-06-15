@@ -88,16 +88,19 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v2.0 Release Reports" in content
-    current_section = content.split("## Current v2.0 Release Reports", 1)[1]
+    assert "## Current v2.1 Release Reports" in content
+    current_section = content.split("## Current v2.1 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
     assert "[hostile_review_latest.md]" in current_section
-    assert "[release_readiness_v2_0.md]" in current_section
-    assert "[dogfooding_project_template_v2_0.md]" in current_section
+    assert "[release_readiness_v2_1.md]" in current_section
+    assert "[evidence_graph_summary_v2_1.md]" in current_section
+    assert "[theme_connectivity_v2_1.md]" in current_section
     assert "[release_notes_v2_0_rc.md]" not in current_section
     assert "[release_readiness_v2_0_rc.md]" not in current_section
     historical_section = content.split("## Historical Versioned Reports", 1)[1]
+    assert "[release_readiness_v2_0.md]" in historical_section
+    assert "[dogfooding_project_template_v2_0.md]" in historical_section
     assert "[release_notes_v2_0_rc.md]" in historical_section
     assert "[release_readiness_v2_0_rc.md]" in historical_section
 
