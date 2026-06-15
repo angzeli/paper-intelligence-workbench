@@ -14,6 +14,7 @@ import re
 from typing import Any, Iterable
 
 from .bibtex import parse_bibtex_file
+from .claim_lifecycle import ClaimLifecycleRecord, lifecycle_status_for_claim
 from .claims import collect_notes
 from .io import write_text
 from .reading import ReadingSession, load_reading_sessions_with_warnings
@@ -147,6 +148,8 @@ class GraphAnalytics:
     central_papers: list[tuple[str, str, int]] = field(default_factory=list)
     review_paper_heavy_themes: list[str] = field(default_factory=list)
     draft_citations_without_graph_support: list[str] = field(default_factory=list)
+    deprecated_claims: list[str] = field(default_factory=list)
+    unverified_claims: list[str] = field(default_factory=list)
 
 
 def make_node_id(node_type: str, key: str) -> str:
@@ -191,6 +194,7 @@ def build_evidence_graph(
     notes: list[PaperNote],
     themes: list[ProjectTheme],
     reading_sessions: list[ReadingSession] | None = None,
+    claim_lifecycle: dict[str, ClaimLifecycleRecord] | None = None,
 ) -> EvidenceGraph:
     graph = EvidenceGraph(project=project)
     entries_by_key = {entry.key: entry for entry in bibtex_entries if entry.key}
@@ -271,6 +275,8 @@ def build_evidence_graph(
     for note in notes:
         note_id = make_node_id(NOTE, note.paper_id or note.source_path or "unknown-note")
         for claim in note.claims:
+            claim_status = lifecycle_status_for_claim(claim, claim_lifecycle) if claim_lifecycle is not None else ""
+            lifecycle_record = (claim_lifecycle or {}).get(claim.claim_id)
             claim_node = graph.add_node(
                 CLAIM,
                 claim.claim_id,
@@ -285,6 +291,13 @@ def build_evidence_graph(
                 supports_theme=claim.supports_theme,
                 note_file=claim.note_file,
                 tags=claim.tags,
+                claim_status=claim_status,
+                review_status=lifecycle_record.review_status if lifecycle_record else "",
+                verification_date=lifecycle_record.verification_date if lifecycle_record else "",
+                deprecated_reason=lifecycle_record.deprecated_reason if lifecycle_record else "",
+                contradiction_group=lifecycle_record.contradiction_group if lifecycle_record else "",
+                needs_reread=lifecycle_record.needs_reread if lifecycle_record else False,
+                used_in_draft=lifecycle_record.used_in_draft if lifecycle_record else False,
             )
             if note_id in graph.nodes:
                 graph.add_edge(note_id, claim_node.node_id, CONTAINS_CLAIM)
@@ -366,6 +379,11 @@ def analyze_graph(graph: EvidenceGraph) -> GraphAnalytics:
             analytics.claims_without_themes.append(str(node.metadata.get("claim_id", "") or claim_id))
         if not graph.neighbors(node.node_id, HAS_EVIDENCE_LOCATION):
             analytics.claims_missing_evidence_locations.append(str(node.metadata.get("claim_id", "") or claim_id))
+        claim_status = str(node.metadata.get("claim_status", "") or "")
+        if claim_status == "deprecated":
+            analytics.deprecated_claims.append(str(node.metadata.get("claim_id", "") or claim_id))
+        elif claim_status and claim_status not in {"verified", "ready_for_draft_use"}:
+            analytics.unverified_claims.append(str(node.metadata.get("claim_id", "") or claim_id))
     for _theme_id, node in theme_nodes.items():
         papers = set(graph.incoming(node.node_id, SUPPORTS_THEME))
         claims = {source for source in graph.incoming(node.node_id, SUPPORTS_THEME) if graph.nodes[source].node_type == CLAIM}
@@ -454,6 +472,8 @@ def graph_summary_markdown(graph: EvidenceGraph, analytics: GraphAnalytics | Non
             f"- Notes without claims: {len(analytics.notes_without_claims)}",
             f"- Claims without themes: {len(analytics.claims_without_themes)}",
             f"- Claims missing evidence locations: {len(analytics.claims_missing_evidence_locations)}",
+            f"- Deprecated claims: {len(analytics.deprecated_claims)}",
+            f"- Unverified lifecycle claims: {len(analytics.unverified_claims)}",
             f"- Isolated themes: {len(analytics.isolated_themes)}",
             f"- Review-paper-heavy themes: {len(analytics.review_paper_heavy_themes)}",
             "",

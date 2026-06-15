@@ -139,6 +139,15 @@ class Claim:
     supports_theme: str = ""
     strength: str = ClaimStrength.WEAK.value
     note_file: str = ""
+    claim_status: str = ""
+    review_status: str = ""
+    verification_date: str = ""
+    deprecated_reason: str = ""
+    contradiction_group: str = ""
+    needs_reread: bool = False
+    used_in_draft: bool = False
+    reviewed_by: str = ""
+    review_comment: str = ""
 
 
 @dataclass(slots=True)

@@ -37,6 +37,24 @@ from .backups import (
     restore_plan_report,
 )
 from .bibtex import parse_bibtex_file, validate_bibtex
+from .claim_lifecycle import (
+    CLAIM_STATUSES,
+    REVIEW_STATUSES,
+    add_claim_to_contradiction_group,
+    build_claim_review_queue,
+    claim_review_queue_report,
+    claims_used_in_drafts_report,
+    contradictions_report,
+    create_contradiction_group,
+    default_claim_lifecycle_path,
+    default_contradictions_path,
+    lifecycle_claims_report,
+    load_claim_lifecycle,
+    load_contradiction_groups,
+    mark_claim_status,
+    save_claim_lifecycle,
+    save_contradiction_groups,
+)
 from .claims import collect_claims, collect_notes, save_claims_csv
 from .dashboard import dashboard_markdown, dashboard_terminal, next_actions_markdown, project_health_summary_markdown, build_dashboard
 from .doctor import workspace_health
@@ -347,6 +365,18 @@ def _followups_state_path_from_args(args: argparse.Namespace, paths: dict[str, P
     return default_followups_state_path(paths["root"])
 
 
+def _claim_lifecycle_path_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
+    if getattr(args, "lifecycle_file", ""):
+        return Path(args.lifecycle_file)
+    return default_claim_lifecycle_path(paths["root"])
+
+
+def _contradictions_path_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
+    if getattr(args, "contradictions_file", ""):
+        return Path(args.contradictions_file)
+    return default_contradictions_path(paths["root"])
+
+
 def _index_records_from_args(args: argparse.Namespace, paths: dict[str, Path | None]):
     return build_index_records(
         project_id=_project_id_from_paths(paths),
@@ -530,6 +560,127 @@ def cmd_claims(args: argparse.Namespace) -> int:
     else:
         for claim in claims:
             print(f"{claim.claim_id}\t{claim.paper_id}\t{claim.strength}\t{claim.claim_text}")
+    return 0
+
+
+def _claim_review_inputs(args: argparse.Namespace):
+    _reject_project_path_overrides(args, ("registry", "notes_dir", "themes", "reports_dir"))
+    paths = _paths_from_args(args)
+    papers = _load_registry(paths["registry"])
+    notes = collect_notes(paths["notes_dir"]) if Path(paths["notes_dir"]).exists() else []
+    claims = [claim for note in notes for claim in note.claims]
+    themes = load_themes(paths["themes"]) if Path(paths["themes"]).exists() else []
+    return papers, notes, claims, themes, paths
+
+
+def cmd_claim_review_queue(args: argparse.Namespace) -> int:
+    papers, _notes, claims, themes, paths = _claim_review_inputs(args)
+    records = load_claim_lifecycle(_claim_lifecycle_path_from_args(args, paths))
+    items = build_claim_review_queue(
+        claims,
+        papers,
+        themes,
+        records,
+        theme=args.theme,
+        limit=args.limit,
+        include_ready=args.include_ready,
+    )
+    content = claim_review_queue_report(items, project=_project_id_from_paths(paths))
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="claim-review queue", action="write_claim_review_queue", affected_paths=[path], summary=f"Wrote claim review queue with {len(items)} item(s)")
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_claim_review_mark(args: argparse.Namespace) -> int:
+    _papers, _notes, claims, _themes, paths = _claim_review_inputs(args)
+    lifecycle_path = _claim_lifecycle_path_from_args(args, paths)
+    records = load_claim_lifecycle(lifecycle_path)
+    record = mark_claim_status(
+        records,
+        claims,
+        args.claim_id,
+        status=args.status,
+        reason=args.reason,
+        reviewed_by=args.reviewed_by,
+        comment=args.comment,
+        verification_date=args.verification_date,
+        needs_reread=args.needs_reread if args.needs_reread else None,
+        used_in_draft=args.used_in_draft if args.used_in_draft else None,
+        review_status=args.review_status,
+    )
+    save_claim_lifecycle(lifecycle_path, records)
+    _record_audit_event(paths, command="claim-review mark", action="write_claim_lifecycle", affected_paths=[lifecycle_path], summary=f"Marked {args.claim_id} as {record.claim_status}")
+    print(f"Marked {args.claim_id} as {record.claim_status}; wrote {lifecycle_path}")
+    return 0
+
+
+def cmd_claim_review_report(args: argparse.Namespace) -> int:
+    _papers, _notes, claims, _themes, paths = _claim_review_inputs(args)
+    records = load_claim_lifecycle(_claim_lifecycle_path_from_args(args, paths))
+    project = _project_id_from_paths(paths)
+    if args.claim_review_command == "verified":
+        content = lifecycle_claims_report(claims, records, project=project, status_filter={"verified", "ready_for_draft_use"}, title="Verified Claims v2.2")
+    elif args.claim_review_command == "deprecated":
+        content = lifecycle_claims_report(claims, records, project=project, status_filter={"deprecated"}, title="Deprecated Claims v2.2")
+    else:
+        content = claims_used_in_drafts_report(claims, records, project=project)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command=f"claim-review {args.claim_review_command}", action="write_claim_lifecycle_report", affected_paths=[path], summary=f"Wrote {args.claim_review_command} claim report")
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_contradictions_create(args: argparse.Namespace) -> int:
+    _papers, _notes, _claims, _themes, paths = _claim_review_inputs(args)
+    contradictions_path = _contradictions_path_from_args(args, paths)
+    groups = load_contradiction_groups(contradictions_path)
+    group = create_contradiction_group(
+        groups,
+        theme=args.theme,
+        description=args.description,
+        status=args.status,
+        user_comment=args.comment,
+        group_id=args.group_id,
+    )
+    save_contradiction_groups(contradictions_path, groups)
+    _record_audit_event(paths, command="contradictions create", action="write_contradiction_group", affected_paths=[contradictions_path], summary=f"Created contradiction group {group.group_id}")
+    print(f"Created {group.group_id}; wrote {contradictions_path}")
+    return 0
+
+
+def cmd_contradictions_add(args: argparse.Namespace) -> int:
+    _papers, _notes, claims, _themes, paths = _claim_review_inputs(args)
+    contradictions_path = _contradictions_path_from_args(args, paths)
+    groups = load_contradiction_groups(contradictions_path)
+    group = add_claim_to_contradiction_group(groups, claims, args.group_id, args.claim_id)
+    lifecycle_path = _claim_lifecycle_path_from_args(args, paths)
+    records = load_claim_lifecycle(lifecycle_path)
+    record = mark_claim_status(records, claims, args.claim_id, status="contradicted", comment=f"Added to {group.group_id}")
+    record.contradiction_group = group.group_id
+    save_contradiction_groups(contradictions_path, groups)
+    save_claim_lifecycle(lifecycle_path, records)
+    _record_audit_event(paths, command="contradictions add", action="write_contradiction_group", affected_paths=[contradictions_path, lifecycle_path], summary=f"Added {args.claim_id} to {group.group_id}")
+    print(f"Added {args.claim_id} to {group.group_id}; wrote {contradictions_path}")
+    return 0
+
+
+def cmd_contradictions_report(args: argparse.Namespace) -> int:
+    _papers, _notes, claims, themes, paths = _claim_review_inputs(args)
+    groups = load_contradiction_groups(_contradictions_path_from_args(args, paths))
+    content = contradictions_report(groups, claims, themes, project=_project_id_from_paths(paths))
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="contradictions report", action="write_contradictions_report", affected_paths=[path], summary=f"Wrote contradictions report with {len(groups)} group(s)")
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
     return 0
 
 
@@ -930,6 +1081,8 @@ def _graph_from_args(args: argparse.Namespace):
     papers, notes, _claims, entries, themes, paths = _report_inputs(args)
     sessions_path = _reading_sessions_path_from_args(args, paths)
     sessions, session_warnings = load_reading_sessions_with_warnings(sessions_path)
+    lifecycle_path = _claim_lifecycle_path_from_args(args, paths)
+    lifecycle_records = load_claim_lifecycle(lifecycle_path) if lifecycle_path.exists() else None
     graph = build_evidence_graph(
         project=_project_id_from_paths(paths),
         root=paths["root"],
@@ -938,6 +1091,7 @@ def _graph_from_args(args: argparse.Namespace):
         notes=notes,
         themes=themes,
         reading_sessions=sessions,
+        claim_lifecycle=lifecycle_records,
     )
     return graph, analyze_graph(graph), paths, session_warnings
 
@@ -1111,6 +1265,8 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
     reports_dir = Path(paths["reports_dir"])
     report_paths = [display_path(path, base_path=paths["root"]) for path in sorted(reports_dir.glob("*.md"))] if reports_dir.exists() else []
     audit_events = [] if args.no_audit_log else load_audit_events(default_audit_log_path(paths["root"]))[-args.limit :]
+    lifecycle_path = _claim_lifecycle_path_from_args(args, paths)
+    lifecycle_records = load_claim_lifecycle(lifecycle_path) if lifecycle_path.exists() else None
     graph = build_evidence_graph(
         project=_project_id_from_paths(paths),
         root=paths["root"],
@@ -1119,7 +1275,9 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         notes=notes,
         themes=themes,
         reading_sessions=sessions,
+        claim_lifecycle=lifecycle_records,
     )
+    claim_queue = build_claim_review_queue(claims, papers, themes, lifecycle_records or {}, limit=args.limit) if lifecycle_records is not None else []
     dashboard = build_dashboard(
         project=_project_id_from_paths(paths),
         root=display_path(paths["root"], base_path=Path(".")),
@@ -1139,6 +1297,7 @@ def cmd_dashboard(args: argparse.Namespace) -> int:
         audit_events=audit_events,
         report_paths=report_paths,
         graph_analytics=analyze_graph(graph),
+        claim_review_queue=claim_queue,
         limit=args.limit,
     )
     if args.out:
@@ -1161,7 +1320,9 @@ def cmd_writing_packet(args: argparse.Namespace) -> int:
     if not _theme_exists(args.theme, themes):
         print(f"Unknown theme: {args.theme}", file=sys.stderr)
         return 2
-    content = writing_packet_report(args.theme, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
+    lifecycle_path = _claim_lifecycle_path_from_args(args, paths)
+    lifecycle_records = load_claim_lifecycle(lifecycle_path) if lifecycle_path.exists() else None
+    content = writing_packet_report(args.theme, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths), claim_lifecycle=lifecycle_records)
     output = args.out or (Path(paths["reports_dir"]) / f"{normalize_tag(args.theme)}_writing_packet.md")
     path = write_text(output, content, force=args.force)
     _record_audit_event(paths, command="writing-packet", action="write_writing_packet", affected_paths=[path], summary=f"Wrote writing packet for {args.theme}")
@@ -1201,7 +1362,9 @@ def _draft_inputs(args: argparse.Namespace):
     claims = [claim for note in notes for claim in note.claims]
     entries = parse_bibtex_file(paths["bibtex"]) if Path(paths["bibtex"]).exists() else []
     themes = load_themes(paths["themes"]) if Path(paths["themes"]).exists() else []
-    report = audit_draft(document, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
+    lifecycle_path = _claim_lifecycle_path_from_args(args, paths)
+    lifecycle_records = load_claim_lifecycle(lifecycle_path) if lifecycle_path.exists() else None
+    report = audit_draft(document, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths), claim_lifecycle=lifecycle_records)
     return document, report, paths
 
 
@@ -1269,7 +1432,9 @@ def _manuscript_inputs(args: argparse.Namespace):
     claims = [claim for note in notes for claim in note.claims]
     entries = parse_bibtex_file(paths["bibtex"]) if Path(paths["bibtex"]).exists() else []
     themes = load_themes(paths["themes"]) if Path(paths["themes"]).exists() else []
-    result = audit_manuscript(args.manuscript, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths))
+    lifecycle_path = _claim_lifecycle_path_from_args(args, paths)
+    lifecycle_records = load_claim_lifecycle(lifecycle_path) if lifecycle_path.exists() else None
+    result = audit_manuscript(args.manuscript, papers, notes, claims, entries, themes, project=_project_id_from_paths(paths), claim_lifecycle=lifecycle_records)
     return result, claims, themes, paths
 
 
@@ -2489,6 +2654,78 @@ def build_parser() -> argparse.ArgumentParser:
     claims_parser.add_argument("--force", action="store_true", help="Overwrite an existing output CSV path.")
     claims_parser.set_defaults(func=cmd_claims)
 
+    claim_review_parser = subparsers.add_parser("claim-review", help="Review claim lifecycle state without editing notes.")
+    claim_review_sub = claim_review_parser.add_subparsers(dest="claim_review_command", required=True)
+
+    def add_claim_review_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--lifecycle-file", default="", help="Claim lifecycle sidecar JSON. Defaults to claim_lifecycle.json under the selected root.")
+
+    claim_review_queue = claim_review_sub.add_parser("queue", help="Prioritize claims that need evidence review before draft use.")
+    add_claim_review_common(claim_review_queue)
+    claim_review_queue.add_argument("--theme", default="", help="Optional theme name or ID filter.")
+    claim_review_queue.add_argument("--limit", type=int, default=50, help="Maximum queued claims.")
+    claim_review_queue.add_argument("--include-ready", action="store_true", help="Include claims already marked verified or ready.")
+    claim_review_queue.add_argument("--out", default="", help="Optional Markdown queue report path.")
+    claim_review_queue.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    claim_review_queue.set_defaults(func=cmd_claim_review_queue)
+
+    claim_review_mark = claim_review_sub.add_parser("mark", help="Mark explicit local lifecycle state for a parsed claim.")
+    claim_review_mark.add_argument("claim_id", help="Claim ID from parsed structured notes.")
+    add_claim_review_common(claim_review_mark)
+    claim_review_mark.add_argument("--status", required=True, choices=sorted(CLAIM_STATUSES), help="New claim lifecycle status.")
+    claim_review_mark.add_argument("--review-status", default="", choices=["", *sorted(REVIEW_STATUSES)], help="Optional review status override.")
+    claim_review_mark.add_argument("--reason", default="", help="Required when marking a claim deprecated.")
+    claim_review_mark.add_argument("--reviewed-by", default="", help="Optional reviewer initials/name.")
+    claim_review_mark.add_argument("--comment", default="", help="Optional local review comment.")
+    claim_review_mark.add_argument("--verification-date", default="", help="Explicit verification date, YYYY-MM-DD. Defaults to today for verified statuses.")
+    claim_review_mark.add_argument("--needs-reread", action="store_true", help="Mark the claim as needing rereading.")
+    claim_review_mark.add_argument("--used-in-draft", action="store_true", help="Mark the claim as used in a draft.")
+    claim_review_mark.set_defaults(func=cmd_claim_review_mark)
+
+    for report_name, report_help in (
+        ("verified", "Report claims explicitly marked verified or ready for draft use."),
+        ("deprecated", "Report claims explicitly marked deprecated."),
+        ("used-in-drafts", "Report claims explicitly marked as used in drafts."),
+    ):
+        claim_report = claim_review_sub.add_parser(report_name, help=report_help)
+        add_claim_review_common(claim_report)
+        claim_report.add_argument("--out", default="", help="Optional Markdown report path.")
+        claim_report.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+        claim_report.set_defaults(func=cmd_claim_review_report)
+
+    contradictions_parser = subparsers.add_parser("contradictions", help="Manage manual contradiction/tension review groups.")
+    contradictions_sub = contradictions_parser.add_subparsers(dest="contradictions_command", required=True)
+
+    def add_contradiction_common(command_parser: argparse.ArgumentParser) -> None:
+        add_claim_review_common(command_parser)
+        command_parser.add_argument("--contradictions-file", default="", help="Contradiction sidecar JSON. Defaults to contradictions.json under the selected root.")
+
+    contradictions_create = contradictions_sub.add_parser("create", help="Create a manual contradiction/tension group.")
+    add_contradiction_common(contradictions_create)
+    contradictions_create.add_argument("--theme", required=True, help="Theme name or ID for this review group.")
+    contradictions_create.add_argument("--description", default="", help="User-written description of the tension.")
+    contradictions_create.add_argument("--status", default="open", help="Manual group status, such as open, reviewing, or resolved.")
+    contradictions_create.add_argument("--comment", default="", help="Optional user comment.")
+    contradictions_create.add_argument("--group-id", default="", help="Optional explicit group ID.")
+    contradictions_create.set_defaults(func=cmd_contradictions_create)
+
+    contradictions_add = contradictions_sub.add_parser("add", help="Add a parsed claim to a manual contradiction/tension group.")
+    contradictions_add.add_argument("group_id", help="Contradiction group ID.")
+    contradictions_add.add_argument("claim_id", help="Claim ID from parsed structured notes.")
+    add_contradiction_common(contradictions_add)
+    contradictions_add.set_defaults(func=cmd_contradictions_add)
+
+    contradictions_report_parser = contradictions_sub.add_parser("report", help="Render manual contradiction groups and heuristic possible tensions.")
+    add_contradiction_common(contradictions_report_parser)
+    contradictions_report_parser.add_argument("--out", default="", help="Optional Markdown report path.")
+    contradictions_report_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    contradictions_report_parser.set_defaults(func=cmd_contradictions_report)
+
     search_parser = subparsers.add_parser("search", help="Search registry, notes, claims, or the local SQLite index.")
     search_parser.add_argument("query", help="Search query.")
     search_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
@@ -2641,6 +2878,7 @@ def build_parser() -> argparse.ArgumentParser:
     dashboard_parser.add_argument("--sessions", default="", help="Reading-session JSONL path. Defaults to .paperwb/reading_sessions.jsonl.")
     dashboard_parser.add_argument("--state", default="", help="Follow-up completion state JSON path. Defaults to .paperwb/followups_state.json.")
     dashboard_parser.add_argument("--rules-file", default="", help="Rules JSON path. Defaults to rules.json in the selected project root when present.")
+    dashboard_parser.add_argument("--lifecycle-file", default="", help="Optional claim lifecycle sidecar JSON.")
     dashboard_parser.add_argument("--manuscript", default="", help="Optional manuscript draft path for manuscript QA warnings.")
     dashboard_parser.add_argument("--view", choices=["full", "next-actions", "health"], default="full", help="Terminal/report view to render.")
     dashboard_parser.add_argument("--limit", type=int, default=10, help="Maximum items to show in each dashboard section.")
@@ -2662,6 +2900,7 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
         command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
         command_parser.add_argument("--sessions", default="", help="Reading-session JSONL path. Defaults to .paperwb/reading_sessions.jsonl.")
+        command_parser.add_argument("--lifecycle-file", default="", help="Optional claim lifecycle sidecar JSON.")
 
     graph_build = graph_sub.add_parser("build", help="Build the local evidence graph and print a compact summary.")
     add_graph_common(graph_build)
@@ -2736,6 +2975,7 @@ def build_parser() -> argparse.ArgumentParser:
     writing_packet_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
     writing_packet_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
     writing_packet_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+    writing_packet_parser.add_argument("--lifecycle-file", default="", help="Optional claim lifecycle sidecar JSON.")
     writing_packet_parser.add_argument("--out", default="", help="Output Markdown path. Defaults to the selected reports directory.")
     writing_packet_parser.add_argument("--force", action="store_true", help="Overwrite an existing writing packet.")
     writing_packet_parser.set_defaults(func=cmd_writing_packet)
@@ -2760,6 +3000,7 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
         command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
         command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--lifecycle-file", default="", help="Optional claim lifecycle sidecar JSON.")
         command_parser.add_argument("--out", default="", help="Optional Markdown output path.")
         command_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
 
@@ -2796,6 +3037,7 @@ def build_parser() -> argparse.ArgumentParser:
         command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
         command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
         command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+        command_parser.add_argument("--lifecycle-file", default="", help="Optional claim lifecycle sidecar JSON.")
         command_parser.add_argument("--out", default="", help="Optional Markdown output path.")
         command_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
 

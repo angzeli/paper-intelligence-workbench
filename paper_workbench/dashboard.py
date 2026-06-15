@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
+from .claim_lifecycle import ClaimReviewItem
 from .reading import FollowUpAction, ReadingQueueItem
 from .schema import BibTeXEntry, CitationAuditFinding, Claim, Paper, PaperNote, ProjectProfile, ProjectTheme, ValidationFinding
 
@@ -57,6 +58,7 @@ class Dashboard:
     graph_isolated_themes: list[str] = field(default_factory=list)
     graph_review_heavy_themes: list[str] = field(default_factory=list)
     graph_central_papers: list[tuple[str, str, int]] = field(default_factory=list)
+    claim_review_queue: list[ClaimReviewItem] = field(default_factory=list)
     next_actions: list[NextAction] = field(default_factory=list)
 
 
@@ -80,6 +82,7 @@ def build_dashboard(
     audit_events: list[dict[str, object]] | None = None,
     report_paths: Iterable[str | Path] = (),
     graph_analytics: Any | None = None,
+    claim_review_queue: list[ClaimReviewItem] | None = None,
     limit: int = 10,
 ) -> Dashboard:
     note_ids = {note.paper_id for note in notes if note.paper_id}
@@ -116,6 +119,7 @@ def build_dashboard(
         graph_isolated_themes=list(getattr(graph_analytics, "isolated_themes", []) if graph_analytics else []),
         graph_review_heavy_themes=list(getattr(graph_analytics, "review_paper_heavy_themes", []) if graph_analytics else []),
         graph_central_papers=list(getattr(graph_analytics, "central_papers", []) if graph_analytics else []),
+        claim_review_queue=list(claim_review_queue or []),
     )
     dashboard.next_actions = build_next_actions(dashboard, limit=limit)
     return dashboard
@@ -144,6 +148,17 @@ def build_next_actions(dashboard: Dashboard, *, limit: int = 10) -> list[NextAct
                 reason=f"Rule violation: {_message(finding)}",
                 command=f"paperwb rules report{project_flag}",
                 related=_identifier(finding),
+            )
+        )
+    for item in dashboard.claim_review_queue[:5]:
+        actions.append(
+            NextAction(
+                action_id=f"claim_review:{item.claim_id}",
+                project=dashboard.project,
+                priority=item.priority,
+                reason=f"{item.claim_id} needs claim review: {'; '.join(item.reasons[:2])}.",
+                command=f"paperwb claim-review queue{project_flag}",
+                related=item.claim_id,
             )
         )
     for paper in dashboard.missing_note_papers[:5]:
@@ -297,6 +312,7 @@ def dashboard_terminal(dashboard: Dashboard, *, view: str = "full", limit: int =
             f"  - Missing parsed notes: {len(dashboard.missing_note_papers)}",
             f"  - Weak/low-confidence claims: {len(dashboard.weak_claims)}",
             f"  - Claims missing evidence locations: {len(dashboard.missing_evidence_claims)}",
+            f"  - Claim review queue: {len(dashboard.claim_review_queue)}",
             f"  - BibTeX findings: {_severity_summary(dashboard.bibtex_findings)}",
             f"  - Citation audit findings: {_severity_summary(dashboard.citation_findings)}",
             f"  - Workspace health findings: {_severity_summary(dashboard.health_findings)}",
@@ -346,6 +362,7 @@ def dashboard_markdown(dashboard: Dashboard, *, title: str = "Terminal Dashboard
         f"| Missing parsed notes | {len(dashboard.missing_note_papers)} |",
         f"| Weak/low-confidence claims | {len(dashboard.weak_claims)} |",
         f"| Claims missing evidence locations | {len(dashboard.missing_evidence_claims)} |",
+        f"| Claim review queue | {len(dashboard.claim_review_queue)} |",
         f"| Graph orphan papers | {len(dashboard.graph_orphan_papers)} |",
         f"| Graph isolated themes | {len(dashboard.graph_isolated_themes)} |",
         f"| Graph review-heavy themes | {len(dashboard.graph_review_heavy_themes)} |",

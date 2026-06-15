@@ -5,7 +5,9 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Mapping
 
+from .claim_lifecycle import ClaimLifecycleRecord, lifecycle_status_for_claim
 from .io import write_csv_rows, write_json
 from .registry import parse_boolish
 from .schema import BibTeXEntry, Claim, EvidenceType, Paper, PaperNote, ProjectTheme, dataclass_to_plain
@@ -727,6 +729,7 @@ def writing_packet_report(
     themes: list[ProjectTheme],
     *,
     project: str = "",
+    claim_lifecycle: Mapping[str, ClaimLifecycleRecord] | None = None,
 ) -> str:
     theme = _theme_for_query(theme_query, themes)
     theme_name = theme.name if theme else theme_query
@@ -748,4 +751,49 @@ def writing_packet_report(
         paragraph_plan_report(plan).replace(f"# Paragraph Plan: {plan.theme}", "## Paragraph Plan", 1),
         subsection_readiness_report(readiness).replace(f"# Subsection Readiness: {readiness.theme}", "## Subsection Readiness", 1),
     ]
+    if claim_lifecycle is not None:
+        parts.append(_claim_lifecycle_warnings_markdown(theme_query, claims, themes, claim_lifecycle))
     return "\n\n".join(part.rstrip() for part in parts).rstrip() + "\n"
+
+
+def _claim_lifecycle_warnings_markdown(
+    theme_query: str,
+    claims: list[Claim],
+    themes: list[ProjectTheme],
+    records: Mapping[str, ClaimLifecycleRecord],
+) -> str:
+    theme = _theme_for_query(theme_query, themes)
+    theme_name = theme.name if theme else theme_query
+    mapped = _theme_claims(theme, claims, themes) if theme else []
+    rows: list[tuple[Claim, str]] = []
+    for claim in mapped:
+        status = lifecycle_status_for_claim(claim, records)
+        if status not in {"verified", "ready_for_draft_use"}:
+            rows.append((claim, status))
+    lines = [
+        "## Claim Lifecycle Warnings",
+        "",
+        f"Theme: {theme_name}",
+        "",
+        "These warnings come from local review state only. They do not decide whether a claim is scientifically true.",
+        "",
+        "| Claim ID | Status | Reason to review before draft use |",
+        "| --- | --- | --- |",
+    ]
+    if rows:
+        for claim, status in sorted(rows, key=lambda item: item[0].claim_id):
+            reason = "verify against note before draft use"
+            if status == "needs_evidence_location":
+                reason = "add or check page/section evidence location"
+            elif status == "too_weak_to_use":
+                reason = "claim is weak/speculative or low-confidence"
+            elif status == "deprecated":
+                reason = "claim is deprecated and should be avoided"
+            elif status == "contradicted":
+                reason = "claim is in contradiction review"
+            elif status == "needs_rereading":
+                reason = "paper or note needs rereading"
+            lines.append(f"| `{claim.claim_id}` | {status} | {reason} |")
+    else:
+        lines.append("| none | ready/verified | No lifecycle warnings for mapped claims. |")
+    return "\n".join(lines).rstrip() + "\n"

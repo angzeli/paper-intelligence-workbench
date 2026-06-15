@@ -9,7 +9,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Mapping
 
+from .claim_lifecycle import ClaimLifecycleRecord
 from .drafts import (
     DraftAuditReport,
     DraftDocument,
@@ -79,9 +81,10 @@ def audit_manuscript(
     themes: list[ProjectTheme],
     *,
     project: str = "",
+    claim_lifecycle: Mapping[str, ClaimLifecycleRecord] | None = None,
 ) -> ManuscriptQAResult:
     document = parse_manuscript(path)
-    audit = audit_draft(document, papers, notes, claims, bibtex_entries, themes, project=project)
+    audit = audit_draft(document, papers, notes, claims, bibtex_entries, themes, project=project, claim_lifecycle=claim_lifecycle)
     contexts = build_citation_contexts(audit, papers, claims)
     verdict = manuscript_readiness_verdict(audit)
     return ManuscriptQAResult(
@@ -106,6 +109,9 @@ def manuscript_readiness_verdict(report: DraftAuditReport) -> str:
         "paragraph_no_evidence_match",
         "cited_paper_only_weak_claims",
         "cited_paper_without_claims",
+        "matched_claim_not_verified",
+        "matched_claim_deprecated",
+        "matched_claim_contradicted",
     } & codes:
         return "needs evidence strengthening"
     return "ready for manual writing review"

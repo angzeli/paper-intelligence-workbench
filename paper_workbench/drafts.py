@@ -9,7 +9,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 import re
+from typing import Mapping
 
+from .claim_lifecycle import ClaimLifecycleRecord, lifecycle_status_for_claim
 from .schema import BibTeXEntry, Claim, EvidenceType, Paper, PaperNote, ProjectTheme
 from .tags import normalize_tag, parse_tags, theme_by_tag
 
@@ -383,6 +385,7 @@ def audit_draft(
     themes: list[ProjectTheme],
     *,
     project: str = "",
+    claim_lifecycle: Mapping[str, ClaimLifecycleRecord] | None = None,
 ) -> DraftAuditReport:
     findings: list[ParagraphAuditFinding] = []
     seen_findings: set[tuple[str, str, str, str]] = set()
@@ -498,6 +501,30 @@ def audit_draft(
                 ParagraphAuditFinding("warning", "strong_wording_with_weak_evidence", f"{paragraph.paragraph_id} uses strong wording ({', '.join(strong_hits)}) but local evidence is weak, missing, or review-only.", paragraph_id=paragraph.paragraph_id, suggestion="Soften wording or add stronger tracked evidence."),
                 seen_findings,
             )
+        if claim_lifecycle is not None:
+            for match in paragraph.linked_evidence_matches:
+                claim = next((item for item in claims if item.claim_id == match.claim_id), None)
+                if not claim:
+                    continue
+                status = lifecycle_status_for_claim(claim, claim_lifecycle)
+                if status == "deprecated":
+                    _add_finding(
+                        findings,
+                        ParagraphAuditFinding("warning", "matched_claim_deprecated", f"{paragraph.paragraph_id} matches deprecated claim {claim.claim_id}.", paragraph_id=paragraph.paragraph_id, paper_id=claim.paper_id, suggestion="Remove this claim from draft use unless you manually reinstate it."),
+                        seen_findings,
+                    )
+                elif status == "contradicted":
+                    _add_finding(
+                        findings,
+                        ParagraphAuditFinding("warning", "matched_claim_contradicted", f"{paragraph.paragraph_id} matches claim {claim.claim_id}, which is in contradiction review.", paragraph_id=paragraph.paragraph_id, paper_id=claim.paper_id, suggestion="Resolve the contradiction group before using this claim confidently."),
+                        seen_findings,
+                    )
+                elif status in {"newly_extracted", "needs_evidence_location", "needs_rereading", "too_weak_to_use", "used_in_draft"}:
+                    _add_finding(
+                        findings,
+                        ParagraphAuditFinding("warning", "matched_claim_not_verified", f"{paragraph.paragraph_id} matches claim {claim.claim_id}, which is not verified for draft use ({status}).", paragraph_id=paragraph.paragraph_id, paper_id=claim.paper_id, suggestion="Review the note and mark the claim verified only after checking it."),
+                        seen_findings,
+                    )
         if theme_hits and not paragraph.citation_keys:
             _add_finding(
                 findings,
