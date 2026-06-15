@@ -17,6 +17,7 @@
 - Mark advanced workflows as experimental in CLI docs until they have real-use
   feedback.
 - Improve report discoverability without adding more report types.
+- Dogfood the evidence graph on a real project before marking graph analytics stable.
 - Consider a guided import-to-registry review command only after dogfooding proves
   the read-only planning report is not enough.
 

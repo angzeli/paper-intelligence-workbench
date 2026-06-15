@@ -23,6 +23,7 @@ classifies command groups for v2.0.
 ## Experimental But Usable
 
 - `index`
+- `graph`
 - `files`
 - `draft`
 - `manuscript`
@@ -61,3 +62,15 @@ with BibTeX keys and does not copy files, read PDF text, or write registry rows.
 
 Stable commands should produce user-facing errors and avoid Python tracebacks
 for normal bad input.
+
+## Evidence Graph Commands
+
+```bash
+paperwb graph build --project zis_photocatalysis
+paperwb graph summary --project zis_photocatalysis --out scratch/evidence_graph_summary.md --force
+paperwb graph export --project zis_photocatalysis --format json --out scratch/evidence_graph.json --force
+paperwb graph export --project zis_photocatalysis --format dot --out scratch/evidence_graph.dot --force
+```
+
+The graph commands are experimental in v2.1. They are read-only unless `--out`
+is supplied, and they derive nodes and edges only from local workbench data.

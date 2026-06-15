@@ -82,3 +82,6 @@ Instructions for future agents working in this repository:
 - Dogfooding scaffolds must remain empty or placeholder-only until a user adds verified metadata.
 - Do not commit private dogfood reference paths, real PDF filenames, copied BibTeX metadata, or 15-paper starter lists derived from private files.
 - Dogfood file-planning commands may compare local filenames with BibTeX keys, but must not copy PDFs, parse PDF text, or write registry rows automatically.
+- Evidence graphs must be derived from local workbench data only.
+- Do not infer scientific truth, paper importance, or unsupported relationships from graph connectivity.
+- Do not add heavy graph database dependencies without explicit approval.

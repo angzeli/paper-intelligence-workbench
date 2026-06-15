@@ -9,7 +9,7 @@ Start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABL
 - Maintains local paper registries, BibTeX files, notes, themes, rules, and reports.
 - Generates structured Markdown note templates and extracts user-entered claims.
 - Validates registry rows, BibTeX entries, citations, notes, themes, and evidence links.
-- Builds evidence maps, citation audits, claim banks, writing packets, and manuscript QA reports.
+- Builds evidence maps, local evidence graphs, citation audits, claim banks, writing packets, and manuscript QA reports.
 - Supports project profiles, reusable project templates, reading queues, follow-up actions, and dashboards.
 - Imports and exports local CSV, BibTeX, RIS, JSON, Markdown, Obsidian-style vaults, and backup bundles.
 - Provides local search, optional SQLite indexing, file audits, backup planning, migration checks, sync plans, and rule reports.
@@ -121,6 +121,7 @@ paperwb report inventory --registry data/registries/example_papers.csv --out scr
 paperwb report bibtex-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --out scratch/bibtex_audit.md --force
 paperwb report evidence-map --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/evidence_map.md --force
 paperwb report citation-audit --registry data/registries/example_papers.csv --bibtex data/bibtex/example_library.bib --notes-dir data/notes --themes data/examples/themes.json --out scratch/citation_audit.md --force
+paperwb graph summary --project zis_photocatalysis --out scratch/evidence_graph_summary.md --force
 ```
 
 Run diagnostics and a section outline:
@@ -180,6 +181,8 @@ paperwb export reading-list --theme photocorrosion --project zis_photocatalysis 
 paperwb search photocorrosion --project zis_photocatalysis
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb search photocorrosion --project zis_photocatalysis --indexed
+paperwb graph build --project zis_photocatalysis
+paperwb graph export --project zis_photocatalysis --format json --out scratch/evidence_graph.json --force
 
 # Writing and manuscript QA
 paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/writing_packet.md --force
@@ -201,6 +204,7 @@ changes. Use `--force` only when you intend to overwrite an output file.
 - Notes: structured Markdown files with metadata, summaries, methods, claims, evidence, open questions, follow-ups, and personal notes.
 - Claims: user-entered statements extracted from notes, with evidence type, location, confidence, strength, tags, themes, and comments.
 - Themes: local JSON definitions used for evidence maps, dashboards, rules, and writing packets.
+- Evidence graph: derived nodes and edges connecting papers, notes, claims, themes, tags, BibTeX entries, sessions, and follow-ups.
 - Reports: generated Markdown or CSV/JSON outputs; they are audit artifacts, not authoritative source data.
 
 Schema docs:
@@ -218,7 +222,7 @@ overwritten unless `--force` is provided.
 Common reports include inventory, reading status, BibTeX audit, citation audit,
 evidence map, theme dashboard, missing notes, weak claims, evidence matrix,
 claim bank, citation bank, paragraph plan, subsection readiness, manuscript QA,
-workspace integrity, and dashboard summaries.
+workspace integrity, evidence graph, and dashboard summaries.
 
 ## ⌨️ CLI Reference
 
@@ -235,6 +239,7 @@ paperwb claims data/notes/
 paperwb search QUERY
 paperwb report evidence-map
 paperwb report citation-audit
+paperwb graph summary --project zis_photocatalysis
 paperwb writing-packet --theme photocorrosion
 paperwb doctor
 paperwb dogfood create photocatalysis --project fyp_review
@@ -253,6 +258,7 @@ for the full command map.
 - Markdown note parsing expects the provided template headings.
 - Default search is substring-based; indexed search is opt-in and uses local SQLite with FTS5 plus substring fallback behavior.
 - Theme mapping is tag-based only.
+- Evidence graph analytics are local connectivity checks, not truth or quality scores.
 - SQLite indexing is a rebuildable cache, not an authoritative database.
 - Citation audit checks completeness of user notes, not scientific correctness.
 
@@ -265,6 +271,9 @@ for the full command map.
 - [docs/EXPERIMENTAL_FEATURES_V2.md](docs/EXPERIMENTAL_FEATURES_V2.md)
 - [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md)
 - [docs/CLI_REFERENCE_V2.md](docs/CLI_REFERENCE_V2.md)
+- [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md)
+- [docs/GRAPH_EXPORTS.md](docs/GRAPH_EXPORTS.md)
+- [docs/GRAPH_ANALYTICS.md](docs/GRAPH_ANALYTICS.md)
 - [docs/REPORTS_V2.md](docs/REPORTS_V2.md)
 - [docs/DATA_SAFETY_V2.md](docs/DATA_SAFETY_V2.md)
 - [docs/KNOWN_LIMITATIONS_V2.md](docs/KNOWN_LIMITATIONS_V2.md)

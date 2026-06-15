@@ -9,7 +9,7 @@
 5. Fill notes manually.
 6. Extract claims.
 7. Generate evidence map and citation audit.
-8. Use dashboard and writing packet as planning aids.
+8. Use dashboard, evidence graph summary, and writing packet as planning aids.
 
 For a first real photocatalysis FYP project, start with the dogfood workflow:
 
@@ -58,3 +58,17 @@ paperwb backup restore BACKUP_ID --project PROJECT --dry-run
 
 For experimental commands, prefer dry-run, write outputs under `scratch/`, and
 review generated Markdown before applying changes.
+
+## Evidence Graph Workflow
+
+Use the graph workflow after registry rows, themes, and notes exist:
+
+```bash
+paperwb graph build --project PROJECT
+paperwb graph summary --project PROJECT --out scratch/evidence_graph_summary.md --force
+paperwb graph export --project PROJECT --format json --out scratch/evidence_graph.json --force
+```
+
+The graph is derived from local metadata and user-entered notes. It helps find
+orphan papers, isolated themes, claims without evidence locations, and highly
+connected papers. It is not a truth or citation-impact score.

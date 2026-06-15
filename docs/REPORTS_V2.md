@@ -34,6 +34,7 @@ Reports are Markdown-first artifacts generated from local inputs.
 - Rule reports
 - Local file audits
 - Search index reports
+- Evidence graph summary, connectivity, and export inventory
 
 ## Interpretation Boundary
 
