@@ -7,6 +7,7 @@ Project: `zis_photocatalysis`
 Root: `projects/zis_photocatalysis`
 Dry run: `true`
 Safety level: `read_only_or_cache`
+Project note: Intentionally imperfect synthetic photocatalysis review profile for dogfooding evidence-gap, weak-claim, and citation-audit workflows.
 
 ## Step Results
 

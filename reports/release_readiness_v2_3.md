@@ -9,6 +9,7 @@ Status: ready for local dogfooding after validation.
 - Added project-local workflow recipe loading from `projects/<project>/workflows/*.json`.
 - Added workflow validation that rejects unknown step types and shell/Python execution fields.
 - Added workflow run reports with per-step status, outputs, warnings, and errors.
+- Applied release-hygiene fixes after hostile review: active report titles now use the package version, the clean-room check uses current v2 wording, and workflow reports surface project descriptions.
 
 ## Commands Checked
 
@@ -17,6 +18,7 @@ Status: ready for local dogfooding after validation.
 - `paperwb workflow run daily_check --project zis_photocatalysis --dry-run`
 - `paperwb workflow run pre_writing_check --project zis_photocatalysis --theme photocorrosion --dry-run`
 - `paperwb workflow validate projects/zis_photocatalysis/workflows/daily_check.json --strict`
+- `paperwb workflow run pre_backup_check --project <synthetic-project> --run-writes --force` covered by regression tests.
 
 ## Safety Assessment
 
@@ -26,6 +28,7 @@ Status: ready for local dogfooding after validation.
 - Dry-run is supported for every built-in step.
 - Recipes that default to dry-run require `--run-writes` before step writes are allowed from the CLI.
 - Existing outputs are refused unless `--force` is supplied.
+- Project descriptions are included in workflow reports so intentionally imperfect synthetic fixtures are labelled before findings are interpreted.
 
 ## Generated Reports
 
@@ -33,12 +36,23 @@ Status: ready for local dogfooding after validation.
 - `reports/workflow_weekly_review_v2_3.md`
 - `reports/workflow_pre_writing_check_v2_3.md`
 - `reports/workflow_release_candidate_check_v2_3.md`
+- `reports/claim_review_queue_v2_3.md`
+- `reports/dashboard_v2_3.md`
+- `reports/workspace_integrity_v2_3.md`
+- `reports/rule_report_v2_3.md`
+- `reports/local_files_audit_v2_3.md`
+- `reports/duplicate_files_v2_3.md`
+- `reports/missing_files_v2_3.md`
+- `reports/text_sidecars_v2_3.md`
+- `reports/migration_plan_v2_3.md`
+- `reports/backup_manifest_demo_v2_3.md`
+- `reports/restore_dry_run_v2_3.md`
 
 ## Known Limitations
 
 - Workflow steps are intentionally coarse-grained adapters around existing local features.
 - Project-specific recipes can configure step order and outputs, but cannot define arbitrary custom logic.
-- Some recipe results surface existing synthetic-project warnings; those warnings are not automatically fixed by the runner.
+- The `zis_photocatalysis` fixture intentionally surfaces evidence-gap, weak-claim, and citation-audit findings for dogfooding; workflow reports now label that fixture explicitly.
 
 ## Recommended v2.4 Scope
 

@@ -2,18 +2,29 @@
 
 Reports directory: .
 
-Markdown reports indexed: 180
+Markdown reports indexed: 191
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
 ## Current v2.3 Release Reports
 
+- [backup_manifest_demo_v2_3.md](backup_manifest_demo_v2_3.md)
+- [claim_review_queue_v2_3.md](claim_review_queue_v2_3.md)
+- [dashboard_v2_3.md](dashboard_v2_3.md)
+- [duplicate_files_v2_3.md](duplicate_files_v2_3.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
+- [local_files_audit_v2_3.md](local_files_audit_v2_3.md)
+- [migration_plan_v2_3.md](migration_plan_v2_3.md)
+- [missing_files_v2_3.md](missing_files_v2_3.md)
 - [release_readiness_v2_3.md](release_readiness_v2_3.md)
+- [restore_dry_run_v2_3.md](restore_dry_run_v2_3.md)
+- [rule_report_v2_3.md](rule_report_v2_3.md)
+- [text_sidecars_v2_3.md](text_sidecars_v2_3.md)
 - [workflow_daily_check_v2_3.md](workflow_daily_check_v2_3.md)
 - [workflow_pre_writing_check_v2_3.md](workflow_pre_writing_check_v2_3.md)
 - [workflow_release_candidate_check_v2_3.md](workflow_release_candidate_check_v2_3.md)
 - [workflow_weekly_review_v2_3.md](workflow_weekly_review_v2_3.md)
+- [workspace_integrity_v2_3.md](workspace_integrity_v2_3.md)
 
 ## Next Patch Plan
 

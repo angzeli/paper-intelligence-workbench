@@ -67,6 +67,24 @@ This verdict does not mean the repository is ready for a polished public stable
 release. The project is safe enough to use locally with synthetic and real
 user-owned metadata, but it still needs high-priority release-hygiene cleanup.
 
+## Post-Fix Status
+
+The high-priority items from this review have been addressed in the follow-up
+fix pass:
+
+- Active report titles and current file-audit output filenames now use the
+  package version instead of old feature-introduction labels.
+- Workflow reports now surface project descriptions, and the canonical
+  `zis_photocatalysis` profile is explicitly labelled as an intentionally
+  imperfect synthetic evidence-gap fixture.
+- `scripts/clean_room_install_check.py` now uses current v2 wording and a
+  package-versioned default title.
+- Workflow tests now cover the guarded `--run-writes` path for a
+  dry-run-default backup recipe.
+
+Remaining medium-priority concerns are architectural and documentation
+consolidation work, not local-dogfooding blockers.
+
 ## High-Priority Issues
 
 1. **Active command outputs still carry old feature-version labels.**
