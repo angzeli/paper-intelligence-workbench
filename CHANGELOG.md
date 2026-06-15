@@ -2,6 +2,16 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v2.1 - Evidence Graph and Release Hygiene
+
+- Added the local evidence graph layer for derived paper, note, claim, theme,
+  citation, reading-session, and follow-up relationships.
+- Added graph summary, JSON export, DOT export, and graph analytics reports.
+- Replaced the public dogfood demo with synthetic-only placeholders and kept
+  private dogfood filenames and bibliography metadata out of tracked files.
+- Hardened data-safety checks for public demo metadata and private PDF filename
+  leaks.
+
 ## v2.0 - Dogfooding Workspace and Onboarding
 
 - Promoted local package metadata to `2.0`.

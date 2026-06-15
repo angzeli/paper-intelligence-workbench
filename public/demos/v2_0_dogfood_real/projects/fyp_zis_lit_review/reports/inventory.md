@@ -1,25 +1,6 @@
-# Paper Inventory Report
+# Synthetic Inventory
 
-Total papers: 15
-
-| Paper ID | Title | Authors | Year | Status | Tags |
-| --- | --- | --- | --- | --- | --- |
-| sigl_2024_znin_2_s | ZnIn 2 S 4 thin films with hierarchical porosity for photocatalysis | Marco Sigl; Melissa Egger; Fernando Warchomicka; Daniel Knez; Martina Dienstleder; Heinz Amenitsch; Gregor Trimmel; Thomas Rath | 2024 | unread | imported-bibtex; starter-15; demo-triage; znin2s4; thin-films; porosity; photocatalysis |
-| campbell_1900_preparation_potassium_xanthate | On the Preparation of Potassium Xanthate for Nickel Determinations. | ED Campbell | 1900 | unread | imported-bibtex; starter-15; demo-triage; xanthate-background; historical-context |
-| rath_2011_direct_route_towards | A direct route towards polymer/copper indium sulfide nanocomposite solar cells | Thomas Rath; Michael Edler; Achim Fischereder; Stefan Moscher; Alexander Schenk; Andreas Pein; Dorith Meischler; Karin Bartl; Robert Saf; Gregor Trimmel; others | 2011 | unread | imported-bibtex; starter-15; demo-triage; thin-films; nanocomposites; adjacent-solar-cells |
-| vakalopoulou_2022_metal_sulfide_thin | Metal sulfide thin films with tunable nanoporosity for photocatalytic applications | Efthymia Vakalopoulou; Thomas Rath; Marianne Kra{\"u}ter; Ana Torvisco; Roland C Fischer; Birgit Kunert; Roland Resel; Hartmuth Schr{\"o}ttner; Anna Maria Coclite; Heinz Amenitsch; others | 2022 | unread | imported-bibtex; starter-15; demo-triage; metal-sulfides; thin-films; nanoporosity; photocatalysis |
-| pradhan_2003_synthesis_high_quality | Synthesis of high-quality metal sulfide nanoparticles from alkyl xanthate single precursors in alkylamine solvents | Narayan Pradhan; Beni Katz; Shlomo Efrima | 2003 | unread | imported-bibtex; starter-15; demo-triage; xanthate-precursors; nanoparticles; metal-sulfides |
-| fischereder_2013_solution_processed_copper | Solution-processed copper zinc tin sulfide thin films from metal xanthate precursors | Achim Fischereder; Alexander Schenk; Thomas Rath; Wernfried Haas; S{\'e}bastien Delbos; Corentin Gougaud; Negar Naghavi; Angelika Pateter; Robert Saf; Dorith Schenk; others | 2013 | unread | imported-bibtex; starter-15; demo-triage; xanthate-precursors; thin-films; solution-processing |
-| vakalopoulou_2020_synthesis_characterization_zinc | Synthesis and characterization of zinc di (O-2, 2-dimethylpentan-3-yl dithiocarbonates) bearing pyridine or tetramethylethylenediamine coligands and investigation of their thermal conversion mechanisms towards nanocrystalline zinc sulfide | Efthymia Vakalopoulou; Christine Buchmaier; Andreas Pein; Robert Saf; Roland C Fischer; Ana Torvisco; Fernando Warchomicka; Thomas Rath; Gregor Trimmel | 2020 | unread | imported-bibtex; starter-15; demo-triage; zinc-sulfide; precursor-chemistry; thermal-conversion |
-| macreadie_2015_soluble_xanthate_compounds | Soluble xanthate compounds for the solution deposition of metal sulfide thin films | Lauren K Macreadie; Helen E Maynard-Casely; Stuart R Batten; David R Turner; Anthony SR Chesman | 2015 | unread | imported-bibtex; starter-15; demo-triage; xanthate-precursors; solution-deposition; metal-sulfides |
-| chesman_2014_solution_processed_cds | Solution-processed CdS thin films from a single-source precursor | Anthony SR Chesman; Noel W Duffy; Alessandro Martucci; Leonardo De Oliveira Tozi; Th Birendra Singh; Jacek J Jasieniak | 2014 | unread | imported-bibtex; starter-15; demo-triage; single-source-precursors; thin-films; metal-sulfides |
-| lewis_2015_situ_synthesis_pbs | In situ synthesis of PbS nanocrystals in polymer thin films from lead (II) xanthate and dithiocarbamate complexes: evidence for size and morphology control | Edward A Lewis; Paul D McNaughter; Zhongjie Yin; Yiqiang Chen; Jack R Brent; Selina A Saah; James Raftery; Johannes AM Awudza; M Azad Malik; Paul O{'}Brien; others | 2015 | unread | imported-bibtex; starter-15; demo-triage; xanthate-precursors; polymer-thin-films; morphology |
-| vanembden_2019_ultrathin_solar_absorber | Ultrathin solar absorber layers of silver bismuth sulfide from molecular precursors | Joel van Embden; Enrico Della Gaspera | 2019 | unread | imported-bibtex; starter-15; demo-triage; thin-films; solar-absorbers; adjacent-scope |
-| roy_2000_xanthates | Xanthates | Kathrin-Maria Roy | 2000 | unread | imported-bibtex; starter-15; demo-triage; xanthate-background; precursor-chemistry; reference-context |
-| hao_2019_metal_sulfide_photocatalysis | Metal sulfide photocatalysis: visible-light-induced organic transformations | Huimin Hao; Xianjun Lang | 2019 | unread | imported-bibtex; starter-15; demo-triage; metal-sulfides; photocatalysis; organic-transformations |
-| chandrasekaran_2019_recent_advances_metal | Recent advances in metal sulfides: from controlled fabrication to electrocatalytic, photocatalytic and photoelectrochemical water splitting and beyond | Sundaram Chandrasekaran; Lei Yao; Libo Deng; Chris Bowen; Yan Zhang; Sanming Chen; Zhiqun Lin; Feng Peng; Peixin Zhang | 2019 | unread | imported-bibtex; starter-15; demo-triage; metal-sulfides; review-context; water-splitting |
-| takayama_2017_development_various_metal | Development of various metal sulfide photocatalysts consisting of d0, d5, and d10 metal ions for sacrificial H2 evolution under visible light irradiation | Tomoaki Takayama; Issei Tsuji; Naruhiko Aono; Masamitsu Harada; Tsutomu Okuda; Akihide Iwase; Hideki Kato; Akihiko Kudo | 2017 | unread | imported-bibtex; starter-15; demo-triage; metal-sulfides; photocatalysis; hydrogen-evolution |
-
-## Registry Findings
-
-No findings.
+| Paper ID | Title | Reading Status | Boundary |
+| --- | --- | --- | --- |
+| `synthetic_zis_demo_a` | Synthetic ZIS Thin Film Demo Paper A | unread | placeholder |
+| `synthetic_zis_demo_b` | Synthetic ZIS Stability Demo Paper B | unread | placeholder |

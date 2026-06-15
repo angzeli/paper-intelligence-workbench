@@ -1,9 +1,7 @@
+# Keep local dogfood inputs private.
 *.pdf
-*.PDF
-.paperwb/
-**/.paperwb/
 *.sqlite
-*.sqlite3
 *.db
-__pycache__/
-.DS_Store
+.paperwb/
+backups/
+audit_log.jsonl

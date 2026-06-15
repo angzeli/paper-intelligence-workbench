@@ -39,6 +39,17 @@ pytest tests/test_evidence_graph_v2_1.py
 - No PDF text, copyrighted paper text, fabricated metadata, or fabricated claims are included.
 - Graph exports may contain local titles, paper IDs, citation keys, tags, and user-entered claim metadata already present in the workspace.
 - Graph analytics are local connectivity checks, not scientific-truth checks.
+- The tracked public dogfood demo has been replaced with synthetic-only placeholders.
+- Data-safety checks now flag non-synthetic public demo registry rows, copied BibTeX-style demo metadata, and non-synthetic PDF filename mentions in public demo Markdown.
+
+## Blocker Fix Validation
+
+- Removed tracked private dogfood outputs from `public/demos/v2_0_dogfood_real/`.
+- Preserved the removed private dogfood output locally outside the repository before cleanup.
+- Changed `scripts/performance_sanity.py` default output to ignored `scratch/performance_sanity.md` so the script no longer overwrites a committed historical report by default.
+- Aligned package metadata with v2.1 and updated v2 API/CLI surface docs to mark graph and advanced workflows honestly.
+- `python scripts/data_safety_audit.py --strict`: 0 errors, 7 warnings.
+- Full `python -m pytest -q`: passed.
 
 ## Known Limitations
 
@@ -51,4 +62,3 @@ pytest tests/test_evidence_graph_v2_1.py
 ## Verdict
 
 Ready for local dogfooding as an experimental v2.1 feature. Keep graph analytics marked experimental until they have been used on a real project and false-positive behavior has been reviewed.
-

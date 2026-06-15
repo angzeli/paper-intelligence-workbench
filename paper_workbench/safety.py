@@ -25,6 +25,8 @@ SECRET_PATTERNS = [
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
 ]
 PUBLISHER_BYPASS_TERMS = ("sci-" + "hub",)
+PUBLIC_DEMO_PREFIX = "public/demos/"
+PUBLIC_DEMO_PDF_PATTERN = re.compile(r"\b[A-Za-z0-9][A-Za-z0-9_.-]*\.pdf\b", re.IGNORECASE)
 
 
 @dataclass(slots=True)
@@ -76,6 +78,57 @@ def _skip_absolute_path_content_scan(relative_path: str) -> bool:
     )
 
 
+def _public_demo_metadata_findings(relative_path: str, content: str) -> list[SafetyFinding]:
+    if not relative_path.startswith(PUBLIC_DEMO_PREFIX):
+        return []
+
+    findings: list[SafetyFinding] = []
+    path = Path(relative_path)
+    lower_content = content.lower()
+    name = path.name.lower()
+
+    if name == "registry.csv":
+        data_rows = [line for line in content.splitlines()[1:] if line.strip()]
+        unsafe_rows = [line for line in data_rows if "synthetic" not in line.lower() and "placeholder" not in line.lower()]
+        if unsafe_rows:
+            findings.append(
+                SafetyFinding(
+                    "error",
+                    "public_demo_real_metadata",
+                    relative_path,
+                    "Public demo registry rows must be synthetic placeholders, not real paper metadata.",
+                )
+            )
+
+    if path.suffix.lower() == ".bib" and "@" in content and "synthetic" not in lower_content and "placeholder" not in lower_content:
+        findings.append(
+            SafetyFinding(
+                "error",
+                "public_demo_real_metadata",
+                relative_path,
+                "Public demo BibTeX entries must be synthetic placeholders, not copied real bibliography metadata.",
+            )
+        )
+
+    if path.suffix.lower() == ".md":
+        unsafe_pdf_names = [
+            match.group(0)
+            for match in PUBLIC_DEMO_PDF_PATTERN.finditer(content)
+            if "synthetic" not in match.group(0).lower() and "placeholder" not in match.group(0).lower()
+        ]
+        if unsafe_pdf_names:
+            findings.append(
+                SafetyFinding(
+                    "error",
+                    "public_demo_private_filename",
+                    relative_path,
+                    "Public demo Markdown mentions PDF filenames that do not look synthetic; keep real dogfood filenames untracked.",
+                )
+            )
+
+    return findings
+
+
 def audit_data_safety(root: str | Path = ".", *, max_file_bytes: int = 1_000_000) -> SafetyAuditResult:
     root_path = Path(root)
     findings: list[SafetyFinding] = []
@@ -110,6 +163,7 @@ def audit_data_safety(root: str | Path = ".", *, max_file_bytes: int = 1_000_000
             findings.append(SafetyFinding("warning", "publisher_bypass_reference", rel, "Text mentions a publisher-bypass source."))
         if path.suffix.lower() == ".txt" and any(part in {"text", "papers"} for part in path.parts) and size > 20_000:
             findings.append(SafetyFinding("warning", "large_text_sidecar", rel, "Tracked text sidecar is large; confirm it is synthetic or user-owned text."))
+        findings.extend(_public_demo_metadata_findings(rel, content))
     return SafetyAuditResult(root=str(root_path), files_checked=len(files), findings=findings)
 
 

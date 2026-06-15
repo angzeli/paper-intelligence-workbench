@@ -77,7 +77,7 @@ def build_report(papers: int, claims: int, themes: int) -> str:
         evidence_map = _timed("build evidence map", timings, lambda: evidence_map_report(loaded_papers, parsed_claims, theme_defs, notes))
 
     lines = [
-        "# Performance Sanity Report v0.3",
+        "# Performance Sanity Report",
         "",
         "This is a lightweight sanity check, not a strict benchmark.",
         "",
@@ -111,18 +111,18 @@ def build_report(papers: int, claims: int, themes: int) -> str:
             "",
             "## Result",
             "",
-            "The v0.3 workload completed locally without cloud services, LLM APIs, publisher scraping, or PDF assets.",
+            "The workload completed locally without cloud services, LLM APIs, publisher scraping, or PDF assets.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run a lightweight paperwb v0.3 performance sanity check.")
+    parser = argparse.ArgumentParser(description="Run a lightweight paperwb performance sanity check.")
     parser.add_argument("--papers", type=int, default=100, help="Number of synthetic papers to generate.")
     parser.add_argument("--claims", type=int, default=220, help="Number of synthetic claims to generate.")
     parser.add_argument("--themes", type=int, default=6, help="Number of synthetic themes to generate.")
-    parser.add_argument("--out", default="reports/performance_sanity_v0_3.md", help="Markdown report path.")
+    parser.add_argument("--out", default="scratch/performance_sanity.md", help="Markdown report path.")
     parser.add_argument("--force", action="store_true", help="Overwrite the output report if it already exists.")
     args = parser.parse_args()
     report = build_report(args.papers, args.claims, args.themes)

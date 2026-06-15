@@ -1,7 +1,7 @@
 # CLI Reference v2
 
 Use `paperwb --help` and `paperwb COMMAND --help` for exact options. This page
-classifies command groups for v2.0.
+classifies command groups for the v2 release line.
 
 ## Stable Core
 

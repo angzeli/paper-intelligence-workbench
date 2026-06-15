@@ -21,7 +21,8 @@
 | Dashboard | `tests/test_dashboard_v1_6.py` |
 | Templates | `tests/test_templates_v1_7.py` |
 | Dogfooding onboarding | `tests/test_dogfood_v2_0.py` |
-| Release contracts | `tests/test_v1_0_rc_command_contracts.py`, `tests/test_v2_release_candidate.py` |
+| Evidence graph | `tests/test_evidence_graph_v2_1.py` |
+| Release contracts and hygiene | `tests/test_v1_0_rc_command_contracts.py`, `tests/test_v2_release_candidate.py`, `tests/test_release_engineering_v0_8.py` |
 
 Run:
 

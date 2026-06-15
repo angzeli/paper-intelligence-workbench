@@ -16,7 +16,7 @@ def test_package_metadata_matches_import_version_and_cli_entrypoint():
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert f'version = "{__version__}"' in content
-    assert __version__ == "2.0"
+    assert __version__ == "2.1"
     assert 'requires-python = ">=3.10"' in content
     assert "dependencies = []" in content
     assert 'paperwb = "paper_workbench.cli:main"' in content
@@ -118,6 +118,45 @@ def test_data_safety_audit_module_flags_forbidden_artifacts_without_failing_on_w
     assert result.files_checked > 0
     assert not result.errors
     assert "Data Safety Audit v0.10" in markdown
+
+
+def test_data_safety_flags_real_metadata_in_public_demo_registry(tmp_path):
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, text=True, capture_output=True)
+    registry = tmp_path / "public" / "demos" / "v2_0_dogfood_real" / "projects" / "demo" / "registry.csv"
+    registry.parent.mkdir(parents=True)
+    registry.write_text(
+        "paper_id,title,authors,year,journal,doi,bibtex_key,reading_status,included_in_lit_review,tags,notes_path,project,source_type,user_comment\n"
+        "real_demo,Real Photocatalysis Article,Real Author,2024,Real Journal,,realKey,unread,yes,photocatalysis,notes/real_demo.md,demo,journal_article,\n",
+        encoding="utf-8",
+    )
+    subprocess.run(["git", "add", "."], cwd=tmp_path, check=True, text=True, capture_output=True)
+
+    result = audit_data_safety(tmp_path)
+
+    assert any(finding.code == "public_demo_real_metadata" for finding in result.errors)
+
+
+def test_performance_sanity_default_writes_to_scratch(tmp_path):
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "performance_sanity.py"),
+            "--papers",
+            "4",
+            "--claims",
+            "6",
+            "--themes",
+            "2",
+        ],
+        cwd=tmp_path,
+        check=False,
+        text=True,
+        capture_output=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert (tmp_path / "scratch" / "performance_sanity.md").exists()
+    assert not (tmp_path / "reports" / "performance_sanity_v0_3.md").exists()
 
 
 def test_ci_runs_v0_8_release_checks():

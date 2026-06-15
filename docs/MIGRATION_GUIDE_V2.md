@@ -1,6 +1,6 @@
 # Migration Guide v2
 
-v2.0rc supports both the legacy `data/` workflow and project profiles under
+v2 supports both the legacy `data/` workflow and project profiles under
 `projects/`. Migration is optional.
 
 ## Recommended Migration Path
@@ -38,4 +38,3 @@ paperwb migrate run --from legacy --to-project migrated_review --force
 
 Do not migrate during active note editing. Finish or commit local note changes
 first, run diagnostics, and review the migration plan before copying.
-

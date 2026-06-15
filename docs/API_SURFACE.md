@@ -1,7 +1,7 @@
-# API Surface v1.8
+# API Surface v2
 
 Paper Intelligence Workbench is a local-first command-line project. The Python
-package is usable by tests and scripts, but v1.8 does not promise a broad
+package is usable by tests and scripts, but v2 does not promise a broad
 stable library API. The stable user interface is the `paperwb` CLI plus the
 documented local file formats.
 
@@ -9,9 +9,9 @@ The package does not use cloud APIs, LLM APIs, publisher scraping, or remote
 metadata lookup. API helpers operate on user-provided local CSV, JSON,
 Markdown, BibTeX, RIS, text sidecar, and project-profile files.
 
-## Stable For v1.8
+## Stable For v2
 
-The stable external API for v1.8 is the CLI plus documented file formats.
+The stable external API for v2 is the CLI plus documented file formats.
 For Python callers, only these small entry points are treated as stable enough
 for local automation:
 
@@ -78,6 +78,8 @@ the CLI when possible unless a script specifically needs Python objects:
 - `paper_workbench.manuscript`: reviewer-style manuscript QA and traceability
   helpers built on the draft-audit core.
 - `paper_workbench.rules`: local declarative rule engine and built-in adapters.
+- `paper_workbench.graph`: local evidence graph models, builders, transparent
+  analytics, and JSON/DOT/Markdown exports.
 - `paper_workbench.errors`: user-facing diagnostic taxonomy helpers.
 - `paper_workbench.doctor`: workspace-health aggregation.
 
@@ -99,7 +101,7 @@ They can be imported by tests, but they are not a stable extension API.
 
 ## Compatibility Notes
 
-- v1.8 keeps the legacy `data/` workflow and the `projects/` workflow.
+- v2 keeps the legacy `data/` workflow and the `projects/` workflow.
 - CSV, JSON, Markdown notes, BibTeX, RIS, and theme JSON remain authoritative
   inputs.
 - SQLite indexes, audit logs, caches, backups, and generated reports are

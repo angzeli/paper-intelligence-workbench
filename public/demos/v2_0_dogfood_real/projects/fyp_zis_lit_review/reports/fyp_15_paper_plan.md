@@ -1,96 +1,51 @@
-# Metadata-backed Dogfood Plan
+# Synthetic 15-Paper Dogfood Plan
 
-This is a local planning report. It does not copy PDFs, read PDF text, write registry rows, or fabricate metadata.
+This public report uses placeholder filenames and placeholder BibTeX keys. A
+real plan generated from private local references must not be committed.
 
-Project: `fyp_zis_lit_review`
-References directory: `<references_dir>`
-BibTeX file: `<ref.bib>`
+## Inputs
 
-## Summary
+- References directory: `<references_dir>`
+- BibTeX file: `<ref.bib>`
+- Limit: 15
 
-- PDF files found: 146
-- Obvious supplement files excluded: 1
-- BibTeX keys found: 129
-- Direct filename/BibTeX key matches: 90
-- Starter papers selected: 15
+## Counts
 
-## 15-paper Starter Shortlist
+- PDF files found: 17 synthetic placeholders
+- Supplement files excluded: 2 synthetic placeholders
+- BibTeX keys found: 15 synthetic placeholders
+- Direct filename/BibTeX matches: 15 synthetic placeholders
 
-| PDF filename | BibTeX key |
-| --- | --- |
-| `001_sigl2024znin.pdf` | `sigl2024znin` |
-| `002_campbell1900preparation.pdf` | `campbell1900preparation` |
-| `003_rath2011direct.pdf` | `rath2011direct` |
-| `004_vakalopoulou2022metal.pdf` | `vakalopoulou2022metal` |
-| `011_pradhan2003synthesis.pdf` | `pradhan2003synthesis` |
-| `014_fischereder2013solution.pdf` | `fischereder2013solution` |
-| `017_vakalopoulou2020synthesis.pdf` | `vakalopoulou2020synthesis` |
-| `018_macreadie2015soluble.pdf` | `macreadie2015soluble` |
-| `019_chesman2014solution.pdf` | `chesman2014solution` |
-| `020_lewis2015situ.pdf` | `lewis2015situ` |
-| `022_van2019ultrathin.pdf` | `van2019ultrathin` |
-| `023_roy2000xanthates.pdf` | `roy2000xanthates` |
-| `024_hao2019metal.pdf` | `hao2019metal` |
-| `025_chandrasekaran2019recent.pdf` | `chandrasekaran2019recent` |
-| `026_takayama2017development.pdf` | `takayama2017development` |
+## Synthetic Starter Shortlist
 
-## Unmatched PDFs
+| Rank | Placeholder PDF | Placeholder BibTeX key | Action |
+| ---: | --- | --- | --- |
+| 1 | `synthetic_zis_demo_01.pdf` | `syntheticZisDemo01` | Verify metadata manually before adding to registry |
+| 2 | `synthetic_zis_demo_02.pdf` | `syntheticZisDemo02` | Verify metadata manually before adding to registry |
+| 3 | `synthetic_zis_demo_03.pdf` | `syntheticZisDemo03` | Verify metadata manually before adding to registry |
+| 4 | `synthetic_zis_demo_04.pdf` | `syntheticZisDemo04` | Verify metadata manually before adding to registry |
+| 5 | `synthetic_zis_demo_05.pdf` | `syntheticZisDemo05` | Verify metadata manually before adding to registry |
+| 6 | `synthetic_zis_demo_06.pdf` | `syntheticZisDemo06` | Verify metadata manually before adding to registry |
+| 7 | `synthetic_zis_demo_07.pdf` | `syntheticZisDemo07` | Verify metadata manually before adding to registry |
+| 8 | `synthetic_zis_demo_08.pdf` | `syntheticZisDemo08` | Verify metadata manually before adding to registry |
+| 9 | `synthetic_zis_demo_09.pdf` | `syntheticZisDemo09` | Verify metadata manually before adding to registry |
+| 10 | `synthetic_zis_demo_10.pdf` | `syntheticZisDemo10` | Verify metadata manually before adding to registry |
+| 11 | `synthetic_zis_demo_11.pdf` | `syntheticZisDemo11` | Verify metadata manually before adding to registry |
+| 12 | `synthetic_zis_demo_12.pdf` | `syntheticZisDemo12` | Verify metadata manually before adding to registry |
+| 13 | `synthetic_zis_demo_13.pdf` | `syntheticZisDemo13` | Verify metadata manually before adding to registry |
+| 14 | `synthetic_zis_demo_14.pdf` | `syntheticZisDemo14` | Verify metadata manually before adding to registry |
+| 15 | `synthetic_zis_demo_15.pdf` | `syntheticZisDemo15` | Verify metadata manually before adding to registry |
 
-- `005_ikeda1966crystal.pdf`
-- `006_vagvala2016effect.pdf`
-- `007_buchmaier2016room.pdf`
-- `008_vakalopoulou2023colloidal.pdf`
-- `009_jen2010synthesis.pdf`
-- `010_rath2015structural.pdf`
-- `012_nair2002cadmium.pdf`
-- `013_shombe2020direct.pdf`
-- `016_vakalopoulou2022honeycomb.pdf`
-- `021_arar2013influence.pdf`
-- `028_zhang2013metal.pdf`
-- `029_shiga2016metal.pdf`
-- `030_wang2012electronics.pdf`
-- `031_vahrenkamp1975sulfur.pdf`
-- `032_pokropivny2007classification.pdf`
-- `033_wang1991nanometer.pdf`
-- `034_hernandez2009development.pdf`
-- `037_dutta2006facile.pdf`
-- `039_fujishima1972electrochemical.pdf`
-- `042_kang2015high.pdf`
-- `045_carlsson2010chemica.pdf`
-- `050_chen2014one.pdf`
-- `053_medina2018development.pdf`
-- `061_williams2017copper.pdf`
-- `069_xue2022bifunctional.pdf`
-- `070_xie2023construction.pdf`
-- `071_qian2020hexagonal.pdf`
-- `072_yan2022highly.pdf`
-- `074_fang2010synthesis.pdf`
-- `076_ran2014earth.pdf`
-- `078_wu2023reversible.pdf`
-- `083_nahar2017advances.pdf`
-- `086_wang2021situ.pdf`
-- `088_wang2024developments.pdf`
-- `089_he2024adsorption.pdf`
-- `090_ren2023mechanism.pdf`
-- `112_yang2021znin2s4.pdf`
-- `115_wu2023znin2s4.pdf`
-- `116_song2021review.pdf`
-- `117_sun2022surface.pdf`
-- `121_omr2025znin2s4.pdf`
-- `122_omr2025functionally.pdf`
-- `127_jiang2022spatial.pdf`
-- `129_zhong2011photo.pdf`
-- `130_kanan2009cobalt.pdf`
-- `131_xu2025localized.pdf`
-- `133_xin2024large.pdf`
-- `134_wang2024efficient.pdf`
-- `135_ivanova2025optical.pdf`
-- `137_jang2019photoelectrochemical.pdf`
-- ... 5 more
+## Unmatched Placeholder PDFs
 
-## Next Safe Steps
+- `synthetic_zis_demo_16.pdf`
+- `synthetic_zis_demo_17_esi.pdf` (supplement placeholder)
 
-1. Review the shortlist manually.
-2. Add verified registry metadata by hand or through a dry-run importer.
-3. Link local files only after checking paths and permissions.
-4. Generate note templates and write claims manually after reading.
+## Unmatched Placeholder BibTeX Keys
+
+None in this synthetic report.
+
+## Boundary
+
+The planning command does not write registry rows, copy PDFs, parse PDF text, or
+generate claims. The user must verify each paper and add metadata manually.

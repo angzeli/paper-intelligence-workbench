@@ -1,10 +1,10 @@
 {
-  "name": "fyp_zis_lit_review",
-  "description": "Photocatalysis Literature Review project from template photocatalysis",
-  "is_default": false,
-  "registry_path": "registry.csv",
-  "bibtex_path": "bibtex/library.bib",
-  "notes_dir": "notes",
-  "themes_path": "themes.json",
-  "reports_dir": "reports"
+  "project": "fyp_zis_lit_review",
+  "name": "Synthetic FYP ZIS Literature Review Demo",
+  "description": "Synthetic public dogfood scaffold; replace placeholders with verified local metadata before real use.",
+  "registry": "registry.csv",
+  "bibtex": "bibtex/library.bib",
+  "notes": "notes",
+  "themes": "themes.json",
+  "reports": "reports"
 }

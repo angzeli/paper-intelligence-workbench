@@ -1,6 +1,6 @@
 # Deprecation Policy
 
-Paper Intelligence Workbench v2.0rc has no deprecated CLI command groups.
+Paper Intelligence Workbench v2 has no deprecated CLI command groups.
 
 ## Policy
 
@@ -11,7 +11,7 @@ Paper Intelligence Workbench v2.0rc has no deprecated CLI command groups.
   `docs/STABLE_SURFACE_V2.md`.
 - Cache, index, audit-log, backup, and migration-plan internals may change as
   long as dry-run and non-destructive behavior is preserved.
-- Legacy `data/` workflows are supported in v2.0rc. If they are ever deprecated,
+- Legacy `data/` workflows are supported in v2. If they are ever deprecated,
   migration planning must remain copy-only and non-destructive.
 
 ## What Counts As Breaking
@@ -21,4 +21,3 @@ Paper Intelligence Workbench v2.0rc has no deprecated CLI command groups.
 - Dropping stable registry or note fields without migration guidance.
 - Changing dry-run behavior into write behavior.
 - Treating heuristic evidence matching as truth evaluation.
-

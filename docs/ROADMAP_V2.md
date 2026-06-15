@@ -5,7 +5,7 @@
 - Use `paperwb dogfood create photocatalysis` as the recommended first real-project path.
 - Keep dogfood scaffolds empty until users add verified metadata.
 - Use metadata-backed planning reports before manually adding a 10-15 paper starter set.
-- Keep the v2.0 release reports current.
+- Keep current release reports up to date after each blocker fix.
 - Run full tests, smoke workflow, notebook validation, and data-safety audit.
 - Confirm no cache, audit, backup, PDF, or build artifacts are staged.
 - Run one dogfooding simulation on a private local project before public release.

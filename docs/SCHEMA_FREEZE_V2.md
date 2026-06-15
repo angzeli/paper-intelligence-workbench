@@ -1,6 +1,6 @@
 # Schema Freeze v2
 
-This page documents the v2.0rc local data schemas. The tool uses files, not a
+This page documents the v2 local data schemas. The tool uses files, not a
 required database.
 
 ## Registry CSV
@@ -82,4 +82,3 @@ rule condition types are documented in `docs/RULE_CONFIG_SCHEMA.md`.
 - Audit logs, session logs, backup manifests, sync plans, and migration reports
   are local safety artifacts. Treat their schema as experimental unless a future
   release explicitly freezes them.
-

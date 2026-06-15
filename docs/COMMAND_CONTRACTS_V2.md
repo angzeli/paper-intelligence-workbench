@@ -1,6 +1,6 @@
 # Command Contracts v2
 
-This page freezes the v2.0 command expectations for external dogfooding. It
+This page freezes the v2 command expectations for external dogfooding. It
 documents command behavior, not internal implementation details.
 
 ## Global Contract
@@ -52,6 +52,7 @@ documents command behavior, not internal implementation details.
 | `migrate` | Legacy-to-project | legacy data | plan/copy report | plan/dry-run first; copy-only | experimental | migration tests |
 | `rules` | Declarative checks | JSON rules | findings/report | read-only except report | experimental | rule tests |
 | `dashboard` | Summary | project/workspace | stdout/Markdown | read-only except `--out` | stable | dashboard tests |
+| `graph` | Evidence graph | project registry/BibTeX/notes/themes | stdout/Markdown/JSON/DOT | read-only except `--out` | experimental | graph tests |
 | `synthetic` | Fixtures | generator options | synthetic project | refuses existing without force | internal/test utility | synthetic tests |
 
 ## Exit Codes

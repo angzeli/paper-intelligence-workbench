@@ -1,6 +1,6 @@
 # Stable Surface v2
 
-Paper Intelligence Workbench v2.0 is a local-first release. The
+Paper Intelligence Workbench v2 is a local-first release line. The
 stable surface is the CLI plus documented CSV, JSON, Markdown, BibTeX, and
 project-profile file formats. The Python package remains usable for local
 scripts, but direct imports outside the documented stable helpers should be
