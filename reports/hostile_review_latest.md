@@ -1,240 +1,290 @@
-# Hostile Maintainer Review: v1.7 Current Repository
+# Hostile Maintainer Review: Current Repository
 
-Date: 2026-06-11
+Date: 2026-06-15
 
-Scope: standalone release review of the current repository as if it were about
-to be handed to external users. I inspected package metadata, CLI behavior,
-project profiles, registry/BibTeX/note/claim workflows, reports, authoring and
-manuscript tooling, import/export, sync, local files, indexed search, rule
-engine, dashboard, v1.7 project templates, tests, notebooks, docs, generated
-reports, synthetic data, CI/release scripts, and repo hygiene. No implementation
-files were modified during inspection.
+Scope: release-gate review of the current repository as if deciding whether it
+is safe for local dogfooding and eventual external handoff. I inspected package
+metadata, module layout, CLI behavior, stable/experimental docs, registry and
+BibTeX workflows, notes and claims, evidence maps, draft/manuscript QA, reading
+sessions, import/export, sync planning, search/indexing, backup/migration,
+integrity, rule engine, dashboard, evidence graph, tests, docs, notebooks,
+reports, synthetic data, data-safety boundaries, `.gitignore`, and git state.
 
 ## Release Verdict
 
-Do not tag this exact tree as a polished external v1.7 release yet. The package
-imports, full pytest suite passes, CLI smoke workflow passes, notebook JSON
-checks pass, and I did not find a tracked PDF/cache/SQLite artifact or a
-cloud/LLM/scraping dependency. The new template feature is useful and mostly
-non-destructive.
+**Needs blocker fixes before being treated as a clean dogfooding release.**
 
-However, the v1.7 template release has visible release-quality defects:
-finance, ML-methods, and generic templates produce contradictory theme coverage
-thresholds between their generated `themes.json` metadata and their generated
-`rules.json` rules; the current report index misclassifies v1.7 template
-overview reports as legacy unversioned reports; and stale ignored package
-artifacts for version `1.1.0` remain in the local workspace. These are not
-data-loss bugs, but they are the kind of issues an external user or maintainer
-will hit immediately when dogfooding the new template workflow.
+The package imports, the CLI entry point works, the full test suite passes, the
+notebook checker passes, and representative smoke workflows run. The current
+implementation is usable by the maintainer locally.
 
-Verdict: **hold external v1.7 release until the high-priority template and
-release-index fixes below land**. Internal/local use remains acceptable.
+The repository is not clean enough for a serious dogfooding release because a
+tracked public dogfood demo contains real-looking bibliography metadata and PDF
+filename-derived starter lists. This conflicts with the repository's own rules
+in `AGENTS.md`, which explicitly say not to commit private dogfood reference
+paths, real PDF filenames, copied BibTeX metadata, or starter lists derived
+from private files. The built-in data-safety audit also reports zero errors
+despite this, so the safety tooling does not enforce the stated boundary.
 
 ## Validation Performed
 
-- `git status --short`: clean before report creation.
-- `python -m pytest -q`: passed, 233 tests.
-- `python scripts/smoke_cli_workflow.py --quick --out <tmp>/paperwb_hostile_review_smoke_v1_7.md`: passed, 14 steps.
-- `python scripts/data_safety_audit.py --out <tmp>/paperwb_hostile_review_data_safety_v1_7.md --strict`: passed with 0 errors and 8 historical absolute-path warnings.
-- `python scripts/check_notebooks.py`: checked 8 notebooks.
-- `python scripts/clean_room_install_check.py --quick --out <tmp>/paperwb_hostile_clean_room_v1_7.md`: passed, 7 steps.
-- `python -m paper_workbench.cli --help`: passed; `template` is exposed.
-- `python -m paper_workbench.cli template --help`: passed.
-- `python -m paper_workbench.cli template list`: passed; four templates are listed.
-- `python -m paper_workbench.cli template inspect photocatalysis`: passed.
-- `python -m paper_workbench.cli template inspect finance`: passed.
-- `python -m paper_workbench.cli template create finance --project review_finance --root <tmp>`: passed.
-- `paperwb rules validate-config --project` on all four generated template projects: passed.
-- `paperwb doctor`, `dashboard`, and `rules run` on generated template projects: passed but exposed threshold inconsistencies.
-- `python -m paper_workbench.cli validate-registry data/registries/example_papers.csv`: passed with expected synthetic duplicate warnings/errors.
-- `python -m paper_workbench.cli validate-bib data/bibtex/example_library.bib --registry data/registries/example_papers.csv`: passed with expected synthetic BibTeX warnings/errors.
-- `git ls-files "*.pdf" "*.sqlite" "*.db" ".paperwb/*" "*/.paperwb/*" "__pycache__/*" "*/__pycache__/*" ".pytest_cache/*" "build/*" "dist/*" "*.egg-info/*"`: no tracked forbidden artifacts found.
+- `git status --short --branch`: clean before report creation; branch is ahead
+  of origin by local commits.
+- `python -c "import paper_workbench; print(paper_workbench.__version__)"`:
+  `2.0`.
+- `python -m paper_workbench.cli --help`: passed; 32 top-level command groups.
+- `python -m paper_workbench.cli graph --help`: passed.
+- `python -m paper_workbench.cli dogfood --help`: passed.
+- `python -m paper_workbench.cli dashboard --help`: passed.
+- `python -m paper_workbench.cli validate-registry projects/zis_photocatalysis/registry.csv --strict`: passed.
+- `python -m paper_workbench.cli validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict`: passed with a warning only.
+- `python -m paper_workbench.cli dashboard --project zis_photocatalysis --limit 5 --no-audit-log`: passed.
+- `python -m paper_workbench.cli graph build --project zis_photocatalysis`: passed.
+- Representative evidence-map, manuscript QA, reading queue, and sync-plan
+  commands: passed and wrote only ignored `scratch/` outputs.
+- `python scripts/check_notebooks.py`: checked 8 notebooks; passed.
+- `python scripts/data_safety_audit.py --out '' --strict`: checked 713 files;
+  0 errors, 8 warnings.
+- `python scripts/smoke_cli_workflow.py`: 21 smoke steps, 0 failures.
+- `python scripts/smoke_cli_workflow.py --quick`: 14 smoke steps, 0 failures.
+- `python scripts/performance_sanity.py`: failed by default because the default
+  report path already exists.
+- `python scripts/performance_sanity.py --out scratch/review_performance_sanity.md --force`: passed.
+- `pytest`: 259 passed.
+- `git ls-files` checks found no tracked PDFs, SQLite databases, `.paperwb`
+  files, backup archives, `.idea` files, or Python caches.
 
 ## Release Blockers
 
-None found that would destroy user data, require network/cloud services, commit
-copyrighted content, make the package unimportable, or break the CLI entry
-point. The release should still be held for the high-priority v1.7 defects
-below because they directly affect the newly advertised template workflow.
+1. **Tracked public dogfood demo violates the repo's own data-safety boundary.**
+
+   Evidence: `public/demos/v2_0_dogfood_real/` is tracked and contains a
+   populated real-project registry, copied BibTeX entries, note filenames, an
+   Obsidian export, report outputs, and `reports/fyp_15_paper_plan.md` with
+   PDF filename-derived starter shortlist and unmatched PDF filenames. It does
+   not contain PDFs or copied paper full text, and its notes are blank, but it
+   still includes real-looking paper titles, authors, journals, BibTeX keys,
+   and PDF filenames.
+
+   Why this blocks dogfooding release: this directly contradicts the current
+   policy in `AGENTS.md` and the product boundary repeated throughout the docs.
+   The project says dogfood planning can inspect private local files but must
+   not commit copied BibTeX metadata, private filenames, or private starter
+   lists. This is the exact scenario those rules were meant to prevent.
+
+2. **The data-safety audit does not detect the most important current risk.**
+
+   Evidence: `python scripts/data_safety_audit.py --out '' --strict` reports
+   `0 error(s), 8 warning(s)` while the tracked public demo contains real
+   bibliography metadata and filename-derived paper lists. The audit detects
+   forbidden file suffixes, caches, secrets, absolute paths, and large text
+   sidecars, but not committed real-looking bibliography corpora under a public
+   demo path.
+
+   Why this blocks release: maintainers could run the advertised safety audit,
+   see zero errors, and assume the repository is clean when it is not clean
+   under its own rules.
 
 ## High-Priority Issues
 
-1. **Generated template theme thresholds contradict generated rule thresholds.**
+1. **Release identity is inconsistent after v2.1 work.**
 
-   Evidence: a direct check of `paper_workbench.templates` reports mismatches
-   for every finance theme, every ML-methods theme, and the generic
-   `future-work` theme. Example output:
+   The code reports package version `2.0`, while current release reports and
+   docs describe v2.1 evidence graph behavior. If the intended release is v2.1,
+   metadata and release docs need a clear policy: either keep package metadata
+   at `2.0` and describe v2.1 as unreleased/local, or update package metadata
+   and changelog coherently.
 
-   - `finance` themes have `min_papers=3` in `themes.json` but generated
-     `finance.*.min_papers` rules require `2`.
-   - `ml-methods` themes have `min_papers=3` in `themes.json` but generated
-     `ml.*.min_papers` rules require `2`.
-   - `generic.future-work` has `min_papers=1` in `themes.json` but the generated
-     custom rule requires `2`.
+2. **Command-surface docs disagree about stability.**
 
-   User-visible impact: `paperwb doctor --project review_finance` reports
-   `target is 3` for theme papers, while `paperwb rules run --project
-   review_finance` also reports `finance.valuation.min_papers ... target is 2`.
-   The dashboard then mixes both thresholds. This undermines the central v1.7
-   promise that templates create clear onboarding expectations. Make theme
-   metadata and custom rule thresholds agree, then add a test that every
-   built-in template has matching `theme.min_papers` and `theme_min_papers`
-   rule values.
+   - `docs/CLI_REFERENCE_V2.md` and `docs/EXPERIMENTAL_FEATURES_V2.md` classify
+     many workflows as experimental.
+   - `docs/CLI_SURFACE.md` still labels advanced imports, sync, index, files,
+     reading, manuscripts, rules, backup, migrate, and other workflows as
+     stable.
+   - `docs/COMMAND_CONTRACTS_V2.md` does not include the new `graph` command
+     group.
 
-2. **The report index is stale/misleading for the new v1.7 reports.**
+   This makes it unclear what an external user can rely on.
 
-   Evidence: `reports/index.md` has a "Current v1.7 Release Reports" section,
-   but it only lists `dogfooding_workflow_v1_7.md`,
-   `hostile_review_latest.md`, and `release_readiness_v1_7.md`. The required
-   v1.7 reports `template_photocatalysis_overview.md`,
-   `template_finance_overview.md`, and `template_ml_methods_overview.md` are
-   instead listed under "Legacy Unversioned Reports." They are unversioned by
-   filename because the task required those exact names, but they are not
-   legacy. Update report-index generation or the checked-in index so current
-   template overview reports appear in the current v1.7 release section. Add a
-   release-hygiene test for that classification.
+3. **API-surface docs are stale.**
 
-3. **Stale ignored build artifacts can confuse a maintainer preparing release artifacts.**
+   `docs/API_SURFACE.md` is still titled v1.8 and does not mention
+   `paper_workbench.graph`, even though graph is now a public importable module
+   with tests and CLI integration.
 
-   Evidence: the filesystem contains ignored local build artifacts:
-   `dist/paper_intelligence_workbench-1.1.0-py3-none-any.whl`,
-   `dist/paper_intelligence_workbench-1.1.0.tar.gz`, `build/`, and
-   `paper_intelligence_workbench.egg-info/`, while `pyproject.toml` and
-   `paper_workbench.__version__` are `1.7.0`. These files are ignored and not
-   tracked, so an external clone is clean. But in this release workspace, a
-   maintainer could easily upload or inspect stale `1.1.0` artifacts by mistake.
-   Clean ignored build artifacts before any public release and consider adding
-   a release-check script that fails when local `dist/` artifacts do not match
-   the current version.
+4. **The current public demo blurs "synthetic" versus "real" examples.**
+
+   The repo now contains both synthetic fixtures and a real metadata-backed demo
+   under `public/`. That is useful for the maintainer but risky for external
+   release: a new user cannot tell from the top-level docs which data is safe
+   reusable synthetic fixture data and which data came from a private real
+   project.
+
+5. **Default performance sanity script fails in a clean-looking working tree.**
+
+   `python scripts/performance_sanity.py` fails unless `--force` or a different
+   `--out` path is provided because it defaults to an already committed
+   historical report. Release checks should either default to `scratch/`, print
+   a clearer command, or require explicit output.
 
 ## Medium-Priority Issues
 
-1. **`clean_room_install_check.py` still writes a v1.0-rc titled report.**
+1. **The top-level CLI is too large to maintain comfortably.**
 
-   Evidence: running `python scripts/clean_room_install_check.py --quick --out
-   <tmp>/paperwb_hostile_clean_room_v1_7.md` produced a report headed
-   `# Current-Environment Release Check v1.0-rc`. The command passed, but the
-   label is stale for v1.7 and weakens trust in release-readiness evidence.
-   Update the script to derive or accept the current version in the report
-   title.
+   `paper_workbench/cli.py` is over 3,000 lines and owns command parsing,
+   validation, data loading, report writing, audit logging, and many workflow
+   adapters. This has not broken tests, but it is now the highest-risk
+   maintenance hotspot.
 
-2. **The data-safety audit still reports historical absolute-path warnings.**
+2. **Several feature modules are large enough to need stronger internal
+   boundaries.**
 
-   Evidence: the strict data-safety audit reports 0 errors but 8 warnings,
-   including historical reports with `/private/...` or `/Users/...` paths and
-   two tests containing `/private/...` strings. This is not a release blocker,
-   but a public repo should avoid normalizing machine-local paths in committed
-   reports.
+   `rules.py`, `index.py`, `reading.py`, `sync.py`, `authoring.py`, and
+   `graph.py` are all sizable. The risk is not raw size alone; it is that many
+   modules own both data modeling and report formatting, which makes regression
+   behavior harder to reason about.
 
-3. **`paperwb template create` prints absolute paths when `--root` is outside the current directory.**
+3. **Notebooks lag behind the feature surface.**
 
-   Evidence: `paperwb template create finance --project review_finance --root
-   <tmp>` prints absolute paths for every written template file. That is
-   useful for local confirmation, but users may paste command output into
-   committed notes/reports. Prefer workspace-relative display when possible,
-   matching the existing `profile_summary` behavior.
+   Static notebook validation passes, but only 8 notebooks exist and they stop
+   at the v0.6-era workflows. Newer graph, dashboard, sync, reading, dogfood,
+   manuscript, and safety workflows are covered by scripts/docs/tests rather
+   than notebooks. That is acceptable if documented, but the notebook story is
+   no longer representative of the full tool.
 
-4. **Generated report sprawl is making the current release hard to audit.**
+4. **Generated reports are numerous and partly stale.**
 
-   Evidence: `reports/index.md` indexes 136 Markdown reports. Historical
-   artifacts are useful for traceability, but the current release signal is
-   diluted. The index helps, but it needs stronger current/historical grouping
-   and should avoid classifying current required reports as legacy.
+   There are 167 Markdown reports. Many are historical release artifacts from
+   v0.x and v1.x. `reports/index.md` correctly indexes them, but the volume now
+   makes release review noisy. A public release should either move historical
+   reports into an archive folder or document that `reports/index.md` is the
+   entry point.
 
-5. **The CLI module remains very large.**
+5. **Graph analytics are correctly experimental but easy to overread.**
 
-   `paper_workbench/cli.py` wires every command group in one file. This is
-   working, but it increases regression risk as new feature groups are added.
-   Post-release, split parser/handler wiring into focused modules.
+   The graph reports state that centrality is a local degree count, not a truth
+   or quality score. Keep this warning prominent; graph-based "central paper"
+   labels are exactly the sort of output users may misinterpret.
+
+6. **Dashboard output is useful but noisy on the bundled synthetic project.**
+
+   The dashboard correctly surfaces workspace and rule errors in
+   `zis_photocatalysis`, but a new user may interpret bundled synthetic errors
+   as product breakage. The quickstart should be explicit that these warnings
+   are intentional training fixtures.
 
 ## Low-Priority Polish
 
-- Template overview reports are unversioned by filename while most recent
-  release artifacts are versioned. This is acceptable because the task required
-  exact filenames, but it increases report-index complexity.
-- The finance template docs correctly say "not investment advice," but the
-  finance template report should keep that boundary prominent in every overview
-  section if it becomes more detailed.
-- `paperwb project list` output is concise but not discoverable for template
-  users; a `template create` success message could suggest `doctor`,
-  `dashboard`, and `rules validate-config` next.
-- Notebook coverage is structurally valid but still trails late feature growth.
-  v1.7 added a script, not a notebook, which is acceptable under the task but
-  leaves docs-site onboarding more script-heavy than notebook-heavy.
-
-## Missing Tests
-
-- Template threshold consistency test: every built-in template should have
-  matching `theme.min_papers` metadata and `theme_min_papers` rule thresholds.
-- Report-index classification test: required current v1.7 template reports
-  should appear under the current release section, not legacy unversioned
-  reports.
-- Release-artifact hygiene test or script: fail or warn when ignored `dist/`
-  artifacts do not match `paper_workbench.__version__`.
-- Template create display-path test if the CLI is changed to avoid absolute
-  path output for external `--root` use.
-- A smoke step that runs `rules run` or `dashboard` on every built-in template,
-  not only the photocatalysis template.
-
-## Documentation Mismatches
-
-- `reports/index.md` misclassifies current v1.7 template overview reports as
-  legacy unversioned reports.
-- `scripts/clean_room_install_check.py` generates a v1.0-rc titled report even
-  in a v1.7 repository.
-- Template docs do not mention that finance/ML/generic currently have
-  inconsistent theme-vs-rule paper thresholds. That should be fixed in code,
-  not documented as expected behavior.
-
-## CLI Usability Problems
-
-- Finance, ML-methods, and generic template users receive contradictory
-  coverage targets across `doctor`, `rules run`, evidence-map findings, and
-  dashboard next actions.
-- Template creation with an external `--root` prints absolute local paths for
-  all generated files.
-- The top-level CLI has many command groups. Help output is accurate, but new
-  users may need the quickstart/template docs rather than raw `--help`.
+- `docs/API_SURFACE.md` and `docs/CLI_SURFACE.md` still use older release labels
+  in titles.
+- `scripts/performance_sanity.py --help` says v0.3; the script still works with
+  a custom output path, but the label is stale.
+- The report index includes `hostile_review_latest.md` as a current v2.1 report,
+  which is mechanically reasonable but semantically odd because the hostile
+  review is a release-gate artifact rather than a feature report.
+- The top-level docs are much cleaner than earlier versions, but there are
+  still overlapping pages for CLI reference, CLI surface, command contracts,
+  workflows, and getting started.
+- Some historical data-safety reports still contain old absolute-path warnings.
 
 ## Data-Safety Risks
 
-- No tracked PDFs, SQLite DBs, `.paperwb` logs, Python caches, build outputs,
-  or IDE folders were found.
-- No cloud, LLM, publisher-scraping, or copyrighted-content dependency risk was
-  found in inspected commands.
-- Ignored local caches and build artifacts exist in the maintainer workspace:
-  `.paperwb/`, `.pytest_cache/`, `paper_workbench/__pycache__/`, `build/`,
-  `dist/`, and egg-info. They are ignored, but release maintainers should clean
-  them before packaging or screenshots.
-- Data-safety audit warnings for historical absolute paths remain unresolved.
+- **Blocking:** tracked public real dogfood metadata and PDF filenames under
+  `public/demos/v2_0_dogfood_real/`.
+- **Blocking:** data-safety audit reports zero errors despite the above.
+- Ignored local `.paperwb/`, `.pytest_cache/`, `.idea/`, and `scratch/` files
+  exist in the working tree but are not tracked.
+- No tracked PDFs, SQLite databases, backup archives, or cache directories were
+  found.
+- No cloud, LLM, scraping, or publisher-bypass runtime dependency was found.
+
+## Docs Mismatches
+
+- `docs/CLI_SURFACE.md` overstates stability compared with
+  `docs/CLI_REFERENCE_V2.md` and `docs/EXPERIMENTAL_FEATURES_V2.md`.
+- `docs/COMMAND_CONTRACTS_V2.md` omits `graph`.
+- `docs/API_SURFACE.md` is stale at v1.8 and omits `paper_workbench.graph`.
+- `docs/TEST_MATRIX_V2.md` omits `tests/test_evidence_graph_v2_1.py`.
+- The docs say not to commit private dogfood filename lists and copied BibTeX
+  metadata, but the tracked public dogfood demo does exactly that.
+
+## CLI Usability Issues
+
+- The command surface is powerful but large: 32 top-level command groups.
+- `paperwb --help` is complete but overwhelming for a first-time user.
+- `scripts/performance_sanity.py` fails by default because it targets an
+  existing committed report.
+- The validation commands intentionally return 0 for error-level findings unless
+  `--strict` is supplied. This is documented, but it remains a scripting footgun
+  for users who expect validation errors to fail by default.
 
 ## Overengineering Risks
 
-- The repo has many feature layers: registry, BibTeX, notes, claims, evidence
-  maps, authoring, draft/manuscript QA, local files, indexed search, sync,
-  backup/migration, rules, dashboard, reading sessions, and now templates.
-  This is useful, but release confidence increasingly depends on contract tests
-  and current docs staying synchronized.
-- The dashboard and rule engine can surface the same underlying issue through
-  multiple adapters. The template threshold bug shows how duplicated validation
-  channels can become inconsistent if the source of truth is not clear.
-- Generated reports are numerous enough that stale or misclassified reports can
-  mislead maintainers. Future releases should keep one canonical current index
-  and automate its correctness.
+- The tool now includes registry, notes, claims, authoring, manuscript QA,
+  reading sessions, sync, local files, indexing, backups, migrations, rules,
+  dashboard, templates, dogfood, and graph. The feature set is broad enough that
+  future work should be consolidation, not expansion.
+- Avoid adding a graph database, embeddings, semantic matching, plugin
+  marketplace, web app, cloud sync, or PDF full-text extraction by default.
+- Keep graph analytics, manuscript matching, and dashboard next actions
+  transparent and explicitly heuristic.
 
-## Recommended Fix Sequence
+## Stale Generated Reports
 
-1. Fix template threshold consistency in `paper_workbench/templates.py` so
-   `themes.json` and generated `rules.json` agree for all built-in templates.
-2. Add tests for built-in template threshold consistency and run template
-   `doctor`/`rules run` smoke checks for all templates.
-3. Regenerate affected template overview reports and `reports/index.md`, and
-   add a release-hygiene assertion that current v1.7 template overview reports
-   are classified as current, not legacy.
-4. Clean ignored local build artifacts before any public packaging step; add a
-   release check for stale `dist/` artifact versions if release packaging will
-   happen from this workspace.
-5. Update the clean-room release-check report title so it reflects the current
-   package version.
-6. Rerun pytest, smoke CLI workflow, data-safety audit, notebook checks, and
-   representative template commands before tagging or handing off.
+- `reports/data_safety_audit_v0_10.md` is still the default output of
+  `scripts/data_safety_audit.py`; current release reviews should avoid
+  overwriting historical reports by default.
+- `reports/performance_sanity_v0_3.md` is still the default output of
+  `scripts/performance_sanity.py`, causing default failure.
+- Many historical release reports are valid artifacts but make the `reports/`
+  folder hard to scan manually.
+
+## Missing Tests
+
+- A safety test that fails when tracked `public/` demo files contain real
+  bibliography metadata, copied BibTeX metadata, PDF filename-derived starter
+  lists, or non-synthetic note filenames.
+- A data-safety audit test covering the public dogfood metadata policy.
+- Command-contract tests asserting `graph` is listed in v2 command contracts and
+  test matrix docs.
+- A regression test for `scripts/performance_sanity.py` default behavior, or a
+  test that the documented invocation uses a non-conflicting output path.
+- Optional docs consistency tests that compare stable/experimental command
+  classifications across `CLI_SURFACE`, `CLI_REFERENCE_V2`, and
+  `EXPERIMENTAL_FEATURES_V2`.
+
+## Recommended Blocker-Fix Sequence
+
+1. **Sanitize or remove the tracked real dogfood demo.**
+   Replace `public/demos/v2_0_dogfood_real/` with a synthetic public demo, or
+   move the real metadata-backed demo to an ignored private path. Do not keep
+   real paper titles, copied BibTeX metadata, PDF filenames, or starter lists in
+   tracked files.
+
+2. **Harden the data-safety audit.**
+   Add checks for real-looking public dogfood metadata and filename-derived PDF
+   lists. Make the current public-demo violation fail before claiming release
+   readiness.
+
+3. **Regenerate affected reports.**
+   Regenerate `reports/index.md`, a current data-safety report, and any dogfood
+   release reports after sanitizing the demo.
+
+4. **Align release identity and surface docs.**
+   Decide whether this tree is package version `2.0` with v2.1 experimental
+   docs, or an actual v2.1 package. Update `CHANGELOG.md`, `pyproject.toml`,
+   `CLI_SURFACE`, `COMMAND_CONTRACTS_V2`, `API_SURFACE`, and `TEST_MATRIX_V2`
+   accordingly.
+
+5. **Fix release-script defaults.**
+   Make `scripts/performance_sanity.py` default to `scratch/` or require an
+   explicit `--out` path so a default release check does not fail due to an
+   existing historical report.
+
+6. **Run validation again.**
+   Run `pytest`, `python scripts/smoke_cli_workflow.py`, `python
+   scripts/check_notebooks.py`, `python scripts/data_safety_audit.py --out ''
+   --strict`, and representative `paperwb graph`, dashboard, registry, BibTeX,
+   manuscript QA, sync-plan, and backup/integrity commands.
+
