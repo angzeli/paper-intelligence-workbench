@@ -2,26 +2,22 @@
 
 Reports directory: .
 
-Markdown reports indexed: 174
+Markdown reports indexed: 180
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v2.2 Release Reports
+## Current v2.3 Release Reports
 
-- [claim_review_queue_v2_2.md](claim_review_queue_v2_2.md)
-- [claims_used_in_drafts_v2_2.md](claims_used_in_drafts_v2_2.md)
-- [cli_smoke_workflow_v2_2.md](cli_smoke_workflow_v2_2.md)
-- [contradictions_v2_2.md](contradictions_v2_2.md)
-- [data_safety_audit_v2_2.md](data_safety_audit_v2_2.md)
-- [deprecated_claims_v2_2.md](deprecated_claims_v2_2.md)
-- [evidence_graph_summary_v2_2.md](evidence_graph_summary_v2_2.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [release_readiness_v2_2.md](release_readiness_v2_2.md)
-- [verified_claims_v2_2.md](verified_claims_v2_2.md)
+- [release_readiness_v2_3.md](release_readiness_v2_3.md)
+- [workflow_daily_check_v2_3.md](workflow_daily_check_v2_3.md)
+- [workflow_pre_writing_check_v2_3.md](workflow_pre_writing_check_v2_3.md)
+- [workflow_release_candidate_check_v2_3.md](workflow_release_candidate_check_v2_3.md)
+- [workflow_weekly_review_v2_3.md](workflow_weekly_review_v2_3.md)
 
 ## Next Patch Plan
 
-- [v2_3_recommended_patch_plan.md](v2_3_recommended_patch_plan.md)
+- [v2_4_recommended_patch_plan.md](v2_4_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -37,19 +33,26 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [citation_context_table_v1_4.md](citation_context_table_v1_4.md)
 - [citation_coverage_v1_1.md](citation_coverage_v1_1.md)
 - [claim_bank_v0_6.md](claim_bank_v0_6.md)
+- [claim_review_queue_v2_2.md](claim_review_queue_v2_2.md)
 - [claim_traceability_v1_4.md](claim_traceability_v1_4.md)
+- [claims_used_in_drafts_v2_2.md](claims_used_in_drafts_v2_2.md)
 - [clean_room_install_check_v1_0_rc.md](clean_room_install_check_v1_0_rc.md)
+- [cli_smoke_workflow_v2_2.md](cli_smoke_workflow_v2_2.md)
+- [contradictions_v2_2.md](contradictions_v2_2.md)
 - [dashboard_v1_6.md](dashboard_v1_6.md)
 - [data_safety_audit_v0_10.md](data_safety_audit_v0_10.md)
 - [data_safety_audit_v0_8.md](data_safety_audit_v0_8.md)
+- [data_safety_audit_v2_2.md](data_safety_audit_v2_2.md)
 - [data_safety_v1_0_rc.md](data_safety_v1_0_rc.md)
 - [data_safety_v2_0_rc.md](data_safety_v2_0_rc.md)
+- [deprecated_claims_v2_2.md](deprecated_claims_v2_2.md)
 - [dogfooding_project_template_v2_0.md](dogfooding_project_template_v2_0.md)
 - [dogfooding_workflow_v1_7.md](dogfooding_workflow_v1_7.md)
 - [draft_audit_v1_1.md](draft_audit_v1_1.md)
 - [duplicate_files_v0_7.md](duplicate_files_v0_7.md)
 - [error_taxonomy_v0_10.md](error_taxonomy_v0_10.md)
 - [evidence_graph_summary_v2_1.md](evidence_graph_summary_v2_1.md)
+- [evidence_graph_summary_v2_2.md](evidence_graph_summary_v2_2.md)
 - [evidence_map_v0_2.md](evidence_map_v0_2.md)
 - [evidence_matrix_v0_6.md](evidence_matrix_v0_6.md)
 - [example_workflow_validation_v2_0_rc.md](example_workflow_validation_v2_0_rc.md)
@@ -120,6 +123,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v2_0.md](release_readiness_v2_0.md)
 - [release_readiness_v2_0_rc.md](release_readiness_v2_0_rc.md)
 - [release_readiness_v2_1.md](release_readiness_v2_1.md)
+- [release_readiness_v2_2.md](release_readiness_v2_2.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
@@ -162,6 +166,8 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v1_8_recommended_patch_plan.md](v1_8_recommended_patch_plan.md)
 - [v2_1_recommended_patch_plan.md](v2_1_recommended_patch_plan.md)
 - [v2_2_recommended_patch_plan.md](v2_2_recommended_patch_plan.md)
+- [v2_3_recommended_patch_plan.md](v2_3_recommended_patch_plan.md)
+- [verified_claims_v2_2.md](verified_claims_v2_2.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
 - [workspace_integrity_v0_9.md](workspace_integrity_v0_9.md)
