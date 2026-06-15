@@ -2,289 +2,246 @@
 
 Date: 2026-06-15
 
-Scope: release-gate review of the current repository as if deciding whether it
-is safe for local dogfooding and eventual external handoff. I inspected package
-metadata, module layout, CLI behavior, stable/experimental docs, registry and
-BibTeX workflows, notes and claims, evidence maps, draft/manuscript QA, reading
-sessions, import/export, sync planning, search/indexing, backup/migration,
-integrity, rule engine, dashboard, evidence graph, tests, docs, notebooks,
+Scope: standalone release-gate review of the current Paper Intelligence
+Workbench repository as if deciding whether this version is safe for local
+dogfooding. I inspected package metadata, architecture, CLI behavior,
+stable/experimental docs, registry and BibTeX workflows, notes and claims,
+evidence maps, manuscript/draft QA, reading sessions, imports/exports,
+sync/conflict planning, search/indexing, backup/migration/integrity, rule
+engine, dashboard, evidence graph, claim lifecycle, tests, docs, notebooks,
 reports, synthetic data, data-safety boundaries, `.gitignore`, and git state.
 
 ## Release Verdict
 
-**Needs blocker fixes before being treated as a clean dogfooding release.**
+**Ready for cautious local dogfooding, but not clean enough for an external
+release without high-priority documentation and release-hygiene fixes.**
 
-The package imports, the CLI entry point works, the full test suite passes, the
-notebook checker passes, and representative smoke workflows run. The current
-implementation is usable by the maintainer locally.
+The current repository is materially healthier than the previous hostile review
+claimed. The package imports, `paperwb --help` works, full pytest passed,
+notebook validation passed, the strict data-safety audit reported zero errors,
+and representative stable and experimental workflows ran without crashes.
 
-The repository is not clean enough for a serious dogfooding release because a
-tracked public dogfood demo contains real-looking bibliography metadata and PDF
-filename-derived starter lists. This conflicts with the repository's own rules
-in `AGENTS.md`, which explicitly say not to commit private dogfood reference
-paths, real PDF filenames, copied BibTeX metadata, or starter lists derived
-from private files. The built-in data-safety audit also reports zero errors
-despite this, so the safety tooling does not enforce the stated boundary.
+There are no release blockers from this pass. The main risk is that the project
+now has a very broad command surface and a large archive of historical reports,
+while several visible labels still point at older release phases. That will
+confuse external users even though the local workflows themselves are usable.
 
 ## Validation Performed
 
-- `git status --short --branch`: clean before report creation; branch is ahead
-  of origin by local commits.
+- `git status --short --branch`: clean before creating this review report;
+  branch was `main...origin/main [ahead 13]`.
 - `python -c "import paper_workbench; print(paper_workbench.__version__)"`:
-  `2.0`.
-- `python -m paper_workbench.cli --help`: passed; 32 top-level command groups.
-- `python -m paper_workbench.cli graph --help`: passed.
-- `python -m paper_workbench.cli dogfood --help`: passed.
-- `python -m paper_workbench.cli dashboard --help`: passed.
-- `python -m paper_workbench.cli validate-registry projects/zis_photocatalysis/registry.csv --strict`: passed.
-- `python -m paper_workbench.cli validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict`: passed with a warning only.
-- `python -m paper_workbench.cli dashboard --project zis_photocatalysis --limit 5 --no-audit-log`: passed.
-- `python -m paper_workbench.cli graph build --project zis_photocatalysis`: passed.
-- Representative evidence-map, manuscript QA, reading queue, and sync-plan
-  commands: passed and wrote only ignored `scratch/` outputs.
-- `python scripts/check_notebooks.py`: checked 8 notebooks; passed.
-- `python scripts/data_safety_audit.py --out '' --strict`: checked 713 files;
-  0 errors, 8 warnings.
-- `python scripts/smoke_cli_workflow.py`: 21 smoke steps, 0 failures.
+  `2.2`.
+- `python -m paper_workbench.cli --help`: passed and listed the current top-level
+  command surface, including `graph`, `claim-review`, and `contradictions`.
+- `python -m pytest -q`: passed.
 - `python scripts/smoke_cli_workflow.py --quick`: 14 smoke steps, 0 failures.
-- `python scripts/performance_sanity.py`: failed by default because the default
-  report path already exists.
-- `python scripts/performance_sanity.py --out scratch/review_performance_sanity.md --force`: passed.
-- `pytest`: 259 passed.
-- `git ls-files` checks found no tracked PDFs, SQLite databases, `.paperwb`
-  files, backup archives, `.idea` files, or Python caches.
+- `python scripts/data_safety_audit.py --strict --out /private/tmp/paperwb_data_safety_review.md`:
+  checked 650 repository files, 0 errors, 7 warnings.
+- `python scripts/validate_notebooks.py`: validated 8 notebooks.
+- `python scripts/check_notebooks.py`: listed 8 notebook titles successfully.
+- `python -m paper_workbench.cli validate-registry projects/zis_photocatalysis/registry.csv --strict`:
+  passed with no findings.
+- `python -m paper_workbench.cli validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict`:
+  passed with one expected sparse synthetic BibTeX warning.
+- `python -m paper_workbench.cli dashboard --project zis_photocatalysis --limit 3 --no-audit-log`:
+  passed.
+- `python -m paper_workbench.cli graph summary --project zis_photocatalysis`:
+  passed, but printed a stale `v2.1` title.
+- `python -m paper_workbench.cli claim-review queue --project zis_photocatalysis --limit 2`:
+  passed.
+- `python -m paper_workbench.cli manuscript citations drafts/synthetic_good_section.md --project zis_photocatalysis`:
+  passed.
+- `python -m paper_workbench.cli rules run --project zis_photocatalysis`:
+  passed and reported expected synthetic fixture findings.
+- Tracked artifact scan found no tracked PDFs, SQLite databases, `.paperwb`
+  files, backup archives, `.idea` files, or Python cache files.
 
 ## Release Blockers
 
-1. **Tracked public dogfood demo violates the repo's own data-safety boundary.**
+None found in this pass.
 
-   Evidence: `public/demos/v2_0_dogfood_real/` is tracked and contains a
-   populated real-project registry, copied BibTeX entries, note filenames, an
-   Obsidian export, report outputs, and `reports/fyp_15_paper_plan.md` with
-   PDF filename-derived starter shortlist and unmatched PDF filenames. It does
-   not contain PDFs or copied paper full text, and its notes are blank, but it
-   still includes real-looking paper titles, authors, journals, BibTeX keys,
-   and PDF filenames.
-
-   Why this blocks dogfooding release: this directly contradicts the current
-   policy in `AGENTS.md` and the product boundary repeated throughout the docs.
-   The project says dogfood planning can inspect private local files but must
-   not commit copied BibTeX metadata, private filenames, or private starter
-   lists. This is the exact scenario those rules were meant to prevent.
-
-2. **The data-safety audit does not detect the most important current risk.**
-
-   Evidence: `python scripts/data_safety_audit.py --out '' --strict` reports
-   `0 error(s), 8 warning(s)` while the tracked public demo contains real
-   bibliography metadata and filename-derived paper lists. The audit detects
-   forbidden file suffixes, caches, secrets, absolute paths, and large text
-   sidecars, but not committed real-looking bibliography corpora under a public
-   demo path.
-
-   Why this blocks release: maintainers could run the advertised safety audit,
-   see zero errors, and assume the repository is clean when it is not clean
-   under its own rules.
+This verdict assumes the target is **local dogfooding**, not a polished public
+release. The repository still needs high-priority cleanup before it should be
+presented to external users as stable.
 
 ## High-Priority Issues
 
-1. **Release identity is inconsistent after v2.1 work.**
+1. **Visible release labels are stale in active commands and scripts.**
 
-   The code reports package version `2.0`, while current release reports and
-   docs describe v2.1 evidence graph behavior. If the intended release is v2.1,
-   metadata and release docs need a clear policy: either keep package metadata
-   at `2.0` and describe v2.1 as unreleased/local, or update package metadata
-   and changelog coherently.
+   Evidence: `paperwb graph summary --project zis_photocatalysis` prints
+   `# Evidence Graph Summary v2.1` while the package reports version `2.2`.
+   `paper_workbench/graph.py` also defaults graph report titles to v2.1, and
+   `scripts/smoke_cli_workflow.py` still defaults to `CLI Smoke Workflow v2.0rc`.
 
-2. **Command-surface docs disagree about stability.**
+   Why it matters: users will not know whether the generated report belongs to
+   the current release or a historical snapshot. This undermines confidence in
+   release-readiness reports even though the command behavior works.
 
-   - `docs/CLI_REFERENCE_V2.md` and `docs/EXPERIMENTAL_FEATURES_V2.md` classify
-     many workflows as experimental.
-   - `docs/CLI_SURFACE.md` still labels advanced imports, sync, index, files,
-     reading, manuscripts, rules, backup, migrate, and other workflows as
-     stable.
-   - `docs/COMMAND_CONTRACTS_V2.md` does not include the new `graph` command
-     group.
+2. **Documentation still has release-state drift around graph and current v2
+   workflows.**
 
-   This makes it unclear what an external user can rely on.
+   Evidence: `docs/STABLE_SURFACE_V2.md` says "`graph` is experimental in
+   v2.1" in a v2.2 repository. Current docs correctly list `graph`,
+   `claim-review`, and `contradictions` elsewhere, but the wording is not
+   consistently current.
 
-3. **API-surface docs are stale.**
+   Why it matters: stable versus experimental boundaries are central to this
+   repo's external-user story. Outdated version labels make the boundary look
+   accidental rather than intentional.
 
-   `docs/API_SURFACE.md` is still titled v1.8 and does not mention
-   `paper_workbench.graph`, even though graph is now a public importable module
-   with tests and CLI integration.
+3. **The data-safety audit default output path is historical and easy to
+   misuse.**
 
-4. **The current public demo blurs "synthetic" versus "real" examples.**
+   Evidence: running `python scripts/data_safety_audit.py --strict` without an
+   explicit `--out` rewrites `reports/data_safety_audit_v0_10.md`. I restored
+   that accidental rewrite before creating this report.
 
-   The repo now contains both synthetic fixtures and a real metadata-backed demo
-   under `public/`. That is useful for the maintainer but risky for external
-   release: a new user cannot tell from the top-level docs which data is safe
-   reusable synthetic fixture data and which data came from a private real
-   project.
+   Why it matters: a maintainer following the obvious command can mutate an old
+   tracked release report while trying to check current safety. CI avoids this
+   with a temporary output path, but the local maintainer path is footgun-prone.
 
-5. **Default performance sanity script fails in a clean-looking working tree.**
+4. **The top-level CLI exposes stable and experimental workflows side by side
+   with no status markers.**
 
-   `python scripts/performance_sanity.py` fails unless `--force` or a different
-   `--out` path is provided because it defaults to an already committed
-   historical report. Release checks should either default to `scratch/`, print
-   a clearer command, or require explicit output.
+   Evidence: `paperwb --help` lists a large command surface covering registry,
+   templates, dogfood, import, sync, claims, graph, rules, dashboard, files,
+   draft/manuscript QA, reading, backup, migration, export, and synthetic data.
+   The command list is complete, but it does not tell a first-time user which
+   commands are stable, experimental, or risky.
+
+   Why it matters: the docs carry this classification, but the CLI is the first
+   interface many users will see. Users can discover advanced workflows before
+   seeing the safety model.
 
 ## Medium-Priority Issues
 
-1. **The top-level CLI is too large to maintain comfortably.**
+1. **`paper_workbench/cli.py` is the main maintenance hotspot.**
 
-   `paper_workbench/cli.py` is over 3,000 lines and owns command parsing,
-   validation, data loading, report writing, audit logging, and many workflow
-   adapters. This has not broken tests, but it is now the highest-risk
-   maintenance hotspot.
+   It is 3,336 lines and owns parsing, dispatch, report writing, output safety,
+   and adapters for nearly every subsystem. This has not broken tests, but it
+   raises the cost of reviewing future CLI changes.
 
-2. **Several feature modules are large enough to need stronger internal
-   boundaries.**
+2. **Several feature modules combine modeling, analysis, and Markdown rendering.**
 
-   `rules.py`, `index.py`, `reading.py`, `sync.py`, `authoring.py`, and
-   `graph.py` are all sizable. The risk is not raw size alone; it is that many
-   modules own both data modeling and report formatting, which makes regression
-   behavior harder to reason about.
+   Large modules include `rules.py` at 957 lines, `authoring.py` at 799,
+   `index.py` at 786, `reading.py` at 764, `sync.py` at 754, `graph.py` at 700,
+   `drafts.py` at 700, `registry.py` at 666, and `importers.py` at 661. This is
+   survivable for local tooling, but it makes regression ownership blurry.
 
-3. **Notebooks lag behind the feature surface.**
+3. **Generated reports are too numerous for manual release review.**
 
-   Static notebook validation passes, but only 8 notebooks exist and they stop
-   at the v0.6-era workflows. Newer graph, dashboard, sync, reading, dogfood,
-   manuscript, and safety workflows are covered by scripts/docs/tests rather
-   than notebooks. That is acceptable if documented, but the notebook story is
-   no longer representative of the full tool.
+   There are 174 Markdown reports under `reports/`. Many are legitimate
+   historical artifacts, but the folder is now difficult to scan without an
+   index. A future public release should archive or clearly separate historical
+   burn-cycle reports from current examples.
 
-4. **Generated reports are numerous and partly stale.**
+4. **Notebook coverage lags behind the current feature surface.**
 
-   There are 167 Markdown reports. Many are historical release artifacts from
-   v0.x and v1.x. `reports/index.md` correctly indexes them, but the volume now
-   makes release review noisy. A public release should either move historical
-   reports into an archive folder or document that `reports/index.md` is the
-   entry point.
+   Notebook JSON validation passes for 8 notebooks, but newer workflows such as
+   dogfood onboarding, graph, claim lifecycle, dashboard, sync, and manuscript
+   QA are primarily represented by scripts, docs, and tests. That is acceptable
+   if documented, but users should not infer that notebooks cover the full v2
+   workflow surface.
 
-5. **Graph analytics are correctly experimental but easy to overread.**
+5. **The bundled synthetic project intentionally reports many warnings.**
 
-   The graph reports state that centrality is a local degree count, not a truth
-   or quality score. Keep this warning prominent; graph-based "central paper"
-   labels are exactly the sort of output users may misinterpret.
-
-6. **Dashboard output is useful but noisy on the bundled synthetic project.**
-
-   The dashboard correctly surfaces workspace and rule errors in
-   `zis_photocatalysis`, but a new user may interpret bundled synthetic errors
-   as product breakage. The quickstart should be explicit that these warnings
-   are intentional training fixtures.
+   Dashboard, rules, citation audit, and workspace health checks correctly flag
+   weak evidence in `zis_photocatalysis`. A new user may read that as product
+   breakage unless the quickstart keeps emphasizing that these are training
+   fixtures.
 
 ## Low-Priority Polish
 
-- `docs/API_SURFACE.md` and `docs/CLI_SURFACE.md` still use older release labels
-  in titles.
-- `scripts/performance_sanity.py --help` says v0.3; the script still works with
-  a custom output path, but the label is stale.
-- The report index includes `hostile_review_latest.md` as a current v2.1 report,
-  which is mechanically reasonable but semantically odd because the hostile
-  review is a release-gate artifact rather than a feature report.
-- The top-level docs are much cleaner than earlier versions, but there are
-  still overlapping pages for CLI reference, CLI surface, command contracts,
-  workflows, and getting started.
-- Some historical data-safety reports still contain old absolute-path warnings.
+- Historical v2.0rc reports still mention `2.0.0rc1`; these are valid
+  historical artifacts but noisy when searching for current release state.
+- `reports/hostile_review_latest.md` was stale before this update and still
+  appeared in search results as if it were current.
+- The docs have overlapping pages for CLI reference, command contracts, stable
+  surface, API surface, workflows, and getting started. This is manageable but
+  increases the chance of drift.
+- Some report titles remain tied to their feature introduction version rather
+  than the current package version.
 
 ## Data-Safety Risks
 
-- **Blocking:** tracked public real dogfood metadata and PDF filenames under
-  `public/demos/v2_0_dogfood_real/`.
-- **Blocking:** data-safety audit reports zero errors despite the above.
-- Ignored local `.paperwb/`, `.pytest_cache/`, `.idea/`, and `scratch/` files
-  exist in the working tree but are not tracked.
-- No tracked PDFs, SQLite databases, backup archives, or cache directories were
-  found.
-- No cloud, LLM, scraping, or publisher-bypass runtime dependency was found.
+- Strict data-safety audit result: 0 errors, 7 warnings.
+- The 7 warnings are local absolute-path patterns in historical reports and
+  tests, including `/private/...` examples used by hygiene checks.
+- No tracked PDFs, cache databases, backup archives, `.paperwb` logs, `.idea`
+  files, or Python caches were found.
+- The public dogfood demo appears synthetic/public after the v2.0 cleanup, but
+  this boundary should stay guarded because dogfood planning can inspect private
+  local reference folders.
+- No cloud, LLM, publisher scraping, OCR, or PDF full-text extraction dependency
+  was found.
 
 ## Docs Mismatches
 
-- `docs/CLI_SURFACE.md` overstates stability compared with
-  `docs/CLI_REFERENCE_V2.md` and `docs/EXPERIMENTAL_FEATURES_V2.md`.
-- `docs/COMMAND_CONTRACTS_V2.md` omits `graph`.
-- `docs/API_SURFACE.md` is stale at v1.8 and omits `paper_workbench.graph`.
-- `docs/TEST_MATRIX_V2.md` omits `tests/test_evidence_graph_v2_1.py`.
-- The docs say not to commit private dogfood filename lists and copied BibTeX
-  metadata, but the tracked public dogfood demo does exactly that.
+- `docs/STABLE_SURFACE_V2.md` references graph as experimental "in v2.1" rather
+  than the current v2 line.
+- Graph report defaults still emit v2.1 titles from `paper_workbench/graph.py`.
+- Smoke workflow report defaults still say v2.0rc.
+- Data-safety audit default output still targets a v0.10 report.
+- Historical release-readiness reports are not stale in the archival sense, but
+  they appear in broad `rg` searches and can look like current instructions.
 
 ## CLI Usability Issues
 
-- The command surface is powerful but large: 32 top-level command groups.
-- `paperwb --help` is complete but overwhelming for a first-time user.
-- `scripts/performance_sanity.py` fails by default because it targets an
-  existing committed report.
-- The validation commands intentionally return 0 for error-level findings unless
-  `--strict` is supplied. This is documented, but it remains a scripting footgun
-  for users who expect validation errors to fail by default.
+- `paperwb --help` is comprehensive but intimidating for a first-time user.
+- Stable and experimental commands are not labeled in top-level help.
+- Advanced write-capable groups such as `sync`, `backup`, `migrate`,
+  `claim-review`, and `contradictions` are discoverable without the safety
+  context shown in docs.
+- Validation commands require `--strict` for nonzero exits on findings; this is
+  documented but remains a scripting trap.
 
 ## Overengineering Risks
 
-- The tool now includes registry, notes, claims, authoring, manuscript QA,
-  reading sessions, sync, local files, indexing, backups, migrations, rules,
-  dashboard, templates, dogfood, and graph. The feature set is broad enough that
-  future work should be consolidation, not expansion.
-- Avoid adding a graph database, embeddings, semantic matching, plugin
-  marketplace, web app, cloud sync, or PDF full-text extraction by default.
-- Keep graph analytics, manuscript matching, and dashboard next actions
-  transparent and explicitly heuristic.
+- The project already includes registry validation, BibTeX checks, note parsing,
+  claim extraction, evidence maps, authoring reports, draft/manuscript QA,
+  reading sessions, local file workflows, imports/exports, sync planning,
+  search/indexing, backup/migration/integrity, rules, dashboard, templates,
+  dogfood scaffolds, evidence graph, and claim lifecycle.
+- Future work should favor consolidation, docs alignment, and dogfooding over
+  new major subsystems.
+- Avoid adding graph databases, embeddings, semantic contradiction inference,
+  cloud sync, plugin marketplaces, web apps, or PDF full-text extraction by
+  default.
 
 ## Stale Generated Reports
 
-- `reports/data_safety_audit_v0_10.md` is still the default output of
-  `scripts/data_safety_audit.py`; current release reviews should avoid
-  overwriting historical reports by default.
-- `reports/performance_sanity_v0_3.md` is still the default output of
-  `scripts/performance_sanity.py`, causing default failure.
-- Many historical release reports are valid artifacts but make the `reports/`
-  folder hard to scan manually.
+- `reports/data_safety_audit_v0_10.md` is still used as the default output of
+  the current data-safety script.
+- Graph summary/report defaults still title generated output as v2.1.
+- Smoke workflow defaults still title generated output as v2.0rc.
+- Historical v0.x, v1.x, v2.0rc, and v2.1 reports remain useful as audit trail
+  artifacts but should not be treated as current release guidance.
 
 ## Missing Tests
 
-- A safety test that fails when tracked `public/` demo files contain real
-  bibliography metadata, copied BibTeX metadata, PDF filename-derived starter
-  lists, or non-synthetic note filenames.
-- A data-safety audit test covering the public dogfood metadata policy.
-- Command-contract tests asserting `graph` is listed in v2 command contracts and
-  test matrix docs.
-- A regression test for `scripts/performance_sanity.py` default behavior, or a
-  test that the documented invocation uses a non-conflicting output path.
-- Optional docs consistency tests that compare stable/experimental command
-  classifications across `CLI_SURFACE`, `CLI_REFERENCE_V2`, and
-  `EXPERIMENTAL_FEATURES_V2`.
+- A regression test that the default data-safety audit does not rewrite a
+  historical release report, or that docs always invoke it with a scratch/temp
+  output.
+- A regression test that active report generators do not emit stale release
+  labels for the current package line, unless intentionally version-pinned.
+- A docs consistency check comparing command stability across
+  `STABLE_SURFACE_V2`, `CLI_REFERENCE_V2`, `COMMAND_CONTRACTS_V2`, and top-level
+  CLI help.
+- A first-user smoke test that asserts top-level help points users toward
+  stable starting commands before advanced experimental workflows.
 
 ## Recommended Blocker-Fix Sequence
 
-1. **Sanitize or remove the tracked real dogfood demo.**
-   Replace `public/demos/v2_0_dogfood_real/` with a synthetic public demo, or
-   move the real metadata-backed demo to an ignored private path. Do not keep
-   real paper titles, copied BibTeX metadata, PDF filenames, or starter lists in
-   tracked files.
-
-2. **Harden the data-safety audit.**
-   Add checks for real-looking public dogfood metadata and filename-derived PDF
-   lists. Make the current public-demo violation fail before claiming release
-   readiness.
-
-3. **Regenerate affected reports.**
-   Regenerate `reports/index.md`, a current data-safety report, and any dogfood
-   release reports after sanitizing the demo.
-
-4. **Align release identity and surface docs.**
-   Decide whether this tree is package version `2.0` with v2.1 experimental
-   docs, or an actual v2.1 package. Update `CHANGELOG.md`, `pyproject.toml`,
-   `CLI_SURFACE`, `COMMAND_CONTRACTS_V2`, `API_SURFACE`, and `TEST_MATRIX_V2`
-   accordingly.
-
-5. **Fix release-script defaults.**
-   Make `scripts/performance_sanity.py` default to `scratch/` or require an
-   explicit `--out` path so a default release check does not fail due to an
-   existing historical report.
-
-6. **Run validation again.**
-   Run `pytest`, `python scripts/smoke_cli_workflow.py`, `python
-   scripts/check_notebooks.py`, `python scripts/data_safety_audit.py --out ''
-   --strict`, and representative `paperwb graph`, dashboard, registry, BibTeX,
-   manuscript QA, sync-plan, and backup/integrity commands.
-
+1. No blocker fix is required before local dogfooding.
+2. Fix high-priority release-label drift: graph report titles, smoke workflow
+   default title, and the `docs/STABLE_SURFACE_V2.md` graph wording.
+3. Change `scripts/data_safety_audit.py` default output behavior so local manual
+   use does not rewrite a historical v0.10 report, or document a scratch output
+   path everywhere.
+4. Improve top-level CLI help text or add a `paperwb workflows`/`paperwb
+   getting-started` style pointer so users see stable starting paths before
+   advanced commands.
+5. Add the missing release-hygiene regression tests listed above.
+6. Defer broad architecture refactors until after real dogfooding produces
+   evidence about which workflows are actually used.
