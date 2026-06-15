@@ -18,6 +18,8 @@
   feedback.
 - Improve report discoverability without adding more report types.
 - Dogfood the evidence graph on a real project before marking graph analytics stable.
+- Dogfood claim lifecycle review on real notes before marking lifecycle sidecar
+  schema stable.
 - Consider a guided import-to-registry review command only after dogfooding proves
   the read-only planning report is not enough.
 

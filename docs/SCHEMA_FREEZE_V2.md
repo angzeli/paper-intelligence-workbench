@@ -47,6 +47,11 @@ Stable claim fields:
 Claims must originate from user-written structured notes. The tool must not
 infer claims from free-form prose, PDFs, abstracts, or draft paragraphs.
 
+v2.2 claim lifecycle state is stored separately from extracted claims in
+project-local sidecars such as `claim_lifecycle.json` and `contradictions.json`.
+Those sidecars are experimental review metadata and do not change the stable
+claim CSV fields above.
+
 ## Project Profile
 
 Stable project layout:

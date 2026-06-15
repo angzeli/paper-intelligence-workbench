@@ -24,6 +24,8 @@ classifies command groups for the v2 release line.
 
 - `index`
 - `graph`
+- `claim-review`
+- `contradictions`
 - `files`
 - `draft`
 - `manuscript`
@@ -72,5 +74,21 @@ paperwb graph export --project zis_photocatalysis --format json --out scratch/ev
 paperwb graph export --project zis_photocatalysis --format dot --out scratch/evidence_graph.dot --force
 ```
 
-The graph commands are experimental in v2.1. They are read-only unless `--out`
+The graph commands remain experimental in the v2 line. They are read-only unless `--out`
 is supplied, and they derive nodes and edges only from local workbench data.
+
+## Claim Lifecycle Commands
+
+```bash
+paperwb claim-review queue --project zis_photocatalysis
+paperwb claim-review mark PAPER_ID:c1 --project zis_photocatalysis --status verified
+paperwb claim-review deprecated --project zis_photocatalysis --out scratch/deprecated_claims.md --force
+paperwb contradictions create --project zis_photocatalysis --theme photocorrosion
+paperwb contradictions add contradiction_photocorrosion_1 PAPER_ID:c1 --project zis_photocatalysis
+paperwb contradictions report --project zis_photocatalysis --out scratch/contradictions.md --force
+```
+
+The claim lifecycle commands are experimental in v2.2. They store explicit
+review state in local JSON sidecars and do not edit notes, registry rows, or
+claim CSV exports. Contradiction groups are user-managed review aids, not
+automatic truth judgments.

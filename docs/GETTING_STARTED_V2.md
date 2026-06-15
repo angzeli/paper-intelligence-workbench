@@ -55,6 +55,7 @@ error-level findings.
 paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
 paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
 paperwb claims --project zis_photocatalysis --output scratch/zis_claims.csv --force
+paperwb claim-review queue --project zis_photocatalysis --out scratch/zis_claim_review_queue.md --force
 paperwb report evidence-map --project zis_photocatalysis --out scratch/zis_evidence_map.md --force
 paperwb report citation-audit --project zis_photocatalysis --out scratch/zis_citation_audit.md --force
 ```

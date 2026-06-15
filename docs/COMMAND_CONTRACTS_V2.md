@@ -53,6 +53,8 @@ documents command behavior, not internal implementation details.
 | `rules` | Declarative checks | JSON rules | findings/report | read-only except report | experimental | rule tests |
 | `dashboard` | Summary | project/workspace | stdout/Markdown | read-only except `--out` | stable | dashboard tests |
 | `graph` | Evidence graph | project registry/BibTeX/notes/themes | stdout/Markdown/JSON/DOT | read-only except `--out` | experimental | graph tests |
+| `claim-review` | Claim lifecycle review | parsed claims + optional sidecar | queue/status reports | writes only lifecycle sidecar for `mark` | experimental | lifecycle tests |
+| `contradictions` | Manual tension groups | parsed claims + sidecar | group/report | writes only contradiction sidecar for create/add | experimental | lifecycle tests |
 | `synthetic` | Fixtures | generator options | synthetic project | refuses existing without force | internal/test utility | synthetic tests |
 
 ## Exit Codes

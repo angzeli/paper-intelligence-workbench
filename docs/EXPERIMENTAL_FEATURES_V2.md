@@ -17,6 +17,7 @@ output shape, or internal file format before a future stable release.
 | Backup/restore/migration | `backup`, `migrate`, `integrity`, `audit-log` | Dry-run planning is the supported safe path; forced restore/migration needs cautious dogfooding. |
 | Rule engine | `rules` | Declarative rule types are stable enough to test, but additional rule types may refine schema. |
 | Evidence graph | `graph` | Graph nodes, edge labels, and analytics are derived from local data and may evolve during dogfooding. |
+| Claim lifecycle | `claim-review`, `contradictions` | Sidecar schemas and review heuristics need real-note dogfooding before being frozen. |
 | Synthetic corpus generator | `synthetic generate` | Fixture shape may change to improve stress coverage. |
 
 Experimental does not mean unsafe by default. These commands remain local-first,

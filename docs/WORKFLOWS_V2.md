@@ -8,8 +8,9 @@
 4. Generate structured note templates.
 5. Fill notes manually.
 6. Extract claims.
-7. Generate evidence map and citation audit.
-8. Use dashboard, evidence graph summary, and writing packet as planning aids.
+7. Run the claim review queue and manually verify or deprecate claims.
+8. Generate evidence map and citation audit.
+9. Use dashboard, evidence graph summary, and writing packet as planning aids.
 
 For a first real photocatalysis FYP project, start with the dogfood workflow:
 
@@ -35,6 +36,19 @@ paperwb dogfood plan-from-files photocatalysis --project fyp_zis_lit_review --re
 The report compares PDF filename slugs with BibTeX keys, excludes obvious
 supplement files, and proposes a 15-paper starter shortlist from direct matches.
 It does not read PDF text, copy files, or write registry rows.
+
+## Claim Evidence Review
+
+After notes contain extracted claims, review claim readiness before drafting:
+
+```bash
+paperwb claim-review queue --project PROJECT
+paperwb claim-review mark PAPER_ID:c1 --project PROJECT --status verified
+paperwb contradictions report --project PROJECT --out scratch/contradictions.md --force
+```
+
+Lifecycle state is sidecar metadata. It does not verify scientific truth, edit
+notes, or change claim CSV exports.
 
 ## Draft Audit Workflow
 

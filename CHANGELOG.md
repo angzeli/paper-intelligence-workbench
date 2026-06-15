@@ -2,6 +2,22 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v2.2 - Claim Lifecycle and Evidence Review
+
+- Promoted local package metadata to `2.2`.
+- Added local claim lifecycle sidecars for explicit review state such as
+  `verified`, `needs_evidence_location`, `deprecated`, `contradicted`, and
+  `too_weak_to_use`.
+- Added `paperwb claim-review` commands for review queues, explicit status
+  marking, and lifecycle reports.
+- Added `paperwb contradictions` commands for manual contradiction/tension
+  groups and conservative tag-based possible-tension reporting.
+- Integrated lifecycle warnings into writing packets, manuscript/draft QA,
+  dashboards, and evidence graph metadata without editing user notes or claim
+  CSV exports.
+- Kept v2.2 local-first: no LLM APIs, no cloud APIs, no scraping, no automatic
+  claim verification, and no scientific-truth judgment.
+
 ## v2.1 - Evidence Graph and Release Hygiene
 
 - Added the local evidence graph layer for derived paper, note, claim, theme,

@@ -85,3 +85,6 @@ Instructions for future agents working in this repository:
 - Evidence graphs must be derived from local workbench data only.
 - Do not infer scientific truth, paper importance, or unsupported relationships from graph connectivity.
 - Do not add heavy graph database dependencies without explicit approval.
+- Do not auto-verify claims or decide scientific truth from claim lifecycle state.
+- Contradiction groups are user-managed or heuristic suggestions only; never present them as proven contradictions.
+- Preserve user claim review sidecars and do not silently overwrite lifecycle or contradiction state.

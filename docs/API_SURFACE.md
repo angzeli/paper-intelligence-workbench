@@ -30,6 +30,7 @@ for local automation:
 | `paper_workbench.manuscript` | `audit_manuscript`, `manuscript_qa_report`, `manuscript_context_table_report`, `build_claim_traceability` | Manuscript citation QA and traceability reports |
 | `paper_workbench.rules` | `load_rule_set`, `validate_rule_set`, `run_rule_set`, `rule_report` | Declarative local rule loading, validation, execution, and reporting |
 | `paper_workbench.templates` | `list_templates`, `get_template`, `inspect_template`, `create_project_from_template` | Built-in empty project scaffolds and template inspection |
+| `paper_workbench.claim_lifecycle` | `build_claim_review_queue`, `mark_claim_status`, `create_contradiction_group` | Experimental v2.2 claim review sidecar helpers |
 
 ## Stable Data Models
 

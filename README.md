@@ -9,10 +9,11 @@ Start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABL
 - Maintains local paper registries, BibTeX files, notes, themes, rules, and reports.
 - Generates structured Markdown note templates and extracts user-entered claims.
 - Validates registry rows, BibTeX entries, citations, notes, themes, and evidence links.
-- Builds evidence maps, local evidence graphs, citation audits, claim banks, writing packets, and manuscript QA reports.
+- Builds evidence maps, local evidence graphs, citation audits, claim banks, claim review queues, writing packets, and manuscript QA reports.
 - Supports project profiles, reusable project templates, reading queues, follow-up actions, and dashboards.
 - Imports and exports local CSV, BibTeX, RIS, JSON, Markdown, Obsidian-style vaults, and backup bundles.
 - Provides local search, optional SQLite indexing, file audits, backup planning, migration checks, sync plans, and rule reports.
+- Tracks manual claim lifecycle state and contradiction/tension groups without auto-verifying claims.
 
 ## 🚫 What It Does Not Do
 

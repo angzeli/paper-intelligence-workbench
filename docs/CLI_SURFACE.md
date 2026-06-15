@@ -27,6 +27,8 @@ command is stable unless the status below says so.
 | `paperwb draft parse/citations/audit/checklist/evidence-matrix` | experimental | Audit Markdown drafts against local citations and tracked evidence without rewriting prose |
 | `paperwb manuscript parse/citations/qa/checklist/trace-claims/context-table/evidence-matrix` | experimental | Run reviewer-style manuscript citation QA against local evidence without rewriting prose |
 | `paperwb rules list/validate-config/run/report/explain` | experimental | Run declarative local validation rules without executing arbitrary code or changing user data |
+| `paperwb claim-review queue/mark/verified/deprecated/used-in-drafts` | experimental | Track explicit claim review state in local sidecars without editing notes |
+| `paperwb contradictions create/add/report` | experimental | Manage manual contradiction/tension groups without deciding scientific truth |
 | `paperwb dashboard` | stable | Show a read-only terminal dashboard and optional Markdown report with local project health and next actions |
 | `paperwb reading queue/start/finish/status/review` | experimental | Manage local reading queues and session records without reading papers or fabricating notes |
 | `paperwb followups list/export/done` | experimental | Collect follow-up actions from notes/sessions and track completion outside source notes |
