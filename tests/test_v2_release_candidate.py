@@ -64,11 +64,14 @@ def test_v2_release_reports_are_current_and_sanitized() -> None:
         assert "/private/tmp/" not in content
 
     index = (ROOT / "reports" / "index.md").read_text(encoding="utf-8")
-    assert "## Current v2.0 Release Reports" in index
-    current_section = index.split("## Current v2.0 Release Reports", 1)[1]
+    assert "## Current v2.1 Release Reports" in index
+    current_section = index.split("## Current v2.1 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
-    assert "[release_readiness_v2_0.md]" in current_section
+    assert "[release_readiness_v2_1.md]" in current_section
+    assert "[evidence_graph_summary_v2_1.md]" in current_section
+    historical_section = index.split("## Historical Versioned Reports", 1)[1]
+    assert "[release_readiness_v2_0.md]" in historical_section
     assert "[release_readiness_v2_0_rc.md]" not in current_section
     assert "[final_release_verdict_v2_0_rc.md]" not in current_section
 
