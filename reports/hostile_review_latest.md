@@ -2,328 +2,245 @@
 
 Date: 2026-06-16
 
-Scope: standalone release-gate review of the current Paper Intelligence
-Workbench repository as if deciding whether this version is safe for local
-dogfooding. I inspected package architecture, CLI behavior, stable versus
-experimental surface docs, registry and BibTeX workflows, notes and claims,
-evidence maps, manuscript and draft QA, reading sessions, imports and exports,
-sync and conflict planning, search and indexing, backup/migration/integrity,
-rule engine, dashboard, evidence graph, claim lifecycle, workflow runner,
-review packets, tests, docs, notebooks, reports, synthetic data, data-safety
-boundaries, `.gitignore`, and git status.
+Scope: standalone release-gate review of Paper Intelligence Workbench v2.5 as if
+deciding whether it is safe for local dogfooding. I inspected package
+architecture, CLI behavior, stable versus experimental surface docs, registry
+and BibTeX workflows, notes and claims, evidence maps, manuscript/draft QA,
+reading sessions, imports/exports, sync/conflict planning, search/indexing,
+backup/migration/integrity, rule engine, dashboard, evidence graph, claim
+lifecycle, workflow runner, collaboration/review packets, performance and
+incremental rebuilds, tests, docs, notebooks, reports, synthetic data,
+data-safety boundaries, `.gitignore`, and git status.
 
 ## Release Verdict
 
-**Ready for cautious local dogfooding. Not ready to present as polished public
-stable software without fixing the v2.4 review-packet first-use mismatch and
-continuing release-hygiene cleanup.**
+**Needs one blocker fix before I would call this v2.5 safe for smooth local
+dogfooding.**
 
-The core local-first workflows still work: package import succeeds, the CLI
-entry point loads, the full test suite passes, notebook structure checks pass,
-the data-safety audit reports no errors, and representative registry, BibTeX,
-dashboard, graph, rules, workflow, manuscript QA, sync, import, backup, and
-review-packet commands run without Python tracebacks.
+The repository is broadly healthy: package import works, `paperwb --help`
+loads, full pytest passes, notebooks validate structurally, the data-safety
+audit reports zero errors/warnings, and representative CLI workflows run without
+Python tracebacks. The local-first boundaries are still intact: no tracked PDFs,
+SQLite/cache DBs, backup archives, audit logs, `.paperwb` sidecars, or Python
+caches were found.
 
-The main release risk is now usability rather than data destruction. The
-new `review-packet` workflow exports a `comments.csv` template that looks
-ready to import, and the public docs show importing that path, but importing
-the untouched template fails because blank comment/recommendation cells are
-treated as row errors. A real reviewer who fills the file works fine; a new
-user following the README too literally hits an avoidable failure.
+The blocker is narrower but serious: the new v2.5 `rebuild plan` workflow emits
+an invalid recommended command for refreshing all reports under a project
+profile. A release focused on incremental rebuilds cannot ship with a generated
+next-action command that fails immediately.
 
 ## Validation Performed
 
-- `git status --short --branch`: clean before this report was written; branch
-  was `main...origin/main [ahead 27]`.
-- `python -c "import paper_workbench; print(paper_workbench.__version__)"`:
-  `2.4`.
-- `paperwb --help`: passed and listed the stable and experimental command
-  surface.
-- `paperwb review-packet --help`, `paperwb workflow --help`,
-  `paperwb graph --help`, `paperwb claim-review --help`, `paperwb rules --help`,
-  and `paperwb sync --help`: passed.
-- `paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict`:
-  passed with no findings.
-- `paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib
-  --registry projects/zis_photocatalysis/registry.csv --strict`: passed with one
-  sparse synthetic-entry warning.
-- `paperwb dashboard --project zis_photocatalysis --no-audit-log --out
-  scratch/hostile_dashboard.md --force`: passed.
-- `paperwb graph summary --project zis_photocatalysis --out
-  scratch/hostile_graph_summary.md --force`: passed.
-- `paperwb rules report --project zis_photocatalysis --out
-  scratch/hostile_rules_report.md --force`: passed and reported expected
-  synthetic evidence-gap findings.
-- `paperwb workflow run daily_check --project zis_photocatalysis --dry-run
-  --out scratch/hostile_workflow_daily.md --force`: passed, with expected
-  synthetic fixture errors and warnings in the report.
-- `paperwb manuscript qa drafts/synthetic_overconfident_section.md --project
-  zis_photocatalysis --out scratch/hostile_manuscript_qa.md --force`: passed.
-- `paperwb review-packet create --project zis_photocatalysis --theme
-  photocorrosion --out scratch/hostile_review_packet --force`: passed; packet
-  included 5 review items and no PDFs.
-- `paperwb review-packet import-comments
-  scratch/hostile_review_packet/comments.csv --project zis_photocatalysis
-  --theme photocorrosion --dry-run --manifest
-  scratch/hostile_review_packet/manifest.json --out
-  scratch/hostile_comment_import.md --force-report`: failed as a user-facing
-  validation failure because the generated template rows were blank.
-- `python examples/review_packet_workflow.py`: passed with a populated synthetic
-  reviewer comment.
-- `paperwb integrity check --project zis_photocatalysis --out
-  scratch/hostile_integrity.md --force`: passed and reported expected synthetic
-  fixture gaps.
-- `paperwb search photocorrosion --project zis_photocatalysis`: passed.
-- `paperwb index status --project zis_photocatalysis`: passed and clearly
-  reported a missing index.
-- `paperwb backup create --project zis_photocatalysis --notes
-  hostile-review-smoke`: passed; backup files were created under an ignored
-  project-local backups folder and excluded PDFs/caches.
-- `paperwb backup list --project zis_photocatalysis`: passed after backup
-  creation and listed the new backup.
-- `paperwb sync plan --project zis_photocatalysis --source
-  data/examples/zotero_export.csv --source-type zotero-csv --out
-  scratch/hostile_sync_plan.md --json-out scratch/hostile_sync_plan.json
-  --force`: passed.
-- `paperwb import zotero-csv data/examples/zotero_export.csv --project
-  zis_photocatalysis --dry-run --report scratch/hostile_import_zotero.md
-  --force`: passed.
-- `python scripts/check_notebooks.py`: checked 8 notebooks successfully.
-- `python scripts/data_safety_audit.py --out scratch/hostile_data_safety.md
-  --strict`: checked repository files with 0 errors and historical local-path
-  warnings.
-- `python scripts/smoke_cli_workflow.py --quick`: 14 smoke steps, 0 failures.
-- `python scripts/clean_room_install_check.py --out
-  scratch/hostile_clean_room_check.md`: 16 release-check steps, 0 failures.
+- `git status --short --branch --ignored`: branch `main...origin/main [ahead 33]`; only ignored local artifacts before writing this report.
+- `python -c "import paper_workbench; print(paper_workbench.__version__)"`: `2.5`.
+- `python -m paper_workbench.cli --help`: passed and listed `rebuild`.
+- `python -m paper_workbench.cli validate-registry projects/zis_photocatalysis/registry.csv --strict`: passed with no findings.
+- `python -m paper_workbench.cli validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict`: passed with one existing sparse synthetic-entry warning.
+- `python -m paper_workbench.cli dashboard --project zis_photocatalysis --no-audit-log`: passed and reported expected synthetic evidence gaps.
+- `python -m paper_workbench.cli rebuild status --project zis_photocatalysis`: passed and reported all rebuild targets stale because metadata/index are absent.
+- `python -m paper_workbench.cli rebuild plan --project zis_photocatalysis`: passed but emitted an invalid `report all` recommendation.
+- `python -m paper_workbench.cli report all --project zis_photocatalysis --reports-dir projects/zis_photocatalysis/reports --force`: failed with the expected CLI rejection, proving the rebuild recommendation is invalid.
+- `python -m paper_workbench.cli workflow run daily_check --project zis_photocatalysis --dry-run --out <tmp> --force`: passed with expected synthetic fixture errors/warnings.
+- `python -m paper_workbench.cli import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --force`: passed, but wrote a default project-local import report.
+- `python -m paper_workbench.cli sync plan --project zis_photocatalysis --source data/examples/zotero_export.csv --source-type zotero-csv --out <tmp> --force`: passed, but also wrote default project-local `sync_plan.json`.
+- `python -m paper_workbench.cli manuscript qa drafts/synthetic_good_section.md --project zis_photocatalysis --out <tmp> --force`: passed.
+- `python -m paper_workbench.cli reading queue --project zis_photocatalysis`: passed.
+- `python -m paper_workbench.cli followups list --project zis_photocatalysis`: passed.
+- `python -m paper_workbench.cli integrity check --project zis_photocatalysis --out <tmp> --force`: passed with expected synthetic fixture findings.
+- `python -m paper_workbench.cli review-packet create --project zis_photocatalysis --theme photocorrosion --out <tmp> --force`: passed and excluded PDFs.
+- `python -m paper_workbench.cli workflow list/show`: passed.
+- `python -m paper_workbench.cli rules run --project zis_photocatalysis --strict`: returned non-zero with expected synthetic evidence-gap rule findings.
+- `python -m paper_workbench.cli graph summary --project zis_photocatalysis`: passed.
+- `python scripts/data_safety_audit.py`: checked 706 repository files with 0 errors and 0 warnings.
+- `python scripts/validate_notebooks.py`: validated 8 notebooks.
 - `python -m pytest -q`: passed.
-- `git ls-files` checks found no tracked PDFs, SQLite/cache databases,
-  `.paperwb` sidecars, Python caches, build artifacts, backup archives, or egg
-  metadata.
-- `git tag --points-at HEAD`: no release tag at `HEAD`.
+- `git ls-files` scan found no tracked PDFs, SQLite/cache DBs, backup archives, audit logs, `.paperwb` directories, or Python caches.
 
 ## Release Blockers
 
-None found for cautious local dogfooding.
+1. **`rebuild plan` emits an invalid command for project report rebuilds.**
 
-This is not a polished public-stable verdict. The repository is safe enough to
-use locally on user-owned metadata and notes, but the high-priority issues
-below should be fixed before advertising v2.4 review packets as a smooth
-external-user workflow.
+   Evidence: `paper_workbench/rebuild.py:300` builds this recommendation:
+   `paperwb report all --reports-dir projects/zis_photocatalysis/reports --project zis_photocatalysis`.
+   The CLI rejects `--project` combined with `--reports-dir` by design, and the
+   probe returned: `error: --project cannot be combined with --reports-dir; project profile paths are used instead.`
 
-## Post-Fix Status
+   Why it matters: v2.5 is specifically about rebuild planning and repeated
+   workflow predictability. A generated next action must be executable. This is
+   not data-destructive, but it breaks the headline workflow and undermines user
+   trust in generated recommendations.
 
-The high-priority items from this review were addressed in the follow-up fix
-pass:
-
-- Untouched generated review-packet `comments.csv` template rows are now skipped
-  with a warning instead of treated as row-level import errors.
-- README and v2 review-packet/comment-import docs now say meaningful imports
-  require reviewer content in `comment` or `recommendation`.
-- First-use docs now distinguish empty template/dogfood scaffolds from the
-  intentionally imperfect `zis_photocatalysis` evidence-gap fixture.
-- The data-safety audit now has an explicit historical absolute-path warning
-  allowlist, so the current strict audit reports zero errors and zero warnings
-  while new private-path leaks still surface.
+   Required fix: when `project_id != "default"`, recommend `paperwb report all
+   --project PROJECT --force` or another actually valid project-profile command.
+   Add a regression test that executes every command emitted in `rebuild plan`
+   or at least validates that project-profile recommendations do not include
+   rejected path override flags.
 
 ## High-Priority Issues
 
-1. **The new review-packet import path fails on the generated comment
-   template.**
+1. **`sync plan --out <path>` still writes a second default JSON file under the project.**
 
-   Evidence: `review-packet create` writes `comments.csv` rows for each review
-   item with empty `comment` and `recommendation` fields. Importing that file
-   immediately with `review-packet import-comments ... --dry-run` returns
-   row-level errors for every generated item. The README, v2 CLI reference, and
-   comment-import doc all show importing the packet `comments.csv` path without
-   first making the "fill in at least one comment or recommendation" requirement
-   explicit.
+   Evidence: `paper_workbench/cli.py:2192-2196` defaults `json_path` to the
+   project reports directory when `--json-out` is omitted, even if `--out`
+   points elsewhere. The probe wrote the Markdown report to a temporary path and
+   still created `projects/zis_photocatalysis/reports/sync_plan.json`.
 
-   Why it matters: this is the newest workflow and the first thing a supervisor
-   review user will try. It does not corrupt data, but it makes the feature feel
-   broken.
+   Why it matters: sync planning is explicitly sold as dry-run-first and
+   non-destructive. Writing a project-local JSON artifact by default is not data
+   loss, but it is surprising file churn and violates the expectation that an
+   explicit output path controls where generated artifacts go.
 
-   Recommended fix: either skip untouched template rows as a no-op warning or
-   update the docs and examples to say the reviewer must fill `comment` or
-   `recommendation` before import. Add a regression test for the untouched
-   template behavior whichever policy is chosen.
+   Recommended fix: require `--json-out` before writing JSON, derive JSON beside
+   `--out`, or make the default write location explicit in CLI output/docs.
+   Add a test for `sync plan --out tmp/report.md` that asserts no project-local
+   JSON file appears unless requested.
 
-2. **The canonical dogfooding project still produces error-level findings in
-   normal review and dashboard workflows.**
+2. **`rebuild run` is documented as metadata-only, but CLI audit logging adds another write path.**
 
-   Evidence: `workflow run daily_check`, `rules report`, `integrity check`, and
-   the dashboard all surface intentional gaps such as missing claim evidence
-   locations. The project is labelled as intentionally imperfect, but it is also
-   the main project used in quickstarts, docs, examples, and smoke commands.
+   Evidence: `docs/COMMAND_CONTRACTS_V2.md` says `rebuild` writes only
+   `.paperwb/rebuild_metadata.json`, while `cmd_rebuild_run` also records an
+   audit event through `_record_audit_event`.
 
-   Why it matters: intentional red flags are valuable for demos, but a new user
-   needs one obvious green-path project where stable commands return clean
-   results. Otherwise users cannot easily tell whether they installed the tool
-   correctly or are seeing fixture-driven warnings.
+   Why it matters: audit logs are ignored and expected elsewhere, so this is not
+   unsafe. It is still a contract mismatch in a patch whose purpose is cache and
+   write-path clarity.
 
-   Recommended fix: keep `zis_photocatalysis` as the imperfect evidence-gap
-   fixture, but add or designate a clean tiny project for installation and
-   first-use validation. Avoid hiding the warnings; route first-time smoke docs
-   to the green path.
+   Recommended fix: update the contract/docs to say rebuild run writes rebuild
+   metadata and the normal local audit log, or suppress audit logging for this
+   cache-only command.
 
-3. **Data-safety warnings remain in historical reports and tests.**
+3. **There is no green-path bundled project for first-run validation.**
 
-   Evidence: the strict audit reports no errors, but still warns about
-   historical local absolute-path strings in old release reports and tests.
+   Evidence: the main bundled `zis_photocatalysis` project intentionally emits
+   dashboard, rule, integrity, citation-audit, and rebuild warnings/errors. Docs
+   explain the imperfection, but this project remains the dominant example in
+   README and smoke workflows.
 
-   Why it matters: warnings are not blockers, but repeated historical local-path
-   hits make it harder to spot new private path leaks during future release
-   checks.
+   Why it matters: the imperfect fixture is good for demos, but new users also
+   need one tiny clean project where stable commands return clean results. That
+   separates installation confidence from evidence-gap demonstration.
 
-   Recommended fix: either sanitize old historical reports or explicitly add a
-   documented allowlist for known historical warning files so new warnings stand
-   out.
+   Recommended fix: add or designate a minimal clean synthetic project for
+   install/quickstart validation. Keep `zis_photocatalysis` as the warning-rich
+   teaching fixture.
 
 ## Medium-Priority Issues
 
-1. **`paper_workbench/cli.py` remains the architectural hotspot.**
+1. **`paper_workbench/cli.py` is still too large.**
 
-   It is roughly 3,700 lines and still owns parser construction, dispatch,
-   path handling, report writes, and adapters for nearly every subsystem.
-   Existing tests are strong enough for dogfooding, but command changes are
-   expensive to review.
+   The CLI is roughly 3,777 lines and owns parser setup, dispatch, path
+   resolution, report writing, workflow glue, and error handling for almost
+   every subsystem. It works, but every new command increases review risk.
 
-2. **Several feature modules combine models, analysis, persistence, and
-   Markdown rendering.**
+2. **Several feature modules are doing too much.**
 
-   Larger modules include workflow, rules, authoring, index, reading, sync,
-   graph, drafts, review packets, registry, and importers. This keeps runtime
-   dependencies low, but increases regression risk as the project grows.
+   Large modules such as `workflow.py`, `rules.py`, `authoring.py`, `index.py`,
+   `review_packets.py`, `reading.py`, `sync.py`, `graph.py`, `drafts.py`,
+   `registry.py`, and `importers.py` combine models, analysis, persistence, and
+   Markdown rendering. This is manageable for dogfooding but weak for long-term
+   maintainability.
 
-3. **Docs and reports are useful but noisy.**
+3. **Generated reports are now a navigation burden.**
 
-   The repository now has more than 130 top-level docs pages and about 200
-   reports. `reports/index.md` helps, but search results still mix current
-   v2.4 guidance with historical v0.x/v1.x/v2.0rc artifacts.
+   `reports/index.md` is useful, but the repo has over 200 Markdown reports,
+   including old hostile reviews and historical release artifacts. Search
+   results mix current v2.5 guidance with old v0.x/v1.x/v2.0rc findings.
 
-4. **Notebook coverage lags behind the current feature surface.**
+4. **Notebooks lag behind the current feature set.**
 
-   Eight notebooks validate structurally. Newer graph, claim lifecycle,
-   workflow-runner, dogfood, sync, and review-packet workflows are covered by
-   tests, examples, docs, and reports rather than notebooks.
+   Eight notebooks validate structurally, but newer workflows such as review
+   packets, workflow runner, claim lifecycle, evidence graph, dogfood, and
+   rebuild are primarily covered by examples/tests/docs rather than notebooks.
 
-5. **Strict validation semantics remain a scripting footgun.**
+5. **Strict-mode semantics remain easy to misunderstand.**
 
-   `validate-bib --strict` exits successfully for warnings. That is reasonable
-   if "strict" means "errors fail"; it is surprising if users expect warnings
-   to fail CI. The docs should keep spelling this out.
-
-6. **Review comments are not yet connected to the broader review lifecycle.**
-
-   Imported comments are safely isolated, but response/follow-up reports do not
-   yet integrate with claim lifecycle queues or follow-up action state. This is
-   acceptable for v2.4 experimental status.
+   `validate-bib --strict` exits 0 for warnings. That is defensible if strict
+   means "error findings fail", but it is not obvious to CI users.
 
 ## Low-Priority Polish
 
-- `paperwb --help` is accurate but dense because the command surface is now
-  very broad.
-- `integrity` requires an explicit `check` subcommand; users may try the shorter
-  mental model first.
-- Public demo folder names include `real`, even though committed contents are
-  synthetic placeholders. The embedded warnings are good; the name can still
-  confuse quick scans.
-- Some command examples write to `scratch/`, while project-profile commands
-  default to project report folders; this is safe but inconsistent for first
-  users.
-- Historical version labels remain part of archived report filenames and docs;
-  this is acceptable but requires users to prefer `*_V2` docs and
-  `reports/index.md`.
+- README is clean but long; the first screen still advertises many advanced
+  workflows before the minimum daily workflow becomes obvious.
+- `reports/index.md` should probably separate "current examples" from
+  "historical audit archaeology" more aggressively.
+- The package has no runtime dependencies, which is good, but the amount of
+  handwritten Markdown/table rendering is becoming repetitive.
+- Some docs still use older lowercase duplicates such as `docs/cli-reference.md`
+  beside v2 uppercase references; this is tolerable but noisy.
 
 ## Data-Safety Risks
 
-- Strict data-safety audit result during review: 0 errors, historical path
-  warnings only.
-- No tracked PDFs, SQLite databases, `.paperwb` sidecars, backup archives,
-  Python caches, build artifacts, or egg metadata were found.
-- The committed dogfood demo uses synthetic placeholder filenames and BibTeX
-  keys. The report explicitly warns that private real plans must not be
-  committed.
-- Local smoke checks created ignored scratch outputs, audit sidecars, and a
-  project-local backup. They are ignored by Git and were not staged.
-- The data-safety boundary remains sound: no cloud APIs, no LLM APIs, no
-  scraping, no PDF copying by default, and no fabricated real metadata in
-  committed examples.
+- No tracked PDFs, copied paper full text, SQLite/cache DBs, backup archives,
+  audit logs, `.paperwb` cache state, or Python caches were found.
+- `.gitignore` covers `.paperwb/`, SQLite files, rebuild metadata, backups,
+  audit logs, scratch/tmp, stress outputs, and PDFs.
+- The current data-safety audit reports 0 errors and 0 warnings.
+- The main residual risk is accidental generated-output churn under tracked
+  project report folders, especially `sync plan` default JSON output and dry-run
+  import reports.
 
 ## Docs Mismatches
 
-- README and v2 CLI/comment-import docs show importing the generated review
-  packet `comments.csv`, but do not make clear that untouched template rows are
-  invalid until a reviewer fills `comment` or `recommendation`.
-- The v2 docs honestly classify review packets, workflow recipes, graph,
-  claim lifecycle, sync apply, backup/restore/migration, indexed search, and
-  manuscript QA as experimental or safety-sensitive.
-- `reports/index.md` correctly marks current v2.4 release reports, but the
-  report directory still contains many historical files that can look current
-  when opened directly.
+- `rebuild` command contracts say metadata-cache-only, but audit logging is an
+  additional write path.
+- `rebuild plan` recommends a command rejected by CLI path-override rules.
+- `sync plan` docs emphasize dry-run planning, but the command writes JSON by
+  default unless `--json-out` is explicitly controlled.
+- Import docs say dry-run does not write the registry, which is true, but they
+  under-emphasize that import reports are still written unless output is
+  redirected.
 
 ## CLI Usability Issues
 
-- The new review-packet import dry-run failure on untouched templates is the
-  clearest usability problem.
-- Top-level help is comprehensive but intimidating.
-- Advanced write-capable commands are visible from top-level help before a user
-  has read safety docs.
-- `workflow run daily_check` returning a report with error-level findings can
-  look like a failed installation unless users understand the intentionally
-  imperfect fixture.
-- Some commands use `--out`; import commands use `--report`; backup create uses
-  `--backups-dir`. The inconsistency is manageable, but it raises support cost.
+- `rebuild plan` generated recommendations are not currently safe to paste and
+  run.
+- `sync plan --out` controls only the Markdown report, not the JSON plan, which
+  is surprising.
+- The command surface is very large. The stable/experimental docs help, but
+  `paperwb --help` is intimidating for the intended undergraduate/researcher
+  persona.
+- `rules run --strict` returning non-zero on the default demo project is
+  correct but easy to misread as installation failure.
 
 ## Overengineering Risks
 
-- The product now includes registry/BibTeX validation, structured notes, claim
-  extraction, evidence maps, manuscript QA, authoring packets, reading sessions,
-  import/export, sync planning, local files, indexing, backups, migration,
-  integrity, audit logs, rules, dashboard, templates, dogfood scaffolds, graph,
-  claim lifecycle, workflow recipes, and review packets.
-- The next patch should not add another subsystem unless it directly improves
-  performance, maintainability, or first-use clarity.
-- Avoid graph databases, embeddings, cloud sync, web apps, plugin marketplaces,
-  automatic contradiction inference, automatic review-comment application, and
-  default PDF full-text extraction.
+- The project has accumulated many adjacent systems: graph, lifecycle,
+  workflow runner, review packets, rebuild metadata, sync planning, local file
+  ingestion, and dashboard actions. Most are local and safe, but there is
+  significant cognitive load.
+- Avoid adding another broad subsystem before v2.6 architecture cleanup.
+- Do not promote rebuild metadata, graph exports, review comments, or workflow
+  recipes as stable schemas until real project dogfooding validates them.
 
 ## Stale Generated Reports
 
-- `reports/index.md` indexes about 200 Markdown reports and correctly puts the
-  current v2.4 reports first.
-- Historical reports remain useful audit trail artifacts but should not be used
-  as current docs.
-- `hostile_review_latest.md` is the canonical current review; versioned hostile
-  reviews are intentionally omitted from the report index.
-- Current v2.4 generated reports exist for review-packet import, reviewer
-  comments, response to review, follow-ups, release readiness, and the v2.5
-  patch plan.
+- `reports/index.md` is current for v2.5.
+- Historical reports intentionally remain and include old absolute-path
+  examples. The current data-safety audit allowlist keeps release checks clean,
+  but maintainers still need to know those old reports are archival, not current
+  guidance.
+- `reports/hostile_review_latest.md` was stale v2.4 content before this review.
 
 ## Missing Tests
 
-- Untouched review-packet `comments.csv` template import behavior.
-- Docs/example regression that prevents README from showing a command sequence
-  that fails immediately on generated artifacts.
-- Draft-specific review-packet creation smoke test.
-- Green-path synthetic project where stable validation, dashboard, and workflow
-  checks produce no error-level findings.
-- Data-safety warning allowlist or regression that distinguishes historical
-  accepted warnings from new private-path leaks.
-- Optional notebook coverage for v2.4 review packets; the example script is
-  useful but notebooks are older.
+- No test appears to assert that every `paperwb rebuild plan` recommended
+  project-profile command is executable or at least syntactically allowed.
+- No test covers `sync plan --out <tmp>` without `--json-out` to prevent
+  unrequested project-local JSON output.
+- No clean first-run project test exists for "all stable commands return clean
+  findings"; current tests mainly validate that commands work on intentionally
+  imperfect fixtures.
+- Notebook validation is structural; newer feature examples are not notebook-run
+  checked.
 
 ## Recommended Blocker-Fix Sequence
 
-No local-dogfooding release blockers were found. Recommended high-priority fix
-sequence:
-
-1. Fix or document untouched review-packet template import behavior; add a test.
-2. Patch README, `docs/CLI_REFERENCE_V2.md`, and `docs/COMMENT_IMPORT.md` so
-   the review-packet workflow says reviewers must add comment/recommendation
-   content before import, unless the importer is changed to skip blank rows.
-3. Add a clean green-path synthetic project or redirect first-use smoke docs to
-   a clean template-created project.
-4. Decide whether historical local-path warnings should be sanitized or
-   allowlisted.
-5. Keep v2.5 focused on performance/cache hygiene and maintainability, not new
-   product surface.
+1. Fix `rebuild plan` project-profile recommendations so generated commands are
+   valid, and add regression coverage.
+2. Decide and document/fix `sync plan --out` JSON behavior; add a no-surprise
+   output-path test.
+3. Align rebuild docs with audit-log behavior or remove audit logging from
+   `rebuild run`.
+4. Add a clean tiny project for first-use green-path validation.
+5. Keep v2.6 focused on CLI decomposition, report-rendering helpers, and public
+   versus internal API boundaries.
