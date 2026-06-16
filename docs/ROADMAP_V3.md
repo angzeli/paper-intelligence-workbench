@@ -1,5 +1,13 @@
 # Roadmap v3
 
+## v3.2 Compatibility Patch
+
+- Add historical workspace fixtures for legacy data, early project profiles,
+  v2.0 dogfood scaffolds, v3.0rc projects, malformed workspaces, partial
+  migrations, path escapes, and extra-column registries.
+- Add read-only compatibility inspection and matrix commands.
+- Keep migration dry-run first and copy-based.
+
 ## v3.1 Support Bundle Patch
 
 - Add safe-by-default support bundles for sanitized local diagnostics.
@@ -7,7 +15,7 @@
   backups, raw audit logs, secrets, and private comments.
 - Keep verbose diagnostic output local-only and clearly labelled.
 
-## v3.0rc Freeze
+## v3 Stable Surface
 
 - Keep `init`, `project`, `template`, `dogfood`, registry/BibTeX validation,
   note templates, claim extraction, core reports, doctor, dashboard, and support
@@ -15,9 +23,9 @@
 - Keep manuscript QA, sync apply, workflow recipes, evidence graph exports,
   review packets, indexed search, claim lifecycle, and rebuild metadata
   experimental until real dogfooding confirms their contracts.
-- Avoid major feature expansion before the actual v3.0.0 tag.
+- Avoid major feature expansion before more real dogfooding.
 
-## Before v3.0.0
+## Before A Public v3 Release
 
 - Run a real 10-15 paper dogfood project.
 - Confirm docs match the commands a new user actually runs.
@@ -25,7 +33,7 @@
 - Re-run full tests, notebook validation, data-safety audit, and smoke CLI.
 - Decide whether any experimental sidecars need a migration note.
 
-## After v3.0.0
+## After Public v3 Stabilization
 
 - Split `paper_workbench/cli.py` only with command-contract coverage in place.
 - Reduce overlapping docs and archive stale generated reports.

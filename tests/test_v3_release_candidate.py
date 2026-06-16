@@ -19,22 +19,22 @@ def run_cli(*args: str, cwd: Path = ROOT) -> subprocess.CompletedProcess[str]:
 
 
 def test_v3_release_candidate_version_metadata() -> None:
-    assert __version__ == "3.1"
-    assert 'version = "3.1"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "3.2"
+    assert 'version = "3.2"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v3_surface_docs_exist_and_classify_release_surfaces() -> None:
     docs = {
-        "docs/STABLE_SURFACE_V3.md": ["`dogfood`", "`validate-registry`", "Registry CSV", "Stable Safety Guarantees"],
+        "docs/STABLE_SURFACE_V3.md": ["`dogfood`", "`validate-registry`", "`compatibility`", "Registry CSV", "Stable Safety Guarantees"],
         "docs/EXPERIMENTAL_FEATURES_V3.md": ["Workflow runner", "Evidence graph", "Incremental rebuilds"],
         "docs/DEPRECATED_FEATURES_V3.md": ["does not deprecate any public CLI command group"],
-        "docs/COMMAND_CONTRACTS_V3.md": ["`backup`", "`workflow`", "`dashboard`", "Exit Codes"],
-        "docs/SCHEMA_REFERENCE_V3.md": ["Registry CSV", "Structured Note Markdown", "Project Profile Layout"],
+        "docs/COMMAND_CONTRACTS_V3.md": ["`backup`", "`workflow`", "`dashboard`", "`compatibility`", "Exit Codes"],
+        "docs/SCHEMA_REFERENCE_V3.md": ["Registry CSV", "Structured Note Markdown", "Project Profile Layout", "Extra user columns"],
         "docs/GETTING_STARTED_V3.md": ["clean_demo", "dogfood create photocatalysis", "No cloud APIs"],
         "docs/FIRST_REAL_PROJECT_V3.md": ["10-15 papers", "plan-from-files", "does not copy PDFs"],
         "docs/DATA_SAFETY_V3.md": ["No cloud APIs", "No LLM APIs", "Files That Should Not Be Committed"],
         "docs/KNOWN_LIMITATIONS_V3.md": ["heuristic", "scientific truth"],
-        "docs/ROADMAP_V3.md": ["Before v3.0.0", "Not In Scope"],
+        "docs/ROADMAP_V3.md": ["v3.2 Compatibility Patch", "Before A Public v3 Release", "Not In Scope"],
     }
     for relative, fragments in docs.items():
         content = (ROOT / relative).read_text(encoding="utf-8")
@@ -60,6 +60,7 @@ def test_v3_stable_command_help_contracts() -> None:
         ("doctor", "--help"),
         ("dashboard", "--help"),
         ("support", "--help"),
+        ("compatibility", "--help"),
     ]
     for command in commands:
         result = run_cli(*command)

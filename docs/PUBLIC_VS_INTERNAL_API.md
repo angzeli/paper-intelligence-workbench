@@ -1,6 +1,6 @@
 # Public vs Internal API
 
-Paper Intelligence Workbench v3.0rc treats the CLI and documented local schemas as
+Paper Intelligence Workbench v3 treats the CLI and documented local schemas as
 the primary public API. Python imports are useful for tests and local scripts,
 but most modules remain internal unless listed as stable in `docs/API_SURFACE.md`
 or `docs/STABLE_SURFACE_V3.md`.

@@ -1,8 +1,8 @@
 # Stable Surface v3
 
-v3.0rc freezes the stable dogfooding surface around local project setup,
-metadata validation, structured notes, user-entered claims, core reports, and
-read-only project status.
+v3.2 keeps the stable dogfooding surface around local project setup, metadata
+validation, structured notes, user-entered claims, core reports, read-only
+project status, support diagnostics, and compatibility inspection.
 
 Stable means the command name, primary flags, file safety behavior, and
 documented schemas should not change without a migration note.
@@ -27,6 +27,7 @@ documented schemas should not change without a migration note.
 | `doctor` | Read-only workspace diagnostics, except explicit report output. |
 | `dashboard` | Read-only terminal and Markdown project summary, except explicit `--out`. |
 | `support` | Generate sanitized diagnostic summaries and support bundles without copying private source files. |
+| `compatibility` | Inspect historical workspace shapes and migration readiness without modifying files. |
 
 ## Stable Data Formats
 
@@ -34,6 +35,7 @@ documented schemas should not change without a migration note.
 - Structured note sections and claim fields are stable for user-authored notes.
 - Project profile layout under `projects/<name>/` is stable.
 - Theme JSON base fields are stable.
+- Compatibility inspection reports are stable diagnostics; migration remains copy-based.
 - Core Markdown reports are human-readable artifacts, not machine APIs.
 
 ## Stable Safety Guarantees

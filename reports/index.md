@@ -2,21 +2,22 @@
 
 Reports directory: .
 
-Markdown reports indexed: 220
+Markdown reports indexed: 226
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v3.1 Release Reports
+## Current v3.2 Release Reports
 
+- [compatibility_matrix_v3_2.md](compatibility_matrix_v3_2.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [redaction_preview_v3_1.md](redaction_preview_v3_1.md)
-- [release_readiness_v3_1.md](release_readiness_v3_1.md)
-- [support_bundle_data_safety_v3_1.md](support_bundle_data_safety_v3_1.md)
-- [support_bundle_demo_v3_1.md](support_bundle_demo_v3_1.md)
+- [legacy_migration_dry_run_v3_2.md](legacy_migration_dry_run_v3_2.md)
+- [partial_migration_conflict_v3_2.md](partial_migration_conflict_v3_2.md)
+- [release_readiness_v3_2.md](release_readiness_v3_2.md)
+- [schema_preservation_v3_2.md](schema_preservation_v3_2.md)
 
 ## Next Patch Plan
 
-- [v3_2_recommended_patch_plan.md](v3_2_recommended_patch_plan.md)
+- [v3_3_recommended_patch_plan.md](v3_3_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -115,6 +116,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [reading_session_demo_v1_2.md](reading_session_demo_v1_2.md)
 - [reading_status_v0_2.md](reading_status_v0_2.md)
 - [real_project_onboarding_v2_0.md](real_project_onboarding_v2_0.md)
+- [redaction_preview_v3_1.md](redaction_preview_v3_1.md)
 - [refactor_summary_v2_6.md](refactor_summary_v2_6.md)
 - [release_notes_v0_8.md](release_notes_v0_8.md)
 - [release_notes_v1_0_rc.md](release_notes_v1_0_rc.md)
@@ -147,6 +149,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v2_5.md](release_readiness_v2_5.md)
 - [release_readiness_v2_6.md](release_readiness_v2_6.md)
 - [release_readiness_v3_0_rc.md](release_readiness_v3_0_rc.md)
+- [release_readiness_v3_1.md](release_readiness_v3_1.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
@@ -172,6 +175,8 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [stress_weak_claims_v0_3.md](stress_weak_claims_v0_3.md)
 - [stress_workspace_health_v0_3.md](stress_workspace_health_v0_3.md)
 - [subsection_readiness_v0_6.md](subsection_readiness_v0_6.md)
+- [support_bundle_data_safety_v3_1.md](support_bundle_data_safety_v3_1.md)
+- [support_bundle_demo_v3_1.md](support_bundle_demo_v3_1.md)
 - [sync_apply_dry_run_v1_3.md](sync_apply_dry_run_v1_3.md)
 - [sync_conflicts_v1_3.md](sync_conflicts_v1_3.md)
 - [sync_plan_v1_3.md](sync_plan_v1_3.md)
@@ -202,6 +207,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v2_5_recommended_patch_plan.md](v2_5_recommended_patch_plan.md)
 - [v2_6_recommended_patch_plan.md](v2_6_recommended_patch_plan.md)
 - [v3_0_rc_recommended_patch_plan.md](v3_0_rc_recommended_patch_plan.md)
+- [v3_2_recommended_patch_plan.md](v3_2_recommended_patch_plan.md)
 - [verified_claims_v2_2.md](verified_claims_v2_2.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)

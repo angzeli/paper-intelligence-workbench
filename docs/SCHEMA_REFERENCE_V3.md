@@ -1,7 +1,7 @@
 # Schema Reference v3
 
 Paper Intelligence Workbench uses local files instead of a required database.
-v3.0rc freezes the core user-facing schemas below.
+v3.2 keeps the core user-facing schemas below stable for local dogfooding.
 
 ## Registry CSV
 
@@ -19,6 +19,9 @@ Policy-sensitive fields:
   PDFs.
 - `relevance_score` is a local planning aid, not a paper-quality score.
 - `included_in_lit_review` is a writing-planning flag, not proof of evidence.
+- Extra user columns may exist in historical registries. Core loaders ignore
+  unknown columns, and compatibility/migration workflows should preserve raw CSV
+  files rather than rewriting those columns away.
 
 ## Structured Note Markdown
 
@@ -72,7 +75,7 @@ Stable fields:
 
 ## Experimental Sidecars
 
-These are local review metadata and are not schema-frozen in v3.0rc:
+These are local review metadata and are not schema-frozen in v3:
 
 - `claim_lifecycle.json`
 - `contradictions.json`

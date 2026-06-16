@@ -18,8 +18,8 @@ def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_v2_release_candidate_version_metadata() -> None:
-    assert __version__ == "3.1"
-    assert 'version = "3.1"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "3.2"
+    assert 'version = "3.2"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v2_surface_docs_exist_and_classify_core_commands() -> None:
@@ -64,15 +64,20 @@ def test_v2_release_reports_are_current_and_sanitized() -> None:
         assert "/private/tmp/" not in content
 
     index = (ROOT / "reports" / "index.md").read_text(encoding="utf-8")
-    assert "## Current v3.1 Release Reports" in index
-    current_section = index.split("## Current v3.1 Release Reports", 1)[1]
+    assert "## Current v3.2 Release Reports" in index
+    current_section = index.split("## Current v3.2 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
-    assert "[support_bundle_demo_v3_1.md]" in current_section
-    assert "[support_bundle_data_safety_v3_1.md]" in current_section
-    assert "[redaction_preview_v3_1.md]" in current_section
-    assert "[release_readiness_v3_1.md]" in current_section
+    assert "[compatibility_matrix_v3_2.md]" in current_section
+    assert "[legacy_migration_dry_run_v3_2.md]" in current_section
+    assert "[partial_migration_conflict_v3_2.md]" in current_section
+    assert "[schema_preservation_v3_2.md]" in current_section
+    assert "[release_readiness_v3_2.md]" in current_section
     historical_section = index.split("## Historical Versioned Reports", 1)[1]
+    assert "[support_bundle_demo_v3_1.md]" in historical_section
+    assert "[support_bundle_data_safety_v3_1.md]" in historical_section
+    assert "[redaction_preview_v3_1.md]" in historical_section
+    assert "[release_readiness_v3_1.md]" in historical_section
     assert "[release_notes_v3_0_rc.md]" in historical_section
     assert "[release_readiness_v3_0_rc.md]" in historical_section
     assert "[final_release_verdict_v3_0_rc.md]" in historical_section

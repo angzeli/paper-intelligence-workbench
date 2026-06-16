@@ -1,6 +1,6 @@
 # Known Limitations v3
 
-v3.0rc is dogfoodable, but not a fully automated research assistant.
+v3 is dogfoodable, but not a fully automated research assistant.
 
 ## Evidence And Writing
 

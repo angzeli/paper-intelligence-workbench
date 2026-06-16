@@ -1,7 +1,7 @@
 # Experimental Features v3
 
 These workflows are useful for local dogfooding but are not API-frozen in
-v3.0rc. They should stay conservative, local, and explicit.
+v3. They should stay conservative, local, and explicit.
 
 | Area | Commands | Why experimental |
 | --- | --- | --- |

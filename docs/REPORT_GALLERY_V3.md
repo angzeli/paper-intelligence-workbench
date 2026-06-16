@@ -27,7 +27,7 @@ inspection and review, not as stable machine APIs.
 
 ## Current Release Reports
 
-Use `reports/index.md` for the latest generated report inventory. v3.1
+Use `reports/index.md` for the latest generated report inventory. v3.2
 diagnostic-support reports include:
 
 - `reports/support_bundle_demo_v3_1.md`

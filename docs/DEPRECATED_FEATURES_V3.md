@@ -1,6 +1,6 @@
 # Deprecated Features v3
 
-v3.0rc does not deprecate any public CLI command group outright.
+v3 does not deprecate any public CLI command group outright.
 
 ## Secondary Or Legacy Paths
 

@@ -18,6 +18,7 @@ Start with [docs/GETTING_STARTED_V3.md](docs/GETTING_STARTED_V3.md), [docs/STABL
 - Exports local review packets and imports reviewer comments as separate advisory sidecars.
 - Plans incremental rebuilds with local content fingerprints for repeated large-project work.
 - Creates sanitized support bundles for local debugging without exporting PDFs, full notes, drafts, cache databases, backups, or raw audit logs.
+- Inspects historical workspaces and migration readiness before touching legacy or partially migrated data.
 
 ## 🚫 What It Does Not Do
 
@@ -147,6 +148,14 @@ paperwb support redact-preview --project clean_demo
 paperwb support bundle --project clean_demo --out scratch/clean_demo_support_bundle
 ```
 
+Inspect historical workspace compatibility before migration:
+
+```bash
+paperwb compatibility matrix
+paperwb compatibility inspect tests/fixtures/workspaces/v0_1_legacy_data
+paperwb compatibility report tests/fixtures/workspaces/v0_1_legacy_data --out scratch/compatibility.md --force
+```
+
 Run diagnostics and a section outline:
 
 ```bash
@@ -227,6 +236,7 @@ paperwb backup create --project zis_photocatalysis --notes "Before major note cl
 
 Use `--dry-run` for imports, sync, restore, and migration planning before writing
 changes. Use `--force` only when you intend to overwrite an output file.
+Use `paperwb compatibility inspect` before migrating older workspaces.
 
 ## 🗂️ Data Model
 

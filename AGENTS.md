@@ -103,3 +103,7 @@ Instructions for future agents working in this repository:
 - Do not include private notes, full drafts, private comments, PDFs, raw audit logs, cache/index DBs, or backup archives in support bundles by default.
 - Redaction changes must preserve useful counts and schema shape while removing private paths, local PDF paths, note bodies, claim text, quotes, and secrets in safe mode.
 - Add tests for support-bundle privacy boundaries and no-forbidden-artifact behavior.
+- Preserve extra user registry columns during compatibility and migration workflows.
+- Compatibility inspection must be read-only except explicit report output.
+- Migration should be dry-run first and should never overwrite existing projects without an explicit force workflow.
+- Add historical workspace fixtures when changing schema or migration behavior.

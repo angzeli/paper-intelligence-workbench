@@ -44,6 +44,6 @@ paperwb dashboard --project my_review --out scratch/dashboard.md --force --no-au
 ## 5. Use Advanced Workflows Carefully
 
 Manuscript QA, sync, review packets, graph exports, workflow recipes, indexed
-search, and incremental rebuilds are useful but experimental in v3.0rc. Use
+search, and incremental rebuilds are useful but experimental in v3. Use
 dry-run/report-first workflows and keep source data untouched unless a command
 explicitly documents its write.

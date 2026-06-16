@@ -57,6 +57,7 @@ from .claim_lifecycle import (
     save_contradiction_groups,
 )
 from .claims import collect_claims, collect_notes, save_claims_csv
+from .compatibility import compatibility_matrix_markdown, compatibility_report, compatibility_terminal_summary, inspect_workspace
 from .dashboard import dashboard_markdown, dashboard_terminal, next_actions_markdown, project_health_summary_markdown, build_dashboard
 from .doctor import workspace_health
 from .dogfood import (
@@ -2397,6 +2398,33 @@ def cmd_support_reproduce(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_compatibility_inspect(args: argparse.Namespace) -> int:
+    inspection = inspect_workspace(args.workspace, to_project=args.to_project)
+    print(compatibility_terminal_summary(inspection), end="")
+    return 1 if args.strict and inspection.errors else 0
+
+
+def cmd_compatibility_report(args: argparse.Namespace) -> int:
+    inspection = inspect_workspace(args.workspace, to_project=args.to_project)
+    content = compatibility_report(inspection)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 1 if args.strict and inspection.errors else 0
+
+
+def cmd_compatibility_matrix(args: argparse.Namespace) -> int:
+    content = compatibility_matrix_markdown()
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
 def cmd_integrity_check(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     paths = _paths_from_args(args)
@@ -2823,7 +2851,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Local-first academic paper registry, notes, claims, BibTeX, and audit workbench.",
         epilog=(
             "Stable starting points: init, project, template, dogfood, validate-registry, "
-            "validate-bib, note-template, claims, report, dashboard, doctor, support.\n"
+            "validate-bib, note-template, claims, report, dashboard, doctor, support, compatibility.\n"
             "Experimental or safety-sensitive workflows: workflow, sync, index, rebuild, files, draft, "
             "manuscript, reading, backup, migrate, rules, graph, claim-review, "
             "contradictions, review-packet. See docs/STABLE_SURFACE_V3.md and docs/CLI_REFERENCE_V3.md."
@@ -2928,6 +2956,25 @@ def build_parser() -> argparse.ArgumentParser:
     support_reproduce.add_argument("--out", default="", help="Optional Markdown output path.")
     support_reproduce.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
     support_reproduce.set_defaults(func=cmd_support_reproduce)
+
+    compatibility_parser = subparsers.add_parser("compatibility", help="Inspect historical workspace compatibility and migration readiness.")
+    compatibility_sub = compatibility_parser.add_subparsers(dest="compatibility_command", required=True)
+    compatibility_inspect = compatibility_sub.add_parser("inspect", help="Inspect a workspace path without modifying files.")
+    compatibility_inspect.add_argument("workspace", help="Workspace root or project folder to inspect.")
+    compatibility_inspect.add_argument("--to-project", default="migrated_review", help="Migration target name used only for conflict detection.")
+    compatibility_inspect.add_argument("--strict", action="store_true", help="Return non-zero when error-level compatibility findings are present.")
+    compatibility_inspect.set_defaults(func=cmd_compatibility_inspect)
+    compatibility_report_parser = compatibility_sub.add_parser("report", help="Generate a Markdown compatibility inspection report.")
+    compatibility_report_parser.add_argument("workspace", help="Workspace root or project folder to inspect.")
+    compatibility_report_parser.add_argument("--to-project", default="migrated_review", help="Migration target name used only for conflict detection.")
+    compatibility_report_parser.add_argument("--out", default="", help="Optional Markdown output path.")
+    compatibility_report_parser.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    compatibility_report_parser.add_argument("--strict", action="store_true", help="Return non-zero when error-level compatibility findings are present.")
+    compatibility_report_parser.set_defaults(func=cmd_compatibility_report)
+    compatibility_matrix = compatibility_sub.add_parser("matrix", help="Print the documented compatibility matrix.")
+    compatibility_matrix.add_argument("--out", default="", help="Optional Markdown output path.")
+    compatibility_matrix.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    compatibility_matrix.set_defaults(func=cmd_compatibility_matrix)
 
     workflow_parser = subparsers.add_parser("workflow", help="List, validate, and run declarative local workflow recipes.")
     workflow_sub = workflow_parser.add_subparsers(dest="workflow_command", required=True)

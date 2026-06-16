@@ -18,6 +18,7 @@ paperwb dashboard --project clean_demo --no-audit-log
 paperwb doctor --project clean_demo
 paperwb support doctor --project clean_demo
 paperwb support bundle --project clean_demo --out scratch/clean_demo_support_bundle
+paperwb compatibility inspect tests/fixtures/workspaces/v0_1_legacy_data
 ```
 
 ## Stable Core Reports
@@ -46,6 +47,18 @@ paperwb support bundle --project clean_demo --safe --out scratch/clean_demo_supp
 not copy PDFs, full notes, full drafts, raw audit logs, cache databases, or
 backup archives. Use `--verbose-local-only` only for private debugging after
 reading [REDACTION.md](REDACTION.md).
+
+## Compatibility Diagnostics
+
+```bash
+paperwb compatibility inspect path/to/workspace
+paperwb compatibility report path/to/workspace --out scratch/compatibility.md
+paperwb compatibility matrix
+```
+
+Compatibility commands are read-only unless `--out` is used to write a report.
+Use them before migrating legacy `data/` workspaces, early project profiles,
+partial migrations, or registries with extra user columns.
 
 ## Experimental Command Groups
 

@@ -60,7 +60,7 @@ current cautions.
 
 ## Deprecated Commands
 
-No command groups are deprecated in v3.0rc.
+No command groups are deprecated in v3.
 
 ## Write Safety Contract
 
