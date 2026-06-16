@@ -165,6 +165,14 @@ from .reading import (
     start_reading_session,
     weekly_reading_review_report,
 )
+from .rebuild import (
+    build_rebuild_plan,
+    default_rebuild_metadata_path,
+    rebuild_plan_markdown,
+    rebuild_run_markdown,
+    rebuild_status_markdown,
+    run_rebuild_metadata,
+)
 from .review_packets import (
     build_review_items,
     build_review_response,
@@ -411,6 +419,29 @@ def _index_records_from_args(args: argparse.Namespace, paths: dict[str, Path | N
         themes_path=paths["themes"],
         text_dir=_text_dir_from_args(args, paths),
         include_text=getattr(args, "include_text", False),
+    )
+
+
+def _rebuild_metadata_path_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
+    if getattr(args, "metadata", ""):
+        return Path(args.metadata)
+    return default_rebuild_metadata_path(paths["root"])
+
+
+def _rebuild_plan_from_args(args: argparse.Namespace):
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    paths = _paths_from_args(args)
+    return paths, build_rebuild_plan(
+        project_id=_project_id_from_paths(paths),
+        root=paths["root"],
+        registry_path=paths["registry"],
+        bibtex_path=paths["bibtex"],
+        notes_dir=paths["notes_dir"],
+        themes_path=paths["themes"],
+        reports_dir=paths["reports_dir"],
+        text_dir=_text_dir_from_args(args, paths),
+        include_text=getattr(args, "include_text", False),
+        metadata_path=_rebuild_metadata_path_from_args(args, paths),
     )
 
 
@@ -826,6 +857,47 @@ def cmd_index_clear(args: argparse.Namespace) -> int:
     clear_index(index_path, project_id=project_id)
     _record_audit_event(paths, command="index clear", action="clear_index", affected_paths=[index_path], summary=f"Cleared index records for {project_id}")
     print(f"Cleared index records for {project_id} at {index_path}")
+    return 0
+
+
+def cmd_rebuild_plan(args: argparse.Namespace) -> int:
+    paths, plan = _rebuild_plan_from_args(args)
+    markdown = rebuild_plan_markdown(plan)
+    if args.out:
+        path = write_text(args.out, markdown, force=args.force_report)
+        print(f"Wrote {path}")
+    else:
+        print(markdown, end="")
+    return 1 if args.strict and plan.stale_items else 0
+
+
+def cmd_rebuild_status(args: argparse.Namespace) -> int:
+    paths, plan = _rebuild_plan_from_args(args)
+    markdown = rebuild_status_markdown(plan)
+    if args.out:
+        path = write_text(args.out, markdown, force=args.force_report)
+        print(f"Wrote {path}")
+    else:
+        print(markdown, end="")
+    return 1 if args.strict and plan.stale_items else 0
+
+
+def cmd_rebuild_run(args: argparse.Namespace) -> int:
+    paths, plan = _rebuild_plan_from_args(args)
+    result = run_rebuild_metadata(plan, force=args.force)
+    markdown = rebuild_run_markdown(result)
+    if args.out:
+        path = write_text(args.out, markdown, force=args.force_report)
+        print(f"Wrote {path}")
+    else:
+        print(markdown, end="")
+    _record_audit_event(
+        paths,
+        command="rebuild run",
+        action="write_rebuild_metadata",
+        affected_paths=[result.metadata_path],
+        summary=f"Refreshed {len(result.refreshed_targets)} rebuild metadata target(s)",
+    )
     return 0
 
 
@@ -2678,7 +2750,7 @@ def build_parser() -> argparse.ArgumentParser:
         epilog=(
             "Stable starting points: init, project, template, dogfood, validate-registry, "
             "validate-bib, note-template, claims, report, dashboard, doctor.\n"
-            "Experimental or safety-sensitive workflows: workflow, sync, index, files, draft, "
+            "Experimental or safety-sensitive workflows: workflow, sync, index, rebuild, files, draft, "
             "manuscript, reading, backup, migrate, rules, graph, claim-review, "
             "contradictions, review-packet. See docs/STABLE_SURFACE_V2.md and docs/CLI_REFERENCE_V2.md."
         ),
@@ -3109,6 +3181,41 @@ def build_parser() -> argparse.ArgumentParser:
     index_clear.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
     index_clear.add_argument("--index", default="", help="SQLite index path. Defaults to .paperwb/index.sqlite under the selected workspace root.")
     index_clear.set_defaults(func=cmd_index_clear)
+
+    rebuild_parser = subparsers.add_parser("rebuild", help="Plan and record incremental rebuild metadata for larger local projects.")
+    rebuild_sub = rebuild_parser.add_subparsers(dest="rebuild_command", required=True)
+
+    def add_rebuild_source_args(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports directory.")
+        command_parser.add_argument("--text-dir", default="", help="Optional text sidecar directory. Defaults to project/text or data/text.")
+        command_parser.add_argument("--include-text", action="store_true", help="Include text sidecars in search-index fingerprints.")
+        command_parser.add_argument("--metadata", default="", help="Rebuild metadata path. Defaults to .paperwb/rebuild_metadata.json under the selected root.")
+
+    rebuild_plan = rebuild_sub.add_parser("plan", help="Show stale notes, reports, search index, dashboard, and manuscript QA targets.")
+    add_rebuild_source_args(rebuild_plan)
+    rebuild_plan.add_argument("--out", default="", help="Optional Markdown rebuild-plan report path.")
+    rebuild_plan.add_argument("--force-report", action="store_true", help="Overwrite an existing --out report.")
+    rebuild_plan.add_argument("--strict", action="store_true", help="Return non-zero when stale targets are found.")
+    rebuild_plan.set_defaults(func=cmd_rebuild_plan)
+
+    rebuild_status = rebuild_sub.add_parser("status", help="Show a short rebuild-cache status summary.")
+    add_rebuild_source_args(rebuild_status)
+    rebuild_status.add_argument("--out", default="", help="Optional Markdown rebuild-status report path.")
+    rebuild_status.add_argument("--force-report", action="store_true", help="Overwrite an existing --out report.")
+    rebuild_status.add_argument("--strict", action="store_true", help="Return non-zero when stale targets are found.")
+    rebuild_status.set_defaults(func=cmd_rebuild_status)
+
+    rebuild_run = rebuild_sub.add_parser("run", help="Refresh local rebuild metadata after you intentionally regenerate outputs.")
+    add_rebuild_source_args(rebuild_run)
+    rebuild_run.add_argument("--force", action="store_true", help="Refresh fingerprints for every target, even if it is currently marked fresh.")
+    rebuild_run.add_argument("--out", default="", help="Optional Markdown rebuild-run report path.")
+    rebuild_run.add_argument("--force-report", action="store_true", help="Overwrite an existing --out report.")
+    rebuild_run.set_defaults(func=cmd_rebuild_run)
 
     files_parser = subparsers.add_parser("files", help="Scan, link, hash, and audit local user-provided files.")
     files_sub = files_parser.add_subparsers(dest="files_command", required=True)

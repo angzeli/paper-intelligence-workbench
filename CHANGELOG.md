@@ -2,6 +2,20 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v2.5 - Performance, Scale, Incremental Rebuilds, and Cache Hygiene
+
+- Promoted local package metadata to `2.5`.
+- Added `paperwb rebuild plan/status/run` for local content-fingerprint based
+  rebuild planning.
+- Added ignored `.paperwb/rebuild_metadata.json` cache metadata for repeated
+  large-project workflows.
+- Extended performance sanity checks to cover local search-index record
+  building and indexing.
+- Added a synthetic stress-project generation script for larger local scale
+  checks.
+- Kept v2.5 local-first: no cloud services, no LLM APIs, no publisher scraping,
+  no heavy graph/cache dependencies, and no automatic rewrite of user data.
+
 ## v2.4 - Collaboration and Manual Review Pack
 
 - Promoted local package metadata to `2.4`.
