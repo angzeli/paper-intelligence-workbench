@@ -40,7 +40,7 @@ When `--project` is used, path overrides for registry, notes, BibTeX, themes, an
 ## Import / Export
 
 ```bash
-paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run
+paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --report scratch/import_zotero_dry_run.md --force
 paperwb export claims-json --project zis_photocatalysis --out scratch/claims.json --force
 ```
 

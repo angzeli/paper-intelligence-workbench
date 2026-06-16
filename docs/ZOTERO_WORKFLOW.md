@@ -7,7 +7,7 @@ Paper Intelligence Workbench does not connect to Zotero or use a cloud API. v0.4
 Export items from Zotero as CSV, then run:
 
 ```bash
-paperwb import zotero-csv path/to/zotero_export.csv --project my_review --dry-run --force
+paperwb import zotero-csv path/to/zotero_export.csv --project my_review --dry-run --report scratch/import_zotero_dry_run.md --force
 ```
 
 Inspect the generated import report. If the report looks correct, run without `--dry-run`:

@@ -5,10 +5,10 @@ Import and export workflows are local-only. They do not call Zotero cloud servic
 ## Imports
 
 ```bash
-paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run
-paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run
-paperwb import bibtex data/examples/library_import.bib --dry-run
-paperwb import ris data/examples/library.ris --dry-run
+paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --report scratch/import_zotero_dry_run.md --force
+paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run --report scratch/import_csv_dry_run.md --force
+paperwb import bibtex data/examples/library_import.bib --dry-run --report scratch/import_bibtex_dry_run.md --force
+paperwb import ris data/examples/library.ris --dry-run --report scratch/import_ris_dry_run.md --force
 ```
 
 Imports preserve existing rows. `--fill-missing` fills blank fields only.

@@ -32,8 +32,8 @@ Malformed note blocks should produce parse warnings rather than crashes. Check f
 Use dry-run first:
 
 ```bash
-paperwb import zotero-csv input.csv --dry-run
-paperwb import csv input.csv --mapping mapping.json --dry-run
+paperwb import zotero-csv input.csv --dry-run --report scratch/recovering_import_dry_run.md --force
+paperwb import csv input.csv --mapping mapping.json --dry-run --report scratch/recovering_import_csv_dry_run.md --force
 ```
 
 Fix mapping files and source headers before using force or fill-missing options.

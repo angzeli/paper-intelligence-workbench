@@ -189,7 +189,7 @@ until you add verified metadata yourself.
 
 ```bash
 # Import/export
-paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --force
+paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --report scratch/import_zotero_dry_run.md --force
 paperwb export reading-list --theme photocorrosion --project zis_photocatalysis --out scratch/reading_list.md --force
 
 # Search and index
@@ -266,7 +266,7 @@ paperwb review-packet create --project zis_photocatalysis --theme photocorrosion
 paperwb doctor
 paperwb dogfood create photocatalysis --project fyp_review
 paperwb dogfood plan-from-files photocatalysis --project fyp_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
-paperwb import zotero-csv data/examples/zotero_export.csv --dry-run
+paperwb import zotero-csv data/examples/zotero_export.csv --dry-run --report scratch/import_zotero_dry_run.md --force
 paperwb export claims --out scratch/claims.csv
 paperwb dashboard --project zis_photocatalysis
 ```

@@ -236,6 +236,36 @@ def test_cli_import_report_collision_does_not_create_registry(tmp_path):
     assert "already exists" in result.stderr
 
 
+def test_documented_project_import_dry_run_uses_explicit_report_only(tmp_path):
+    report = tmp_path / "import_zotero_dry_run.md"
+    default_project_report = ROOT / "projects" / "zis_photocatalysis" / "reports" / "import_zotero_csv.md"
+    before_default_exists = default_project_report.exists()
+    before_default_content = default_project_report.read_text(encoding="utf-8") if before_default_exists else ""
+    registry = ROOT / "projects" / "zis_photocatalysis" / "registry.csv"
+    before_registry = registry.read_text(encoding="utf-8")
+
+    result = run_cli(
+        "import",
+        "zotero-csv",
+        str(EXAMPLE_ZOTERO_CSV),
+        "--project",
+        "zis_photocatalysis",
+        "--dry-run",
+        "--report",
+        str(report),
+        "--force",
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert report.exists()
+    assert "dry-run: True" in result.stdout
+    assert "Dry run: true" in report.read_text(encoding="utf-8")
+    assert registry.read_text(encoding="utf-8") == before_registry
+    assert default_project_report.exists() is before_default_exists
+    if before_default_exists:
+        assert default_project_report.read_text(encoding="utf-8") == before_default_content
+
+
 def test_cli_repeated_import_default_report_collision_does_not_modify_registry(tmp_path):
     registry = tmp_path / "papers.csv"
     reports = tmp_path / "reports"

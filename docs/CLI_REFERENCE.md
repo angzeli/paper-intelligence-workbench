@@ -43,10 +43,10 @@ expectations.
 Imports:
 
 ```bash
-paperwb import zotero-csv data/examples/zotero_export.csv --dry-run
-paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run
-paperwb import bibtex data/examples/library_import.bib --dry-run
-paperwb import ris data/examples/library.ris --dry-run
+paperwb import zotero-csv data/examples/zotero_export.csv --dry-run --report scratch/import_zotero_dry_run.md --force
+paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run --report scratch/import_csv_dry_run.md --force
+paperwb import bibtex data/examples/library_import.bib --dry-run --report scratch/import_bibtex_dry_run.md --force
+paperwb import ris data/examples/library.ris --dry-run --report scratch/import_ris_dry_run.md --force
 ```
 
 Import commands preserve existing registry rows. `--fill-missing` fills only blank fields on matched rows. Import reports are written to the selected reports directory unless `--report` is provided. If the report path already exists and `--force` is not provided, the command fails before writing the registry.

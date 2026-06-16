@@ -14,6 +14,6 @@
 | Reports | `paperwb report evidence-map --project zis_photocatalysis --force` | Refuses existing reports | `--force` overwrites reports | Yes | Report tests |
 | Rules | `paperwb rules report --project zis_photocatalysis` | Read-only except optional report output | `--force` overwrites rule report | Yes | Rule tests |
 | Dashboard | `paperwb dashboard --project zis_photocatalysis --view next-actions` | Read-only terminal output | Optional `--out` requires `--force`; `--no-audit-log` omits ignored local audit state | Yes | Dashboard tests |
-| Import | `paperwb import zotero-csv ... --dry-run` | Dry-run available | Writes only when not dry-run | Yes | Import/export tests |
+| Import | `paperwb import zotero-csv ... --dry-run --report scratch/import_zotero_dry_run.md --force` | Dry-run available | Writes explicit report only; registry unchanged | Yes | Import/export tests |
 | Export | `paperwb export claims-json --out scratch/claims.json` | Explicit output path | `--force` for files | Yes | Import/export tests |
 | Synthetic | `paperwb synthetic generate --project stress_demo` | Refuses existing project | `--force` for regeneration | Creates profile | Stress tests |

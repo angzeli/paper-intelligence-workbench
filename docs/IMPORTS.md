@@ -24,10 +24,10 @@ Each importer writes a Markdown import report with rows read, records imported, 
 ## Examples
 
 ```bash
-paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --force
-paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run --force
-paperwb import bibtex data/examples/library_import.bib --dry-run --force
-paperwb import ris data/examples/library.ris --dry-run --force
+paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --report scratch/import_zotero_dry_run.md --force
+paperwb import csv data/examples/generic_papers.csv --mapping data/examples/generic_mapping.json --dry-run --report scratch/import_csv_dry_run.md --force
+paperwb import bibtex data/examples/library_import.bib --dry-run --report scratch/import_bibtex_dry_run.md --force
+paperwb import ris data/examples/library.ris --dry-run --report scratch/import_ris_dry_run.md --force
 ```
 
 Use a temporary project or `--dry-run` before importing real files.
