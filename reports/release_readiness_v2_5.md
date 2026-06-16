@@ -34,6 +34,22 @@ Package metadata: 2.5
 - `reports/release_readiness_v2_5.md`
 - `reports/v2_6_recommended_patch_plan.md`
 
+## Post-Review Fixes
+
+- Fixed `paperwb rebuild plan --project <project>` so project report rebuild
+  recommendations use the valid project-profile command and no longer combine
+  `--project` with `--reports-dir`.
+- Fixed `paperwb rebuild plan` recommendations to use current output flags for
+  claims, evidence-map, dashboard, and report targets.
+- Fixed `paperwb sync plan --out <path>` so the default JSON plan is written
+  beside the requested Markdown output instead of also creating project-local
+  churn under `reports/`.
+- Updated rebuild documentation to disclose that `rebuild run` writes rebuild
+  metadata and the normal ignored local audit-log event.
+- Added `projects/clean_demo`, a minimal clean synthetic project for first-run
+  validation, while leaving `projects/zis_photocatalysis` as the intentionally
+  warning-rich teaching fixture.
+
 ## Test Coverage Added
 
 - Content hashing changes when file content changes.
@@ -59,5 +75,6 @@ Package metadata: 2.5
 ## Release Verdict
 
 Ready for local dogfooding as an experimental v2.5 scale and cache-hygiene
-workflow. The patch improves repeatability for larger projects without adding
-heavy dependencies or modifying user evidence automatically.
+workflow after the post-review blocker fixes above. The patch improves
+repeatability for larger projects without adding heavy dependencies or modifying
+user evidence automatically.

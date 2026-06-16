@@ -14,8 +14,7 @@ data-safety boundaries, `.gitignore`, and git status.
 
 ## Release Verdict
 
-**Needs one blocker fix before I would call this v2.5 safe for smooth local
-dogfooding.**
+**Ready for cautious local dogfooding after the follow-up blocker-fix pass.**
 
 The repository is broadly healthy: package import works, `paperwb --help`
 loads, full pytest passes, notebooks validate structurally, the data-safety
@@ -24,10 +23,12 @@ Python tracebacks. The local-first boundaries are still intact: no tracked PDFs,
 SQLite/cache DBs, backup archives, audit logs, `.paperwb` sidecars, or Python
 caches were found.
 
-The blocker is narrower but serious: the new v2.5 `rebuild plan` workflow emits
-an invalid recommended command for refreshing all reports under a project
-profile. A release focused on incremental rebuilds cannot ship with a generated
-next-action command that fails immediately.
+The original review found one release blocker and three high-priority issues.
+The follow-up fix pass addressed them without expanding scope: rebuild
+recommendations now emit valid project-profile commands, sync JSON output follows
+explicit `--out` placement, rebuild write-path docs mention audit logging, and a
+minimal clean synthetic project is available for first-run validation. The
+detailed findings below are retained as traceability for what was fixed.
 
 ## Validation Performed
 
@@ -58,7 +59,11 @@ next-action command that fails immediately.
 
 ## Release Blockers
 
-1. **`rebuild plan` emits an invalid command for project report rebuilds.**
+None remaining after the follow-up fix pass.
+
+Fixed finding:
+
+1. **`rebuild plan` emitted an invalid command for project report rebuilds.**
 
    Evidence: `paper_workbench/rebuild.py:300` builds this recommendation:
    `paperwb report all --reports-dir projects/zis_photocatalysis/reports --project zis_photocatalysis`.
@@ -70,13 +75,14 @@ next-action command that fails immediately.
    not data-destructive, but it breaks the headline workflow and undermines user
    trust in generated recommendations.
 
-   Required fix: when `project_id != "default"`, recommend `paperwb report all
-   --project PROJECT --force` or another actually valid project-profile command.
-   Add a regression test that executes every command emitted in `rebuild plan`
-   or at least validates that project-profile recommendations do not include
-   rejected path override flags.
+   Fix applied: project-profile rebuild recommendations now use the valid
+   `paperwb report all --force --project PROJECT` form and regression tests
+   execute the emitted report recommendation.
 
 ## High-Priority Issues
+
+All high-priority findings were addressed in the follow-up fix pass. Original
+findings are retained below for traceability.
 
 1. **`sync plan --out <path>` still writes a second default JSON file under the project.**
 
@@ -90,10 +96,9 @@ next-action command that fails immediately.
    loss, but it is surprising file churn and violates the expectation that an
    explicit output path controls where generated artifacts go.
 
-   Recommended fix: require `--json-out` before writing JSON, derive JSON beside
-   `--out`, or make the default write location explicit in CLI output/docs.
-   Add a test for `sync plan --out tmp/report.md` that asserts no project-local
-   JSON file appears unless requested.
+   Fix applied: when `--out` is supplied and `--json-out` is omitted, the JSON
+   plan is written beside the Markdown output. The CLI help, sync docs, and
+   regression tests now cover this behavior.
 
 2. **`rebuild run` is documented as metadata-only, but CLI audit logging adds another write path.**
 
@@ -105,9 +110,8 @@ next-action command that fails immediately.
    unsafe. It is still a contract mismatch in a patch whose purpose is cache and
    write-path clarity.
 
-   Recommended fix: update the contract/docs to say rebuild run writes rebuild
-   metadata and the normal local audit log, or suppress audit logging for this
-   cache-only command.
+   Fix applied: rebuild docs now state that `rebuild run` writes rebuild
+   metadata and the normal ignored local audit-log event.
 
 3. **There is no green-path bundled project for first-run validation.**
 
@@ -120,9 +124,9 @@ next-action command that fails immediately.
    need one tiny clean project where stable commands return clean results. That
    separates installation confidence from evidence-gap demonstration.
 
-   Recommended fix: add or designate a minimal clean synthetic project for
-   install/quickstart validation. Keep `zis_photocatalysis` as the warning-rich
-   teaching fixture.
+   Fix applied: `projects/clean_demo` is now a minimal clean synthetic project,
+   and public quickstarts use it for first-run validation while preserving
+   `zis_photocatalysis` as the warning-rich teaching fixture.
 
 ## Medium-Priority Issues
 
