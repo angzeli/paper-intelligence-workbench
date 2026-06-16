@@ -23,6 +23,7 @@ classifies command groups for the v2 release line.
 ## Experimental But Usable
 
 - `workflow`
+- `review-packet`
 - `index`
 - `graph`
 - `claim-review`
@@ -83,6 +84,22 @@ backup creation, but they cannot execute arbitrary shell or Python code. Use
 `--dry-run` before running recipes that write reports, backups, or indexes.
 Recipes that default to dry-run require `--run-writes` before those step writes
 are allowed from the CLI.
+
+## Review Packet Commands
+
+```bash
+paperwb review-packet create --project zis_photocatalysis --theme photocorrosion --out scratch/review_packet_photocorrosion --force
+paperwb review-packet import-comments scratch/review_packet_photocorrosion/comments.csv --project zis_photocatalysis --theme photocorrosion --dry-run
+paperwb review-packet import-comments scratch/review_packet_photocorrosion/comments.csv --project zis_photocatalysis --theme photocorrosion --force --out scratch/reviewer_comment_import.md --force-report
+paperwb review-packet comments --project zis_photocatalysis --out scratch/reviewer_comments.md --force
+paperwb review-packet response --project zis_photocatalysis --theme photocorrosion --out scratch/response_to_review.md --force
+paperwb review-packet followups --project zis_photocatalysis --theme photocorrosion --out scratch/review_followups.md --force
+```
+
+Review packets are experimental in the v2 line. They export local Markdown,
+CSV, and JSON review artifacts without PDFs. Imported comments are stored as
+separate `.paperwb/reviewer_comments.json` metadata and never rewrite claims,
+notes, registry rows, BibTeX, or evidence locations.
 
 ## Evidence Graph Commands
 

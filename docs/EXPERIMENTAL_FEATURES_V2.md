@@ -19,6 +19,7 @@ output shape, or internal file format before a future stable release.
 | Evidence graph | `graph` | Graph nodes, edge labels, and analytics are derived from local data and may evolve during dogfooding. |
 | Claim lifecycle | `claim-review`, `contradictions` | Sidecar schemas and review heuristics need real-note dogfooding before being frozen. |
 | Workflow runner | `workflow` | Recipe schema and built-in step coverage need real-project dogfooding before being frozen. |
+| Review packets | `review-packet` | Packet shape and comment sidecar schema need supervisor/collaborator dogfooding before being frozen. |
 | Synthetic corpus generator | `synthetic generate` | Fixture shape may change to improve stress coverage. |
 
 Experimental does not mean unsafe by default. These commands remain local-first,

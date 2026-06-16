@@ -83,6 +83,8 @@ the CLI when possible unless a script specifically needs Python objects:
   analytics, and JSON/DOT/Markdown exports.
 - `paper_workbench.workflow`: declarative workflow recipes, built-in step
   adapters, dry-run execution, and workflow run reports.
+- `paper_workbench.review_packets`: local review-packet exports, reviewer
+  comment sidecars, and response-to-review reports.
 - `paper_workbench.errors`: user-facing diagnostic taxonomy helpers.
 - `paper_workbench.doctor`: workspace-health aggregation.
 

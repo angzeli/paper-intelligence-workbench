@@ -35,9 +35,14 @@
 
 ## Recommended v2.4 Scope
 
-- Consolidate recipe schema docs after dogfooding.
-- Add workflow examples for one real private project without committing private
-  metadata.
+- Add local file-based review packets for supervisor/collaborator feedback.
+- Import reviewer comments into separate sidecars without mutating evidence.
+- Generate response-to-review and follow-up reports from imported comments.
+
+## Recommended v2.5 Scope
+
+- Add performance sanity checks and incremental rebuild planning for larger
+  local projects.
 - Improve report cleanup and archive guidance for historical generated reports.
 
 ## Not Worth Expanding Yet

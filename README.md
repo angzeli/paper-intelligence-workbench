@@ -15,6 +15,7 @@ Start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABL
 - Provides local search, optional SQLite indexing, file audits, backup planning, migration checks, sync plans, and rule reports.
 - Tracks manual claim lifecycle state and contradiction/tension groups without auto-verifying claims.
 - Runs declarative local workflow recipes for repeatable validation, report, dashboard, manuscript QA, and backup-precheck routines.
+- Exports local review packets and imports reviewer comments as separate advisory sidecars.
 
 ## 🚫 What It Does Not Do
 
@@ -198,6 +199,8 @@ paperwb graph export --project zis_photocatalysis --format json --out scratch/ev
 paperwb workflow run pre_writing_check --project zis_photocatalysis --theme photocorrosion --dry-run --out scratch/pre_writing_check.md --force
 paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/writing_packet.md --force
 paperwb manuscript qa drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_qa.md --force
+paperwb review-packet create --project zis_photocatalysis --theme photocorrosion --out scratch/review_packet_photocorrosion --force
+paperwb review-packet import-comments scratch/review_packet_photocorrosion/comments.csv --project zis_photocatalysis --theme photocorrosion --dry-run
 
 # Reading and safety
 paperwb reading queue --project zis_photocatalysis
@@ -252,6 +255,7 @@ paperwb report evidence-map
 paperwb report citation-audit
 paperwb graph summary --project zis_photocatalysis
 paperwb writing-packet --theme photocorrosion
+paperwb review-packet create --project zis_photocatalysis --theme photocorrosion --out scratch/review_packet --force
 paperwb doctor
 paperwb dogfood create photocatalysis --project fyp_review
 paperwb dogfood plan-from-files photocatalysis --project fyp_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
@@ -285,6 +289,9 @@ for the full command map.
 - [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md)
 - [docs/GRAPH_EXPORTS.md](docs/GRAPH_EXPORTS.md)
 - [docs/GRAPH_ANALYTICS.md](docs/GRAPH_ANALYTICS.md)
+- [docs/REVIEW_PACKETS.md](docs/REVIEW_PACKETS.md)
+- [docs/COMMENT_IMPORT.md](docs/COMMENT_IMPORT.md)
+- [docs/RESPONSE_TO_REVIEW.md](docs/RESPONSE_TO_REVIEW.md)
 - [docs/REPORTS_V2.md](docs/REPORTS_V2.md)
 - [docs/DATA_SAFETY_V2.md](docs/DATA_SAFETY_V2.md)
 - [docs/KNOWN_LIMITATIONS_V2.md](docs/KNOWN_LIMITATIONS_V2.md)

@@ -92,3 +92,6 @@ Instructions for future agents working in this repository:
 - Do not execute arbitrary shell commands, subprocesses, or Python code from workflow recipe files.
 - Use dry-run first for workflow recipes that can write reports, rebuild indexes, or create backups.
 - Preserve user data when adding workflow steps; recipe runs must not silently overwrite outputs without an explicit force option.
+- Review comments must not automatically change claims, notes, registry rows, BibTeX entries, or evidence locations.
+- Do not include PDFs in review packets by default.
+- Treat imported reviewer comments as advisory local sidecar metadata, not as scientific truth.
