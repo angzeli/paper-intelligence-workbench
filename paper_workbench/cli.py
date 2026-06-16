@@ -165,6 +165,18 @@ from .reading import (
     start_reading_session,
     weekly_reading_review_report,
 )
+from .review_packets import (
+    build_review_items,
+    build_review_response,
+    create_review_packet,
+    default_review_comments_path,
+    import_reviewer_comments,
+    load_reviewer_comments,
+    response_to_review_report,
+    review_followups_report,
+    review_import_report,
+    reviewer_comments_report,
+)
 from .reporting import (
     bibtex_audit_report,
     citation_audit_report,
@@ -2455,6 +2467,153 @@ def cmd_migrate_run(args: argparse.Namespace) -> int:
     return 1 if plan.conflicts and args.strict else 0
 
 
+def _review_packet_inputs(args: argparse.Namespace):
+    _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
+    return _report_inputs(args)
+
+
+def _default_review_packet_out(paths: dict[str, Path | None], *, theme: str = "", draft: str = "") -> Path:
+    label = theme or Path(draft).stem or "review"
+    return Path(paths["root"]) / "exports" / f"review_packet_{normalize_tag(label)}"
+
+
+def _review_comments_path_from_args(args: argparse.Namespace, paths: dict[str, Path | None]) -> Path:
+    if getattr(args, "comments_store", ""):
+        return Path(args.comments_store)
+    return default_review_comments_path(paths["root"])
+
+
+def _review_manifest_from_args(args: argparse.Namespace) -> Path | None:
+    if getattr(args, "manifest", ""):
+        return Path(args.manifest)
+    comments = Path(getattr(args, "comments_csv", "") or "")
+    candidate = comments.parent / "manifest.json"
+    return candidate if candidate.exists() else None
+
+
+def _review_items_from_args(args: argparse.Namespace, papers, notes, claims, entries, themes):
+    items, warnings = build_review_items(
+        papers,
+        notes,
+        claims,
+        themes,
+        entries,
+        theme=getattr(args, "theme", "") or "",
+        draft_path=getattr(args, "draft", "") or "",
+    )
+    return items, warnings
+
+
+def cmd_review_packet_create(args: argparse.Namespace) -> int:
+    papers, notes, claims, entries, themes, paths = _review_packet_inputs(args)
+    output_dir = Path(args.out) if args.out else _default_review_packet_out(paths, theme=args.theme, draft=args.draft)
+    packet = create_review_packet(
+        project=_project_id_from_paths(paths),
+        output_dir=output_dir,
+        papers=papers,
+        notes=notes,
+        claims=claims,
+        entries=entries,
+        themes=themes,
+        theme=args.theme,
+        draft_path=args.draft,
+        force=args.force,
+    )
+    _record_audit_event(
+        paths,
+        command="review-packet create",
+        action="write_review_packet",
+        affected_paths=[output_dir],
+        warnings=packet.warnings,
+        summary=f"Wrote review packet {packet.packet_id} with {len(packet.items)} item(s)",
+    )
+    print(f"Wrote review packet to {output_dir}")
+    print(f"Items: {len(packet.items)}")
+    print("Includes PDFs: false")
+    return 0
+
+
+def cmd_review_packet_import_comments(args: argparse.Namespace) -> int:
+    papers, notes, claims, entries, themes, paths = _review_packet_inputs(args)
+    manifest_path = _review_manifest_from_args(args)
+    items, item_warnings = _review_items_from_args(args, papers, notes, claims, entries, themes)
+    comments_path = _review_comments_path_from_args(args, paths)
+    dry_run = args.dry_run or not args.force
+    result = import_reviewer_comments(
+        args.comments_csv,
+        project=_project_id_from_paths(paths),
+        output_path=comments_path,
+        known_items=items,
+        manifest_path=manifest_path,
+        dry_run=dry_run,
+        force=True,
+    )
+    result.warnings.extend(item_warnings)
+    content = review_import_report(result)
+    if args.out:
+        path = write_text(args.out, content, force=args.force_report)
+        print(f"Wrote {path}")
+        affected = [path]
+    else:
+        print(content, end="")
+        affected = []
+    if not dry_run and not result.errors:
+        affected.append(comments_path)
+    _record_audit_event(
+        paths,
+        command="review-packet import-comments",
+        action="import_reviewer_comments" if not dry_run else "import_reviewer_comments_dry_run",
+        affected_paths=affected,
+        dry_run=dry_run,
+        warnings=result.warnings + result.errors,
+        success=not result.errors,
+        summary=f"Imported reviewer comments valid={len(result.comments)} errors={len(result.errors)} dry_run={dry_run}",
+    )
+    return 1 if result.errors else 0
+
+
+def cmd_review_packet_comments(args: argparse.Namespace) -> int:
+    paths = _paths_from_args(args)
+    comments = load_reviewer_comments(_review_comments_path_from_args(args, paths))
+    content = reviewer_comments_report(comments, project=_project_id_from_paths(paths))
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_review_packet_response(args: argparse.Namespace) -> int:
+    papers, notes, claims, entries, themes, paths = _review_packet_inputs(args)
+    comments = load_reviewer_comments(_review_comments_path_from_args(args, paths))
+    items, _warnings = _review_items_from_args(args, papers, notes, claims, entries, themes)
+    response = build_review_response(comments, project=_project_id_from_paths(paths), known_items=items)
+    content = response_to_review_report(response)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="review-packet response", action="write_response_to_review", affected_paths=[path], summary=f"Wrote response-to-review report for {len(comments)} comment(s)")
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_review_packet_followups(args: argparse.Namespace) -> int:
+    papers, notes, claims, entries, themes, paths = _review_packet_inputs(args)
+    comments = load_reviewer_comments(_review_comments_path_from_args(args, paths))
+    items, _warnings = _review_items_from_args(args, papers, notes, claims, entries, themes)
+    response = build_review_response(comments, project=_project_id_from_paths(paths), known_items=items)
+    content = review_followups_report(response)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        _record_audit_event(paths, command="review-packet followups", action="write_review_followups", affected_paths=[path], summary=f"Wrote review follow-up report for {len(comments)} comment(s)")
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
 def cmd_workflow_list(args: argparse.Namespace) -> int:
     recipes = list_workflow_recipes(args.project, root=args.root)
     if not recipes:
@@ -2521,7 +2680,7 @@ def build_parser() -> argparse.ArgumentParser:
             "validate-bib, note-template, claims, report, dashboard, doctor.\n"
             "Experimental or safety-sensitive workflows: workflow, sync, index, files, draft, "
             "manuscript, reading, backup, migrate, rules, graph, claim-review, "
-            "contradictions. See docs/STABLE_SURFACE_V2.md and docs/CLI_REFERENCE_V2.md."
+            "contradictions, review-packet. See docs/STABLE_SURFACE_V2.md and docs/CLI_REFERENCE_V2.md."
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -2619,6 +2778,66 @@ def build_parser() -> argparse.ArgumentParser:
     workflow_validate.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
     workflow_validate.add_argument("--strict", action="store_true", help="Return non-zero when recipe errors are found.")
     workflow_validate.set_defaults(func=cmd_workflow_validate)
+
+    review_packet_parser = subparsers.add_parser("review-packet", help="Create local manual-review packets and import reviewer comments.")
+    review_packet_sub = review_packet_parser.add_subparsers(dest="review_packet_command", required=True)
+
+    def add_review_packet_sources(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--registry", default=str(default_registry_path()), help="Registry CSV path.")
+        command_parser.add_argument("--bibtex", default=str(default_bibtex_path()), help="BibTeX file path.")
+        command_parser.add_argument("--notes-dir", default=str(default_notes_dir()), help="Notes directory.")
+        command_parser.add_argument("--themes", default=str(default_themes_path()), help="Themes JSON path.")
+        command_parser.add_argument("--reports-dir", default=str(default_reports_dir()), help="Reports output directory.")
+
+    def add_review_comment_store(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--comments-store", default="", help="Reviewer comment sidecar JSON path. Defaults to .paperwb/reviewer_comments.json under the selected root.")
+
+    review_create = review_packet_sub.add_parser("create", help="Export a local review packet directory without PDFs.")
+    add_review_packet_sources(review_create)
+    review_create.add_argument("--theme", default="", help="Theme ID/name for a theme evidence packet.")
+    review_create.add_argument("--draft", default="", help="Optional Markdown draft to include in the packet.")
+    review_create.add_argument("--out", default="", help="Output packet directory. Defaults to exports/review_packet_<label> under the selected root.")
+    review_create.add_argument("--force", action="store_true", help="Overwrite known packet files in an existing output directory.")
+    review_create.set_defaults(func=cmd_review_packet_create)
+
+    review_import = review_packet_sub.add_parser("import-comments", help="Validate or import reviewer comments from a packet CSV.")
+    review_import.add_argument("comments_csv", help="CSV comment template completed by a reviewer.")
+    add_review_packet_sources(review_import)
+    add_review_comment_store(review_import)
+    review_import.add_argument("--manifest", default="", help="Optional review-packet manifest.json used to validate item IDs.")
+    review_import.add_argument("--theme", default="", help="Optional theme ID/name used to validate item IDs when no manifest is supplied.")
+    review_import.add_argument("--draft", default="", help="Optional draft path used to validate item IDs when no manifest is supplied.")
+    review_import.add_argument("--dry-run", action="store_true", help="Validate comments without writing the sidecar. This is also the default unless --force is used.")
+    review_import.add_argument("--force", action="store_true", help="Actually write valid comments to the sidecar JSON.")
+    review_import.add_argument("--out", default="", help="Optional Markdown import report path.")
+    review_import.add_argument("--force-report", action="store_true", help="Overwrite an existing --out report path.")
+    review_import.set_defaults(func=cmd_review_packet_import_comments)
+
+    review_comments = review_packet_sub.add_parser("comments", help="Report imported reviewer comments.")
+    review_comments.add_argument("--project", default="", help="Use a project profile comment sidecar.")
+    add_review_comment_store(review_comments)
+    review_comments.add_argument("--out", default="", help="Optional Markdown reviewer-comments report path.")
+    review_comments.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    review_comments.set_defaults(func=cmd_review_packet_comments)
+
+    review_response = review_packet_sub.add_parser("response", help="Generate a response-to-review checklist from imported comments.")
+    add_review_packet_sources(review_response)
+    add_review_comment_store(review_response)
+    review_response.add_argument("--theme", default="", help="Optional theme ID/name used to validate linked review items.")
+    review_response.add_argument("--draft", default="", help="Optional draft path used to validate linked review items.")
+    review_response.add_argument("--out", default="", help="Optional Markdown response report path.")
+    review_response.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    review_response.set_defaults(func=cmd_review_packet_response)
+
+    review_followups = review_packet_sub.add_parser("followups", help="Generate a manual follow-up checklist from imported comments.")
+    add_review_packet_sources(review_followups)
+    add_review_comment_store(review_followups)
+    review_followups.add_argument("--theme", default="", help="Optional theme ID/name used to validate linked review items.")
+    review_followups.add_argument("--draft", default="", help="Optional draft path used to validate linked review items.")
+    review_followups.add_argument("--out", default="", help="Optional Markdown follow-up report path.")
+    review_followups.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    review_followups.set_defaults(func=cmd_review_packet_followups)
 
     validate_registry_parser = subparsers.add_parser("validate-registry", help="Validate a CSV paper registry.")
     validate_registry_parser.add_argument("registry", help="Registry CSV path.")

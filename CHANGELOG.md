@@ -2,6 +2,20 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v2.4 - Collaboration and Manual Review Pack
+
+- Promoted local package metadata to `2.4`.
+- Added `paperwb review-packet create/import-comments/comments/response/followups`
+  for local file-based collaboration.
+- Added review packet exports containing Markdown reports, CSV comment
+  templates, and JSON manifests without PDFs.
+- Added safe reviewer comment import into `.paperwb/reviewer_comments.json`
+  sidecars without rewriting claims, notes, registry rows, BibTeX, or evidence.
+- Added response-to-review and review follow-up reports for manual action
+  tracking.
+- Kept v2.4 local-first: no cloud services, no email sending, no LLM APIs, and
+  no automatic evidence edits from reviewer comments.
+
 ## v2.3 - Workflow Runner and Report Recipes
 
 - Promoted local package metadata to `2.3`.
