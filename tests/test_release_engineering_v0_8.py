@@ -16,7 +16,7 @@ def test_package_metadata_matches_import_version_and_cli_entrypoint():
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert f'version = "{__version__}"' in content
-    assert __version__ == "2.6"
+    assert __version__ == "3.0.0rc1"
     assert 'requires-python = ">=3.10"' in content
     assert "dependencies = []" in content
     assert 'paperwb = "paper_workbench.cli:main"' in content
@@ -70,6 +70,14 @@ def test_release_docs_site_and_matrices_exist():
         "docs/KNOWN_LIMITATIONS_V2.md",
         "docs/ROADMAP_V2.md",
         "docs/TEST_MATRIX_V2.md",
+        "docs/GETTING_STARTED_V3.md",
+        "docs/STABLE_SURFACE_V3.md",
+        "docs/EXPERIMENTAL_FEATURES_V3.md",
+        "docs/COMMAND_CONTRACTS_V3.md",
+        "docs/SCHEMA_REFERENCE_V3.md",
+        "docs/CLI_REFERENCE_V3.md",
+        "docs/DATA_SAFETY_V3.md",
+        "docs/ROADMAP_V3.md",
     ]
 
     for relative in expected:

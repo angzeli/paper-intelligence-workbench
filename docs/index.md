@@ -6,6 +6,12 @@ Use these docs as static Markdown source. No site generator is required.
 
 ## Start Here
 
+- [Getting Started v3](GETTING_STARTED_V3.md)
+- [Stable Surface v3](STABLE_SURFACE_V3.md)
+- [Experimental Features v3](EXPERIMENTAL_FEATURES_V3.md)
+- [Command Contracts v3](COMMAND_CONTRACTS_V3.md)
+- [Schema Reference v3](SCHEMA_REFERENCE_V3.md)
+- [First Real Project v3](FIRST_REAL_PROJECT_V3.md)
 - [Getting Started v2](GETTING_STARTED_V2.md)
 - [Stable Surface v2](STABLE_SURFACE_V2.md)
 - [Experimental Features v2](EXPERIMENTAL_FEATURES_V2.md)
@@ -75,6 +81,12 @@ Use these docs as static Markdown source. No site generator is required.
 
 ## Release Engineering
 
+- [CLI Reference v3](CLI_REFERENCE_V3.md)
+- [Report Gallery v3](REPORT_GALLERY_V3.md)
+- [Data Safety v3](DATA_SAFETY_V3.md)
+- [Dogfooding Guide v3](DOGFOODING_GUIDE_V3.md)
+- [Known Limitations v3](KNOWN_LIMITATIONS_V3.md)
+- [Roadmap v3](ROADMAP_V3.md)
 - [Command Contracts v2](COMMAND_CONTRACTS_V2.md)
 - [Schema Freeze v2](SCHEMA_FREEZE_V2.md)
 - [Migration Guide v2](MIGRATION_GUIDE_V2.md)

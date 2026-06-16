@@ -2,6 +2,17 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v3.0rc - Release Candidate Stabilization
+
+- Promoted local package metadata to `3.0.0rc1`.
+- Added v3 stable, experimental, deprecated, command-contract, schema,
+  data-safety, dogfooding, and known-limitation documentation.
+- Added v3 release notes, data-safety, external dogfooding simulation,
+  release-readiness, final verdict, and post-v3 roadmap reports.
+- Kept v3.0rc focused on stabilization: no new cloud APIs, no LLM APIs, no
+  scraping, no fabricated paper data, no broad feature expansion, and no
+  changes to stable CLI behavior.
+
 ## v2.5 - Performance, Scale, Incremental Rebuilds, and Cache Hygiene
 
 - Promoted local package metadata to `2.5`.

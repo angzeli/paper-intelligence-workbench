@@ -2,7 +2,7 @@
 
 `paper-intelligence-workbench` is a local-first CLI tool for small academic literature-review projects. It manages paper metadata, structured Markdown notes, user-recorded claims, evidence links, BibTeX validation, project profiles, theme coverage, citation-audit reports, and an optional SQLite search cache without cloud services, publisher scraping, or LLM APIs.
 
-Start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABLE_SURFACE_V2.md](docs/STABLE_SURFACE_V2.md), and [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md).
+Start with [docs/GETTING_STARTED_V3.md](docs/GETTING_STARTED_V3.md), [docs/STABLE_SURFACE_V3.md](docs/STABLE_SURFACE_V3.md), and [docs/COMMAND_CONTRACTS_V3.md](docs/COMMAND_CONTRACTS_V3.md).
 
 ## 🧭 What It Does
 
@@ -148,7 +148,7 @@ paperwb report section-outline --theme photocorrosion --registry data/registries
 
 ## 🧪 Project Profile Workflow
 
-Project profiles are the recommended v2 workflow. They keep each literature
+Project profiles are the recommended v3 workflow. They keep each literature
 review in its own local folder under `projects/`, with separate registry,
 BibTeX, notes, themes, rules, reports, and safety artifacts.
 
@@ -232,7 +232,7 @@ Schema docs:
 [registry](docs/REGISTRY_SCHEMA.md),
 [notes](docs/NOTE_FORMAT.md),
 [BibTeX audit](docs/BIBTEX_AUDIT.md),
-and [v2 schema freeze](docs/SCHEMA_FREEZE_V2.md).
+and [v3 schema reference](docs/SCHEMA_REFERENCE_V3.md).
 
 ## 📊 Report Examples
 
@@ -271,7 +271,7 @@ paperwb export claims --out scratch/claims.csv
 paperwb dashboard --project zis_photocatalysis
 ```
 
-Run `paperwb --help` or see [docs/CLI_REFERENCE_V2.md](docs/CLI_REFERENCE_V2.md)
+Run `paperwb --help` or see [docs/CLI_REFERENCE_V3.md](docs/CLI_REFERENCE_V3.md)
 for the full command map.
 
 ## ⚠️ Limitations
@@ -286,26 +286,26 @@ for the full command map.
 
 ## 📘 More Documentation
 
-- [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md)
-- [docs/STABLE_SURFACE_V2.md](docs/STABLE_SURFACE_V2.md)
+- [docs/GETTING_STARTED_V3.md](docs/GETTING_STARTED_V3.md)
+- [docs/STABLE_SURFACE_V3.md](docs/STABLE_SURFACE_V3.md)
 - [docs/REAL_PROJECT_ONBOARDING.md](docs/REAL_PROJECT_ONBOARDING.md)
 - [docs/FYP_DOGFOODING_WORKFLOW.md](docs/FYP_DOGFOODING_WORKFLOW.md)
-- [docs/EXPERIMENTAL_FEATURES_V2.md](docs/EXPERIMENTAL_FEATURES_V2.md)
-- [docs/COMMAND_CONTRACTS_V2.md](docs/COMMAND_CONTRACTS_V2.md)
-- [docs/CLI_REFERENCE_V2.md](docs/CLI_REFERENCE_V2.md)
+- [docs/EXPERIMENTAL_FEATURES_V3.md](docs/EXPERIMENTAL_FEATURES_V3.md)
+- [docs/COMMAND_CONTRACTS_V3.md](docs/COMMAND_CONTRACTS_V3.md)
+- [docs/CLI_REFERENCE_V3.md](docs/CLI_REFERENCE_V3.md)
 - [docs/EVIDENCE_GRAPH.md](docs/EVIDENCE_GRAPH.md)
 - [docs/GRAPH_EXPORTS.md](docs/GRAPH_EXPORTS.md)
 - [docs/GRAPH_ANALYTICS.md](docs/GRAPH_ANALYTICS.md)
 - [docs/REVIEW_PACKETS.md](docs/REVIEW_PACKETS.md)
 - [docs/COMMENT_IMPORT.md](docs/COMMENT_IMPORT.md)
 - [docs/RESPONSE_TO_REVIEW.md](docs/RESPONSE_TO_REVIEW.md)
-- [docs/REPORTS_V2.md](docs/REPORTS_V2.md)
-- [docs/DATA_SAFETY_V2.md](docs/DATA_SAFETY_V2.md)
-- [docs/KNOWN_LIMITATIONS_V2.md](docs/KNOWN_LIMITATIONS_V2.md)
+- [docs/REPORT_GALLERY_V3.md](docs/REPORT_GALLERY_V3.md)
+- [docs/DATA_SAFETY_V3.md](docs/DATA_SAFETY_V3.md)
+- [docs/KNOWN_LIMITATIONS_V3.md](docs/KNOWN_LIMITATIONS_V3.md)
 
 ## 🧭 Roadmap
 
-See [docs/ROADMAP_V2.md](docs/ROADMAP_V2.md) for the current maintenance roadmap.
+See [docs/ROADMAP_V3.md](docs/ROADMAP_V3.md) for the current maintenance roadmap.
 
 ## 👤 Author
 

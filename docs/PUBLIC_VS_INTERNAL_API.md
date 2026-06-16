@@ -1,14 +1,14 @@
 # Public vs Internal API
 
-Paper Intelligence Workbench v2.6 treats the CLI and documented local schemas as
+Paper Intelligence Workbench v3.0rc treats the CLI and documented local schemas as
 the primary public API. Python imports are useful for tests and local scripts,
 but most modules remain internal unless listed as stable in `docs/API_SURFACE.md`
-or `docs/STABLE_SURFACE_V2.md`.
+or `docs/STABLE_SURFACE_V3.md`.
 
 ## Public And Stable
 
-- `paperwb` command groups documented in `docs/CLI_REFERENCE_V2.md`.
-- Registry CSV fields documented in `docs/SCHEMA_FREEZE_V2.md`.
+- `paperwb` command groups documented in `docs/CLI_REFERENCE_V3.md`.
+- Registry CSV fields documented in `docs/SCHEMA_REFERENCE_V3.md`.
 - Structured note Markdown documented in `docs/NOTE_FORMAT.md`.
 - Project profile layout under `projects/<name>/`.
 - Themes JSON and rule JSON as documented in their schema guides.
@@ -54,4 +54,3 @@ The following modules are useful but not API-frozen:
 
 Use their CLI workflows first. If a Python script imports them, pin tests to the
 specific behavior the script relies on.
-

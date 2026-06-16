@@ -1,12 +1,12 @@
-# CLI Surface v2
+# CLI Surface
 
 The external interface for Paper Intelligence Workbench is the `paperwb`
 command. Commands are local-first, operate on user-provided files, and do not
 call cloud APIs, LLM APIs, or publisher scrapers.
 
 This page is an inventory. For the current stability policy, use
-[STABLE_SURFACE_V2.md](STABLE_SURFACE_V2.md) and
-[EXPERIMENTAL_FEATURES_V2.md](EXPERIMENTAL_FEATURES_V2.md). Do not assume a
+[STABLE_SURFACE_V3.md](STABLE_SURFACE_V3.md) and
+[EXPERIMENTAL_FEATURES_V3.md](EXPERIMENTAL_FEATURES_V3.md). Do not assume a
 command is stable unless the status below says so.
 
 ## Command Inventory
@@ -51,7 +51,7 @@ command is stable unless the status below says so.
 ## Experimental Commands
 
 The inventory above marks experimental command groups inline. See
-[EXPERIMENTAL_FEATURES_V2.md](EXPERIMENTAL_FEATURES_V2.md) for rationale and
+[EXPERIMENTAL_FEATURES_V3.md](EXPERIMENTAL_FEATURES_V3.md) for rationale and
 current cautions.
 
 | Command | Reason |
@@ -60,7 +60,7 @@ current cautions.
 
 ## Deprecated Commands
 
-No command groups are deprecated in v2.
+No command groups are deprecated in v3.0rc.
 
 ## Write Safety Contract
 

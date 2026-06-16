@@ -64,7 +64,7 @@ def test_release_candidate_docs_describe_frozen_surfaces():
         path = ROOT / relative
         assert path.exists(), relative
         content = path.read_text(encoding="utf-8")
-        assert "v1." in content or "v2" in content
+        assert "v1." in content or "v2" in content or "v3" in content
         assert "local-first" in content
 
 

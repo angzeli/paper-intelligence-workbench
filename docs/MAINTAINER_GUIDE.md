@@ -9,7 +9,7 @@ surface area.
 1. Run `git status --short --branch --ignored`.
 2. Inspect the affected module and its tests.
 3. Check whether the behavior is stable or experimental in
-   `docs/STABLE_SURFACE_V2.md` and `docs/EXPERIMENTAL_FEATURES_V2.md`.
+   `docs/STABLE_SURFACE_V3.md` and `docs/EXPERIMENTAL_FEATURES_V3.md`.
 4. Prefer focused patches over broad rewrites.
 
 ## Safe Refactor Rules
@@ -47,4 +47,3 @@ adversarial or failure-path tests.
 - Introducing plugin execution, shell-command recipes, cloud services, LLM APIs,
   scraping, or heavy UI dependencies.
 - Deleting historical reports without a cleanup plan.
-

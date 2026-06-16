@@ -2760,7 +2760,7 @@ def build_parser() -> argparse.ArgumentParser:
             "validate-bib, note-template, claims, report, dashboard, doctor.\n"
             "Experimental or safety-sensitive workflows: workflow, sync, index, rebuild, files, draft, "
             "manuscript, reading, backup, migrate, rules, graph, claim-review, "
-            "contradictions, review-packet. See docs/STABLE_SURFACE_V2.md and docs/CLI_REFERENCE_V2.md."
+            "contradictions, review-packet. See docs/STABLE_SURFACE_V3.md and docs/CLI_REFERENCE_V3.md."
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
