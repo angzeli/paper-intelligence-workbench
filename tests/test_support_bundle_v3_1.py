@@ -178,3 +178,26 @@ def test_support_cli_smoke_bundle_preview_and_reproduce(tmp_path: Path) -> None:
     assert reproduce_result.returncode == 0, reproduce_result.stderr
     assert preview.exists()
     assert reproduce.exists()
+
+
+def test_support_cli_rejects_conflicting_redaction_modes_without_writing(tmp_path: Path) -> None:
+    make_private_project(tmp_path)
+    out_dir = tmp_path / "conflicting_support_bundle"
+
+    result = run_cli(
+        "support",
+        "bundle",
+        "--project",
+        "support_demo",
+        "--root",
+        str(tmp_path),
+        "--safe",
+        "--verbose-local-only",
+        "--out",
+        str(out_dir),
+    )
+
+    assert result.returncode == 2
+    assert "--safe" in result.stderr
+    assert "--verbose-local-only" in result.stderr
+    assert not out_dir.exists()
