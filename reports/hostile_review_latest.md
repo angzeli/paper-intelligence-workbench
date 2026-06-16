@@ -2,59 +2,81 @@
 
 Date: 2026-06-16
 
-Scope: standalone release-gate review of Paper Intelligence Workbench v2.6 as if
-deciding whether this version is safe for local dogfooding. I inspected package
-architecture, CLI behavior, stable versus experimental surface docs, registry
-and BibTeX workflows, notes and claims, evidence maps, manuscript/draft QA,
-reading sessions, imports/exports, sync/conflict planning, search/indexing,
-backup/migration/integrity, rule engine, dashboard, evidence graph, claim
-lifecycle, workflow runner, collaboration/review packets, performance and
-incremental rebuilds, tests, docs, notebooks, reports, synthetic data,
-data-safety boundaries, `.gitignore`, and git status.
+Scope: standalone release-gate review of Paper Intelligence Workbench v3.0rc as
+if deciding whether this version is safe for local dogfooding. I inspected
+package architecture, CLI behavior, stable versus experimental surface docs,
+registry and BibTeX workflows, notes and claims, evidence maps,
+manuscript/draft QA, reading sessions, imports/exports, sync/conflict planning,
+search/indexing, backup/migration/integrity, rule engine, dashboard, evidence
+graph, claim lifecycle, workflow runner, collaboration/review packets,
+performance and incremental rebuilds, tests, docs, notebooks, reports,
+synthetic data, data-safety boundaries, `.gitignore`, and git status.
 
 ## Release Verdict
 
-**Ready for cautious local dogfooding as v2.6.**
+**Ready for local dogfooding as v3.0rc.**
 
-I did not find a release blocker. The package imports as `2.6`, `paperwb --help`
-loads, the clean first-run project validates without findings, the full test
-suite passes, notebooks validate and execute with the repository's lightweight
-runner, and the data-safety audit reports zero errors/warnings. Representative
-stable and experimental CLI workflows completed without tracebacks.
+I did not find a release blocker. The package imports as `3.0.0rc1`, `paperwb
+--help` loads and points to v3 docs, the clean first-run project validates
+without findings, the full test suite passes, notebook structure validation
+passes, the data-safety audit reports zero errors/warnings, and representative
+stable plus experimental CLI workflows completed without tracebacks.
 
-This is still not a polished public release. The product surface is very broad,
-the CLI remains oversized, generated reports are noisy, and some dry-run
-workflows still create local report artifacts by default. Those are dogfooding
-risks, not release blockers.
+This is still not a public-release verdict. The project is broad, the CLI is
+oversized, historical docs/reports are noisy, and some experimental workflows
+still have inconsistent output flags. Those are dogfooding risks, not release
+blockers.
 
 ## Validation Performed
 
-- `git status --short --branch --ignored`: branch `main...origin/main [ahead 41]`; only ignored local artifacts before writing this report.
-- `python -c "import paper_workbench; print(paper_workbench.__version__)"`: `2.6`.
+- `git status --short --branch --ignored`: branch `main...origin/main [ahead
+  45]`; only ignored local artifacts before writing this report.
+- `python -c "import paper_workbench; print(paper_workbench.__version__)"`:
+  `3.0.0rc1`.
 - `paperwb --help`: passed and listed current command groups.
-- `paperwb validate-registry projects/clean_demo/registry.csv --strict`: passed with no findings.
-- `paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict`: passed with no findings.
-- `paperwb dashboard --project clean_demo --no-audit-log`: passed with zero BibTeX, citation, workspace, rule, manuscript, and graph findings.
-- `paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict`: passed with no findings.
-- `paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict`: passed with one expected sparse synthetic-entry warning.
-- `paperwb rebuild plan --project zis_photocatalysis`: passed and emitted valid project-profile recommendations.
-- `paperwb workflow run daily_check --project zis_photocatalysis --dry-run --out <tmp> --force`: passed with expected synthetic fixture errors/warnings.
-- `paperwb sync plan --project zis_photocatalysis --source data/examples/zotero_export.csv --source-type zotero-csv --out <tmp> --force`: passed and wrote JSON beside the explicit Markdown output.
-- `paperwb manuscript qa drafts/synthetic_good_section.md --project zis_photocatalysis --out <tmp> --force`: passed.
-- `paperwb graph summary --project zis_photocatalysis`: passed.
-- `paperwb review-packet create --project zis_photocatalysis --theme photocorrosion --out <tmp> --force`: passed and excluded PDFs.
-- `paperwb reading queue --project zis_photocatalysis`: passed.
-- `paperwb rules run --project zis_photocatalysis --strict`: returned non-zero with expected synthetic evidence-gap rule findings.
-- `paperwb integrity check --project clean_demo --out <tmp> --force`: passed with zero errors/warnings.
-- `paperwb backup create --project clean_demo --backups-dir <tmp> --notes review-smoke`: passed and wrote outside the repo.
-- `paperwb migrate plan --to-project review_migration_probe --out <tmp> --force`: passed.
-- `paperwb search photocorrosion --project zis_photocatalysis`: passed.
-- `paperwb import zotero-csv data/examples/zotero_export.csv --project zis_photocatalysis --dry-run --force`: passed but created a default project-local import report; the temporary review artifact was removed.
-- `python scripts/data_safety_audit.py --out <tmp>`: checked 725 repository files with 0 errors and 0 warnings.
+- `paperwb validate-registry projects/clean_demo/registry.csv --strict`: passed
+  with no findings.
+- `paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry
+  projects/clean_demo/registry.csv --strict`: passed with no findings.
+- `paperwb dashboard --project clean_demo --no-audit-log`: passed with zero
+  BibTeX, citation, workspace, rule, manuscript, graph, and claim-review
+  findings.
+- `paperwb workflow run release_candidate_check --project clean_demo --dry-run
+  --out <tmp> --force`: passed with 7 steps, 0 errors, 0 warnings.
+- `paperwb graph summary --project clean_demo --out <tmp> --force`: passed.
+- `paperwb rebuild plan --project clean_demo --out <tmp> --force-report`:
+  passed.
+- `paperwb draft audit drafts/synthetic_photocorrosion_section.md --project
+  zis_photocatalysis --out <tmp> --force`: passed.
+- `paperwb manuscript qa drafts/synthetic_good_section.md --project
+  zis_photocatalysis --out <tmp> --force`: passed.
+- `paperwb reading queue --project clean_demo`: passed.
+- `paperwb rules report --project clean_demo --out <tmp> --force`: passed.
+- `paperwb review-packet create --project clean_demo --theme clean-validation
+  --out <tmp> --force`: passed and reported `Includes PDFs: false`.
+- `paperwb backup list --project clean_demo`: passed and reported no backups.
+- `paperwb sync plan --project zis_photocatalysis --source
+  data/examples/zotero_export.csv --source-type zotero-csv --out <tmp>
+  --json-out <tmp> --force`: passed with 3 actions and 0 conflicts.
+- `paperwb import zotero-csv data/examples/zotero_export.csv --project
+  zis_photocatalysis --dry-run --report <tmp> --force`: passed with 5 rows read,
+  3 imported, 2 skipped, dry-run true.
+- `paperwb files scan --project clean_demo`: passed and listed local note and
+  BibTeX files without copying/deleting files.
+- `paperwb index status --project clean_demo --check-files`: passed and clearly
+  reported the missing rebuildable cache.
+- `paperwb claim-review queue --project clean_demo`: passed and reported one
+  newly extracted claim needing explicit review.
+- `paperwb contradictions report --project clean_demo --out <tmp> --force`:
+  passed.
 - `python scripts/validate_notebooks.py`: validated 8 notebooks.
-- `python scripts/validate_notebooks.py --execute`: executed 8 notebooks with the lightweight runner.
+- `python scripts/data_safety_audit.py --out <tmp> --strict`: checked 746
+  repository files with 0 errors and 0 warnings.
 - `python -m pytest -q`: passed.
-- `git ls-files` scan found no tracked PDFs, SQLite/cache DBs, backup archives, audit logs, `.paperwb` directories, Python caches, `.DS_Store`, `build/`, or `dist/` artifacts.
+- `reports/index.md` matches a freshly generated report index.
+- `git ls-files` scan found no tracked PDFs, SQLite/cache DBs, backup archives,
+  audit logs, `.paperwb` directories, Python caches, `.DS_Store`, `build/`,
+  `dist/`, or egg-info artifacts.
 
 ## Release Blockers
 
@@ -62,150 +84,157 @@ None found.
 
 ## High-Priority Issues
 
-None found.
+1. **Import dry-run report output is still too easy to dirty a project.**
+
+   Evidence: `paperwb import zotero-csv ... --project zis_photocatalysis
+   --dry-run --out <tmp>` fails because import commands do not support `--out`.
+   `--project` plus `--reports-dir <tmp>` also fails because project profiles
+   reject path overrides. The correct escape hatch is `--report <tmp>`, which
+   works, but README/common examples still show dry-run imports without an
+   explicit report path.
+
+   Why it matters: this does not mutate registry rows, so it is not a data-loss
+   blocker. It can still write a project-local report during what many users
+   interpret as a no-write dry run, creating avoidable working-tree churn in
+   dogfooding projects.
+
+   Recommended fix: update public import examples to use `--report
+   scratch/import_zotero_dry_run.md --force`, and add a regression test that the
+   documented dry-run command writes only the expected report path.
 
 ## Medium-Priority Issues
 
-1. **Dry-run import still creates project-local report churn by default.**
+1. **The CLI implementation is still a maintainability hotspot.**
 
-   Evidence: `paperwb import zotero-csv ... --project zis_photocatalysis --dry-run --force` wrote
-   `projects/zis_photocatalysis/reports/import_zotero_csv.md` when no explicit
-   `--report` was supplied.
+   `paper_workbench/cli.py` is about 3,785 lines and owns argument parsing,
+   project path resolution, write preflights, audit events, and dispatch for
+   nearly every subsystem. v2.6 helper cleanup helped, but future changes here
+   remain high-risk.
 
-   Why it matters: this is not data-destructive and does not write registry
-   rows, but "dry-run" reads as no project mutation to many users. In a
-   dogfooding repo, it can create untracked report files unless users know to
-   pass `--report <tmp>` or route reports elsewhere.
+2. **Advanced modules still mix models, analysis, persistence, and reporting.**
 
-   Recommended fix: either document the default report write more prominently in
-   import docs and examples, or change dry-run imports to print by default unless
-   `--report` or `--reports-dir` is supplied.
+   `workflow.py` is about 981 lines, `review_packets.py` 775, `sync.py` 754,
+   and several other modules remain feature-complete but dense. They are
+   dogfoodable, but should not be expanded without extraction tests.
 
-2. **`paper_workbench/cli.py` remains a maintainability hotspot.**
+3. **Historical docs and reports are noisy enough to confuse new maintainers.**
 
-   The CLI is still roughly 3,785 lines and coordinates argument parsing,
-   project path resolution, write preflights, audit events, report writing, and
-   dispatch for nearly every subsystem. v2.6 added useful helper consolidation,
-   but this module is still the highest-risk place to make future changes.
+   `reports/index.md` now correctly marks v3.0 reports as current, but it
+   indexes 215 Markdown reports. Search results still surface v0/v1/v2
+   historical findings beside current v3 guidance.
 
-3. **Several feature modules still combine too many responsibilities.**
+4. **Notebook coverage lags the product surface.**
 
-   `workflow.py`, `rules.py`, `authoring.py`, `index.py`, `review_packets.py`,
-   `reading.py`, `sync.py`, `graph.py`, `drafts.py`, `registry.py`, and
-   `importers.py` mix models, analysis, persistence, and Markdown rendering.
-   They are dogfoodable, but future patches should avoid expanding them further
-   without extracting stable helper seams.
+   Eight notebooks validate structurally, but they cover early workflows only.
+   Evidence graph, claim lifecycle, workflow runner, review packet, rebuild,
+   and v3 dogfooding workflows are demonstrated by scripts/tests/docs rather
+   than notebooks.
 
-4. **The v2.6 release bundle lacks a current checked-in data-safety report.**
+5. **The v3 stable surface is honest but still broad for a first-time user.**
 
-   A data-safety smoke audit passed during this review, but the current v2.6
-   report set includes architecture/refactor/readiness reports, not a
-   `reports/data_safety_*_v2_6.md` artifact. That is acceptable for an internal
-   architecture patch, but weaker than prior release-candidate bundles.
-
-5. **Report archaeology is now a real usability problem.**
-
-   `reports/index.md` indexes 209 Markdown reports. It correctly separates the
-   current v2.6 reports from historical artifacts, but search results still mix
-   live guidance with old v0.x/v1.x/v2.0rc findings. New maintainers can easily
-   read stale historical output as current status.
+   `paperwb --help` is an inventory, not onboarding. The v3 docs solve this
+   reasonably, but the CLI itself still presents 30-plus command groups at once.
 
 ## Low-Priority Polish
 
-- `paperwb --help` is intimidating for the target undergraduate/researcher
-  persona despite stable/experimental guidance at the bottom.
-- README is clean, but still advertises many advanced workflows before the
-  minimum daily loop is obvious.
-- `dogfood status` prints an absolute project root in terminal output; harmless
-  locally, but easy to capture into a committed report by accident.
-- `validate-bib --strict` exits 0 for warnings. This is defensible, but CI users
-  may expect strict mode to fail on warnings unless docs are explicit.
-- Many report modules still carry local `_escape` helpers after v2.6; migrate
-  only when touching those reports for other reasons.
+- `dogfood status` prints absolute project roots; harmless locally, but easy to
+  accidentally capture into a committed report.
+- `index status --check-files` reports `FTS5 enabled: false` when the index is
+  missing; that is technically coherent but can read like a capability failure.
+- `validate-bib --strict` does not fail on warning-level findings; docs explain
+  this, but strict-mode expectations vary.
+- Some commands use `--out`, others `--output`, `--report`,
+  `--reports-dir`, or `--force-report`; the inconsistency is historical but
+  still a usability tax.
+- README is clean enough, but the common workflows section still exposes many
+  experimental paths before users need them.
 
 ## Data-Safety Risks
 
-- No tracked PDFs, copied paper full text, SQLite/cache DBs, backup archives,
-  audit logs, `.paperwb` cache state, Python caches, `.DS_Store`, `build/`, or
-  `dist/` artifacts were found.
+- No tracked PDFs, copied full text, SQLite/cache DBs, backup archives, audit
+  logs, `.paperwb` state, Python caches, `.DS_Store`, `build/`, `dist/`, or
+  egg-info artifacts were found.
 - `.gitignore` covers `.paperwb/`, nested `.paperwb/`, rebuild metadata,
   SQLite/database files, backups, audit logs, scratch/tmp, stress outputs,
   hostile-review drafts, and PDFs.
-- The data-safety audit passed with 0 errors and 0 warnings.
-- The main residual data-safety risk is accidental local-output churn in tracked
-  project folders, especially dry-run import reports or user-captured CLI output
-  containing absolute paths.
+- The data-safety audit passed with 746 files checked, 0 errors, and 0 warnings.
+- Residual risk is operational: users can still generate local reports, audit
+  logs, backups, and caches in project folders. Most are ignored or force-gated,
+  but maintainers must continue to inspect `git status --ignored` before
+  commits.
 
 ## Docs Mismatches
 
-- `reports/release_readiness_v2_6.md` says v2.6 is ready assuming tests and
-  smoke checks pass. They did pass in this review, but the release-readiness
-  report itself was not regenerated after this validation.
-- Import docs are technically accurate, but they under-emphasize that dry-run
-  import writes a Markdown report by default unless users choose `--report` or
-  `--reports-dir`.
-- The docs now include v2.6 internal architecture guidance, but the main user
-  docs still use v2 naming. That is fine for the v2 line, but v3.0rc should
-  create a cleaner `GETTING_STARTED_V3`/surface set instead of stretching v2
-  docs further.
+- Public import examples should consistently show `--report scratch/...` for
+  dry-run imports. The command help is accurate, but users coming from the
+  common workflow examples will not know that `--out` is invalid and
+  `--reports-dir` is rejected with `--project`.
+- v3 docs are current, but older v2 and lowercase docs remain prominent in the
+  tree for historical/site-source reasons. They are not wrong, but they are easy
+  to mistake for the current release-candidate path.
+- `docs/COMMAND_CONTRACTS_V3.md` labels core `export` as partly stable, but the
+  practical distinction between stable core exports and advanced experimental
+  outputs is still mostly prose, not command-level subcommand grouping.
 
 ## CLI Usability Issues
 
-- Dry-run import report output is surprising because most other "plan" commands
-  route explicit outputs more visibly.
-- `rules run --strict` returns non-zero on `zis_photocatalysis`, which is
-  correct for the intentionally imperfect fixture but still easy to confuse with
-  an install failure.
-- The command surface is broad enough that `paperwb --help` is better as a
-  command inventory than an onboarding path.
-- Some commands use `--out`, others use `--output`, others use `--report`; the
-  inconsistency is historical and manageable, but it remains a new-user tax.
+- Import dry-run output routing is the roughest current UX point.
+- `paperwb --help` is long enough that users need the docs to know where to
+  start.
+- Experimental command groups are correctly labelled, but users can still run
+  them without seeing the stability warning unless they read v3 docs.
+- Path override rejection with `--project` is good for safety, but it makes
+  temporary-output smoke testing less obvious for commands that use
+  `--reports-dir` rather than exact output paths.
 
 ## Overengineering Risks
 
-- The project now includes many adjacent systems: local graph, claim lifecycle,
-  contradiction tracking, workflow runner, review packets, rebuild metadata,
-  sync planning, file ingestion, dashboard actions, reading sessions, rules, and
+- The repository now includes graph analytics, claim lifecycle, contradiction
+  tracking, workflow recipes, review packets, rebuild metadata, sync planning,
+  file ingestion, dashboard next actions, reading sessions, rules, and
   manuscript QA. All are local-first, but the cognitive load is high.
-- Do not add another major subsystem before v3.0rc. The next release should
-  classify, freeze, and simplify the surface, not expand it.
+- Do not add another major subsystem before real dogfooding. The next work
+  should reduce friction, clarify docs, and retire or hide confusing historical
+  artifacts.
 - Keep graph exports, claim lifecycle sidecars, workflow recipes, review-packet
-  comments, sync apply, and rebuild metadata experimental until real dogfooding
-  proves their schemas.
+  comments, sync apply, indexed search, and rebuild metadata experimental until
+  a real project proves their contracts.
 
 ## Stale Generated Reports
 
-- `reports/index.md` is current for v2.6.
-- `reports/hostile_review_latest.md` was stale v2.5 content before this review
+- `reports/index.md` is current for v3.0rc.
+- `reports/hostile_review_latest.md` was stale v2.6 content before this review
   and is now refreshed.
-- Historical reports intentionally remain. Some old reports contain absolute
-  path examples under allowlist; they should be treated as archival evidence, not
-  current release guidance.
-- No current v2.6 data-safety report is checked in, although the smoke audit
-  passed during review.
+- Historical reports intentionally remain. Some old ignored hostile-review
+  drafts contain absolute-path evidence and should stay ignored archival
+  material, not release guidance.
+- The v3 report bundle exists and includes release notes, data safety, external
+  dogfooding simulation, release readiness, final verdict, and post-v3 roadmap.
 
 ## Missing Tests
 
-- No test asserts that dry-run import without `--report` avoids project-local
-  churn or clearly reports the default output location.
-- CI-style notebook validation is structural; optional notebook execution passed
-  here but is not clearly part of the regular release gate.
-- There is still no automated "README command transcript" test to prove the
-  public quickstart remains pasteable end to end.
-- Command contract coverage is strong for many groups, but the surface is too
-  large to claim every experimental command has a happy path, failure path, and
-  non-destructive behavior test.
+- No test currently proves the README/common import dry-run command writes only
+  to a caller-selected `--report` path.
+- CI notebook checks are structural. That is acceptable for speed, but optional
+  notebook execution is not a regular gate.
+- There is no single "README transcript" test that pastes the public quickstart
+  end to end.
+- Experimental command coverage is broad but not exhaustive; not every
+  experimental command has help, happy-path, failure-path, and no-overwrite
+  contract tests.
 
 ## Recommended Blocker-Fix Sequence
 
-There are no blockers to fix before local dogfooding.
+There are no release blockers to fix before local dogfooding.
 
-Recommended next sequence before v3.0rc:
+Recommended high-priority sequence:
 
-1. Decide whether dry-run imports should default to stdout/no-write or keep
-   writing reports; document and test the chosen behavior.
-2. Add a pasteable README/quickstart transcript test using `clean_demo` and
-   temporary output paths.
-3. Generate a v3 release-candidate data-safety report as a checked-in artifact.
-4. Freeze stable/experimental/deprecated command groups and schemas for v3.
-5. Defer any broad CLI split until v3 command-contract tests are current.
+1. Update README/import docs to route dry-run import reports with `--report
+   scratch/import_zotero_dry_run.md --force`.
+2. Add a regression test for that documented import dry-run path.
+3. Add a pasteable README/quickstart transcript test using `clean_demo` and
+   temporary outputs.
+4. Keep v3.0rc stable/experimental docs as the source of truth and avoid adding
+   new subsystems before real dogfooding feedback.
+5. Defer any broad `cli.py` split until the v3 stable command contracts are
+   explicitly preserved by tests.
