@@ -20,9 +20,10 @@ The repository ignores:
 
 ## Rebuild Metadata
 
-`paperwb rebuild run` writes `.paperwb/rebuild_metadata.json`. This file records
-content fingerprints for stale detection only. It can be deleted and regenerated
-without losing user notes, registry rows, BibTeX entries, or claims.
+`paperwb rebuild run` writes `.paperwb/rebuild_metadata.json` and the normal
+ignored audit-log event. The metadata file records content fingerprints for
+stale detection only. It can be deleted and regenerated without losing user
+notes, registry rows, BibTeX entries, or claims.
 
 ## Search Indexes
 

@@ -62,6 +62,7 @@ with BibTeX keys and does not copy files, read PDF text, or write registry rows.
 
 - `--project PROJECT`: use a project profile.
 - `--out PATH`: write a report/export.
+- `--json-out PATH`: write a JSON companion file for commands such as `sync plan`; when omitted and `--out` is supplied, sync plans write JSON beside the Markdown report.
 - `--force`: overwrite an output where the command allows it.
 - `--dry-run`: plan without writing for risky workflows.
 

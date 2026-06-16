@@ -2180,6 +2180,14 @@ def _default_sync_report(paths: dict[str, Path | None], filename: str) -> Path:
     return Path(paths["reports_dir"]) / filename
 
 
+def _sync_json_path_from_args(args: argparse.Namespace, markdown_path: Path, paths: dict[str, Path | None]) -> Path:
+    if args.json_out:
+        return Path(args.json_out)
+    if args.out:
+        return markdown_path.with_suffix(".json")
+    return _default_sync_report(paths, "sync_plan.json")
+
+
 def cmd_sync_plan(args: argparse.Namespace) -> int:
     paths = _sync_paths(args)
     project_id = _project_id_from_paths(paths)
@@ -2190,7 +2198,7 @@ def cmd_sync_plan(args: argparse.Namespace) -> int:
     target = SyncTarget(target_type="registry", path=str(registry_path), project=project_id)
     plan = build_registry_sync_plan(existing_papers=papers, source_papers=source_papers, source=source, target=target, project=project_id, warnings=warnings)
     markdown_path = Path(args.out) if args.out else _default_sync_report(paths, "sync_plan.md")
-    json_path = Path(args.json_out) if args.json_out else _default_sync_report(paths, "sync_plan.json")
+    json_path = _sync_json_path_from_args(args, markdown_path, paths)
     _preflight_output_paths([markdown_path, json_path], force=args.force)
     write_text(markdown_path, sync_plan_report(plan), force=True)
     save_sync_plan_json(plan, json_path, force=True)
@@ -2973,7 +2981,7 @@ def build_parser() -> argparse.ArgumentParser:
     sync_plan.add_argument("--mapping", default="", help="Generic CSV mapping JSON path when --source-type generic-csv is used.")
     add_sync_context(sync_plan)
     sync_plan.add_argument("--out", default="", help="Markdown sync-plan report path. Defaults to reports/sync_plan.md.")
-    sync_plan.add_argument("--json-out", default="", help="JSON sync-plan path. Defaults to reports/sync_plan.json.")
+    sync_plan.add_argument("--json-out", default="", help="JSON sync-plan path. Defaults beside --out when provided, otherwise reports/sync_plan.json.")
     sync_plan.add_argument("--force", action="store_true", help="Overwrite existing sync plan outputs.")
     sync_plan.add_argument("--strict", action="store_true", help="Return non-zero when conflicts are detected.")
     sync_plan.set_defaults(func=cmd_sync_plan)

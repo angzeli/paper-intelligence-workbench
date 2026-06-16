@@ -199,6 +199,12 @@ def _command_path(path: str | Path) -> str:
     return display_path(path, base_path=Path.cwd())
 
 
+def _report_all_command(project_id: str, reports: Path) -> str:
+    if project_id != "default":
+        return _project_command(project_id, "report", "all", "--force")
+    return _project_command(project_id, "report", "all", "--reports-dir", _command_path(reports), "--force")
+
+
 def build_rebuild_plan(
     *,
     project_id: str,
@@ -263,7 +269,7 @@ def build_rebuild_plan(
             source_paths=[notes],
             root=root_path,
             output_path=reports / "claims.csv",
-            recommended_action=_project_command(project_id, "claims", "--out", _command_path(reports / "claims.csv")),
+            recommended_action=_project_command(project_id, "claims", "--output", _command_path(reports / "claims.csv"), "--force"),
         ),
         _mark_item(
             target="evidence_map",
@@ -274,7 +280,7 @@ def build_rebuild_plan(
             source_paths=core_inputs,
             root=root_path,
             output_path=reports / "evidence_map.md",
-            recommended_action=_project_command(project_id, "report", "evidence-map", "--out", _command_path(reports / "evidence_map.md")),
+            recommended_action=_project_command(project_id, "report", "evidence-map", "--out", _command_path(reports / "evidence_map.md"), "--force"),
         ),
         _mark_item(
             target="search_index",
@@ -297,7 +303,7 @@ def build_rebuild_plan(
             source_paths=core_inputs,
             root=root_path,
             output_path=reports,
-            recommended_action=_project_command(project_id, "report", "all", "--reports-dir", _command_path(reports)),
+            recommended_action=_report_all_command(project_id, reports),
         ),
         _mark_item(
             target="manuscript_qa",
@@ -319,7 +325,7 @@ def build_rebuild_plan(
             source_paths=[registry, bibtex, notes, themes],
             root=root_path,
             output_path=reports / "dashboard.md",
-            recommended_action=_project_command(project_id, "dashboard", "--out", _command_path(reports / "dashboard.md")),
+            recommended_action=_project_command(project_id, "dashboard", "--out", _command_path(reports / "dashboard.md"), "--force"),
         ),
     ]
     if not index_file.exists():

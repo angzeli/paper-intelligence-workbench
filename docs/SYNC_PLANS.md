@@ -3,6 +3,11 @@
 A sync plan is a local JSON file plus a Markdown report. It is a dry-run record
 of proposed changes and conflicts.
 
+If `paperwb sync plan` receives `--out scratch/sync_plan.md` without
+`--json-out`, it writes `scratch/sync_plan.json` beside the Markdown report. If
+neither output path is supplied, both files default to the selected reports
+directory.
+
 ## Plan Contents
 
 Each action includes:
@@ -37,4 +42,3 @@ v1.3 applies only safe registry actions:
 
 It does not overwrite non-empty registry fields, delete rows, delete notes,
 rewrite Markdown notes, or merge Obsidian edits.
-

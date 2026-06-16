@@ -1,7 +1,7 @@
 # Incremental Rebuild Plan v2.5
 
 - Project: `zis_photocatalysis`
-- Generated at: `2026-06-16T10:16:56.601718+00:00`
+- Generated at: `2026-06-16T10:36:58.214697+00:00`
 - Metadata path: `.paperwb/rebuild_metadata.json`
 - Metadata exists: `false`
 - Stale targets: 6 / 6
@@ -19,12 +19,12 @@
 
 ## Recommended Actions
 
-- `claims`: paperwb claims --out projects/zis_photocatalysis/reports/claims.csv --project zis_photocatalysis
-- `evidence_map`: paperwb report evidence-map --out projects/zis_photocatalysis/reports/evidence_map.md --project zis_photocatalysis
+- `claims`: paperwb claims --output projects/zis_photocatalysis/reports/claims.csv --force --project zis_photocatalysis
+- `evidence_map`: paperwb report evidence-map --out projects/zis_photocatalysis/reports/evidence_map.md --force --project zis_photocatalysis
 - `search_index`: paperwb index rebuild --project zis_photocatalysis
-- `report_outputs`: paperwb report all --reports-dir projects/zis_photocatalysis/reports --project zis_photocatalysis
+- `report_outputs`: paperwb report all --force --project zis_photocatalysis
 - `manuscript_qa`: Run `paperwb manuscript qa DRAFT --project PROJECT --out REPORT` for each active draft.
-- `dashboard`: paperwb dashboard --out projects/zis_photocatalysis/reports/dashboard.md --project zis_photocatalysis
+- `dashboard`: paperwb dashboard --out projects/zis_photocatalysis/reports/dashboard.md --force --project zis_photocatalysis
 
 ## Source Coverage
 

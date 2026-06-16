@@ -123,11 +123,42 @@ def test_rebuild_cli_smoke_and_metadata_only_write(tmp_path: Path) -> None:
     assert str(ROOT) not in plan_path.read_text(encoding="utf-8")
 
 
+def test_rebuild_plan_project_recommendations_use_valid_flags(tmp_path: Path) -> None:
+    summary, project = _make_project(tmp_path)
+    plan = _plan(project, summary.project)
+    actions = {item.target: item.recommended_action for item in plan.items}
+
+    assert " --output " in actions["claims"]
+    assert " --out " not in actions["claims"]
+    assert actions["report_outputs"] == f"paperwb report all --force --project {summary.project}"
+    assert "--reports-dir" not in actions["report_outputs"]
+
+
+def test_rebuild_cli_plan_recommendation_report_all_is_executable(tmp_path: Path) -> None:
+    summary, _project = _make_project(tmp_path)
+    plan_result = _run_cli(tmp_path, "rebuild", "plan", "--project", summary.project)
+    assert plan_result.returncode == 0, plan_result.stderr
+    report_action = next(line for line in plan_result.stdout.splitlines() if line.startswith("- `report_outputs`:"))
+
+    command = report_action.split(": ", 1)[1].split()
+    executable = _run_cli(tmp_path, *command[1:])
+
+    assert executable.returncode == 0, executable.stderr
+
+
 def test_cache_hygiene_ignore_patterns_cover_rebuild_and_indexes() -> None:
     ignore = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
 
     for pattern in ("**/.paperwb/", "rebuild_metadata.json", "*.sqlite", "*.db", "**/backups/", "audit.log", "stress_outputs/"):
         assert pattern in ignore
+
+
+def test_rebuild_docs_disclose_audit_log_write() -> None:
+    contracts = (ROOT / "docs" / "COMMAND_CONTRACTS_V2.md").read_text(encoding="utf-8")
+    rebuilds = (ROOT / "docs" / "INCREMENTAL_REBUILDS.md").read_text(encoding="utf-8")
+
+    assert "local audit-log event" in contracts
+    assert "audit-log event" in rebuilds
 
 
 def test_performance_sanity_script_smoke(tmp_path: Path) -> None:

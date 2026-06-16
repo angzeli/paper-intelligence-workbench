@@ -31,8 +31,9 @@ refresh outputs.
 
 ## Safety Boundary
 
-`paperwb rebuild run` updates rebuild metadata only. It does not rewrite notes,
-registry rows, BibTeX entries, reports, indexes, drafts, or user comments.
+`paperwb rebuild run` updates rebuild metadata and records the normal ignored
+local audit-log event. It does not rewrite notes, registry rows, BibTeX entries,
+reports, indexes, drafts, or user comments.
 
 Use the recommended commands from `paperwb rebuild plan` to refresh actual
 outputs. Use explicit `--force` or output overwrite flags only when you intend

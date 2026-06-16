@@ -258,6 +258,40 @@ def test_sync_cli_plan_apply_and_conflicts(tmp_path):
     assert "Sync Conflicts" in conflicts.stdout
 
 
+def test_sync_plan_out_places_default_json_beside_markdown(tmp_path):
+    registry = tmp_path / "registry.csv"
+    source = tmp_path / "zotero.csv"
+    reports_dir = tmp_path / "reports"
+    custom_dir = tmp_path / "custom"
+    save_registry([_paper("known", title="Known Synthetic Study", doi="10.1300/sync.known")], registry)
+    source.write_text(
+        "Title,Author,Publication Year,Publication Title,DOI,Url,Item Type,Tags\n"
+        "Known Synthetic Study,Synthetic Author,2026,Synthetic Journal,10.1300/sync.known,,Journal Article,sync\n",
+        encoding="utf-8",
+    )
+    plan_md = custom_dir / "planned_sync.md"
+
+    planned = run_cli(
+        "sync",
+        "plan",
+        "--source",
+        str(source),
+        "--source-type",
+        "zotero-csv",
+        "--registry",
+        str(registry),
+        "--reports-dir",
+        str(reports_dir),
+        "--out",
+        str(plan_md),
+    )
+
+    assert planned.returncode == 0, planned.stderr
+    assert plan_md.exists()
+    assert (custom_dir / "planned_sync.json").exists()
+    assert not (reports_dir / "sync_plan.json").exists()
+
+
 def test_sync_cli_force_apply_preserves_unplanned_registry_field_formatting(tmp_path):
     registry = tmp_path / "registry.csv"
     source = tmp_path / "zotero.csv"

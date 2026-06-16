@@ -20,6 +20,10 @@ paperwb sync plan \
   --force
 ```
 
+When `--json-out` is omitted, the JSON plan is written beside `--out` if an
+explicit Markdown output path is provided. Without `--out`, both files default
+to the selected reports directory.
+
 Supported source types:
 
 - `zotero-csv`
