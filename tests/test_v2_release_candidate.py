@@ -18,14 +18,14 @@ def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_v2_release_candidate_version_metadata() -> None:
-    assert __version__ == "2.3"
-    assert 'version = "2.3"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "2.4"
+    assert 'version = "2.4"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v2_surface_docs_exist_and_classify_core_commands() -> None:
     docs = {
         "docs/STABLE_SURFACE_V2.md": ["`init`", "`project`", "`validate-registry`", "Registry CSV"],
-        "docs/EXPERIMENTAL_FEATURES_V2.md": ["SQLite indexed search", "Sync apply", "Draft/manuscript QA", "Workflow runner"],
+        "docs/EXPERIMENTAL_FEATURES_V2.md": ["SQLite indexed search", "Sync apply", "Draft/manuscript QA", "Workflow runner", "Review packets"],
         "docs/DEPRECATION_POLICY.md": ["no deprecated CLI command groups"],
         "docs/COMMAND_CONTRACTS_V2.md": ["`backup`", "`migrate`", "`dashboard`", "Exit Codes"],
         "docs/SCHEMA_FREEZE_V2.md": ["Registry CSV", "Structured Note Markdown", "Project Profile"],
@@ -64,13 +64,13 @@ def test_v2_release_reports_are_current_and_sanitized() -> None:
         assert "/private/tmp/" not in content
 
     index = (ROOT / "reports" / "index.md").read_text(encoding="utf-8")
-    assert "## Current v2.3 Release Reports" in index
-    current_section = index.split("## Current v2.3 Release Reports", 1)[1]
+    assert "## Current v2.4 Release Reports" in index
+    current_section = index.split("## Current v2.4 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
-    assert "[release_readiness_v2_3.md]" in current_section
-    assert "[workflow_daily_check_v2_3.md]" in current_section
-    assert "[workflow_release_candidate_check_v2_3.md]" in current_section
+    assert "[release_readiness_v2_4.md]" in current_section
+    assert "[reviewer_comments_v2_4.md]" in current_section
+    assert "[response_to_review_v2_4.md]" in current_section
     historical_section = index.split("## Historical Versioned Reports", 1)[1]
     assert "[release_readiness_v2_2.md]" in historical_section
     assert "[release_readiness_v2_1.md]" in historical_section
