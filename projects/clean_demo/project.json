@@ -1,0 +1,10 @@
+{
+  "name": "clean_demo",
+  "description": "Tiny clean synthetic project for first-run validation.",
+  "is_default": false,
+  "registry_path": "registry.csv",
+  "bibtex_path": "bibtex/library.bib",
+  "notes_dir": "notes",
+  "themes_path": "themes.json",
+  "reports_dir": "reports"
+}

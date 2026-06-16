@@ -118,7 +118,7 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     assert "[release_readiness_v2_0_rc.md]" in historical_section
 
 
-def test_public_quickstarts_label_bundled_zis_project_as_imperfect():
+def test_public_quickstarts_use_clean_demo_and_label_zis_as_imperfect():
     docs = [
         ROOT / "README.md",
         ROOT / "docs" / "GETTING_STARTED_V2.md",
@@ -127,14 +127,15 @@ def test_public_quickstarts_label_bundled_zis_project_as_imperfect():
     ]
     for path in docs:
         content = path.read_text(encoding="utf-8")
-        assert "validate-registry projects/zis_photocatalysis/registry.csv --strict" in content
+        assert "validate-registry projects/clean_demo/registry.csv --strict" in content
         assert (
-            "validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict"
+            "validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict"
             in content
         )
+        assert "zis_photocatalysis" in content
     getting_started = (ROOT / "docs" / "GETTING_STARTED_V2.md").read_text(encoding="utf-8")
     assert "intentionally imperfect" in getting_started
-    assert "clean first-use scaffold" in getting_started
+    assert "green first-run validation path" in getting_started
 
 
 def test_command_contracts_document_non_strict_validation_exit_behavior():

@@ -51,13 +51,17 @@ paperwb dogfood plan-from-files photocatalysis --project fyp_zis_lit_review --re
 Use `--strict` when you want validation commands to return non-zero for
 error-level findings.
 
-The bundled `zis_photocatalysis` project is intentionally imperfect so evidence
-gap, rule, dashboard, and workflow reports have real findings to display. Use
-template-created projects such as `my_review` as the clean first-use scaffold;
-use `zis_photocatalysis` when you want to see populated synthetic evidence
-reports.
+The bundled `clean_demo` project is the green first-run validation path. It is a
+tiny synthetic project with complete registry, BibTeX, note, theme, and claim
+links. The bundled `zis_photocatalysis` project is intentionally imperfect so
+evidence-gap, rule, dashboard, and workflow reports have real findings to
+display.
 
 ```bash
+paperwb validate-registry projects/clean_demo/registry.csv --strict
+paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict
+paperwb dashboard --project clean_demo --no-audit-log
+
 paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
 paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
 paperwb claims --project zis_photocatalysis --output scratch/zis_claims.csv --force

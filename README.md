@@ -100,17 +100,20 @@ paperwb dogfood status --project fyp_zis_lit_review
 paperwb dogfood checklist --project fyp_zis_lit_review
 ```
 
-Validate a clean bundled project registry:
+Validate the clean bundled first-run project:
 
 ```bash
-paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
+paperwb validate-registry projects/clean_demo/registry.csv --strict
 ```
 
 Validate its synthetic BibTeX library:
 
 ```bash
-paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
+paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict
 ```
+
+Use `projects/zis_photocatalysis` when you want populated synthetic evidence-gap
+findings for dashboard, rule, and citation-audit demos.
 
 Extract claims from notes:
 

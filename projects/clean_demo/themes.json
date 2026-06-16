@@ -1,0 +1,12 @@
+{
+  "themes": [
+    {
+      "theme_id": "clean-validation",
+      "name": "clean validation",
+      "tags": ["clean validation", "evidence tracking"],
+      "min_claims": 1,
+      "min_papers": 1,
+      "description": "Synthetic green-path theme for first-run validation."
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 This audit checks tracked and unignored repository files. It does not inspect ignored user caches, local PDFs, or ignored private files.
 
 Root: .
-Repository files checked: 705
+Repository files checked: 714
 Errors: 0
 Warnings: 0
 

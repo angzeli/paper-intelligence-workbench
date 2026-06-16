@@ -19,29 +19,32 @@ In offline or restricted-network environments, editable install may fail if `pip
 
 ## 2. Understand the Example Data
 
-The included corpus is synthetic. It intentionally contains duplicate DOIs, incomplete BibTeX entries, weak claims, missing evidence locations, and under-supported themes. Those problems are useful because they show what the audit reports catch.
+The included corpus is synthetic. `clean_demo` is the green first-run project.
+Other fixtures intentionally contain duplicate DOIs, incomplete BibTeX entries,
+weak claims, missing evidence locations, and under-supported themes. Those
+problems are useful because they show what the audit reports catch.
 
 No copyrighted PDFs are included.
 
 ## 3. Run the Safe First Workflow
 
-Start with the bundled project profile. Its registry is valid, but the project
-intentionally contains evidence gaps so later audit reports have findings to
-display. Use `--strict` when validation errors should make a script fail.
+Start with the bundled `clean_demo` project profile. It is intentionally tiny
+and should return clean stable-command results. Use `--strict` when validation
+errors should make a script fail.
 
 Validate the registry:
 
 ```bash
-paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
+paperwb validate-registry projects/clean_demo/registry.csv --strict
 ```
 
 Validate BibTeX against the registry:
 
 ```bash
-paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict
+paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict
 ```
 
-Extract claims from structured notes:
+Then use `zis_photocatalysis` when you want populated evidence-gap reports:
 
 ```bash
 paperwb claims --project zis_photocatalysis --output scratch/paperwb_zis_claims.csv --force
