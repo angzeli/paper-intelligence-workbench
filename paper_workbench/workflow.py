@@ -721,7 +721,6 @@ def _step_search_index_rebuild(step: WorkflowStep, recipe: WorkflowRecipe, data:
         themes_path=data.paths.themes,
         project_id=data.paths.project,
         include_text=bool(step.params.get("include_text", False)),
-        root=data.paths.root,
     )
     output = _step_output_path(step, recipe, data, default_suffix="index_status.md")
     if dry_run:

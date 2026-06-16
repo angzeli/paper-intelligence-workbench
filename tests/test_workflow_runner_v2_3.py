@@ -154,6 +154,15 @@ def test_workflow_run_report_includes_project_description(tmp_path: Path) -> Non
     assert "Generic Literature Review" in content
 
 
+def test_release_candidate_workflow_dry_run_has_no_step_errors(tmp_path: Path) -> None:
+    create_dogfood_project("generic", "demo_review", root=tmp_path)
+
+    run = run_workflow(builtin_recipes()["release_candidate_check"], project="demo_review", root=tmp_path, dry_run=True)
+
+    assert not run.errors
+    assert {result.step_id for result in run.results} >= {"validate_registry", "validate_bibtex", "index"}
+
+
 def test_project_specific_recipe_loading(tmp_path: Path) -> None:
     create_dogfood_project("generic", "demo_review", root=tmp_path)
     workflows_dir = tmp_path / "projects" / "demo_review" / "workflows"

@@ -495,6 +495,10 @@ def _is_release_candidate_report(path: Path) -> bool:
     return re.search(r"_rc(?:_|$)", path.stem) is not None
 
 
+def _is_post_release_roadmap(path: Path) -> bool:
+    return path.stem.startswith("post_") and path.stem.endswith("_roadmap")
+
+
 def _format_report_version(version: tuple[int, int]) -> str:
     return f"v{version[0]}.{version[1]}"
 
@@ -537,6 +541,7 @@ def report_index_markdown(reports_dir: str | Path, *, output_path: str | Path | 
     has_final_reports_for_latest = latest_release is not None and any(
         _report_version(report) == latest_release
         and not _is_release_candidate_report(report)
+        and not _is_post_release_roadmap(report)
         and "recommended_patch_plan" not in report.name
         for report in reports
     )
