@@ -11,10 +11,11 @@ from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_notes
 from .doctor import workspace_health
 from .files import default_file_registry_path, scan_local_files
-from .paths import default_bibtex_path, default_notes_dir, default_registry_path, default_reports_dir, default_themes_path
+from .markdown import findings_table
+from .paths import default_bibtex_path, default_notes_dir, default_registry_path, default_reports_dir, default_themes_path, display_path, is_path_within
 from .projects import list_project_profiles
 from .registry import load_registry, validate_registry
-from .schema import ProjectProfile, ValidationFinding
+from .schema import ProjectProfile, ValidationFinding, make_validation_finding
 from .tags import load_themes
 
 
@@ -35,22 +36,7 @@ class IntegrityResult:
 
 
 def _finding(severity: str, code: str, message: str, identifier: str = "", suggestion: str = "") -> ValidationFinding:
-    return ValidationFinding(severity=severity, code=code, message=message, identifier=identifier, suggestion=suggestion)
-
-
-def is_path_within(path: str | Path, root: str | Path) -> bool:
-    try:
-        Path(path).expanduser().resolve(strict=False).relative_to(Path(root).expanduser().resolve(strict=False))
-        return True
-    except ValueError:
-        return False
-
-
-def _display(path: Path, root: Path) -> str:
-    try:
-        return path.resolve(strict=False).relative_to(root.resolve(strict=False)).as_posix()
-    except ValueError:
-        return path.as_posix()
+    return make_validation_finding(severity, code, message, identifier=identifier, suggestion=suggestion)
 
 
 def _tracked_files(root: Path) -> list[str]:
@@ -214,7 +200,7 @@ def workspace_integrity_report(result: IntegrityResult) -> str:
         "",
         "This report checks local workspace consistency. It does not modify files.",
         "",
-        f"Root: {_portable_path(result.root)}",
+        f"Root: {display_path(result.root)}",
         f"Project: {result.project or 'default data workflow'}",
         f"Errors: {len(result.errors)}",
         f"Warnings: {len(result.warnings)}",
@@ -224,16 +210,9 @@ def workspace_integrity_report(result: IntegrityResult) -> str:
         "",
     ]
     for path in result.checked_paths:
-        lines.append(f"- `{_portable_path(path)}`")
+        lines.append(f"- `{display_path(path)}`")
     lines.extend(["", "## Findings", ""])
-    if not result.findings:
-        lines.append("No integrity findings detected.")
-    else:
-        lines.extend(["| Severity | Code | Identifier | Message | Suggestion |", "| --- | --- | --- | --- | --- |"])
-        for finding in result.findings:
-            lines.append(
-                f"| {finding.severity} | {finding.code} | {_escape(finding.identifier)} | {_escape(finding.message)} | {_escape(finding.suggestion)} |"
-            )
+    lines.append(findings_table(result.findings, empty="No integrity findings detected."))
     lines.extend(
         [
             "",
@@ -245,18 +224,6 @@ def workspace_integrity_report(result: IntegrityResult) -> str:
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
-
-
-def _escape(value: str) -> str:
-    return str(value).replace("|", "\\|").replace("\n", " ")
-
-
-def _portable_path(value: str | Path) -> str:
-    path = Path(value)
-    try:
-        return path.resolve(strict=False).relative_to(Path.cwd().resolve(strict=False)).as_posix()
-    except ValueError:
-        return path.as_posix()
 
 
 def _dedupe_findings(findings: list[ValidationFinding]) -> list[ValidationFinding]:

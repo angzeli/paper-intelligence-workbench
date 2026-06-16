@@ -248,6 +248,26 @@ class ValidationFinding:
     suggestion: str = ""
 
 
+def make_validation_finding(
+    severity: str,
+    code: str,
+    message: str,
+    *,
+    source: str = "",
+    identifier: str = "",
+    suggestion: str = "",
+) -> ValidationFinding:
+    """Create a standard validation finding with explicit field names."""
+    return ValidationFinding(
+        severity=severity,
+        code=code,
+        message=message,
+        source=source,
+        identifier=identifier,
+        suggestion=suggestion,
+    )
+
+
 def enum_values(enum_type: type[Enum]) -> set[str]:
     return {item.value for item in enum_type}
 

@@ -66,6 +66,24 @@ def default_processed_dir(root: str | Path = ".") -> Path:
     return project_root(root) / "data" / "processed"
 
 
+def is_path_within(path: str | Path, root: str | Path) -> bool:
+    """Return whether a path resolves inside a workspace root."""
+    try:
+        Path(path).expanduser().resolve(strict=False).relative_to(Path(root).expanduser().resolve(strict=False))
+        return True
+    except ValueError:
+        return False
+
+
+def relative_path(path: str | Path, root: str | Path) -> str:
+    """Return a slash-style path relative to root when possible."""
+    target = Path(path)
+    try:
+        return target.resolve(strict=False).relative_to(Path(root).resolve(strict=False)).as_posix()
+    except ValueError:
+        return target.as_posix()
+
+
 def display_path(path: str | Path, *, base_path: str | Path | None = None) -> str:
     """Display a filesystem path relative to a stable base when possible."""
     if not path:

@@ -8,6 +8,7 @@ from pathlib import Path
 from .audit import citation_audit
 from .bibtex import validate_bibtex
 from .io import write_text
+from .markdown import escape_table_cell, findings_table
 from .registry import display_authors, validate_registry
 from .schema import BibTeXEntry, CitationAuditFinding, Claim, EvidenceType, Paper, PaperNote, ProjectTheme, ValidationFinding
 from .tags import count_paper_tags, group_claims_by_theme, normalize_tag, theme_by_tag
@@ -19,25 +20,11 @@ def write_report(name: str, content: str, reports_dir: str | Path = "reports", f
 
 
 def _finding_rows(findings: list[ValidationFinding] | list[CitationAuditFinding]) -> str:
-    if not findings:
-        return "No findings.\n"
-    lines = ["| Severity | Code | Identifier | Message | Suggestion |", "| --- | --- | --- | --- | --- |"]
-    for finding in findings:
-        identifier = getattr(finding, "identifier", "") or getattr(finding, "paper_id", "") or getattr(finding, "claim_id", "") or getattr(finding, "theme", "")
-        lines.append(
-            "| {severity} | {code} | {identifier} | {message} | {suggestion} |".format(
-                severity=finding.severity,
-                code=finding.code,
-                identifier=_escape(identifier),
-                message=_escape(finding.message),
-                suggestion=_escape(getattr(finding, "suggestion", "")),
-            )
-        )
-    return "\n".join(lines) + "\n"
+    return findings_table(findings) + "\n"
 
 
 def _escape(value: str) -> str:
-    return str(value).replace("|", "\\|").replace("\n", " ")
+    return escape_table_cell(value)
 
 
 def inventory_report(papers: list[Paper], *, root: str | Path | None = None, claims: list[Claim] | None = None) -> str:

@@ -7,12 +7,12 @@ from pathlib import Path
 from .bibtex import parse_bibtex_file, validate_bibtex
 from .claims import collect_notes
 from .registry import load_registry, validate_registry
-from .schema import ProjectProfile, ValidationFinding
+from .schema import ProjectProfile, ValidationFinding, make_validation_finding
 from .tags import group_claims_by_theme, load_themes, normalize_tag, theme_by_tag
 
 
 def _finding(severity: str, code: str, message: str, identifier: str = "", suggestion: str = "") -> ValidationFinding:
-    return ValidationFinding(severity=severity, code=code, message=message, identifier=identifier, suggestion=suggestion)
+    return make_validation_finding(severity, code, message, identifier=identifier, suggestion=suggestion)
 
 
 def workspace_health(
