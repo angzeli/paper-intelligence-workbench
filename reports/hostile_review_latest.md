@@ -162,7 +162,7 @@ conflicting invocation exits with code 2 before writing a bundle.
 
    Impact: `.gitignore` prevents accidental staging, so this is not a data
    safety blocker. It is still annoying for maintainer reviews. Future smoke
-   docs should prefer copying fixtures to `/private/tmp` before commands that
+   docs should prefer copying fixtures to an ignored temporary workspace before commands that
    may write audit/cache state.
 
 ## Low-Priority Polish
@@ -279,7 +279,7 @@ Recommended next sequence:
 2. Regenerate `reports/index.md` after this review and decide whether old
    release-burn reports should be archived outside the main report index.
 3. Add a README quickstart transcript smoke test.
-4. Update maintainer smoke docs to run fixture migration checks on `/private/tmp`
-   copies instead of fixture directories.
+4. Update maintainer smoke docs to run fixture migration checks on ignored
+   temporary workspace copies instead of fixture directories.
 5. Keep splitting CLI helpers only where behavior is already pinned by command
    tests; do not do a large CLI rewrite before more real dogfooding.
