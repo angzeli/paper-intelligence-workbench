@@ -1,9 +1,17 @@
 # Roadmap v3
 
+## v3.1 Support Bundle Patch
+
+- Add safe-by-default support bundles for sanitized local diagnostics.
+- Keep diagnostic exports free of PDFs, full notes, full drafts, cache DBs,
+  backups, raw audit logs, secrets, and private comments.
+- Keep verbose diagnostic output local-only and clearly labelled.
+
 ## v3.0rc Freeze
 
 - Keep `init`, `project`, `template`, `dogfood`, registry/BibTeX validation,
-  note templates, claim extraction, core reports, doctor, and dashboard stable.
+  note templates, claim extraction, core reports, doctor, dashboard, and support
+  diagnostics stable.
 - Keep manuscript QA, sync apply, workflow recipes, evidence graph exports,
   review packets, indexed search, claim lifecycle, and rebuild metadata
   experimental until real dogfooding confirms their contracts.
@@ -23,6 +31,8 @@
 - Reduce overlapping docs and archive stale generated reports.
 - Dogfood evidence graph, workflow runner, review packets, and claim lifecycle
   before marking any of them stable.
+- Dogfood support bundles on one real project before recommending external
+  issue sharing.
 
 ## Not In Scope
 

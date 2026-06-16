@@ -1,6 +1,6 @@
 # Command Contracts v3
 
-This page documents v3.0rc command behavior for local dogfooding. It freezes
+This page documents v3 command behavior for local dogfooding. It freezes
 contracts for stable commands and labels advanced workflows honestly.
 
 ## Global Contract
@@ -34,6 +34,7 @@ contracts for stable commands and labels advanced workflows honestly.
 | `checklist` | Generate theme checklist | project/theme | stdout/Markdown | output only | stable |
 | `doctor` | Workspace diagnostics | workspace/project | stdout/report | none unless `--out` | stable |
 | `dashboard` | Project health summary | workspace/project | stdout/Markdown | none unless `--out` | stable |
+| `support` | Sanitized diagnostic bundles | workspace/project | support bundle or Markdown report | generated outputs only; no source-file copying | stable |
 | `index` | SQLite search cache | project/local files | `.paperwb/index.sqlite` | cache only | experimental |
 | `rebuild` | Incremental rebuild metadata | project | `.paperwb/rebuild_metadata.json`, report | cache/audit state only | experimental |
 | `files` | Local file audit/linking | project files | file registry/report | no delete/copy by default | experimental |

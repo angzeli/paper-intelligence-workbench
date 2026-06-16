@@ -17,6 +17,7 @@ Start with [docs/GETTING_STARTED_V3.md](docs/GETTING_STARTED_V3.md), [docs/STABL
 - Runs declarative local workflow recipes for repeatable validation, report, dashboard, manuscript QA, and backup-precheck routines.
 - Exports local review packets and imports reviewer comments as separate advisory sidecars.
 - Plans incremental rebuilds with local content fingerprints for repeated large-project work.
+- Creates sanitized support bundles for local debugging without exporting PDFs, full notes, drafts, cache databases, backups, or raw audit logs.
 
 ## 🚫 What It Does Not Do
 
@@ -139,6 +140,13 @@ paperwb workflow show daily_check
 paperwb workflow run daily_check --project zis_photocatalysis --dry-run --out scratch/daily_check.md --force
 ```
 
+Create a safe diagnostic bundle:
+
+```bash
+paperwb support redact-preview --project clean_demo
+paperwb support bundle --project clean_demo --out scratch/clean_demo_support_bundle
+```
+
 Run diagnostics and a section outline:
 
 ```bash
@@ -213,6 +221,7 @@ paperwb review-packet import-comments scratch/review_packet_photocorrosion/comme
 paperwb reading queue --project zis_photocatalysis
 paperwb followups list --project zis_photocatalysis
 paperwb integrity check --project zis_photocatalysis --out scratch/integrity.md --force
+paperwb support bundle --project zis_photocatalysis --out scratch/zis_support_bundle
 paperwb backup create --project zis_photocatalysis --notes "Before major note cleanup"
 ```
 
@@ -269,6 +278,7 @@ paperwb dogfood plan-from-files photocatalysis --project fyp_review --references
 paperwb import zotero-csv data/examples/zotero_export.csv --dry-run --report scratch/import_zotero_dry_run.md --force
 paperwb export claims --out scratch/claims.csv
 paperwb dashboard --project zis_photocatalysis
+paperwb support bundle --project zis_photocatalysis --out scratch/zis_support_bundle
 ```
 
 Run `paperwb --help` or see [docs/CLI_REFERENCE_V3.md](docs/CLI_REFERENCE_V3.md)
@@ -302,6 +312,9 @@ for the full command map.
 - [docs/REPORT_GALLERY_V3.md](docs/REPORT_GALLERY_V3.md)
 - [docs/DATA_SAFETY_V3.md](docs/DATA_SAFETY_V3.md)
 - [docs/KNOWN_LIMITATIONS_V3.md](docs/KNOWN_LIMITATIONS_V3.md)
+- [docs/SUPPORT_BUNDLES.md](docs/SUPPORT_BUNDLES.md)
+- [docs/REDACTION.md](docs/REDACTION.md)
+- [docs/PRIVACY_BOUNDARIES.md](docs/PRIVACY_BOUNDARIES.md)
 
 ## 🧭 Roadmap
 

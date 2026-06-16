@@ -2,6 +2,22 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v3.1 - Support Bundle and Sanitized Diagnostics
+
+- Promoted local package metadata to `3.1`.
+- Added `paperwb support bundle/doctor/redact-preview/reproduce` for safe
+  local diagnostic exports.
+- Added safe-by-default redaction for private paths, local PDF paths, paper
+  titles/authors/DOI/URL values, BibTeX keys, claim text, quotes, note bodies,
+  user comments, and secret-like strings.
+- Added support bundle manifests, environment summaries, CLI inventories,
+  project-structure summaries, validation summaries, report inventories, schema
+  summaries, data-safety summaries, sanitized CSV samples, and reproduction
+  commands.
+- Kept v3.1 local-first and privacy-preserving: no PDFs, copied full text,
+  full notes, full drafts, raw audit logs, cache DBs, backup archives, cloud
+  APIs, LLM APIs, or publisher scraping.
+
 ## v3.0rc - Release Candidate Stabilization
 
 - Promoted local package metadata to `3.0.0rc1`.

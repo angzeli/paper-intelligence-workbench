@@ -6,7 +6,7 @@ structured notes, user-entered claims, evidence gaps, and writing readiness.
 
 It does not read papers for you, scrape publishers, use cloud or LLM APIs,
 fabricate claims, or write final literature-review prose. No cloud APIs or LLM
-APIs are required for any v3.0rc workflow.
+APIs are required for any v3 workflow.
 
 ## Install Or Run Locally
 
@@ -62,6 +62,19 @@ reference paths.
 7. Generate evidence maps, citation audits, checklists, and dashboards.
 8. Back up before risky migrations, restores, or sync applies.
 
+## Safe Diagnostics
+
+When you need to inspect or share project state for debugging, use the support
+workflow instead of copying project folders:
+
+```bash
+paperwb support redact-preview --project clean_demo
+paperwb support bundle --project clean_demo --out scratch/clean_demo_support_bundle
+```
+
+The bundle is sanitized by default and does not include PDFs, full notes, full
+drafts, cache databases, backup archives, raw audit logs, or private comments.
+
 ## Current Release Docs
 
 - `docs/STABLE_SURFACE_V3.md`
@@ -69,3 +82,4 @@ reference paths.
 - `docs/COMMAND_CONTRACTS_V3.md`
 - `docs/SCHEMA_REFERENCE_V3.md`
 - `docs/DATA_SAFETY_V3.md`
+- `docs/SUPPORT_BUNDLES.md`

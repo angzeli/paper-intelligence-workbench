@@ -16,6 +16,8 @@ paperwb note-template PAPER_ID --project clean_demo
 paperwb claims projects/clean_demo/notes --output scratch/claims.csv
 paperwb dashboard --project clean_demo --no-audit-log
 paperwb doctor --project clean_demo
+paperwb support doctor --project clean_demo
+paperwb support bundle --project clean_demo --out scratch/clean_demo_support_bundle
 ```
 
 ## Stable Core Reports
@@ -30,6 +32,20 @@ paperwb report weak-claims --project clean_demo --out scratch/weak_claims.md --f
 paperwb report missing-evidence --project clean_demo --out scratch/missing_evidence.md --force
 paperwb export report-index --out reports/index.md --force
 ```
+
+## Support Bundle Diagnostics
+
+```bash
+paperwb support doctor --project clean_demo
+paperwb support redact-preview --project clean_demo
+paperwb support reproduce --project clean_demo
+paperwb support bundle --project clean_demo --safe --out scratch/clean_demo_support_bundle
+```
+
+`support bundle` writes generated diagnostics and sanitized CSV samples. It does
+not copy PDFs, full notes, full drafts, raw audit logs, cache databases, or
+backup archives. Use `--verbose-local-only` only for private debugging after
+reading [REDACTION.md](REDACTION.md).
 
 ## Experimental Command Groups
 

@@ -26,6 +26,7 @@ documented schemas should not change without a migration note.
 | `checklist` | Generate theme review checklists. |
 | `doctor` | Read-only workspace diagnostics, except explicit report output. |
 | `dashboard` | Read-only terminal and Markdown project summary, except explicit `--out`. |
+| `support` | Generate sanitized diagnostic summaries and support bundles without copying private source files. |
 
 ## Stable Data Formats
 
@@ -43,6 +44,8 @@ documented schemas should not change without a migration note.
 - No silent overwrite of notes, registry fields, BibTeX files, backups, sync
   applies, migrations, or restores.
 - Generated examples must remain synthetic or empty placeholders.
+- Support bundles must not include PDFs, full notes, full drafts, raw audit logs,
+  cache databases, backup archives, or private comments by default.
 
 ## Public Python Surface
 

@@ -27,12 +27,11 @@ inspection and review, not as stable machine APIs.
 
 ## Current Release Reports
 
-Use `reports/index.md` for the latest generated report inventory. v3.0rc
-release reports include:
+Use `reports/index.md` for the latest generated report inventory. v3.1
+diagnostic-support reports include:
 
-- `reports/release_notes_v3_0_rc.md`
-- `reports/data_safety_v3_0_rc.md`
-- `reports/external_dogfooding_simulation_v3_0_rc.md`
-- `reports/release_readiness_v3_0_rc.md`
-- `reports/final_release_verdict_v3_0_rc.md`
-- `reports/post_v3_0_roadmap.md`
+- `reports/support_bundle_demo_v3_1.md`
+- `reports/support_bundle_data_safety_v3_1.md`
+- `reports/redaction_preview_v3_1.md`
+- `reports/release_readiness_v3_1.md`
+- `reports/v3_2_recommended_patch_plan.md`
