@@ -78,5 +78,9 @@ This repository uses plain Markdown as the documentation-site source.
 - `docs/CLI_BEHAVIOR_MATRIX.md`
 - `docs/REPORT_MATRIX.md`
 - `docs/DATA_SAFETY_MATRIX.md`
+- `docs/INTERNAL_ARCHITECTURE.md`
+- `docs/PUBLIC_VS_INTERNAL_API.md`
+- `docs/MAINTAINER_GUIDE.md`
+- `docs/MODULE_BOUNDARIES.md`
 - `docs/REPORT_GALLERY.md`
 - `docs/ROADMAP.md`
