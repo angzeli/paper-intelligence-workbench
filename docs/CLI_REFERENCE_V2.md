@@ -25,6 +25,7 @@ classifies command groups for the v2 release line.
 - `workflow`
 - `review-packet`
 - `index`
+- `rebuild`
 - `graph`
 - `claim-review`
 - `contradictions`
@@ -101,6 +102,21 @@ Review packets are experimental in the v2 line. They export local Markdown,
 CSV, and JSON review artifacts without PDFs. Imported comments are stored as
 separate `.paperwb/reviewer_comments.json` metadata and never rewrite claims,
 notes, registry rows, BibTeX, or evidence locations.
+
+## Rebuild Commands
+
+```bash
+paperwb rebuild plan --project zis_photocatalysis
+paperwb rebuild status --project zis_photocatalysis
+paperwb rebuild run --project zis_photocatalysis
+paperwb rebuild run --project zis_photocatalysis --force
+```
+
+Rebuild commands are experimental in the v2 line. They compare local content
+fingerprints for notes, registry rows, BibTeX, themes, reports, drafts,
+dashboard inputs, and search-index records. `run` writes
+`.paperwb/rebuild_metadata.json` only; it does not regenerate reports, rebuild
+the search index, or modify user notes/data.
 
 ## Evidence Graph Commands
 

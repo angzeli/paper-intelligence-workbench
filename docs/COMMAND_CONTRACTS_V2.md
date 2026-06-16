@@ -34,6 +34,7 @@ documents command behavior, not internal implementation details.
 | `claims` | Claim extraction | notes dir | stdout/CSV/Markdown | output only | stable | note/claim tests |
 | `search` | Search | query, local files | stdout/Markdown | read-only unless `--out` | stable; indexed experimental | search/index tests |
 | `index` | SQLite cache | project/local files | `.paperwb/index.sqlite` | rebuildable cache only | experimental | index tests |
+| `rebuild` | Incremental rebuild planning | project/local files | plan/status report, `.paperwb/rebuild_metadata.json` | metadata cache only; no report/index regeneration | experimental | rebuild tests |
 | `files` | Local file audit | project files | scan/audit reports | no delete/move/copy by default | experimental | local-file tests |
 | `report` | Markdown reports | registry/BibTeX/notes/themes | Markdown | no overwrite without force | stable core, experimental authoring | report tests |
 | `writing-packet` | Writing planning | project/theme | Markdown packet | output only | experimental | authoring tests |

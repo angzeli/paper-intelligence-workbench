@@ -6,6 +6,7 @@ output shape, or internal file format before a future stable release.
 | Feature | Commands | Why experimental |
 | --- | --- | --- |
 | SQLite indexed search | `index`, `search --indexed` | Cache schema is rebuildable and may change. |
+| Incremental rebuild metadata | `rebuild` | Fingerprint metadata is local cache state and may evolve. |
 | Text sidecar indexing | `index rebuild --include-text`, `search --text` | Sidecars are user-provided and search ranking is simple lexical matching. |
 | Import workflows | `import zotero-csv/csv/bibtex/ris` | Column mappings and enrichment policies may need real-world tuning. |
 | Export round-trips | `export obsidian`, `sync plan-obsidian` | Markdown round-trip conflict detection is conservative. |

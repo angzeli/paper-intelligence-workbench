@@ -95,3 +95,7 @@ Instructions for future agents working in this repository:
 - Review comments must not automatically change claims, notes, registry rows, BibTeX entries, or evidence locations.
 - Do not include PDFs in review packets by default.
 - Treat imported reviewer comments as advisory local sidecar metadata, not as scientific truth.
+- Do not commit rebuild metadata, search indexes, cache databases, stress-project outputs, audit logs, or backup archives.
+- Incremental rebuild commands should be transparent metadata/check commands and must not silently rewrite user notes, registries, BibTeX, reports, drafts, or indexes.
+- Keep performance and stress fixtures synthetic; do not use real paper metadata, real claims, real PDFs, or copied full text in stress projects.
+- Do not add heavy performance, cache, or database dependencies without explicit approval.

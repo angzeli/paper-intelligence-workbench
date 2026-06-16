@@ -39,11 +39,19 @@
 - Import reviewer comments into separate sidecars without mutating evidence.
 - Generate response-to-review and follow-up reports from imported comments.
 
-## Recommended v2.5 Scope
+## v2.5 Performance and Incremental Rebuilds
 
 - Add performance sanity checks and incremental rebuild planning for larger
   local projects.
+- Track rebuild metadata in ignored `.paperwb/` cache state.
+- Keep stress projects synthetic and outside committed data by default.
 - Improve report cleanup and archive guidance for historical generated reports.
+
+## Recommended v2.6 Scope
+
+- Consolidate duplicated internal path, report, and CLI helper logic.
+- Clarify public versus internal Python APIs before a v3.0rc cycle.
+- Preserve stable CLI behavior while reducing maintenance friction.
 
 ## Not Worth Expanding Yet
 

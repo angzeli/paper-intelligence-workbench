@@ -16,6 +16,7 @@ Start with [docs/GETTING_STARTED_V2.md](docs/GETTING_STARTED_V2.md), [docs/STABL
 - Tracks manual claim lifecycle state and contradiction/tension groups without auto-verifying claims.
 - Runs declarative local workflow recipes for repeatable validation, report, dashboard, manuscript QA, and backup-precheck routines.
 - Exports local review packets and imports reviewer comments as separate advisory sidecars.
+- Plans incremental rebuilds with local content fingerprints for repeated large-project work.
 
 ## 🚫 What It Does Not Do
 
@@ -192,6 +193,8 @@ paperwb export reading-list --theme photocorrosion --project zis_photocatalysis 
 paperwb search photocorrosion --project zis_photocatalysis
 paperwb index rebuild --project zis_photocatalysis --include-text
 paperwb search photocorrosion --project zis_photocatalysis --indexed
+paperwb rebuild plan --project zis_photocatalysis --out scratch/rebuild_plan.md --force-report
+paperwb rebuild run --project zis_photocatalysis
 paperwb graph build --project zis_photocatalysis
 paperwb graph export --project zis_photocatalysis --format json --out scratch/evidence_graph.json --force
 
