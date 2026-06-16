@@ -119,19 +119,23 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v3.0 Release Reports" in content
-    current_section = content.split("## Current v3.0 Release Reports", 1)[1]
+    assert "## Current v3.1 Release Reports" in content
+    current_section = content.split("## Current v3.1 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
     assert "[hostile_review_latest.md]" in current_section
-    assert "[release_notes_v3_0_rc.md]" in current_section
-    assert "[release_readiness_v3_0_rc.md]" in current_section
-    assert "[final_release_verdict_v3_0_rc.md]" in current_section
-    assert "[external_dogfooding_simulation_v3_0_rc.md]" in current_section
-    assert "[data_safety_v3_0_rc.md]" in current_section
+    assert "[support_bundle_demo_v3_1.md]" in current_section
+    assert "[support_bundle_data_safety_v3_1.md]" in current_section
+    assert "[redaction_preview_v3_1.md]" in current_section
+    assert "[release_readiness_v3_1.md]" in current_section
     assert "[release_notes_v2_0_rc.md]" not in current_section
     assert "[release_readiness_v2_0_rc.md]" not in current_section
     historical_section = content.split("## Historical Versioned Reports", 1)[1]
+    assert "[release_notes_v3_0_rc.md]" in historical_section
+    assert "[release_readiness_v3_0_rc.md]" in historical_section
+    assert "[final_release_verdict_v3_0_rc.md]" in historical_section
+    assert "[external_dogfooding_simulation_v3_0_rc.md]" in historical_section
+    assert "[data_safety_v3_0_rc.md]" in historical_section
     assert "[architecture_audit_v2_6.md]" in historical_section
     assert "[behavior_preservation_v2_6.md]" in historical_section
     assert "[refactor_summary_v2_6.md]" in historical_section

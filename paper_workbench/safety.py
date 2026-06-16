@@ -37,6 +37,7 @@ ABSOLUTE_PATH_WARNING_ALLOWLIST = {
     "reports/release_readiness_v0_6.md",
     "tests/test_integrity_backup_migration_v0_9.py",
     "tests/test_release_hygiene.py",
+    "tests/test_support_bundle_v3_1.py",
     "tests/test_v2_release_candidate.py",
 }
 

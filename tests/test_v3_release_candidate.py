@@ -19,8 +19,8 @@ def run_cli(*args: str, cwd: Path = ROOT) -> subprocess.CompletedProcess[str]:
 
 
 def test_v3_release_candidate_version_metadata() -> None:
-    assert __version__ == "3.0.0rc1"
-    assert 'version = "3.0.0rc1"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "3.1"
+    assert 'version = "3.1"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v3_surface_docs_exist_and_classify_release_surfaces() -> None:
@@ -59,6 +59,7 @@ def test_v3_stable_command_help_contracts() -> None:
         ("checklist", "--help"),
         ("doctor", "--help"),
         ("dashboard", "--help"),
+        ("support", "--help"),
     ]
     for command in commands:
         result = run_cli(*command)
