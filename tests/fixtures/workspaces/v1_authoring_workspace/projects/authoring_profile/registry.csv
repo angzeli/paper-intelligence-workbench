@@ -1,0 +1,3 @@
+paper_id,title,authors,year,journal,doi,url,local_pdf_path,bibtex_key,tags,reading_status,notes_path,added_date,last_reviewed_date,priority,project,source_type,relevance_score,reading_priority,included_in_lit_review,exclude_reason,user_comment
+authoring_profile_2026,Synthetic Authoring Workspace,"Example, Cy",2026,Synthetic Fixtures,,,,AuthoringProfile2026,authoring,read,notes/authoring_profile_2026.md,2026-01-01,,high,authoring_profile,journal_article,3,high,true,,
+

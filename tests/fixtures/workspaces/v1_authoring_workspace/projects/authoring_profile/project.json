@@ -1,0 +1,11 @@
+{
+  "name": "authoring_profile",
+  "description": "Synthetic v1 authoring-style fixture",
+  "is_default": false,
+  "registry_path": "registry.csv",
+  "bibtex_path": "bibtex/library.bib",
+  "notes_dir": "notes",
+  "themes_path": "themes.json",
+  "reports_dir": "reports"
+}
+

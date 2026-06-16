@@ -1,0 +1,2 @@
+{"recipe_id":"daily_check","name":"Synthetic Daily Check","steps":[{"step_type":"validate_registry"}]}
+
