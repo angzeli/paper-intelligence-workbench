@@ -2,19 +2,21 @@
 
 Reports directory: .
 
-Markdown reports indexed: 215
+Markdown reports indexed: 220
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v3.0 Release Reports
+## Current v3.1 Release Reports
 
-- [data_safety_v3_0_rc.md](data_safety_v3_0_rc.md)
-- [external_dogfooding_simulation_v3_0_rc.md](external_dogfooding_simulation_v3_0_rc.md)
-- [final_release_verdict_v3_0_rc.md](final_release_verdict_v3_0_rc.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [post_v3_0_roadmap.md](post_v3_0_roadmap.md)
-- [release_notes_v3_0_rc.md](release_notes_v3_0_rc.md)
-- [release_readiness_v3_0_rc.md](release_readiness_v3_0_rc.md)
+- [redaction_preview_v3_1.md](redaction_preview_v3_1.md)
+- [release_readiness_v3_1.md](release_readiness_v3_1.md)
+- [support_bundle_data_safety_v3_1.md](support_bundle_data_safety_v3_1.md)
+- [support_bundle_demo_v3_1.md](support_bundle_demo_v3_1.md)
+
+## Next Patch Plan
+
+- [v3_2_recommended_patch_plan.md](v3_2_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -49,6 +51,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [data_safety_audit_v2_5.md](data_safety_audit_v2_5.md)
 - [data_safety_v1_0_rc.md](data_safety_v1_0_rc.md)
 - [data_safety_v2_0_rc.md](data_safety_v2_0_rc.md)
+- [data_safety_v3_0_rc.md](data_safety_v3_0_rc.md)
 - [deprecated_claims_v2_2.md](deprecated_claims_v2_2.md)
 - [dogfooding_project_template_v2_0.md](dogfooding_project_template_v2_0.md)
 - [dogfooding_workflow_v1_7.md](dogfooding_workflow_v1_7.md)
@@ -61,11 +64,13 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [evidence_map_v0_2.md](evidence_map_v0_2.md)
 - [evidence_matrix_v0_6.md](evidence_matrix_v0_6.md)
 - [example_workflow_validation_v2_0_rc.md](example_workflow_validation_v2_0_rc.md)
+- [external_dogfooding_simulation_v3_0_rc.md](external_dogfooding_simulation_v3_0_rc.md)
 - [external_user_simulation_v0_8.md](external_user_simulation_v0_8.md)
 - [external_user_simulation_v1_0_rc.md](external_user_simulation_v1_0_rc.md)
 - [external_user_simulation_v2_0_rc.md](external_user_simulation_v2_0_rc.md)
 - [failure_mode_matrix_v0_10.md](failure_mode_matrix_v0_10.md)
 - [final_release_verdict_v2_0_rc.md](final_release_verdict_v2_0_rc.md)
+- [final_release_verdict_v3_0_rc.md](final_release_verdict_v3_0_rc.md)
 - [followups_v1_2.md](followups_v1_2.md)
 - [full_text_sidecar_demo_v0_5.md](full_text_sidecar_demo_v0_5.md)
 - [fyp_photocatalysis_theme_pack_v2_0.md](fyp_photocatalysis_theme_pack_v2_0.md)
@@ -101,6 +106,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [photocorrosion_section_outline_v0_3.md](photocorrosion_section_outline_v0_3.md)
 - [post_v1_0_roadmap.md](post_v1_0_roadmap.md)
 - [post_v2_0_roadmap.md](post_v2_0_roadmap.md)
+- [post_v3_0_roadmap.md](post_v3_0_roadmap.md)
 - [project_health_summary_v1_6.md](project_health_summary_v1_6.md)
 - [project_rules_zis_v1_5.md](project_rules_zis_v1_5.md)
 - [project_summary_v0_4.md](project_summary_v0_4.md)
@@ -113,6 +119,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_notes_v0_8.md](release_notes_v0_8.md)
 - [release_notes_v1_0_rc.md](release_notes_v1_0_rc.md)
 - [release_notes_v2_0_rc.md](release_notes_v2_0_rc.md)
+- [release_notes_v3_0_rc.md](release_notes_v3_0_rc.md)
 - [release_readiness_v0_10.md](release_readiness_v0_10.md)
 - [release_readiness_v0_2.md](release_readiness_v0_2.md)
 - [release_readiness_v0_3.md](release_readiness_v0_3.md)
@@ -139,6 +146,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v2_4.md](release_readiness_v2_4.md)
 - [release_readiness_v2_5.md](release_readiness_v2_5.md)
 - [release_readiness_v2_6.md](release_readiness_v2_6.md)
+- [release_readiness_v3_0_rc.md](release_readiness_v3_0_rc.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
