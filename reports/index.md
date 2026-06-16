@@ -2,22 +2,23 @@
 
 Reports directory: .
 
-Markdown reports indexed: 197
+Markdown reports indexed: 204
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v2.4 Release Reports
+## Current v2.5 Release Reports
 
+- [cache_hygiene_v2_5.md](cache_hygiene_v2_5.md)
+- [data_safety_audit_v2_5.md](data_safety_audit_v2_5.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [release_readiness_v2_4.md](release_readiness_v2_4.md)
-- [response_to_review_v2_4.md](response_to_review_v2_4.md)
-- [review_followups_v2_4.md](review_followups_v2_4.md)
-- [reviewer_comment_import_v2_4.md](reviewer_comment_import_v2_4.md)
-- [reviewer_comments_v2_4.md](reviewer_comments_v2_4.md)
+- [incremental_rebuild_plan_v2_5.md](incremental_rebuild_plan_v2_5.md)
+- [performance_sanity_v2_5.md](performance_sanity_v2_5.md)
+- [release_readiness_v2_5.md](release_readiness_v2_5.md)
+- [stress_project_summary_v2_5.md](stress_project_summary_v2_5.md)
 
 ## Next Patch Plan
 
-- [v2_5_recommended_patch_plan.md](v2_5_recommended_patch_plan.md)
+- [v2_6_recommended_patch_plan.md](v2_6_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -132,11 +133,16 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v2_1.md](release_readiness_v2_1.md)
 - [release_readiness_v2_2.md](release_readiness_v2_2.md)
 - [release_readiness_v2_3.md](release_readiness_v2_3.md)
+- [release_readiness_v2_4.md](release_readiness_v2_4.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
+- [response_to_review_v2_4.md](response_to_review_v2_4.md)
 - [restore_dry_run_v0_9.md](restore_dry_run_v0_9.md)
 - [restore_dry_run_v2_3.md](restore_dry_run_v2_3.md)
+- [review_followups_v2_4.md](review_followups_v2_4.md)
+- [reviewer_comment_import_v2_4.md](reviewer_comment_import_v2_4.md)
+- [reviewer_comments_v2_4.md](reviewer_comments_v2_4.md)
 - [revision_checklist_v1_1.md](revision_checklist_v1_1.md)
 - [rule_config_audit_v1_5.md](rule_config_audit_v1_5.md)
 - [rule_report_v1_5.md](rule_report_v1_5.md)
@@ -179,6 +185,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v2_2_recommended_patch_plan.md](v2_2_recommended_patch_plan.md)
 - [v2_3_recommended_patch_plan.md](v2_3_recommended_patch_plan.md)
 - [v2_4_recommended_patch_plan.md](v2_4_recommended_patch_plan.md)
+- [v2_5_recommended_patch_plan.md](v2_5_recommended_patch_plan.md)
 - [verified_claims_v2_2.md](verified_claims_v2_2.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
