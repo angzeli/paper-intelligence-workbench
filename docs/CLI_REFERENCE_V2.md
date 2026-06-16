@@ -89,6 +89,7 @@ are allowed from the CLI.
 
 ```bash
 paperwb review-packet create --project zis_photocatalysis --theme photocorrosion --out scratch/review_packet_photocorrosion --force
+# Fill scratch/review_packet_photocorrosion/comments.csv before importing comments.
 paperwb review-packet import-comments scratch/review_packet_photocorrosion/comments.csv --project zis_photocatalysis --theme photocorrosion --dry-run
 paperwb review-packet import-comments scratch/review_packet_photocorrosion/comments.csv --project zis_photocatalysis --theme photocorrosion --force --out scratch/reviewer_comment_import.md --force-report
 paperwb review-packet comments --project zis_photocatalysis --out scratch/reviewer_comments.md --force

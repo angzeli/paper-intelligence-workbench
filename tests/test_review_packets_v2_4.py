@@ -114,6 +114,35 @@ def test_comment_import_dry_run_validates_without_writing(tmp_path: Path) -> Non
     assert not sidecar.exists()
 
 
+def test_comment_import_skips_untouched_packet_template_rows(tmp_path: Path) -> None:
+    papers, notes, claims, entries, themes = _zis_inputs()
+    packet = create_review_packet(
+        project="zis_photocatalysis",
+        output_dir=tmp_path / "packet",
+        papers=papers,
+        notes=notes,
+        claims=claims,
+        entries=entries,
+        themes=themes,
+        theme="photocorrosion",
+    )
+    sidecar = tmp_path / "reviewer_comments.json"
+
+    result = import_reviewer_comments(
+        tmp_path / "packet" / "comments.csv",
+        project="zis_photocatalysis",
+        output_path=sidecar,
+        manifest_path=tmp_path / "packet" / "manifest.json",
+        dry_run=True,
+    )
+
+    assert packet.items
+    assert not result.errors
+    assert not result.comments
+    assert "Skipped" in result.warnings[0]
+    assert not sidecar.exists()
+
+
 def test_comment_import_rejects_unknown_item_and_invalid_rows(tmp_path: Path) -> None:
     comments_csv = tmp_path / "bad_comments.csv"
     _write_comment_row(comments_csv, item_id="claim:unknown", item_type="claim")
@@ -198,6 +227,18 @@ def test_review_packet_cli_smoke(tmp_path: Path) -> None:
         "--out",
         str(packet_dir),
     )
+    blank_template_import = run_cli(
+        "review-packet",
+        "import-comments",
+        str(packet_dir / "comments.csv"),
+        "--project",
+        "zis_photocatalysis",
+        "--theme",
+        "photocorrosion",
+        "--manifest",
+        str(packet_dir / "manifest.json"),
+        "--dry-run",
+    )
     _write_comment_row(comments_csv)
     dry_run = run_cli(
         "review-packet",
@@ -258,6 +299,8 @@ def test_review_packet_cli_smoke(tmp_path: Path) -> None:
     assert "{create,import-comments,comments,response,followups}" in help_result.stdout
     assert create.returncode == 0, create.stderr
     assert (packet_dir / "manifest.json").exists()
+    assert blank_template_import.returncode == 0, blank_template_import.stderr
+    assert "Skipped" in blank_template_import.stdout
     assert dry_run.returncode == 0, dry_run.stderr
     assert "Dry run: `true`" in dry_run.stdout
     assert write.returncode == 0, write.stderr

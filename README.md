@@ -200,6 +200,7 @@ paperwb workflow run pre_writing_check --project zis_photocatalysis --theme phot
 paperwb writing-packet --project zis_photocatalysis --theme photocorrosion --out scratch/writing_packet.md --force
 paperwb manuscript qa drafts/synthetic_overconfident_section.md --project zis_photocatalysis --out scratch/manuscript_qa.md --force
 paperwb review-packet create --project zis_photocatalysis --theme photocorrosion --out scratch/review_packet_photocorrosion --force
+# Fill scratch/review_packet_photocorrosion/comments.csv before importing comments.
 paperwb review-packet import-comments scratch/review_packet_photocorrosion/comments.csv --project zis_photocatalysis --theme photocorrosion --dry-run
 
 # Reading and safety

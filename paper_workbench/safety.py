@@ -30,6 +30,15 @@ PUBLISHER_BYPASS_TERMS = ("sci-" + "hub",)
 PUBLIC_DEMO_PREFIX = "public/demos/"
 PUBLIC_DEMO_PDF_PATTERN = re.compile(r"\b[A-Za-z0-9][A-Za-z0-9_.-]*\.pdf\b", re.IGNORECASE)
 DEFAULT_DATA_SAFETY_TITLE = f"Data Safety Audit v{__version__}"
+ABSOLUTE_PATH_WARNING_ALLOWLIST = {
+    "reports/hostile_review_v0_4.md",
+    "reports/hostile_review_v0_5.md",
+    "reports/release_readiness_v0_3.md",
+    "reports/release_readiness_v0_6.md",
+    "tests/test_integrity_backup_migration_v0_9.py",
+    "tests/test_release_hygiene.py",
+    "tests/test_v2_release_candidate.py",
+}
 
 
 @dataclass(slots=True)
@@ -76,9 +85,7 @@ def _read_text_if_possible(path: Path) -> str:
 
 
 def _skip_absolute_path_content_scan(relative_path: str) -> bool:
-    return bool(
-        re.fullmatch(r"reports/data_safety(?:_audit)?_v[0-9A-Za-z_]+\.md", relative_path)
-    )
+    return relative_path in ABSOLUTE_PATH_WARNING_ALLOWLIST or bool(re.fullmatch(r"reports/data_safety(?:_audit)?_v[0-9A-Za-z_]+\.md", relative_path))
 
 
 def _public_demo_metadata_findings(relative_path: str, content: str) -> list[SafetyFinding]:

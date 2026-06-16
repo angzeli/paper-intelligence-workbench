@@ -26,6 +26,10 @@ A packet directory contains:
 When `--draft` is supplied, the packet also includes draft parse and audit
 outputs. Draft review remains heuristic and local; it does not rewrite prose.
 
+The generated `comments.csv` is a reviewer template. Untouched rows are skipped
+during import with a warning; reviewers should fill `comment` or
+`recommendation` on rows they want imported.
+
 ## Boundary
 
 Review packets expose only the local metadata and evidence reports the user

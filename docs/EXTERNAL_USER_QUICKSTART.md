@@ -23,7 +23,7 @@ paperwb init --root scratch/first_workspace
 
 This creates local folders without overwriting existing user files.
 
-## 3. Validate A Clean Synthetic Project
+## 3. Validate Bundled Synthetic Metadata
 
 ```bash
 paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict
@@ -31,8 +31,10 @@ paperwb validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry p
 ```
 
 Use `--strict` when a validation error should fail a script or CI job. The
-legacy `data/` examples intentionally contain validation findings and are useful
-for seeing what audits catch.
+`zis_photocatalysis` project has clean registry structure but intentionally
+imperfect evidence tracking so later reports have findings to display. The
+legacy `data/` examples also intentionally contain validation findings and are
+useful for seeing what audits catch.
 
 ## 4. Generate A Note Template
 

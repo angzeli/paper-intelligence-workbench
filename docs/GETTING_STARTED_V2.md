@@ -46,10 +46,16 @@ planning report without copying files or writing registry rows:
 paperwb dogfood plan-from-files photocatalysis --project fyp_zis_lit_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
 ```
 
-## Try A Clean Synthetic Project
+## Try Bundled Synthetic Fixtures
 
 Use `--strict` when you want validation commands to return non-zero for
 error-level findings.
+
+The bundled `zis_photocatalysis` project is intentionally imperfect so evidence
+gap, rule, dashboard, and workflow reports have real findings to display. Use
+template-created projects such as `my_review` as the clean first-use scaffold;
+use `zis_photocatalysis` when you want to see populated synthetic evidence
+reports.
 
 ```bash
 paperwb validate-registry projects/zis_photocatalysis/registry.csv --strict

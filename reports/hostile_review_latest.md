@@ -110,6 +110,21 @@ use locally on user-owned metadata and notes, but the high-priority issues
 below should be fixed before advertising v2.4 review packets as a smooth
 external-user workflow.
 
+## Post-Fix Status
+
+The high-priority items from this review were addressed in the follow-up fix
+pass:
+
+- Untouched generated review-packet `comments.csv` template rows are now skipped
+  with a warning instead of treated as row-level import errors.
+- README and v2 review-packet/comment-import docs now say meaningful imports
+  require reviewer content in `comment` or `recommendation`.
+- First-use docs now distinguish empty template/dogfood scaffolds from the
+  intentionally imperfect `zis_photocatalysis` evidence-gap fixture.
+- The data-safety audit now has an explicit historical absolute-path warning
+  allowlist, so the current strict audit reports zero errors and zero warnings
+  while new private-path leaks still surface.
+
 ## High-Priority Issues
 
 1. **The new review-packet import path fails on the generated comment

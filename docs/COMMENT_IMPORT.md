@@ -3,6 +3,11 @@
 Reviewer comments are collected in the packet `comments.csv` file and imported
 separately from project evidence.
 
+The generated `comments.csv` is a template. Rows with no `comment` and no
+`recommendation` are treated as untouched template rows and skipped with a
+warning. Add at least one of those fields before expecting a comment to be
+imported.
+
 ```bash
 paperwb review-packet import-comments scratch/review_packet_photocorrosion/comments.csv \
   --project zis_photocatalysis \

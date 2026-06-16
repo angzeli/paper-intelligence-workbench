@@ -354,8 +354,14 @@ def import_reviewer_comments(
         return result
 
     seen_ids: set[str] = set()
+    skipped_template_rows = 0
     for index, row in enumerate(rows, start=2):
+        comment_text = str(row.get("comment", "") or "").strip()
+        recommendation = str(row.get("recommendation", "") or "").strip()
         if not any(str(row.get(field, "") or "").strip() for field in ("comment_id", "item_id", "comment", "recommendation")):
+            continue
+        if not comment_text and not recommendation and str(row.get("item_id", "") or "").strip() and not str(row.get("comment_id", "") or "").strip():
+            skipped_template_rows += 1
             continue
         try:
             comment = _comment_from_row(row, source_path=display_path(comments_csv), row_number=index)
@@ -369,6 +375,8 @@ def import_reviewer_comments(
         if known_ids and comment.item_id not in known_ids:
             result.errors.append(f"Row {index}: unknown review item {comment.item_id!r}.")
         result.comments.append(comment)
+    if skipped_template_rows:
+        result.warnings.append(f"Skipped {skipped_template_rows} untouched review template row(s). Add a comment or recommendation before import.")
 
     if result.errors or dry_run:
         return result

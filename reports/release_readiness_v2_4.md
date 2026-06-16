@@ -24,6 +24,8 @@ Package metadata: 2.4
 - Comment import never rewrites claims, notes, registry rows, BibTeX entries,
   or evidence locations.
 - Comment import defaults to dry-run unless `--force` is supplied.
+- Untouched generated `comments.csv` template rows are skipped with a warning
+  instead of reported as row errors.
 
 ## Commands Checked
 
@@ -41,6 +43,7 @@ Package metadata: 2.4
 - Packet creation and manifest generation.
 - CSV comment template generation.
 - Comment import dry-run behavior.
+- Untouched generated comment-template rows.
 - Invalid comment rows and unknown item IDs.
 - Response and follow-up report generation.
 - No automatic claim overwrite behavior.
@@ -55,6 +58,10 @@ Package metadata: 2.4
 - Review packet creation, dry-run comment import, forced comment import,
   comments report, response report, and follow-up report were checked on the
   synthetic `zis_photocatalysis` project.
+- Post-review high-priority checks confirmed generated blank comment templates
+  import as a no-op warning, data-safety audit reports 0 errors and 0 warnings,
+  and public quickstarts distinguish clean scaffolds from intentionally
+  imperfect bundled evidence-gap fixtures.
 
 ## Reports Generated
 

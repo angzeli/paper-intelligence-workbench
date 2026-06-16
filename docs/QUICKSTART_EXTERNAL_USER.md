@@ -25,8 +25,9 @@ No copyrighted PDFs are included.
 
 ## 3. Run the Safe First Workflow
 
-Start with the clean bundled project profile. Use `--strict` when validation
-errors should make a script fail.
+Start with the bundled project profile. Its registry is valid, but the project
+intentionally contains evidence gaps so later audit reports have findings to
+display. Use `--strict` when validation errors should make a script fail.
 
 Validate the registry:
 

@@ -5,6 +5,7 @@ import subprocess
 from conftest import ROOT
 from paper_workbench import __version__
 from paper_workbench.exports import report_index_markdown
+from paper_workbench.safety import ABSOLUTE_PATH_WARNING_ALLOWLIST, audit_data_safety
 
 
 def test_ci_workflow_runs_release_gates():
@@ -26,6 +27,14 @@ def test_versioned_hostile_review_drafts_are_ignored_but_latest_is_not():
 
     assert "reports/hostile_review_v0_*.md" in ignore
     assert "reports/hostile_review_latest.md" not in ignore
+
+
+def test_data_safety_absolute_path_allowlist_keeps_current_audit_clear():
+    result = audit_data_safety(ROOT)
+
+    assert not result.errors
+    assert not [finding for finding in result.warnings if finding.code == "absolute_local_path"]
+    assert "reports/hostile_review_v0_4.md" in ABSOLUTE_PATH_WARNING_ALLOWLIST
 
 
 def test_report_index_groups_current_historical_and_next_reports(tmp_path):
@@ -108,7 +117,7 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     assert "[release_readiness_v2_0_rc.md]" in historical_section
 
 
-def test_public_quickstarts_use_clean_strict_validation_examples():
+def test_public_quickstarts_label_bundled_zis_project_as_imperfect():
     docs = [
         ROOT / "README.md",
         ROOT / "docs" / "GETTING_STARTED_V2.md",
@@ -122,6 +131,9 @@ def test_public_quickstarts_use_clean_strict_validation_examples():
             "validate-bib projects/zis_photocatalysis/bibtex/library.bib --registry projects/zis_photocatalysis/registry.csv --strict"
             in content
         )
+    getting_started = (ROOT / "docs" / "GETTING_STARTED_V2.md").read_text(encoding="utf-8")
+    assert "intentionally imperfect" in getting_started
+    assert "clean first-use scaffold" in getting_started
 
 
 def test_command_contracts_document_non_strict_validation_exit_behavior():
