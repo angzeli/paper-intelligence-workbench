@@ -230,6 +230,13 @@ from .sync import (
     sync_plan_report,
     write_registry_apply_result,
 )
+from .support import (
+    create_support_bundle,
+    redaction_preview_markdown,
+    reproduction_markdown,
+    support_bundle_markdown,
+    support_doctor_markdown,
+)
 from .tags import load_themes, normalize_tag, normalize_theme_id
 from .templates import create_project_from_template, inspect_template, list_templates, template_summary
 from .workflow import (
@@ -2331,6 +2338,65 @@ def cmd_synthetic_generate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_support_bundle(args: argparse.Namespace) -> int:
+    if args.sample_limit <= 0:
+        raise ValueError("support --sample-limit must be a positive integer")
+    bundle = create_support_bundle(
+        project=args.project,
+        root=args.root,
+        out_dir=args.out or None,
+        safe=not args.verbose_local_only,
+        verbose_local_only=args.verbose_local_only,
+        force=args.force,
+        sample_limit=args.sample_limit,
+    )
+    print(f"Wrote support bundle to {bundle.out_dir}")
+    print(f"Project: {bundle.project}")
+    print(f"Safe mode: {str(bundle.safe).lower()}")
+    print(f"Verbose local-only mode: {str(bundle.verbose_local_only).lower()}")
+    print(f"Files: {len(bundle.files_written)}")
+    if args.print_report:
+        print(support_bundle_markdown(bundle), end="")
+    return 0
+
+
+def cmd_support_doctor(args: argparse.Namespace) -> int:
+    content = support_doctor_markdown(args.project, root=args.root)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_support_redact_preview(args: argparse.Namespace) -> int:
+    if args.sample_limit <= 0:
+        raise ValueError("support redact-preview --sample-limit must be a positive integer")
+    content = redaction_preview_markdown(
+        args.project,
+        root=args.root,
+        verbose_local_only=args.verbose_local_only,
+        sample_limit=args.sample_limit,
+    )
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
+def cmd_support_reproduce(args: argparse.Namespace) -> int:
+    content = reproduction_markdown(args.project, root=args.root)
+    if args.out:
+        path = write_text(args.out, content, force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(content, end="")
+    return 0
+
+
 def cmd_integrity_check(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     paths = _paths_from_args(args)
@@ -2757,7 +2823,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Local-first academic paper registry, notes, claims, BibTeX, and audit workbench.",
         epilog=(
             "Stable starting points: init, project, template, dogfood, validate-registry, "
-            "validate-bib, note-template, claims, report, dashboard, doctor.\n"
+            "validate-bib, note-template, claims, report, dashboard, doctor, support.\n"
             "Experimental or safety-sensitive workflows: workflow, sync, index, rebuild, files, draft, "
             "manuscript, reading, backup, migrate, rules, graph, claim-review, "
             "contradictions, review-packet. See docs/STABLE_SURFACE_V3.md and docs/CLI_REFERENCE_V3.md."
@@ -2824,6 +2890,43 @@ def build_parser() -> argparse.ArgumentParser:
     dogfood_plan.add_argument("--out", help="Optional Markdown output path.")
     dogfood_plan.add_argument("--force", action="store_true", help="Overwrite an existing output path.")
     dogfood_plan.set_defaults(func=cmd_dogfood_plan_from_files)
+
+    support_parser = subparsers.add_parser("support", help="Create sanitized local diagnostic support bundles.")
+    support_sub = support_parser.add_subparsers(dest="support_command", required=True)
+
+    def add_support_common(command_parser: argparse.ArgumentParser) -> None:
+        command_parser.add_argument("--project", default="", help="Use a project profile instead of default data/ paths.")
+        command_parser.add_argument("--root", default=".", help="Workspace root. Defaults to the current directory.")
+
+    support_bundle = support_sub.add_parser("bundle", help="Write a sanitized support bundle directory.")
+    add_support_common(support_bundle)
+    support_bundle.add_argument("--out", default="", help="Output bundle directory. Defaults to support_bundles/<project>_support_bundle.")
+    support_bundle.add_argument("--safe", action="store_true", help="Use safe redaction mode. This is the default.")
+    support_bundle.add_argument("--verbose-local-only", action="store_true", help="Include more local metadata for private debugging; inspect before sharing.")
+    support_bundle.add_argument("--sample-limit", type=int, default=20, help="Maximum sanitized registry/claim sample rows to export.")
+    support_bundle.add_argument("--force", action="store_true", help="Rewrite known bundle files in an existing output directory.")
+    support_bundle.add_argument("--print-report", action="store_true", help="Print a short Markdown bundle summary after writing files.")
+    support_bundle.set_defaults(func=cmd_support_bundle)
+
+    support_doctor = support_sub.add_parser("doctor", help="Print sanitized diagnostic summary without creating a bundle.")
+    add_support_common(support_doctor)
+    support_doctor.add_argument("--out", default="", help="Optional Markdown output path.")
+    support_doctor.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    support_doctor.set_defaults(func=cmd_support_doctor)
+
+    support_redact = support_sub.add_parser("redact-preview", help="Preview sanitized sample rows and redaction rules.")
+    add_support_common(support_redact)
+    support_redact.add_argument("--verbose-local-only", action="store_true", help="Preview less-redacted local-only mode.")
+    support_redact.add_argument("--sample-limit", type=int, default=5, help="Maximum sample rows to show.")
+    support_redact.add_argument("--out", default="", help="Optional Markdown output path.")
+    support_redact.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    support_redact.set_defaults(func=cmd_support_redact_preview)
+
+    support_reproduce = support_sub.add_parser("reproduce", help="Print local reproduction commands for basic diagnostics.")
+    add_support_common(support_reproduce)
+    support_reproduce.add_argument("--out", default="", help="Optional Markdown output path.")
+    support_reproduce.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    support_reproduce.set_defaults(func=cmd_support_reproduce)
 
     workflow_parser = subparsers.add_parser("workflow", help="List, validate, and run declarative local workflow recipes.")
     workflow_sub = workflow_parser.add_subparsers(dest="workflow_command", required=True)
