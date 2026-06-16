@@ -18,8 +18,8 @@ def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_v2_release_candidate_version_metadata() -> None:
-    assert __version__ == "2.4"
-    assert 'version = "2.4"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "2.5"
+    assert 'version = "2.5"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v2_surface_docs_exist_and_classify_core_commands() -> None:
@@ -64,13 +64,13 @@ def test_v2_release_reports_are_current_and_sanitized() -> None:
         assert "/private/tmp/" not in content
 
     index = (ROOT / "reports" / "index.md").read_text(encoding="utf-8")
-    assert "## Current v2.4 Release Reports" in index
-    current_section = index.split("## Current v2.4 Release Reports", 1)[1]
+    assert "## Current v2.5 Release Reports" in index
+    current_section = index.split("## Current v2.5 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
-    assert "[release_readiness_v2_4.md]" in current_section
-    assert "[reviewer_comments_v2_4.md]" in current_section
-    assert "[response_to_review_v2_4.md]" in current_section
+    assert "[release_readiness_v2_5.md]" in current_section
+    assert "[performance_sanity_v2_5.md]" in current_section
+    assert "[incremental_rebuild_plan_v2_5.md]" in current_section
     historical_section = index.split("## Historical Versioned Reports", 1)[1]
     assert "[release_readiness_v2_2.md]" in historical_section
     assert "[release_readiness_v2_1.md]" in historical_section

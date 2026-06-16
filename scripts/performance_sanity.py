@@ -14,6 +14,7 @@ from paper_workbench.audit import citation_audit
 from paper_workbench.bibtex import parse_bibtex_file, validate_bibtex
 from paper_workbench.claims import collect_notes
 from paper_workbench.doctor import workspace_health
+from paper_workbench.index import build_index_records, index_status, rebuild_index
 from paper_workbench.io import write_text
 from paper_workbench.registry import load_registry, validate_registry
 from paper_workbench.reporting import evidence_map_report
@@ -74,6 +75,28 @@ def build_report(papers: int, claims: int, themes: int) -> str:
                 reports_dir=reports_dir,
             ),
         )
+        index_records = _timed(
+            "build search-index records",
+            timings,
+            lambda: build_index_records(
+                project_id=summary.project,
+                registry_path=registry_path,
+                bibtex_path=bibtex_path,
+                notes_dir=notes_dir,
+                themes_path=themes_path,
+            ),
+        )
+        index_path = project / ".paperwb" / "index.sqlite"
+        index_rebuild_status = _timed(
+            "rebuild SQLite search index",
+            timings,
+            lambda: rebuild_index(index_path, index_records, project_id=summary.project),
+        )
+        index_check = _timed(
+            "check search-index status",
+            timings,
+            lambda: index_status(index_path, project_id=summary.project, current_records=index_records),
+        )
         evidence_map = _timed("build evidence map", timings, lambda: evidence_map_report(loaded_papers, parsed_claims, theme_defs, notes))
 
     lines = [
@@ -88,10 +111,11 @@ def build_report(papers: int, claims: int, themes: int) -> str:
         f"- Requested themes: {themes}",
         f"- Parsed papers: {len(loaded_papers)}",
         f"- Parsed notes: {len(notes)}",
-        f"- Parsed claims: {len(parsed_claims)}",
-        f"- Parsed BibTeX entries: {len(entries)}",
-        "",
-        "## Timings",
+            f"- Parsed claims: {len(parsed_claims)}",
+            f"- Parsed BibTeX entries: {len(entries)}",
+            f"- Search-index records: {len(index_records)}",
+            "",
+            "## Timings",
         "",
         "| Step | Seconds |",
         "| --- | ---: |",
@@ -107,6 +131,8 @@ def build_report(papers: int, claims: int, themes: int) -> str:
             f"- BibTeX findings: {len(bibtex_findings)}",
             f"- Citation-audit findings: {len(audit_findings)}",
             f"- Workspace-health findings: {len(health_findings)}",
+            f"- Search-index warnings: {len(index_check.warnings)}",
+            f"- Search-index records stored: {index_rebuild_status.total_records}",
             f"- Evidence-map size: {len(evidence_map)} characters",
             "",
             "## Result",
