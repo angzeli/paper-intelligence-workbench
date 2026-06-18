@@ -2,22 +2,21 @@
 
 Reports directory: .
 
-Markdown reports indexed: 226
+Markdown reports indexed: 231
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v3.2 Release Reports
+## Current v3.3 Release Reports
 
-- [compatibility_matrix_v3_2.md](compatibility_matrix_v3_2.md)
+- [ci_matrix_v3_3.md](ci_matrix_v3_3.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [legacy_migration_dry_run_v3_2.md](legacy_migration_dry_run_v3_2.md)
-- [partial_migration_conflict_v3_2.md](partial_migration_conflict_v3_2.md)
-- [release_readiness_v3_2.md](release_readiness_v3_2.md)
-- [schema_preservation_v3_2.md](schema_preservation_v3_2.md)
+- [quality_gate_v3_3.md](quality_gate_v3_3.md)
+- [release_readiness_v3_3.md](release_readiness_v3_3.md)
+- [type_lint_summary_v3_3.md](type_lint_summary_v3_3.md)
 
 ## Next Patch Plan
 
-- [v3_3_recommended_patch_plan.md](v3_3_recommended_patch_plan.md)
+- [v3_4_recommended_patch_plan.md](v3_4_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -43,6 +42,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [claims_used_in_drafts_v2_2.md](claims_used_in_drafts_v2_2.md)
 - [clean_room_install_check_v1_0_rc.md](clean_room_install_check_v1_0_rc.md)
 - [cli_smoke_workflow_v2_2.md](cli_smoke_workflow_v2_2.md)
+- [compatibility_matrix_v3_2.md](compatibility_matrix_v3_2.md)
 - [contradictions_v2_2.md](contradictions_v2_2.md)
 - [dashboard_v1_6.md](dashboard_v1_6.md)
 - [dashboard_v2_3.md](dashboard_v2_3.md)
@@ -86,6 +86,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [index_v2_0_rc.md](index_v2_0_rc.md)
 - [inventory_v0_2.md](inventory_v0_2.md)
 - [known_limitations_v1_0_rc.md](known_limitations_v1_0_rc.md)
+- [legacy_migration_dry_run_v3_2.md](legacy_migration_dry_run_v3_2.md)
 - [local_files_audit_v0_7.md](local_files_audit_v0_7.md)
 - [local_files_audit_v2_3.md](local_files_audit_v2_3.md)
 - [manuscript_qa_v1_4.md](manuscript_qa_v1_4.md)
@@ -102,6 +103,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [orphan_nodes_v2_1.md](orphan_nodes_v2_1.md)
 - [paragraph_evidence_matrix_v1_1.md](paragraph_evidence_matrix_v1_1.md)
 - [paragraph_plan_v0_6.md](paragraph_plan_v0_6.md)
+- [partial_migration_conflict_v3_2.md](partial_migration_conflict_v3_2.md)
 - [performance_sanity_v0_3.md](performance_sanity_v0_3.md)
 - [performance_sanity_v2_5.md](performance_sanity_v2_5.md)
 - [photocorrosion_section_outline_v0_3.md](photocorrosion_section_outline_v0_3.md)
@@ -150,6 +152,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v2_6.md](release_readiness_v2_6.md)
 - [release_readiness_v3_0_rc.md](release_readiness_v3_0_rc.md)
 - [release_readiness_v3_1.md](release_readiness_v3_1.md)
+- [release_readiness_v3_2.md](release_readiness_v3_2.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
@@ -163,6 +166,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [rule_config_audit_v1_5.md](rule_config_audit_v1_5.md)
 - [rule_report_v1_5.md](rule_report_v1_5.md)
 - [rule_report_v2_3.md](rule_report_v2_3.md)
+- [schema_preservation_v3_2.md](schema_preservation_v3_2.md)
 - [search_demo_v0_5.md](search_demo_v0_5.md)
 - [stress_bibtex_audit_v0_3.md](stress_bibtex_audit_v0_3.md)
 - [stress_citation_audit_v0_3.md](stress_citation_audit_v0_3.md)
@@ -208,6 +212,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v2_6_recommended_patch_plan.md](v2_6_recommended_patch_plan.md)
 - [v3_0_rc_recommended_patch_plan.md](v3_0_rc_recommended_patch_plan.md)
 - [v3_2_recommended_patch_plan.md](v3_2_recommended_patch_plan.md)
+- [v3_3_recommended_patch_plan.md](v3_3_recommended_patch_plan.md)
 - [verified_claims_v2_2.md](verified_claims_v2_2.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
