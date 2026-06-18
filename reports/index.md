@@ -2,21 +2,20 @@
 
 Reports directory: .
 
-Markdown reports indexed: 236
+Markdown reports indexed: 240
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
-## Current v3.4 Release Reports
+## Current v3.5 Release Reports
 
-- [command_reference_audit_v3_4.md](command_reference_audit_v3_4.md)
-- [cookbook_inventory_v3_4.md](cookbook_inventory_v3_4.md)
-- [docs_audit_v3_4.md](docs_audit_v3_4.md)
+- [external_workspace_safety_v3_5.md](external_workspace_safety_v3_5.md)
 - [hostile_review_latest.md](hostile_review_latest.md)
-- [release_readiness_v3_4.md](release_readiness_v3_4.md)
+- [private_dogfooding_adapter_v3_5.md](private_dogfooding_adapter_v3_5.md)
+- [release_readiness_v3_5.md](release_readiness_v3_5.md)
 
 ## Next Patch Plan
 
-- [v3_5_recommended_patch_plan.md](v3_5_recommended_patch_plan.md)
+- [v3_6_recommended_patch_plan.md](v3_6_recommended_patch_plan.md)
 
 ## Historical Versioned Reports
 
@@ -43,8 +42,10 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [claims_used_in_drafts_v2_2.md](claims_used_in_drafts_v2_2.md)
 - [clean_room_install_check_v1_0_rc.md](clean_room_install_check_v1_0_rc.md)
 - [cli_smoke_workflow_v2_2.md](cli_smoke_workflow_v2_2.md)
+- [command_reference_audit_v3_4.md](command_reference_audit_v3_4.md)
 - [compatibility_matrix_v3_2.md](compatibility_matrix_v3_2.md)
 - [contradictions_v2_2.md](contradictions_v2_2.md)
+- [cookbook_inventory_v3_4.md](cookbook_inventory_v3_4.md)
 - [dashboard_v1_6.md](dashboard_v1_6.md)
 - [dashboard_v2_3.md](dashboard_v2_3.md)
 - [data_safety_audit_v0_10.md](data_safety_audit_v0_10.md)
@@ -55,6 +56,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [data_safety_v2_0_rc.md](data_safety_v2_0_rc.md)
 - [data_safety_v3_0_rc.md](data_safety_v3_0_rc.md)
 - [deprecated_claims_v2_2.md](deprecated_claims_v2_2.md)
+- [docs_audit_v3_4.md](docs_audit_v3_4.md)
 - [dogfooding_project_template_v2_0.md](dogfooding_project_template_v2_0.md)
 - [dogfooding_workflow_v1_7.md](dogfooding_workflow_v1_7.md)
 - [draft_audit_v1_1.md](draft_audit_v1_1.md)
@@ -156,6 +158,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v3_1.md](release_readiness_v3_1.md)
 - [release_readiness_v3_2.md](release_readiness_v3_2.md)
 - [release_readiness_v3_3.md](release_readiness_v3_3.md)
+- [release_readiness_v3_4.md](release_readiness_v3_4.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
@@ -218,6 +221,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [v3_2_recommended_patch_plan.md](v3_2_recommended_patch_plan.md)
 - [v3_3_recommended_patch_plan.md](v3_3_recommended_patch_plan.md)
 - [v3_4_recommended_patch_plan.md](v3_4_recommended_patch_plan.md)
+- [v3_5_recommended_patch_plan.md](v3_5_recommended_patch_plan.md)
 - [verified_claims_v2_2.md](verified_claims_v2_2.md)
 - [weak_claims_v0_2.md](weak_claims_v0_2.md)
 - [weekly_reading_review_v1_2.md](weekly_reading_review_v1_2.md)
