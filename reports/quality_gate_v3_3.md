@@ -17,3 +17,5 @@ Skipped optional steps: 3
 | check notebooks | pass | `python scripts/check_notebooks.py` |
 | data safety audit | pass | `python scripts/data_safety_audit.py --out scratch/quality_gate_data_safety.md --strict` |
 | build distributions | skipped (missing Python module: setuptools.build_meta) | `python -m build --sdist --wheel --no-isolation` |
+
+> Diagnostic note: skipped optional steps mean this report is not a strict release-gate pass.

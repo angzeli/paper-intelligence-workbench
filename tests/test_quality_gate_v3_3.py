@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import subprocess
+from pathlib import Path
+
+import pytest
 
 from scripts import run_quality_gate as quality_gate
 
@@ -18,6 +21,14 @@ def test_release_target_includes_expected_gate_steps():
     assert "check notebooks" in names
     assert "data safety audit" in names
     assert "build distributions" in names
+
+
+def test_local_diagnostic_target_matches_release_steps():
+    release_names = [step.name for step in quality_gate.expand_targets(["release"])]
+    diagnostic_names = [step.name for step in quality_gate.expand_targets(["local-diagnostic"])]
+
+    assert diagnostic_names == release_names
+    assert "local-diagnostic" in quality_gate.available_targets()
 
 
 def test_quality_gate_steps_use_argument_vectors_not_shell_strings():
@@ -45,6 +56,42 @@ def test_missing_tool_can_be_skipped(monkeypatch):
     assert results[0].skipped
     assert results[0].returncode == 0
     assert "missing Python module: ruff" == results[0].reason
+
+
+def test_release_target_rejects_allow_missing_tools():
+    with pytest.raises(SystemExit) as excinfo:
+        quality_gate.main(["release", "--allow-missing-tools"])
+
+    assert excinfo.value.code == 2
+
+
+def test_local_diagnostic_enables_missing_tool_allowance(monkeypatch):
+    captured = {}
+    step = quality_gate.QualityStep("ruff lint", ("python", "-m", "ruff", "check"), tool_module="ruff")
+
+    monkeypatch.setattr(quality_gate, "expand_targets", lambda targets: [step])
+
+    def fake_run_steps(steps, *, allow_missing_tools):
+        captured["allow_missing_tools"] = allow_missing_tools
+        return [quality_gate.QualityResult(step, 0, skipped=True, reason="missing Python module: ruff")]
+
+    monkeypatch.setattr(quality_gate, "run_steps", fake_run_steps)
+
+    assert quality_gate.main(["local-diagnostic"]) == 0
+    assert captured["allow_missing_tools"] is True
+
+
+def test_quality_docs_use_local_diagnostic_for_missing_tools():
+    docs = [
+        Path("docs/QUALITY_GATE.md"),
+        Path("docs/DEVELOPMENT_WORKFLOW.md"),
+        Path("docs/RELEASE_VALIDATION.md"),
+    ]
+
+    for doc in docs:
+        text = doc.read_text(encoding="utf-8")
+        assert "release --allow-missing-tools" not in text
+        assert "local-diagnostic" in text
 
 
 def test_missing_tool_fails_without_allowance(monkeypatch):
@@ -86,6 +133,7 @@ def test_results_markdown_records_skipped_and_failed_steps():
 
     assert "Skipped optional steps: 1" in markdown
     assert "| ruff lint | skipped (missing Python module: ruff)" in markdown
+    assert "not a strict release-gate pass" in markdown
     assert "### pytest" in markdown
     assert "failed" in markdown
 

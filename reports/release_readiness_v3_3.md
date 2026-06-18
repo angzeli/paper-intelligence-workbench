@@ -2,7 +2,8 @@
 
 ## Verdict
 
-Ready for local dogfooding after quality-gate validation.
+Ready for local dogfooding after available local quality checks. Strict release
+validation still requires the development-tool environment used by CI.
 
 v3.3 is a maintainability patch. It adds quality tooling, CI hardening, and
 release validation structure without changing product workflows.
@@ -31,18 +32,32 @@ paperwb --help
 
 ## Local Validation Result
 
-The v3.3 release gate was run locally with `--allow-missing-tools` because the
-current environment does not have ruff installed and its local setuptools import
-is broken. The gate passed all available checks:
+The strict release gate remains:
+
+```bash
+python scripts/run_quality_gate.py release
+```
+
+In this local environment the strict gate cannot complete because Ruff is not
+installed and `setuptools.build_meta` is not importable through the local
+setuptools chain. The previous `release --allow-missing-tools` path has been
+replaced with an explicit diagnostic target:
+
+```bash
+python scripts/run_quality_gate.py local-diagnostic
+```
+
+The local diagnostic gate passed all available checks and labels skipped
+tool-backed steps as diagnostic, not release-ready:
 
 - mypy scripts: pass
 - pytest: pass
 - CLI smoke workflow: pass
 - notebook validation: pass
 - data-safety audit: pass
-- ruff lint: skipped locally, installed in CI through `.[dev]`
-- ruff format-check: skipped locally, installed in CI through `.[dev]`
-- build distributions: skipped locally because `setuptools.build_meta` is not
+- ruff lint: diagnostic skip locally, installed in CI through `.[dev]`
+- ruff format-check: diagnostic skip locally, installed in CI through `.[dev]`
+- build distributions: diagnostic skip locally because `setuptools.build_meta` is not
   importable in this environment
 
 ## Known Limitations
@@ -51,6 +66,8 @@ is broken. The gate passed all available checks:
   it through development extras.
 - Build validation uses `--no-isolation` to avoid network-backed dependency
   installation during local release checks.
+- `local-diagnostic` output is useful for bootstrap environments but is not a
+  strict release-gate pass.
 - Ruff rules are intentionally narrow in v3.3.
 - Ruff format-check is scoped to the new quality-gate script to avoid broad
   formatting churn.

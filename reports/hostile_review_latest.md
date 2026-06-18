@@ -32,6 +32,11 @@ report using `--allow-missing-tools`, which is transparent, but it is not the
 same thing as a strict release gate. That is a high-priority release-readiness
 issue, not a data-loss blocker.
 
+Post-review fix status: addressed in the follow-up pass by adding an explicit
+`local-diagnostic` target, rejecting `release --allow-missing-tools`, and
+regenerating the v3.3 quality/readiness reports so skipped tool-backed checks
+are not described as a strict release-gate pass.
+
 ## Validation Performed
 
 - `git status --short --branch --ignored`: branch `main...origin/main [ahead
@@ -127,6 +132,11 @@ None found for local dogfooding.
    and a clearly named bootstrap diagnostic gate. Keep `--allow-missing-tools`
    out of release-verdict language unless the skipped steps are explicitly
    called non-blocking.
+
+   Post-review status: fixed by splitting skipped-tool runs into
+   `local-diagnostic` and rejecting `release --allow-missing-tools`. The strict
+   release gate still requires Ruff/build tooling to be available locally or in
+   CI.
 
 ## Medium-Priority Issues
 

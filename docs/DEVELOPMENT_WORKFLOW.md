@@ -42,7 +42,7 @@ In a bootstrap environment without optional tools, this command can be used only
 as a diagnostic preview:
 
 ```bash
-python scripts/run_quality_gate.py release --allow-missing-tools
+python scripts/run_quality_gate.py local-diagnostic
 ```
 
 CI and release validation should not skip missing tools.

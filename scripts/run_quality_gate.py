@@ -121,10 +121,11 @@ def build_step_groups() -> dict[str, list[QualityStep]]:
 
 
 RELEASE_GROUPS = ("lint", "format-check", "type-check", "tests", "smoke", "notebooks", "data-safety", "build")
+DIAGNOSTIC_TARGET = "local-diagnostic"
 
 
 def available_targets() -> list[str]:
-    return sorted([*build_step_groups().keys(), "release"])
+    return sorted([*build_step_groups().keys(), DIAGNOSTIC_TARGET, "release"])
 
 
 def expand_targets(targets: list[str]) -> list[QualityStep]:
@@ -133,7 +134,7 @@ def expand_targets(targets: list[str]) -> list[QualityStep]:
     steps: list[QualityStep] = []
     seen: set[str] = set()
     for target in selected:
-        group_names = RELEASE_GROUPS if target == "release" else (target,)
+        group_names = RELEASE_GROUPS if target in {"release", DIAGNOSTIC_TARGET} else (target,)
         for group_name in group_names:
             if group_name not in groups:
                 raise ValueError(f"Unknown quality target: {target}")
@@ -217,6 +218,13 @@ def results_markdown(results: list[QualityResult]) -> str:
         else:
             status = f"fail {result.returncode}"
         lines.append(f"| {result.step.name} | {status} | `{_display_command(result.step)}` |")
+    if skipped:
+        lines.extend(
+            [
+                "",
+                "> Diagnostic note: skipped optional steps mean this report is not a strict release-gate pass.",
+            ]
+        )
     if failures:
         lines.extend(["", "## Failure Details", ""])
         for result in failures:
@@ -244,14 +252,18 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run Paper Workbench quality gate targets.")
     parser.add_argument("targets", nargs="*", help="Gate targets. Defaults to release.")
     parser.add_argument("--list", action="store_true", help="List available targets and steps.")
-    parser.add_argument("--allow-missing-tools", action="store_true", help="Skip optional tool-backed steps when tools are not installed.")
+    parser.add_argument(
+        "--allow-missing-tools",
+        action="store_true",
+        help="Skip optional tool-backed steps for non-release diagnostic targets.",
+    )
     parser.add_argument("--out", default="", help="Optional Markdown report path.")
     args = parser.parse_args(argv)
 
     if args.list:
         groups = build_step_groups()
         for target in available_targets():
-            if target == "release":
+            if target in {"release", DIAGNOSTIC_TARGET}:
                 print(f"{target}: {', '.join(RELEASE_GROUPS)}")
                 continue
             step_names = ", ".join(step.name for step in groups[target])
@@ -261,8 +273,12 @@ def main(argv: list[str] | None = None) -> int:
     unknown_targets = sorted(set(args.targets) - set(available_targets()))
     if unknown_targets:
         parser.error(f"unknown target(s): {', '.join(unknown_targets)}")
+    selected_targets = args.targets or ["release"]
+    if args.allow_missing_tools and "release" in selected_targets:
+        parser.error("--allow-missing-tools is not allowed for release; use local-diagnostic instead")
     steps = expand_targets(args.targets)
-    results = run_steps(steps, allow_missing_tools=args.allow_missing_tools)
+    allow_missing_tools = args.allow_missing_tools or DIAGNOSTIC_TARGET in selected_targets
+    results = run_steps(steps, allow_missing_tools=allow_missing_tools)
     print_summary(results)
     if args.out:
         out_path = Path(args.out)
