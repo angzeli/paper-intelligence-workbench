@@ -10,6 +10,8 @@ paperwb init
 paperwb project list
 paperwb template list
 paperwb dogfood create photocatalysis --project fyp_zis_lit_review
+paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_real
+paperwb external validate fyp_zis_real --strict
 paperwb validate-registry projects/clean_demo/registry.csv --strict
 paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict
 paperwb list --project clean_demo
@@ -21,6 +23,24 @@ paperwb support doctor --project clean_demo
 paperwb support bundle --project clean_demo --out scratch/clean_demo_support_bundle
 paperwb compatibility inspect tests/fixtures/workspaces/v0_1_legacy_data
 ```
+
+## External Private Workspaces
+
+```bash
+paperwb external add NAME <external_workspace> --project PROJECT
+paperwb external list
+paperwb external validate NAME --strict
+paperwb external run NAME doctor
+paperwb external run NAME dashboard
+paperwb external run NAME validate-registry --strict
+paperwb external run NAME validate-bib --strict
+paperwb external run NAME support-bundle
+paperwb external remove NAME
+```
+
+External registrations are stored in ignored `.paperwb-local/workspaces.json`.
+They point at local workspaces outside the repository and do not copy private
+data into tracked files. See [EXTERNAL_WORKSPACES.md](EXTERNAL_WORKSPACES.md).
 
 ## Stable Core Reports
 

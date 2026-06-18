@@ -23,6 +23,7 @@ contracts for stable commands and labels advanced workflows honestly.
 | `project` | Manage project profiles | project name | `projects/<name>` files | refuses unsafe overwrites | stable |
 | `template` | Create empty/synthetic scaffolds | template id, project | project scaffold | refuses existing target | stable |
 | `dogfood` | Real-project onboarding | template id, project, optional local paths | empty scaffold or planning report | plan-from-files is read-only | stable |
+| `external` | Private external workspace adapter | ignored local pointer config | local config, external reports/bundles | never copies private workspace data into repo | stable |
 | `validate-registry` | Audit registry CSV | CSV path | optional report/JSON | none | stable |
 | `validate-bib` | Audit BibTeX and registry linkage | `.bib`, optional registry | optional report | none | stable |
 | `add-paper` | Append explicit metadata | user-supplied flags | registry CSV row | append only | stable |

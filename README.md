@@ -19,6 +19,7 @@ Start with the [documentation index](docs/index.md), [getting started guide](doc
 - Plans incremental rebuilds with local content fingerprints for repeated large-project work.
 - Creates sanitized support bundles for local debugging without exporting PDFs, full notes, drafts, cache databases, backups, or raw audit logs.
 - Inspects historical workspaces and migration readiness before touching legacy or partially migrated data.
+- Registers private external workspaces through ignored local config so real projects can stay outside the repository.
 
 ## 🚫 What It Does Not Do
 
@@ -123,6 +124,17 @@ paperwb dogfood create photocatalysis --project fyp_zis_lit_review
 paperwb dogfood status --project fyp_zis_lit_review
 paperwb dogfood checklist --project fyp_zis_lit_review
 ```
+
+Register a real private workspace outside the repository:
+
+```bash
+paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_real
+paperwb external validate fyp_zis_real --strict
+paperwb external run fyp_zis_real dashboard
+```
+
+External registrations live in ignored `.paperwb-local/workspaces.json`; do
+not commit that file or copy private project data into the repo.
 
 Validate the clean bundled first-run project:
 
@@ -307,6 +319,8 @@ paperwb review-packet create --project zis_photocatalysis --theme photocorrosion
 paperwb doctor
 paperwb dogfood create photocatalysis --project fyp_review
 paperwb dogfood plan-from-files photocatalysis --project fyp_review --references-dir <references_dir> --bibtex <ref.bib> --out scratch/fyp_15_paper_plan.md --force
+paperwb external add fyp_real <external_workspace> --project fyp_real
+paperwb external run fyp_real dashboard
 paperwb import zotero-csv data/examples/zotero_export.csv --dry-run --report scratch/import_zotero_dry_run.md --force
 paperwb export claims --out scratch/claims.csv
 paperwb dashboard --project zis_photocatalysis

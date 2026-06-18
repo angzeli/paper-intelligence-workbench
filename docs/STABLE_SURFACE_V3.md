@@ -1,8 +1,9 @@
 # Stable Surface v3
 
-v3.4 keeps the stable dogfooding surface around local project setup, metadata
+v3.5 keeps the stable dogfooding surface around local project setup, metadata
 validation, structured notes, user-entered claims, core reports, read-only
-project status, support diagnostics, and compatibility inspection.
+project status, external private workspace pointers, support diagnostics, and
+compatibility inspection.
 
 Stable means the command name, primary flags, file safety behavior, and
 documented schemas should not change without a migration note.
@@ -15,6 +16,7 @@ documented schemas should not change without a migration note.
 | `project` | Create, list, and validate project profiles without overwriting user data. |
 | `template` | Create empty or synthetic project scaffolds and refuse existing targets. |
 | `dogfood` | Create empty dogfooding scaffolds, show onboarding status/checklists, and generate read-only file plans. |
+| `external` | Register ignored local pointers to private workspaces and run bounded workflows without copying private data into the repo. |
 | `validate-registry` | Validate registry CSV files; non-strict mode reports findings without failing scripts. |
 | `validate-bib` | Validate BibTeX files and registry linkage; `--strict` fails on error-level findings. |
 | `add-paper` | Append one explicit user-supplied registry row. |
@@ -34,6 +36,8 @@ documented schemas should not change without a migration note.
 - Registry CSV stable fields are listed in `docs/SCHEMA_REFERENCE_V3.md`.
 - Structured note sections and claim fields are stable for user-authored notes.
 - Project profile layout under `projects/<name>/` is stable.
+- External workspace config shape is stable for `.paperwb-local/workspaces.json`;
+  the file itself is local-only and must not be committed.
 - Theme JSON base fields are stable.
 - Compatibility inspection reports are stable diagnostics; migration remains copy-based.
 - Core Markdown reports are human-readable artifacts, not machine APIs.

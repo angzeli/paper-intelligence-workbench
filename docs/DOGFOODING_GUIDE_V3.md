@@ -39,3 +39,19 @@ rows.
 - Extract claims.
 - Generate an evidence map and citation audit.
 - Use dashboard and checklist reports to decide what to read next.
+
+## Private External Workspace Mode
+
+For real dogfooding, keep the workspace outside this repository and register a
+local pointer:
+
+```bash
+paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_real
+paperwb external validate fyp_zis_real --strict
+paperwb external run fyp_zis_real dashboard
+paperwb external run fyp_zis_real support-bundle
+```
+
+The pointer file lives in ignored `.paperwb-local/workspaces.json`. Do not
+commit it, and do not copy private PDFs, notes, drafts, or BibTeX files into
+the repo. See [PRIVATE_DOGFOODING.md](PRIVATE_DOGFOODING.md).

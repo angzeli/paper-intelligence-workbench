@@ -11,6 +11,7 @@ reference. This page groups the current command surface by expected stability.
 | `paperwb project` | Manage project profiles. |
 | `paperwb template` | Create empty or synthetic project scaffolds. |
 | `paperwb dogfood` | Create empty real-project onboarding scaffolds and file plans. |
+| `paperwb external` | Register ignored pointers to private external workspaces and run bounded workflows. |
 | `paperwb validate-registry` | Validate registry CSV files. |
 | `paperwb validate-bib` | Validate BibTeX files and registry linkage. |
 | `paperwb add-paper` | Append one explicit user-provided registry row. |

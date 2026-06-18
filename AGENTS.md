@@ -107,6 +107,9 @@ Instructions for future agents working in this repository:
 - Compatibility inspection must be read-only except explicit report output.
 - Migration should be dry-run first and should never overwrite existing projects without an explicit force workflow.
 - Add historical workspace fixtures when changing schema or migration behavior.
+- Never commit private external workspace data.
+- Local-only external workspace config under `.paperwb-local/` must remain ignored.
+- External workspace support bundles must redact by default and must not include PDFs, full notes, full drafts, cache DBs, backups, or raw audit logs.
 - Run the v3 quality gate before the final response when quality tooling, CI, release validation, or public CLI behavior changes.
 - Do not ignore failing tests, lint checks, type checks, notebook checks, CLI smoke checks, or data-safety audits; fix the cause or document a true blocker.
 - Do not add dependencies without documenting why they are needed and keeping them in optional development tooling when possible.

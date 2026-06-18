@@ -3,7 +3,7 @@
 Reports are generated Markdown artifacts for human review. They are not stable
 machine APIs and they do not judge scientific truth.
 
-For the full v3.4 gallery, use [docs/reports/index.md](reports/index.md).
+For the full v3.5 gallery, use [docs/reports/index.md](reports/index.md).
 
 ## Stable Core Reports
 
@@ -42,7 +42,7 @@ For the full v3.4 gallery, use [docs/reports/index.md](reports/index.md).
 ## Current Release Reports
 
 Use [reports/index.md](../reports/index.md) for the generated report inventory.
-The v3.4 docs patch adds:
+The v3.5 docs set includes:
 
 - `reports/docs_audit_v3_4.md`
 - `reports/cookbook_inventory_v3_4.md`

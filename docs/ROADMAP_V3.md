@@ -1,5 +1,13 @@
 # Roadmap v3
 
+## v3.5 Private Dogfooding Adapter
+
+- Add ignored local external-workspace registrations under `.paperwb-local/`.
+- Add `paperwb external ...` commands for private local workspaces outside the
+  repository.
+- Run bounded diagnostics, validation, dashboard, report, backup, and support
+  bundle workflows without copying private data into tracked files.
+
 ## v3.4 Documentation Site Source
 
 - Add a coherent Markdown documentation source layout with start, concepts,
@@ -34,7 +42,7 @@
 
 ## v3 Stable Surface
 
-- Keep `init`, `project`, `template`, `dogfood`, registry/BibTeX validation,
+- Keep `init`, `project`, `template`, `dogfood`, `external`, registry/BibTeX validation,
   note templates, claim extraction, core reports, doctor, dashboard, and support
   diagnostics stable.
 - Keep manuscript QA, sync apply, workflow recipes, evidence graph exports,
