@@ -114,18 +114,22 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v3.3 Release Reports" in content
-    current_section = content.split("## Current v3.3 Release Reports", 1)[1]
+    assert "## Current v3.4 Release Reports" in content
+    current_section = content.split("## Current v3.4 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
     assert "[hostile_review_latest.md]" in current_section
-    assert "[quality_gate_v3_3.md]" in current_section
-    assert "[ci_matrix_v3_3.md]" in current_section
-    assert "[type_lint_summary_v3_3.md]" in current_section
-    assert "[release_readiness_v3_3.md]" in current_section
+    assert "[docs_audit_v3_4.md]" in current_section
+    assert "[cookbook_inventory_v3_4.md]" in current_section
+    assert "[command_reference_audit_v3_4.md]" in current_section
+    assert "[release_readiness_v3_4.md]" in current_section
     assert "[release_notes_v2_0_rc.md]" not in current_section
     assert "[release_readiness_v2_0_rc.md]" not in current_section
     historical_section = content.split("## Historical Versioned Reports", 1)[1]
+    assert "[quality_gate_v3_3.md]" in historical_section
+    assert "[ci_matrix_v3_3.md]" in historical_section
+    assert "[type_lint_summary_v3_3.md]" in historical_section
+    assert "[release_readiness_v3_3.md]" in historical_section
     assert "[compatibility_matrix_v3_2.md]" in historical_section
     assert "[legacy_migration_dry_run_v3_2.md]" in historical_section
     assert "[partial_migration_conflict_v3_2.md]" in historical_section
