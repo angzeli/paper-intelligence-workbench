@@ -77,6 +77,21 @@ In offline or restricted-network environments, `pip` may be unable to fetch buil
 
 See [docs/INSTALLATION.md](docs/INSTALLATION.md) for release-check commands and troubleshooting.
 
+## 🧪 Quality Gate
+
+For development and release validation, install development extras and run the
+local quality gate:
+
+```bash
+python -m pip install -e ".[dev]"
+python scripts/run_quality_gate.py release
+```
+
+The gate runs tests, lint, script type checks, CLI smoke checks, notebook
+validation, data-safety validation, and package build checks. See
+[docs/QUALITY_GATE.md](docs/QUALITY_GATE.md) and
+[docs/RELEASE_VALIDATION.md](docs/RELEASE_VALIDATION.md).
+
 ## 🚀 Quickstart
 
 Initialize a workspace:

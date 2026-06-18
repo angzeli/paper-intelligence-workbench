@@ -107,3 +107,7 @@ Instructions for future agents working in this repository:
 - Compatibility inspection must be read-only except explicit report output.
 - Migration should be dry-run first and should never overwrite existing projects without an explicit force workflow.
 - Add historical workspace fixtures when changing schema or migration behavior.
+- Run the v3 quality gate before the final response when quality tooling, CI, release validation, or public CLI behavior changes.
+- Do not ignore failing tests, lint checks, type checks, notebook checks, CLI smoke checks, or data-safety audits; fix the cause or document a true blocker.
+- Do not add dependencies without documenting why they are needed and keeping them in optional development tooling when possible.
+- Preserve stable CLI behavior when adding or tightening quality gates.

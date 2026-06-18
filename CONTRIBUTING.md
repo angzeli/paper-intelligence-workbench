@@ -5,11 +5,8 @@ Paper Intelligence Workbench is a local-first research workflow tool. Contributi
 ## Development Setup
 
 ```bash
-python -m pip install -e ".[test]"
-python -m pytest -q
-python scripts/check_notebooks.py
-python scripts/smoke_cli_workflow.py --quick
-python scripts/data_safety_audit.py --out scratch/data_safety_audit.md --strict
+python -m pip install -e ".[dev]"
+python scripts/run_quality_gate.py --list
 ```
 
 The package intentionally has no runtime dependencies. Add dependencies only when they remove meaningful complexity and keep optional tooling separated under `project.optional-dependencies`.
@@ -36,11 +33,7 @@ Update docs when public CLI behavior changes. Documentation examples should use 
 Before a release-ready patch, run:
 
 ```bash
-python -m pytest -q
-python scripts/check_notebooks.py
-python scripts/smoke_cli_workflow.py
-python scripts/data_safety_audit.py --strict
-python -m paper_workbench.cli --help
+python scripts/run_quality_gate.py release
 ```
 
 Do not push from an automated agent unless explicitly asked.

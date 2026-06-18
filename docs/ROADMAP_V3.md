@@ -1,5 +1,12 @@
 # Roadmap v3
 
+## v3.3 Quality Gate Patch
+
+- Add a local quality-gate runner for tests, lint, format check, script type
+  check, CLI smoke, notebook validation, data-safety audit, and package build.
+- Keep ruff and mypy as optional development tooling, not runtime dependencies.
+- Keep package-wide typing and broad formatting as future stabilization work.
+
 ## v3.2 Compatibility Patch
 
 - Add historical workspace fixtures for legacy data, early project profiles,

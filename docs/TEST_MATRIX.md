@@ -20,3 +20,4 @@
 | Local files | Scans, hashes, links, audits, and preserves user files | `tests/test_local_files_v0_7.py` | `docs/local-files.md` | Optional PDF metadata extraction is future work |
 | Notebook validation | Notebooks are valid JSON and portable | `scripts/check_notebooks.py`, release tests | `docs/SITE_MAP.md` | Notebooks are not executed in CI by default |
 | Data safety | Tracked files are checked for forbidden artifacts and secrets | `scripts/data_safety_audit.py`, release tests | `docs/safety-and-boundaries.md` | Warnings require human review |
+| Quality gate | Release validation runs tests, lint, format-check, script type-check, smoke, notebook, data-safety, and build checks | `tests/test_quality_gate_v3_3.py`, `scripts/run_quality_gate.py` | `docs/QUALITY_GATE.md`, `docs/CI.md`, `docs/RELEASE_VALIDATION.md` | Package-wide typing and broad formatting remain future work |
