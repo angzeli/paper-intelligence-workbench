@@ -16,11 +16,13 @@ def test_package_metadata_matches_import_version_and_cli_entrypoint():
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
     assert f'version = "{__version__}"' in content
-    assert __version__ == "3.2"
+    assert __version__ == "3.3"
     assert 'requires-python = ">=3.10"' in content
     assert "dependencies = []" in content
     assert 'paperwb = "paper_workbench.cli:main"' in content
     assert "test = [\"pytest>=8\"]" in content
+    assert "ruff>=0.6" in content
+    assert "mypy>=1.8" in content
 
 
 def test_release_docs_site_and_matrices_exist():
@@ -195,12 +197,15 @@ def test_ci_runs_v0_8_release_checks():
 
     assert 'python-version: ["3.10", "3.11", "3.12"]' in content
     assert 'python -m pip install -e ".[dev]"' in content
-    assert "python scripts/check_notebooks.py" in content
-    assert "python scripts/smoke_cli_workflow.py --quick" in content
     assert "python scripts/clean_room_install_check.py --quick" in content
-    assert "python scripts/data_safety_audit.py" in content
     assert "paperwb --help" in content
-    assert "python -m build --sdist --wheel" in content
+    assert "python scripts/run_quality_gate.py release" in content
+
+    gate = (ROOT / "scripts" / "run_quality_gate.py").read_text(encoding="utf-8")
+    assert "scripts/check_notebooks.py" in gate
+    assert "scripts/smoke_cli_workflow.py" in gate
+    assert "scripts/data_safety_audit.py" in gate
+    assert '"build", "--sdist", "--wheel"' in gate
 
 
 def test_v2_stable_surface_uses_current_line_for_experimental_graph():

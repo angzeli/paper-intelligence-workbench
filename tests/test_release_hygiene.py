@@ -12,14 +12,9 @@ def test_ci_workflow_runs_release_gates():
     workflow = ROOT / ".github" / "workflows" / "ci.yml"
     content = workflow.read_text(encoding="utf-8")
 
-    assert "python -m pytest -q" in content
-    assert "python scripts/validate_notebooks.py" in content
-    assert 'python -c "import paper_workbench"' in content
-    assert "python -m paper_workbench.cli --help" in content
-    assert "python -m paper_workbench.cli files --help" in content
-    assert "python -m paper_workbench.cli files scan --project zis_photocatalysis" in content
-    assert "python -m paper_workbench.cli files audit --project zis_photocatalysis" in content
-    assert '["git", "ls-files"]' in content
+    assert "python scripts/run_quality_gate.py release" in content
+    assert 'python-version: ["3.10", "3.11", "3.12"]' in content
+    assert 'python -c "import paper_workbench; print(paper_workbench.__version__)"' in content
 
 
 def test_versioned_hostile_review_drafts_are_ignored_but_latest_is_not():
@@ -119,19 +114,23 @@ def test_checked_in_report_index_matches_latest_generated_reports():
     generated = report_index_markdown(ROOT / "reports", output_path=index_path)
 
     assert content == generated
-    assert "## Current v3.2 Release Reports" in content
-    current_section = content.split("## Current v3.2 Release Reports", 1)[1]
+    assert "## Current v3.3 Release Reports" in content
+    current_section = content.split("## Current v3.3 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
     assert "[hostile_review_latest.md]" in current_section
-    assert "[compatibility_matrix_v3_2.md]" in current_section
-    assert "[legacy_migration_dry_run_v3_2.md]" in current_section
-    assert "[partial_migration_conflict_v3_2.md]" in current_section
-    assert "[schema_preservation_v3_2.md]" in current_section
-    assert "[release_readiness_v3_2.md]" in current_section
+    assert "[quality_gate_v3_3.md]" in current_section
+    assert "[ci_matrix_v3_3.md]" in current_section
+    assert "[type_lint_summary_v3_3.md]" in current_section
+    assert "[release_readiness_v3_3.md]" in current_section
     assert "[release_notes_v2_0_rc.md]" not in current_section
     assert "[release_readiness_v2_0_rc.md]" not in current_section
     historical_section = content.split("## Historical Versioned Reports", 1)[1]
+    assert "[compatibility_matrix_v3_2.md]" in historical_section
+    assert "[legacy_migration_dry_run_v3_2.md]" in historical_section
+    assert "[partial_migration_conflict_v3_2.md]" in historical_section
+    assert "[schema_preservation_v3_2.md]" in historical_section
+    assert "[release_readiness_v3_2.md]" in historical_section
     assert "[support_bundle_demo_v3_1.md]" in historical_section
     assert "[support_bundle_data_safety_v3_1.md]" in historical_section
     assert "[redaction_preview_v3_1.md]" in historical_section

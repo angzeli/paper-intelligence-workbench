@@ -25,73 +25,16 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
 
-      - name: Run pytest
-        run: python -m pytest -q
-
-      - name: Validate notebooks
-        run: python scripts/validate_notebooks.py
-
-      - name: Check notebooks
-        run: python scripts/check_notebooks.py
-
       - name: Import package
-        run: python -c "import paper_workbench"
+        run: python -c "import paper_workbench; print(paper_workbench.__version__)"
 
       - name: CLI smoke test
         run: |
           python -m paper_workbench.cli --help
           paperwb --help
 
-      - name: CLI workflow smoke test
-        run: python scripts/smoke_cli_workflow.py --quick
-
       - name: Clean-room install check
         run: python scripts/clean_room_install_check.py --quick --out /tmp/paperwb_clean_room_check.md
 
-      - name: Build source and wheel distributions
-        run: python -m build --sdist --wheel
-
-      - name: Local file CLI smoke tests
-        run: |
-          python -m paper_workbench.cli files --help
-          python -m paper_workbench.cli files scan --project zis_photocatalysis
-          python -m paper_workbench.cli files audit --project zis_photocatalysis --reports-dir /tmp/paperwb_ci_file_reports --force
-
-      - name: Data safety audit
-        run: python scripts/data_safety_audit.py --out /tmp/paperwb_data_safety_audit.md --strict
-
-      - name: Tracked artifact hygiene
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import subprocess
-          import sys
-
-          forbidden_suffixes = {
-              ".pdf",
-              ".pyc",
-              ".sqlite",
-              ".db",
-          }
-          forbidden_parts = {
-              ".paperwb",
-              ".pytest_cache",
-              ".idea",
-              ".ipynb_checkpoints",
-              "__pycache__",
-          }
-          forbidden_names = {
-              ".DS_Store",
-          }
-          result = subprocess.run(["git", "ls-files"], check=True, text=True, capture_output=True)
-          bad = []
-          for line in result.stdout.splitlines():
-              path = Path(line)
-              if path.suffix in forbidden_suffixes or path.name in forbidden_names or any(part in forbidden_parts for part in path.parts):
-                  bad.append(line)
-          if bad:
-              print("Forbidden tracked artifacts:")
-              for item in bad:
-                  print(f"- {item}")
-              sys.exit(1)
-          PY
+      - name: Release quality gate
+        run: python scripts/run_quality_gate.py release --out scratch/ci_quality_gate.md
