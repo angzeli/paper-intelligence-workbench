@@ -12,7 +12,7 @@ from . import __version__
 
 
 FORBIDDEN_SUFFIXES = {".pdf", ".pyc", ".sqlite", ".db"}
-FORBIDDEN_PARTS = {".paperwb", ".pytest_cache", ".idea", ".ipynb_checkpoints", "__pycache__"}
+FORBIDDEN_PARTS = {".paperwb", ".paperwb-local", ".pytest_cache", ".idea", ".ipynb_checkpoints", "__pycache__"}
 FORBIDDEN_NAMES = {".DS_Store"}
 TEXT_SUFFIXES = {".bib", ".csv", ".json", ".md", ".py", ".ris", ".toml", ".txt", ".yaml", ".yml"}
 ABSOLUTE_PATH_PATTERNS = [

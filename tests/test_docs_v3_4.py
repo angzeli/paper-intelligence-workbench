@@ -30,9 +30,10 @@ def test_docs_checker_passes_for_public_docs() -> None:
 
 
 def test_v3_docs_match_current_version_label() -> None:
-    assert __version__ == "3.4"
+    assert __version__ == "3.5"
     stable_surface = (ROOT / "docs" / "STABLE_SURFACE_V3.md").read_text(encoding="utf-8")
     roadmap = (ROOT / "docs" / "ROADMAP_V3.md").read_text(encoding="utf-8")
 
-    assert "v3.4" in stable_surface
+    assert "v3.5" in stable_surface
+    assert "v3.5 Private Dogfooding Adapter" in roadmap
     assert "v3.4 Documentation Site Source" in roadmap

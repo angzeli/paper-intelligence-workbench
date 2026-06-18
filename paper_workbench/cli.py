@@ -67,6 +67,16 @@ from .dogfood import (
     dogfood_file_plan_markdown,
     dogfood_status,
 )
+from .external import (
+    ALLOWED_EXTERNAL_RUNS,
+    add_external_workspace,
+    external_validation_markdown,
+    external_workspace_summary,
+    list_external_workspaces,
+    remove_external_workspace,
+    run_external_workflow,
+    validate_external_workspace,
+)
 from .drafts import (
     audit_draft,
     citation_coverage_report as draft_citation_coverage_report,
@@ -1961,6 +1971,67 @@ def cmd_dogfood_plan_from_files(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_external_add(args: argparse.Namespace) -> int:
+    workspace = add_external_workspace(
+        args.name,
+        args.path,
+        project=args.project,
+        description=args.description,
+        config_path=args.config,
+        force=args.force,
+    )
+    print(f"Registered external workspace {workspace.name}")
+    print(f"Project: {workspace.project}")
+    print(f"Path: {workspace.path}")
+    print("Local-only config: .paperwb-local/workspaces.json" if not args.config else f"Local-only config: {args.config}")
+    print("Private data was not copied into the repository.")
+    return 0
+
+
+def cmd_external_list(args: argparse.Namespace) -> int:
+    workspaces = list_external_workspaces(config_path=args.config)
+    if not workspaces:
+        print("No external workspaces registered.")
+        return 0
+    for workspace in workspaces:
+        print(external_workspace_summary(workspace))
+    return 0
+
+
+def cmd_external_validate(args: argparse.Namespace) -> int:
+    validation = validate_external_workspace(args.name, config_path=args.config)
+    if args.out:
+        path = write_text(args.out, external_validation_markdown(validation), force=args.force)
+        print(f"Wrote {path}")
+    else:
+        print(external_validation_markdown(validation), end="")
+    return 1 if args.strict and validation.blocking_errors else 0
+
+
+def cmd_external_remove(args: argparse.Namespace) -> int:
+    removed = remove_external_workspace(args.name, config_path=args.config)
+    print(f"Removed external workspace {removed.name}")
+    print("External files were not modified.")
+    return 0
+
+
+def cmd_external_run(args: argparse.Namespace) -> int:
+    result = run_external_workflow(
+        args.name,
+        args.external_workflow,
+        config_path=args.config,
+        out=args.out or None,
+        force=args.force,
+        notes=args.notes,
+    )
+    has_errors = any(finding.severity == "error" for finding in result.findings)
+    if has_errors and not result.content:
+        _print_findings(result.findings)
+        return 1
+    print(result.content, end="")
+    return 1 if args.strict and has_errors else 0
+
+
 def cmd_doctor(args: argparse.Namespace) -> int:
     _reject_project_path_overrides(args, ("registry", "bibtex", "notes_dir", "themes", "reports_dir"))
     paths = _paths_from_args(args)
@@ -2850,7 +2921,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="paperwb",
         description="Local-first academic paper registry, notes, claims, BibTeX, and audit workbench.",
         epilog=(
-            "Stable starting points: init, project, template, dogfood, validate-registry, "
+            "Stable starting points: init, project, template, dogfood, external, validate-registry, "
             "validate-bib, note-template, claims, report, dashboard, doctor, support, compatibility.\n"
             "Experimental or safety-sensitive workflows: workflow, sync, index, rebuild, files, draft, "
             "manuscript, reading, backup, migrate, rules, graph, claim-review, "
@@ -2918,6 +2989,40 @@ def build_parser() -> argparse.ArgumentParser:
     dogfood_plan.add_argument("--out", help="Optional Markdown output path.")
     dogfood_plan.add_argument("--force", action="store_true", help="Overwrite an existing output path.")
     dogfood_plan.set_defaults(func=cmd_dogfood_plan_from_files)
+
+    external_parser = subparsers.add_parser("external", help="Register and use private local workspaces without copying data into the repository.")
+    external_sub = external_parser.add_subparsers(dest="external_command", required=True)
+    external_add = external_sub.add_parser("add", help="Register an external workspace path in ignored local config.")
+    external_add.add_argument("name", help="Local alias for the external workspace.")
+    external_add.add_argument("path", help="External workspace root containing projects/<project>/.")
+    external_add.add_argument("--project", default="", help="Project profile name inside the external workspace. Defaults to NAME.")
+    external_add.add_argument("--description", default="", help="Optional local-only description.")
+    external_add.add_argument("--config", default="", help="Local-only config path. Defaults to .paperwb-local/workspaces.json.")
+    external_add.add_argument("--force", action="store_true", help="Update an existing local registration.")
+    external_add.set_defaults(func=cmd_external_add)
+    external_list = external_sub.add_parser("list", help="List registered external workspaces.")
+    external_list.add_argument("--config", default="", help="Local-only config path. Defaults to .paperwb-local/workspaces.json.")
+    external_list.set_defaults(func=cmd_external_list)
+    external_validate = external_sub.add_parser("validate", help="Validate a registered external workspace without copying private data.")
+    external_validate.add_argument("name", help="External workspace alias.")
+    external_validate.add_argument("--config", default="", help="Local-only config path. Defaults to .paperwb-local/workspaces.json.")
+    external_validate.add_argument("--out", default="", help="Optional Markdown validation report path.")
+    external_validate.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
+    external_validate.add_argument("--strict", action="store_true", help="Return non-zero when the registered path or project structure is missing.")
+    external_validate.set_defaults(func=cmd_external_validate)
+    external_remove = external_sub.add_parser("remove", help="Remove a local external-workspace registration.")
+    external_remove.add_argument("name", help="External workspace alias.")
+    external_remove.add_argument("--config", default="", help="Local-only config path. Defaults to .paperwb-local/workspaces.json.")
+    external_remove.set_defaults(func=cmd_external_remove)
+    external_run = external_sub.add_parser("run", help="Run a bounded safe workflow against a registered external workspace.")
+    external_run.add_argument("name", help="External workspace alias.")
+    external_run.add_argument("external_workflow", choices=sorted(ALLOWED_EXTERNAL_RUNS), help="Known workflow to run against the external workspace.")
+    external_run.add_argument("--config", default="", help="Local-only config path. Defaults to .paperwb-local/workspaces.json.")
+    external_run.add_argument("--out", default="", help="Optional output path. Report outputs should normally live in the external workspace.")
+    external_run.add_argument("--force", action="store_true", help="Overwrite an existing output path where the selected workflow writes one.")
+    external_run.add_argument("--notes", default="", help="Backup note used only by `external run NAME backup`.")
+    external_run.add_argument("--strict", action="store_true", help="Return non-zero when error-level findings are present.")
+    external_run.set_defaults(func=cmd_external_run)
 
     support_parser = subparsers.add_parser("support", help="Create sanitized local diagnostic support bundles.")
     support_sub = support_parser.add_subparsers(dest="support_command", required=True)

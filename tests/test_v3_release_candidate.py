@@ -19,13 +19,13 @@ def run_cli(*args: str, cwd: Path = ROOT) -> subprocess.CompletedProcess[str]:
 
 
 def test_v3_release_candidate_version_metadata() -> None:
-    assert __version__ == "3.4"
-    assert 'version = "3.4"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "3.5"
+    assert 'version = "3.5"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v3_surface_docs_exist_and_classify_release_surfaces() -> None:
     docs = {
-        "docs/STABLE_SURFACE_V3.md": ["`dogfood`", "`validate-registry`", "`compatibility`", "Registry CSV", "Stable Safety Guarantees"],
+        "docs/STABLE_SURFACE_V3.md": ["`dogfood`", "`external`", "`validate-registry`", "`compatibility`", "Registry CSV", "Stable Safety Guarantees"],
         "docs/EXPERIMENTAL_FEATURES_V3.md": ["Workflow runner", "Evidence graph", "Incremental rebuilds"],
         "docs/DEPRECATED_FEATURES_V3.md": ["does not deprecate any public CLI command group"],
         "docs/COMMAND_CONTRACTS_V3.md": ["`backup`", "`workflow`", "`dashboard`", "`compatibility`", "Exit Codes"],
@@ -34,7 +34,7 @@ def test_v3_surface_docs_exist_and_classify_release_surfaces() -> None:
         "docs/FIRST_REAL_PROJECT_V3.md": ["10-15 papers", "plan-from-files", "does not copy PDFs"],
         "docs/DATA_SAFETY_V3.md": ["No cloud APIs", "No LLM APIs", "Files That Should Not Be Committed"],
         "docs/KNOWN_LIMITATIONS_V3.md": ["heuristic", "scientific truth"],
-        "docs/ROADMAP_V3.md": ["v3.4 Documentation Site Source", "v3.3 Quality Gate Patch", "Not In Scope"],
+        "docs/ROADMAP_V3.md": ["v3.5 Private Dogfooding Adapter", "v3.4 Documentation Site Source", "v3.3 Quality Gate Patch", "Not In Scope"],
     }
     for relative, fragments in docs.items():
         content = (ROOT / relative).read_text(encoding="utf-8")
@@ -49,6 +49,7 @@ def test_v3_stable_command_help_contracts() -> None:
         ("project", "--help"),
         ("template", "--help"),
         ("dogfood", "--help"),
+        ("external", "--help"),
         ("validate-registry", "--help"),
         ("validate-bib", "--help"),
         ("add-paper", "--help"),

@@ -18,8 +18,8 @@ def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_v2_release_candidate_version_metadata() -> None:
-    assert __version__ == "3.4"
-    assert 'version = "3.4"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert __version__ == "3.5"
+    assert 'version = "3.5"' in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
 def test_v2_surface_docs_exist_and_classify_core_commands() -> None:
@@ -64,15 +64,18 @@ def test_v2_release_reports_are_current_and_sanitized() -> None:
         assert "/private/tmp/" not in content
 
     index = (ROOT / "reports" / "index.md").read_text(encoding="utf-8")
-    assert "## Current v3.4 Release Reports" in index
-    current_section = index.split("## Current v3.4 Release Reports", 1)[1]
+    assert "## Current v3.5 Release Reports" in index
+    current_section = index.split("## Current v3.5 Release Reports", 1)[1]
     current_section = current_section.split("## Next Patch Plan", 1)[0]
     current_section = current_section.split("## Historical Versioned Reports", 1)[0]
-    assert "[docs_audit_v3_4.md]" in current_section
-    assert "[cookbook_inventory_v3_4.md]" in current_section
-    assert "[command_reference_audit_v3_4.md]" in current_section
-    assert "[release_readiness_v3_4.md]" in current_section
+    assert "[private_dogfooding_adapter_v3_5.md]" in current_section
+    assert "[external_workspace_safety_v3_5.md]" in current_section
+    assert "[release_readiness_v3_5.md]" in current_section
     historical_section = index.split("## Historical Versioned Reports", 1)[1]
+    assert "[docs_audit_v3_4.md]" in historical_section
+    assert "[cookbook_inventory_v3_4.md]" in historical_section
+    assert "[command_reference_audit_v3_4.md]" in historical_section
+    assert "[release_readiness_v3_4.md]" in historical_section
     assert "[quality_gate_v3_3.md]" in historical_section
     assert "[ci_matrix_v3_3.md]" in historical_section
     assert "[type_lint_summary_v3_3.md]" in historical_section
