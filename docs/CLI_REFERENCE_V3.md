@@ -1,6 +1,7 @@
 # CLI Reference v3
 
-Use `paperwb --help` and `paperwb COMMAND --help` for exact flags.
+Use `paperwb --help` and `paperwb COMMAND --help` for exact flags. For a
+grouped user-facing command map, see [command-reference/index.md](command-reference/index.md).
 
 ## Stable Starting Points
 

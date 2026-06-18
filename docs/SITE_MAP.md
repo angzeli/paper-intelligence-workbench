@@ -5,6 +5,16 @@ This repository uses plain Markdown as the documentation-site source.
 ## Primary Pages
 
 - `docs/index.md`
+- `docs/getting-started/index.md`
+- `docs/concepts/index.md`
+- `docs/workflows/index.md`
+- `docs/workflows/full-literature-review-walkthrough.md`
+- `docs/command-reference/index.md`
+- `docs/reports/index.md`
+- `docs/safety/index.md`
+- `docs/development/index.md`
+- `docs/cookbook/index.md`
+- `docs/troubleshooting/index.md`
 - `docs/getting-started.md`
 - `docs/workflows.md`
 - `docs/cli-reference.md`

@@ -2,6 +2,35 @@
 
 All notable changes are tracked here for local release planning. This project has not been published to PyPI.
 
+## v3.4 - Documentation Site Source, Cookbook, and Guided Workflows
+
+- Promoted local package metadata to `3.4`.
+- Added a coherent Markdown documentation source layout with start, concepts,
+  workflows, command reference, report gallery, safety, development, cookbook,
+  and troubleshooting sections.
+- Added cookbook recipes and a full synthetic literature-review walkthrough.
+- Added documentation consistency checks for local Markdown links, private path
+  patterns, and `paperwb` command examples.
+- Kept v3.4 docs-only and local-first: no cloud APIs, no LLM APIs, no scraping,
+  no real paper metadata, no PDFs, and no public CLI behavior changes.
+
+## v3.3 - Quality Gate and CI Hardening
+
+- Promoted local package metadata to `3.3`.
+- Added local quality-gate tooling, CI workflow hardening, Ruff/Mypy
+  development configuration, notebook validation, CLI smoke validation, and
+  data-safety release checks.
+- Split skipped-tool checks into a diagnostic-only local path so strict release
+  validation cannot be confused with a bootstrap diagnostic run.
+
+## v3.2 - Backward Compatibility Matrix and Migration Torture Suite
+
+- Promoted local package metadata to `3.2`.
+- Added historical workspace fixtures, compatibility inspection, compatibility
+  matrix reports, and migration torture tests for legacy and malformed
+  workspaces.
+- Kept migration dry-run first and preserved extra user registry columns.
+
 ## v3.1 - Support Bundle and Sanitized Diagnostics
 
 - Promoted local package metadata to `3.1`.

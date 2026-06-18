@@ -1,6 +1,6 @@
 # Release Validation
 
-Use the v3.3 quality gate before release-candidate or dogfooding readiness
+Use the v3 quality gate before release-candidate or dogfooding readiness
 claims.
 
 ```bash

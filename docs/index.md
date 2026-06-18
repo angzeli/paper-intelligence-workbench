@@ -1,123 +1,80 @@
-# Paper Intelligence Workbench Docs
+# Paper Intelligence Workbench Documentation
 
-Paper Intelligence Workbench is a local-first command-line workbench for academic paper registries, structured notes, user-entered claims, citation audits, evidence maps, local search, import/export workflows, and writing preparation.
+Paper Intelligence Workbench is a local-first command-line workbench for
+literature-review projects. It helps manage paper metadata, BibTeX linkage,
+structured notes, user-entered claims, evidence reports, draft QA, reading
+workflows, backups, compatibility checks, and sanitized diagnostics.
 
-Use these docs as static Markdown source. No site generator is required.
+It does not read papers for you, scrape publishers, use cloud or LLM APIs,
+fabricate claims, judge scientific truth, or write final prose.
+
+This directory is Markdown site source. No site generator is required. The
+subdirectories below provide a coherent path through the existing docs while
+preserving older reference files.
 
 ## Start Here
 
-- [Getting Started v3](GETTING_STARTED_V3.md)
+1. [Getting Started](getting-started/index.md)
+2. [Core Concepts](concepts/index.md)
+3. [Full Literature Review Walkthrough](workflows/full-literature-review-walkthrough.md)
+4. [Cookbook](cookbook/index.md)
+5. [Command Reference](command-reference/index.md)
+6. [Report Gallery](reports/index.md)
+7. [Safety](safety/index.md)
+8. [Troubleshooting](troubleshooting/index.md)
+
+## Stable v3 References
+
 - [Stable Surface v3](STABLE_SURFACE_V3.md)
 - [Experimental Features v3](EXPERIMENTAL_FEATURES_V3.md)
 - [Command Contracts v3](COMMAND_CONTRACTS_V3.md)
 - [Schema Reference v3](SCHEMA_REFERENCE_V3.md)
-- [Compatibility Matrix v3](COMPATIBILITY_MATRIX_V3.md)
-- [Migration Guide v3](MIGRATION_GUIDE_V3.md)
+- [Data Safety v3](DATA_SAFETY_V3.md)
+- [Known Limitations v3](KNOWN_LIMITATIONS_V3.md)
+- [Roadmap v3](ROADMAP_V3.md)
+
+## Workflow Guides
+
+- [Core Workflow v3](CORE_WORKFLOW_V3.md)
 - [First Real Project v3](FIRST_REAL_PROJECT_V3.md)
-- [Getting Started v2](GETTING_STARTED_V2.md)
-- [Stable Surface v2](STABLE_SURFACE_V2.md)
-- [Experimental Features v2](EXPERIMENTAL_FEATURES_V2.md)
-- [Known Limitations v2](KNOWN_LIMITATIONS_V2.md)
-- [Getting Started](getting-started.md)
-- [External User Quickstart](EXTERNAL_USER_QUICKSTART.md)
-- [Installation](INSTALLATION.md)
-- [Workflows](workflows.md)
-- [CLI Reference](cli-reference.md)
-
-## Core Areas
-
-- [Project Profiles](project-profiles.md)
+- [Dogfooding Guide v3](DOGFOODING_GUIDE_V3.md)
+- [Project Profiles](PROJECT_PROFILES.md)
 - [Project Templates](PROJECT_TEMPLATES.md)
 - [Real Project Onboarding](REAL_PROJECT_ONBOARDING.md)
-- [FYP Dogfooding Workflow](FYP_DOGFOODING_WORKFLOW.md)
 - [Adding Real Papers Safely](ADDING_REAL_PAPERS_SAFELY.md)
 - [Dogfooding Workflow](DOGFOODING_WORKFLOW.md)
-- [Reports](reports.md)
-- [Report Gallery](REPORT_GALLERY.md)
-- [Local Search](local-search.md)
-- [Import / Export](import-export.md)
-- [Sync](SYNC.md)
-- [Safe Sync Workflow](SAFE_SYNC_WORKFLOW.md)
-- [Conflict Resolution](CONFLICT_RESOLUTION.md)
-- [Sync Plans](SYNC_PLANS.md)
-- [Obsidian Round-trip](OBSIDIAN_ROUNDTRIP.md)
-- [Authoring Workbench](authoring-workbench.md)
-- [Draft Citation Audit](DRAFT_CITATION_AUDIT.md)
-- [Manuscript Evidence Checker](MANUSCRIPT_EVIDENCE_CHECKER.md)
+- [Structured Note Format](NOTE_FORMAT.md)
+- [Evidence Maps](EVIDENCE_MAPS.md)
+- [Citation Audit](CITATION_AUDIT.md)
+- [Writing Packet](WRITING_PACKET.md)
 - [Manuscript QA](MANUSCRIPT_QA.md)
 - [Citation Context Table](CITATION_CONTEXT_TABLE.md)
 - [Claim Traceability](CLAIM_TRACEABILITY.md)
-- [Claim Lifecycle](CLAIM_LIFECYCLE.md)
-- [Claim Review Queue](CLAIM_REVIEW_QUEUE.md)
-- [Contradictions](CONTRADICTIONS.md)
-- [Evidence Review](EVIDENCE_REVIEW.md)
 - [Manuscript Limitations](MANUSCRIPT_LIMITATIONS.md)
-- [Rule Engine](RULE_ENGINE.md)
-- [Custom Rules](CUSTOM_RULES.md)
-- [Built-in Rules](BUILT_IN_RULES.md)
-- [Rule Safety](RULE_SAFETY.md)
-- [Terminal Dashboard](DASHBOARD.md)
-- [Next Actions](NEXT_ACTIONS.md)
-- [Terminal Workflow](TERMINAL_WORKFLOW.md)
-- [Workflow Runner](WORKFLOW_RUNNER.md)
-- [Report Recipes](REPORT_RECIPES.md)
-- [Built-in Workflows](BUILT_IN_WORKFLOWS.md)
-- [Workflow Safety](WORKFLOW_SAFETY.md)
-- [Review Packets](REVIEW_PACKETS.md)
-- [Comment Import](COMMENT_IMPORT.md)
-- [Response to Review](RESPONSE_TO_REVIEW.md)
-- [Collaboration Boundary](COLLABORATION_BOUNDARY.md)
-- [Incremental Rebuilds](INCREMENTAL_REBUILDS.md)
-- [Performance](PERFORMANCE.md)
-- [Cache Hygiene](CACHE_HYGIENE.md)
-- [Scale Limits](SCALE_LIMITS.md)
-- [Support Bundles](SUPPORT_BUNDLES.md)
-- [Diagnostic Exports](DIAGNOSTIC_EXPORTS.md)
-- [Redaction](REDACTION.md)
-- [Privacy Boundaries](PRIVACY_BOUNDARIES.md)
-- [Legacy Workspaces](LEGACY_WORKSPACES.md)
-- [Schema Evolution](SCHEMA_EVOLUTION.md)
-- [Backward Compatibility Policy](BACKWARD_COMPATIBILITY_POLICY.md)
-- [Evidence Graph](EVIDENCE_GRAPH.md)
-- [Graph Exports](GRAPH_EXPORTS.md)
-- [Graph Analytics](GRAPH_ANALYTICS.md)
 - [Reading Sessions](READING_SESSIONS.md)
-- [Reading Queue](READING_QUEUE.md)
-- [Follow-up Actions](FOLLOW_UP_ACTIONS.md)
-- [Weekly Reading Review](WEEKLY_READING_REVIEW.md)
-- [Local Files](local-files.md)
-- [Safety and Boundaries](safety-and-boundaries.md)
+- [Workflow Runner](WORKFLOW_RUNNER.md)
+- [Support Bundles](SUPPORT_BUNDLES.md)
+- [Compatibility Matrix v3](COMPATIBILITY_MATRIX_V3.md)
 
-## Release Engineering
+## Advanced And Experimental Guides
 
-- [CLI Reference v3](CLI_REFERENCE_V3.md)
-- [Report Gallery v3](REPORT_GALLERY_V3.md)
-- [Data Safety v3](DATA_SAFETY_V3.md)
-- [Dogfooding Guide v3](DOGFOODING_GUIDE_V3.md)
-- [Known Limitations v3](KNOWN_LIMITATIONS_V3.md)
-- [Roadmap v3](ROADMAP_V3.md)
+- [Sync](SYNC.md)
+- [Conflict Resolution](CONFLICT_RESOLUTION.md)
+- [Local Search](LOCAL_SEARCH.md)
+- [SQLite Index](SQLITE_INDEX.md)
+- [Evidence Graph](EVIDENCE_GRAPH.md)
+- [Claim Lifecycle](CLAIM_LIFECYCLE.md)
+- [Review Packets](REVIEW_PACKETS.md)
+- [Incremental Rebuilds](INCREMENTAL_REBUILDS.md)
+- [Rule Engine](RULE_ENGINE.md)
+- [Dashboard](DASHBOARD.md)
+
+## Development And Release
+
+- [Development Workflow](development/index.md)
 - [Quality Gate](QUALITY_GATE.md)
 - [CI](CI.md)
-- [Development Workflow](DEVELOPMENT_WORKFLOW.md)
-- [Contributing](CONTRIBUTING.md)
 - [Release Validation](RELEASE_VALIDATION.md)
-- [Command Contracts v2](COMMAND_CONTRACTS_V2.md)
-- [Schema Freeze v2](SCHEMA_FREEZE_V2.md)
-- [Migration Guide v2](MIGRATION_GUIDE_V2.md)
-- [Backward Compatibility v2](BACKWARD_COMPATIBILITY_V2.md)
-- [Reports v2](REPORTS_V2.md)
-- [Data Safety v2](DATA_SAFETY_V2.md)
-- [Test Matrix v2](TEST_MATRIX_V2.md)
-- [Roadmap v2](ROADMAP_V2.md)
-- [API Surface](API_SURFACE.md)
-- [Internal Architecture](INTERNAL_ARCHITECTURE.md)
-- [Public vs Internal API](PUBLIC_VS_INTERNAL_API.md)
 - [Maintainer Guide](MAINTAINER_GUIDE.md)
+- [Public vs Internal API](PUBLIC_VS_INTERNAL_API.md)
 - [Module Boundaries](MODULE_BOUNDARIES.md)
-- [CLI Surface](CLI_SURFACE.md)
-- [Command Contracts](COMMAND_CONTRACTS.md)
-- [Test Matrix](TEST_MATRIX.md)
-- [CLI Behavior Matrix](CLI_BEHAVIOR_MATRIX.md)
-- [Report Matrix](REPORT_MATRIX.md)
-- [Data Safety Matrix](DATA_SAFETY_MATRIX.md)
-- [Site Map](SITE_MAP.md)

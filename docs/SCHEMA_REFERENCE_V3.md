@@ -1,7 +1,7 @@
 # Schema Reference v3
 
 Paper Intelligence Workbench uses local files instead of a required database.
-v3.2 keeps the core user-facing schemas below stable for local dogfooding.
+v3.4 keeps the core user-facing schemas below stable for local dogfooding.
 
 ## Registry CSV
 

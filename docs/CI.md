@@ -18,7 +18,7 @@ scraping, or real paper data.
 3. Import the package and print the version.
 4. Run basic CLI help smoke checks.
 5. Run the clean-room install check.
-6. Run the v3.3 release quality gate:
+6. Run the v3 release quality gate:
 
    ```bash
    python scripts/run_quality_gate.py release --out scratch/ci_quality_gate.md

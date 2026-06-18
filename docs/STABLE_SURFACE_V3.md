@@ -1,6 +1,6 @@
 # Stable Surface v3
 
-v3.2 keeps the stable dogfooding surface around local project setup, metadata
+v3.4 keeps the stable dogfooding surface around local project setup, metadata
 validation, structured notes, user-entered claims, core reports, read-only
 project status, support diagnostics, and compatibility inspection.
 

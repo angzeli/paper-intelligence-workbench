@@ -1,5 +1,15 @@
 # Roadmap v3
 
+## v3.4 Documentation Site Source
+
+- Add a coherent Markdown documentation source layout with start, concepts,
+  workflows, command reference, reports, safety, development, cookbook, and
+  troubleshooting sections.
+- Keep existing docs in place and map them from the new index instead of moving
+  or deleting history.
+- Add documentation consistency checks for local links, private path patterns,
+  and `paperwb` command examples.
+
 ## v3.3 Quality Gate Patch
 
 - Add a local quality-gate runner for tests, lint, format check, script type

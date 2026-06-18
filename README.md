@@ -2,7 +2,7 @@
 
 `paper-intelligence-workbench` is a local-first CLI tool for small academic literature-review projects. It manages paper metadata, structured Markdown notes, user-recorded claims, evidence links, BibTeX validation, project profiles, theme coverage, citation-audit reports, and an optional SQLite search cache without cloud services, publisher scraping, or LLM APIs.
 
-Start with [docs/GETTING_STARTED_V3.md](docs/GETTING_STARTED_V3.md), [docs/STABLE_SURFACE_V3.md](docs/STABLE_SURFACE_V3.md), and [docs/COMMAND_CONTRACTS_V3.md](docs/COMMAND_CONTRACTS_V3.md).
+Start with the [documentation index](docs/index.md), [getting started guide](docs/getting-started/index.md), [cookbook](docs/cookbook/index.md), and [stable surface](docs/STABLE_SURFACE_V3.md).
 
 ## 🧭 What It Does
 
@@ -76,6 +76,13 @@ python -m paper_workbench.cli --help
 In offline or restricted-network environments, `pip` may be unable to fetch build dependencies for editable install. In that case, use the no-install `python -m paper_workbench.cli ...` form from the repository root, or install after local build dependencies such as `setuptools` and `pytest` are available. For normal work inside initialized workspaces, use `paperwb`; workspace data folders can shadow the Python package when using `python -m`.
 
 See [docs/INSTALLATION.md](docs/INSTALLATION.md) for release-check commands and troubleshooting.
+
+For guided use after installation, use:
+
+- [Full literature review walkthrough](docs/workflows/full-literature-review-walkthrough.md)
+- [Cookbook recipes](docs/cookbook/index.md)
+- [Report gallery](docs/reports/index.md)
+- [Troubleshooting](docs/troubleshooting/index.md)
 
 ## 🧪 Quality Gate
 

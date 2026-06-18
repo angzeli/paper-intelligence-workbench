@@ -1,6 +1,6 @@
 # Quality Gate
 
-v3.3 introduces a single local quality-gate runner:
+v3.3 introduced a single local quality-gate runner:
 
 ```bash
 python scripts/run_quality_gate.py --list
