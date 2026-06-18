@@ -73,6 +73,7 @@ from .external import (
     external_validation_markdown,
     external_workspace_summary,
     list_external_workspaces,
+    redact_external_output,
     remove_external_workspace,
     run_external_workflow,
     validate_external_workspace,
@@ -1982,7 +1983,7 @@ def cmd_external_add(args: argparse.Namespace) -> int:
     )
     print(f"Registered external workspace {workspace.name}")
     print(f"Project: {workspace.project}")
-    print(f"Path: {workspace.path}")
+    print(f"Path: {workspace.path if args.show_paths else '<redacted-external-workspace>'}")
     print("Local-only config: .paperwb-local/workspaces.json" if not args.config else f"Local-only config: {args.config}")
     print("Private data was not copied into the repository.")
     return 0
@@ -1994,17 +1995,17 @@ def cmd_external_list(args: argparse.Namespace) -> int:
         print("No external workspaces registered.")
         return 0
     for workspace in workspaces:
-        print(external_workspace_summary(workspace))
+        print(external_workspace_summary(workspace, reveal_paths=args.show_paths))
     return 0
 
 
 def cmd_external_validate(args: argparse.Namespace) -> int:
     validation = validate_external_workspace(args.name, config_path=args.config)
     if args.out:
-        path = write_text(args.out, external_validation_markdown(validation), force=args.force)
-        print(f"Wrote {path}")
+        path = write_text(args.out, external_validation_markdown(validation, reveal_paths=args.show_paths), force=args.force)
+        print(f"Wrote {redact_external_output(path, validation, reveal_paths=args.show_paths)}")
     else:
-        print(external_validation_markdown(validation), end="")
+        print(external_validation_markdown(validation, reveal_paths=args.show_paths), end="")
     return 1 if args.strict and validation.blocking_errors else 0
 
 
@@ -2023,6 +2024,7 @@ def cmd_external_run(args: argparse.Namespace) -> int:
         out=args.out or None,
         force=args.force,
         notes=args.notes,
+        reveal_paths=args.show_paths,
     )
     has_errors = any(finding.severity == "error" for finding in result.findings)
     if has_errors and not result.content:
@@ -2999,9 +3001,11 @@ def build_parser() -> argparse.ArgumentParser:
     external_add.add_argument("--description", default="", help="Optional local-only description.")
     external_add.add_argument("--config", default="", help="Local-only config path. Defaults to .paperwb-local/workspaces.json.")
     external_add.add_argument("--force", action="store_true", help="Update an existing local registration.")
+    external_add.add_argument("--show-paths", action="store_true", help="Show private local paths in terminal output. Default redacts them.")
     external_add.set_defaults(func=cmd_external_add)
     external_list = external_sub.add_parser("list", help="List registered external workspaces.")
     external_list.add_argument("--config", default="", help="Local-only config path. Defaults to .paperwb-local/workspaces.json.")
+    external_list.add_argument("--show-paths", action="store_true", help="Show private local paths in terminal output. Default redacts them.")
     external_list.set_defaults(func=cmd_external_list)
     external_validate = external_sub.add_parser("validate", help="Validate a registered external workspace without copying private data.")
     external_validate.add_argument("name", help="External workspace alias.")
@@ -3009,6 +3013,7 @@ def build_parser() -> argparse.ArgumentParser:
     external_validate.add_argument("--out", default="", help="Optional Markdown validation report path.")
     external_validate.add_argument("--force", action="store_true", help="Overwrite an existing --out report.")
     external_validate.add_argument("--strict", action="store_true", help="Return non-zero when the registered path or project structure is missing.")
+    external_validate.add_argument("--show-paths", action="store_true", help="Show private local paths in validation output. Default redacts them.")
     external_validate.set_defaults(func=cmd_external_validate)
     external_remove = external_sub.add_parser("remove", help="Remove a local external-workspace registration.")
     external_remove.add_argument("name", help="External workspace alias.")
@@ -3022,6 +3027,7 @@ def build_parser() -> argparse.ArgumentParser:
     external_run.add_argument("--force", action="store_true", help="Overwrite an existing output path where the selected workflow writes one.")
     external_run.add_argument("--notes", default="", help="Backup note used only by `external run NAME backup`.")
     external_run.add_argument("--strict", action="store_true", help="Return non-zero when error-level findings are present.")
+    external_run.add_argument("--show-paths", action="store_true", help="Show private local paths in run summaries. Default redacts them.")
     external_run.set_defaults(func=cmd_external_run)
 
     support_parser = subparsers.add_parser("support", help="Create sanitized local diagnostic support bundles.")

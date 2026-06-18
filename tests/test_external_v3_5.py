@@ -7,7 +7,7 @@ from pathlib import Path
 
 from conftest import ROOT
 from paper_workbench.dogfood import create_dogfood_project
-from paper_workbench.external import add_external_workspace, list_external_workspaces, validate_external_workspace
+from paper_workbench.external import add_external_workspace, external_validation_markdown, list_external_workspaces, validate_external_workspace
 from paper_workbench.io import write_csv_rows
 from paper_workbench.registry import REGISTRY_FIELDS
 from paper_workbench.safety import FORBIDDEN_PARTS
@@ -102,10 +102,26 @@ def test_external_workspace_validation(tmp_path: Path) -> None:
     add_external_workspace("fyp_private", external_root, project="real_demo", config_path=config)
 
     validation = validate_external_workspace("fyp_private", config_path=config)
+    report = external_validation_markdown(validation)
 
     assert validation.profile is not None
     assert validation.profile.name == "real_demo"
     assert not validation.blocking_errors
+    assert str(external_root) not in report
+    assert "<redacted-external-workspace>" in report
+
+
+def test_external_validation_show_paths_is_explicit(tmp_path: Path) -> None:
+    external_root, _project = make_external_workspace(tmp_path)
+    config = tmp_path / ".paperwb-local" / "workspaces.json"
+    add_external_workspace("fyp_private", external_root, project="real_demo", config_path=config)
+
+    validation = validate_external_workspace("fyp_private", config_path=config)
+    safe_report = external_validation_markdown(validation)
+    verbose_report = external_validation_markdown(validation, reveal_paths=True)
+
+    assert str(external_root) not in safe_report
+    assert str(external_root) in verbose_report
 
 
 def test_external_missing_path_handling(tmp_path: Path) -> None:
@@ -130,7 +146,23 @@ def test_external_cli_workflows_do_not_copy_private_data_into_repo(tmp_path: Pat
     add_result = run_cli("external", "add", "fyp_private", str(external_root), "--project", "real_demo", "--config", str(config))
     list_result = run_cli("external", "list", "--config", str(config))
     validate_result = run_cli("external", "validate", "fyp_private", "--config", str(config), "--strict")
+    validate_report = project / "reports" / "external_validate.md"
+    validate_report_result = run_cli("external", "validate", "fyp_private", "--config", str(config), "--out", str(validate_report), "--force")
+    validate_verbose_report = project / "reports" / "external_validate_verbose.md"
+    validate_verbose_result = run_cli(
+        "external",
+        "validate",
+        "fyp_private",
+        "--config",
+        str(config),
+        "--out",
+        str(validate_verbose_report),
+        "--force",
+        "--show-paths",
+    )
     doctor_result = run_cli("external", "run", "fyp_private", "doctor", "--config", str(config))
+    doctor_report = project / "reports" / "external_doctor.md"
+    doctor_report_result = run_cli("external", "run", "fyp_private", "doctor", "--config", str(config), "--out", str(doctor_report), "--force")
     dashboard_result = run_cli("external", "run", "fyp_private", "dashboard", "--config", str(config))
     registry_result = run_cli("external", "run", "fyp_private", "validate-registry", "--config", str(config), "--strict")
     bib_result = run_cli("external", "run", "fyp_private", "validate-bib", "--config", str(config), "--strict")
@@ -142,9 +174,22 @@ def test_external_cli_workflows_do_not_copy_private_data_into_repo(tmp_path: Pat
     assert add_result.returncode == 0, add_result.stderr
     assert list_result.returncode == 0
     assert "fyp_private" in list_result.stdout
+    assert str(external_root) not in add_result.stdout
+    assert str(external_root) not in list_result.stdout
     assert validate_result.returncode == 0, validate_result.stderr
+    assert str(external_root) not in validate_result.stdout
+    assert validate_report_result.returncode == 0, validate_report_result.stderr
+    assert str(external_root) not in validate_report_result.stdout
+    assert str(external_root) not in validate_report.read_text(encoding="utf-8")
+    assert "<redacted-external-workspace>" in validate_report.read_text(encoding="utf-8")
+    assert validate_verbose_result.returncode == 0, validate_verbose_result.stderr
+    assert str(external_root) in validate_verbose_result.stdout
+    assert str(external_root) in validate_verbose_report.read_text(encoding="utf-8")
     assert doctor_result.returncode == 0, doctor_result.stderr
     assert "Workspace Health Report" in doctor_result.stdout
+    assert str(external_root) not in doctor_result.stdout
+    assert doctor_report_result.returncode == 0, doctor_report_result.stderr
+    assert str(external_root) not in doctor_report.read_text(encoding="utf-8")
     assert dashboard_result.returncode == 0, dashboard_result.stderr
     assert "Paper Workbench Dashboard - real_demo" in dashboard_result.stdout
     assert registry_result.returncode == 0, registry_result.stderr
@@ -153,6 +198,8 @@ def test_external_cli_workflows_do_not_copy_private_data_into_repo(tmp_path: Pat
     assert evidence_result.returncode == 0, evidence_result.stderr
     assert citation_result.returncode == 0, citation_result.stderr
     assert support_result.returncode == 0, support_result.stderr
+    for result in [claims_result, evidence_result, citation_result, support_result]:
+        assert str(external_root) not in result.stdout
 
     assert claims_out.exists()
     assert evidence_out.exists()
@@ -177,6 +224,7 @@ def test_external_cli_remove_and_backup(tmp_path: Path) -> None:
 
     assert backup_result.returncode == 0, backup_result.stderr
     assert "Created backup" in backup_result.stdout
+    assert str(external_root) not in backup_result.stdout
     assert not any(path.suffix.lower() == ".pdf" for path in (external_root / "projects" / "real_demo" / "backups").rglob("*") if path.is_file())
     assert remove_result.returncode == 0, remove_result.stderr
     assert "Removed external workspace" in remove_result.stdout

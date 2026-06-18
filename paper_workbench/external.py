@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+import re
 
 from .audit import citation_audit
 from .backups import BackupManifest, create_backup
@@ -25,6 +26,8 @@ from .tags import load_themes
 
 EXTERNAL_CONFIG_SCHEMA = "paperwb-external-workspaces-v1"
 DEFAULT_LOCAL_CONFIG = ".paperwb-local/workspaces.json"
+REDACTED_EXTERNAL_PATH = "<redacted-external-workspace>"
+GENERAL_ABSOLUTE_PATH_RE = re.compile(r"(?<![:\w>])/(?:[^\s`|,\")]+/)*[^\s`|,\")]+")
 ALLOWED_EXTERNAL_RUNS = {
     "doctor",
     "dashboard",
@@ -240,29 +243,36 @@ def inspect_external_workspace(workspace: ExternalWorkspace, *, repo_root: str |
     return ExternalValidation(workspace=workspace, workspace_root=workspace_root, profile=profile, findings=findings)
 
 
-def external_validation_markdown(validation: ExternalValidation) -> str:
+def external_validation_markdown(validation: ExternalValidation, *, reveal_paths: bool = False) -> str:
     workspace = validation.workspace
     lines = [
         "# External Workspace Validation",
         "",
         "This validation uses a local-only workspace registration. It does not copy private data into the repository.",
+        "Private paths are redacted by default; use `--show-paths` only for local debugging.",
         "",
         f"Name: {workspace.name}",
         f"Project: {workspace.project}",
-        f"Path: `{workspace.path}`",
+        f"Path: `{_redact_external_text(workspace.path, validation, reveal_paths=reveal_paths)}`",
         f"Profile loaded: {str(validation.profile is not None).lower()}",
         f"Errors: {len(validation.errors)}",
         f"Warnings: {len(validation.warnings)}",
         "",
         "## Findings",
         "",
-        findings_table(validation.findings),
+        findings_table(_redact_findings(validation.findings, validation, reveal_paths=reveal_paths)),
     ]
     return "\n".join(lines).rstrip() + "\n"
 
 
-def external_workspace_summary(workspace: ExternalWorkspace, *, base_path: str | Path = ".") -> str:
-    return f"{workspace.name}\tproject={workspace.project}\tpath={display_path(workspace.path, base_path=base_path)}"
+def external_workspace_summary(workspace: ExternalWorkspace, *, base_path: str | Path = ".", reveal_paths: bool = False) -> str:
+    path_display = display_path(workspace.path, base_path=base_path) if reveal_paths else REDACTED_EXTERNAL_PATH
+    return f"{workspace.name}\tproject={workspace.project}\tpath={path_display}"
+
+
+def redact_external_output(text: str | Path, validation: ExternalValidation, *, reveal_paths: bool = False) -> str:
+    """Redact path-like text for external workspace terminal/report output."""
+    return _redact_external_text(str(text), validation, reveal_paths=reveal_paths)
 
 
 def run_external_workflow(
@@ -274,15 +284,26 @@ def run_external_workflow(
     out: str | Path | None = None,
     force: bool = False,
     notes: str = "",
+    reveal_paths: bool = False,
 ) -> ExternalRunResult:
     if command not in ALLOWED_EXTERNAL_RUNS:
         allowed = ", ".join(sorted(ALLOWED_EXTERNAL_RUNS))
         raise ValueError(f"unsupported external run command {command!r}; allowed commands: {allowed}")
     validation = validate_external_workspace(name, config_path=config_path, root=root)
     if validation.blocking_errors:
-        return ExternalRunResult(workspace=validation.workspace, command=command, findings=validation.findings)
+        return ExternalRunResult(
+            workspace=validation.workspace,
+            command=command,
+            content=findings_table(_redact_findings(validation.findings, validation, reveal_paths=reveal_paths)) + "\n",
+            findings=validation.findings,
+        )
     if validation.profile is None:
-        return ExternalRunResult(workspace=validation.workspace, command=command, findings=validation.findings)
+        return ExternalRunResult(
+            workspace=validation.workspace,
+            command=command,
+            content=findings_table(_redact_findings(validation.findings, validation, reveal_paths=reveal_paths)) + "\n",
+            findings=validation.findings,
+        )
     profile = validation.profile
     papers = load_registry(profile.registry_path) if Path(profile.registry_path).exists() else []
     entries = parse_bibtex_file(profile.bibtex_path) if Path(profile.bibtex_path).exists() else []
@@ -322,19 +343,24 @@ def run_external_workflow(
     elif command == "claims":
         target = Path(out) if out else default_reports_dir / "external_claims.csv"
         outputs.append(save_claims_csv(claims, target, force=force, root=profile.root))
-        content = f"Wrote {outputs[-1]}\nClaims: {len(claims)}\n"
+        content = f"Wrote {_redact_external_text(str(outputs[-1]), validation, reveal_paths=reveal_paths)}\nClaims: {len(claims)}\n"
     elif command == "evidence-map":
         target = Path(out) if out else default_reports_dir / "external_evidence_map.md"
         outputs.append(write_text(target, evidence_map_report(papers, claims, themes, notes_data), force=force))
-        content = f"Wrote {outputs[-1]}\n"
+        content = f"Wrote {_redact_external_text(str(outputs[-1]), validation, reveal_paths=reveal_paths)}\n"
     elif command == "citation-audit":
         target = Path(out) if out else default_reports_dir / "external_citation_audit.md"
         findings = citation_audit(papers, notes_data, claims, entries, themes, root=profile.root)
         outputs.append(write_text(target, citation_audit_report(findings), force=force))
-        content = f"Wrote {outputs[-1]}\nFindings: {len(findings)}\n"
+        content = f"Wrote {_redact_external_text(str(outputs[-1]), validation, reveal_paths=reveal_paths)}\nFindings: {len(findings)}\n"
     elif command == "support-bundle":
         bundle = create_support_bundle(project=profile.name, root=validation.workspace_root, out_dir=out or None, force=force)
-        content = f"Wrote support bundle to {bundle.out_dir}\nProject: {bundle.project}\nSafe mode: {str(bundle.safe).lower()}\nFiles: {len(bundle.files_written)}\n"
+        content = (
+            f"Wrote support bundle to {_redact_external_text(str(bundle.out_dir), validation, reveal_paths=reveal_paths)}\n"
+            f"Project: {bundle.project}\n"
+            f"Safe mode: {str(bundle.safe).lower()}\n"
+            f"Files: {len(bundle.files_written)}\n"
+        )
         outputs.append(Path(bundle.out_dir))
     elif command == "backup":
         manifest, backup_path = create_backup(
@@ -348,17 +374,61 @@ def run_external_workflow(
             include_reports=False,
             notes=notes,
         )
-        content = f"Created backup {manifest.backup_id}\nPath: {backup_path}\nFiles: {len(manifest.included_files)}\n"
+        content = f"Created backup {manifest.backup_id}\nPath: {_redact_external_text(str(backup_path), validation, reveal_paths=reveal_paths)}\nFiles: {len(manifest.included_files)}\n"
         outputs.append(backup_path)
         return ExternalRunResult(workspace=validation.workspace, command=command, content=content, outputs=outputs, findings=validation.findings, backup=manifest)
     else:  # pragma: no cover - guarded above
         raise AssertionError(command)
 
+    content = _redact_external_text(content, validation, reveal_paths=reveal_paths)
     if out and command not in {"claims", "evidence-map", "citation-audit", "support-bundle"}:
         target = write_text(out, content, force=force)
         outputs.append(target)
-        content = f"Wrote {target}\n"
-    return ExternalRunResult(workspace=validation.workspace, command=command, content=content, outputs=outputs, findings=result_findings)
+        content = f"Wrote {_redact_external_text(str(target), validation, reveal_paths=reveal_paths)}\n"
+    return ExternalRunResult(
+        workspace=validation.workspace,
+        command=command,
+        content=content,
+        outputs=outputs,
+        findings=result_findings,
+    )
+
+
+def _redact_findings(findings: list[ValidationFinding], validation: ExternalValidation, *, reveal_paths: bool = False) -> list[ValidationFinding]:
+    if reveal_paths:
+        return findings
+    return [
+        ValidationFinding(
+            severity=finding.severity,
+            code=finding.code,
+            message=_redact_external_text(finding.message, validation, reveal_paths=False),
+            source=_redact_external_text(finding.source, validation, reveal_paths=False),
+            identifier=_redact_external_text(finding.identifier, validation, reveal_paths=False),
+            suggestion=_redact_external_text(finding.suggestion, validation, reveal_paths=False),
+        )
+        for finding in findings
+    ]
+
+
+def _redact_external_text(text: str, validation: ExternalValidation, *, reveal_paths: bool = False) -> str:
+    if reveal_paths:
+        return text
+    redacted = text
+    path_values = [validation.workspace.path, str(validation.workspace_root)]
+    if validation.profile is not None:
+        path_values.extend(
+            [
+                str(validation.profile.root),
+                str(validation.profile.registry_path),
+                str(validation.profile.bibtex_path),
+                str(validation.profile.notes_dir),
+                str(validation.profile.themes_path),
+                str(validation.profile.reports_dir),
+            ]
+        )
+    for value in sorted({path for path in path_values if path}, key=len, reverse=True):
+        redacted = redacted.replace(value, REDACTED_EXTERNAL_PATH)
+    return GENERAL_ABSOLUTE_PATH_RE.sub(REDACTED_EXTERNAL_PATH, redacted)
 
 
 def _workspace_to_dict(workspace: ExternalWorkspace) -> dict[str, str]:

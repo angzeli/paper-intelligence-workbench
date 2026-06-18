@@ -48,11 +48,15 @@ Report outputs default to the external workspace when the selected workflow
 writes files. You can pass `--out <external_workspace>/...` explicitly when you
 need a specific destination.
 
+External validation reports and run summaries redact private local paths by
+default, even when written with `--out`. Use `--show-paths` only for private
+local debugging, and do not commit outputs generated with that flag.
+
 ## Safety Boundary
 
 - The adapter stores pointers, not copied papers.
 - It does not copy PDFs, notes, drafts, or BibTeX into the repository.
+- External validation and run summaries redact private paths by default.
 - Support bundles remain redacted by default.
 - Backups created through external mode live under the external project root.
 - Do not stage `.paperwb-local/`.
-

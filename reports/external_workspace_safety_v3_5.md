@@ -10,6 +10,8 @@
 - No private notes or drafts copied into the repository.
 - No real paper metadata committed by the adapter.
 - Support bundles stay redacted by default.
+- External validation reports and run summaries redact private local paths by
+  default. `--show-paths` is the explicit local-only opt-in.
 
 ## Ignored Local State
 
@@ -25,6 +27,7 @@ audit treats it as a forbidden tracked artifact.
 - External workspace validation.
 - Missing path rejection.
 - External doctor/dashboard/validation runs.
+- Redacted external validation reports, including `--out` report files.
 - Claims, evidence map, and citation-audit outputs written to external paths.
 - Support bundle redaction from an external workspace.
 - Backup creation in the external project root without copying PDFs.
@@ -37,4 +40,3 @@ audit treats it as a forbidden tracked artifact.
 - Validation includes project-readiness findings, so early real projects may
   show many evidence/theme gaps.
 - The local pointer file is private local state; users must not share it.
-

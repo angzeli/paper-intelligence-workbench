@@ -40,7 +40,10 @@ paperwb external remove NAME
 
 External registrations are stored in ignored `.paperwb-local/workspaces.json`.
 They point at local workspaces outside the repository and do not copy private
-data into tracked files. See [EXTERNAL_WORKSPACES.md](EXTERNAL_WORKSPACES.md).
+data into tracked files. External validation reports and run summaries redact
+private local paths by default; add `--show-paths` only for local debugging
+outputs that will not be committed or shared. See
+[EXTERNAL_WORKSPACES.md](EXTERNAL_WORKSPACES.md).
 
 ## Stable Core Reports
 

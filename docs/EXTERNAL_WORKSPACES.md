@@ -10,6 +10,7 @@ the repository.
 paperwb external add NAME <external_workspace> --project PROJECT
 paperwb external list
 paperwb external validate NAME
+paperwb external validate NAME --out scratch/external_validation.md
 paperwb external remove NAME
 paperwb external run NAME doctor
 ```
@@ -41,3 +42,6 @@ projects are visible. With `--strict`, only missing external path/project
 structure blocks the command; weak evidence or under-supported themes remain
 findings for the user to address.
 
+Validation reports and run summaries redact private local paths by default.
+Use `--show-paths` only for local debugging when the output will not be
+committed or shared.

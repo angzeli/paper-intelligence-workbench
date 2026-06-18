@@ -260,3 +260,11 @@ Recommended next sequence:
    from local-only verbose outputs.
 4. Add transcript tests for the most important stable cookbook recipes.
 5. Keep v3.6 focused on tightening existing contracts, not adding features.
+
+## Post-Review Fix Status
+
+The high-priority external-workspace path redaction issue identified in this
+review has been fixed in the follow-up patch. External validation reports and
+external run summaries now redact private local paths by default, and
+`--show-paths` is the explicit local-only opt-in. Regression coverage was added
+in `tests/test_external_v3_5.py`.

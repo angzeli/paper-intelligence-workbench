@@ -12,6 +12,7 @@ repository while still using the Paper Intelligence Workbench CLI.
 paperwb external add NAME <external_workspace> --project PROJECT
 paperwb external list
 paperwb external validate NAME --strict
+paperwb external validate NAME --out scratch/external_validation.md
 paperwb external remove NAME
 paperwb external run NAME doctor
 ```
@@ -46,6 +47,10 @@ BibTeX, registry rows, or private project reports into this repository.
 Workflow outputs are printed to stdout, written to user-specified paths, or
 written into the external workspace.
 
+External validation reports and run summaries redact private local paths by
+default. `--show-paths` is available only as an explicit local-debugging opt-in
+for outputs that will not be committed or shared.
+
 ## Validation
 
 External validation checks that the registered path and project profile can be
@@ -53,4 +58,3 @@ resolved. It also includes workspace-health findings so incomplete real
 projects remain visible. Structural errors block `external run`; ordinary
 project-readiness findings do not prevent dashboard, report, or support-bundle
 generation.
-
