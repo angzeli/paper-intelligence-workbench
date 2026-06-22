@@ -1,270 +1,266 @@
 # Hostile Maintainer Review: Current Repository
 
-Date: 2026-06-18
+Date: 2026-06-22 14:19:33 CST
 
-Scope: standalone release-gate review of Paper Intelligence Workbench v3.5 as
-if deciding whether this version is safe for local dogfooding. I inspected
-package architecture, CLI behavior, stable versus experimental surface docs,
-registry and BibTeX workflows, notes and claims, evidence maps,
-manuscript/draft QA, reading sessions, imports/exports, sync/conflict
-planning, search/indexing, backup/migration/integrity, rule engine,
-dashboard, evidence graph, claim lifecycle, workflow runner,
-collaboration/review packets, performance/incremental rebuilds, support
-bundles, compatibility/migration behavior, private external workspaces, tests,
-docs, notebooks, reports, synthetic data, data-safety boundaries,
-`.gitignore`, and git status.
+Scope: standalone release-gate review of the current Paper Intelligence
+Workbench repository as if deciding whether this version is safe for local
+dogfooding. I inspected package architecture, CLI behavior, stable versus
+experimental surface docs, registry and BibTeX workflows, notes and claims,
+evidence maps, manuscript/draft QA, reading sessions, imports/exports,
+sync/conflict planning, search/indexing, backup/migration/integrity, rule
+engine, dashboard, evidence graph, claim lifecycle, workflow runner,
+collaboration/review packets, performance/incremental rebuilds, tests, docs,
+notebooks, reports, synthetic data, data-safety boundaries, `.gitignore`, and
+git status.
 
 ## Release Verdict
 
-**Ready for local dogfooding as v3.5, but not ready to call public-release
-polished.**
+**Ready for private local dogfooding, not ready for a public push or tag from
+this worktree.**
 
-I found no release blocker that should stop local dogfooding. The package
-imports as `3.5`, the full test suite passes, stable registry and BibTeX
-validation pass on the clean synthetic project, docs and notebooks validate,
-the data-safety audit reports zero findings, and representative stable and
-experimental smoke commands run without unexpected writes.
+The product surface is dogfoodable: package import works, the CLI loads, full
+pytest passes, docs and notebooks validate structurally, the data-safety audit
+reports zero findings, and representative stable/safety-sensitive workflows run
+without unsafe writes.
 
-The main risk is no longer basic functionality. The main risk is operational
-discipline around a large CLI surface. The project has many subsystems, a
-4,000-line CLI dispatcher, hundreds of generated reports, and now a private
-external-workspace adapter. That adapter is useful, but one part of its output
-still exposes absolute external workspace paths unless the user keeps the
-report local. That should be fixed before recommending external-mode reports
-to less careful users.
+The blocker is release hygiene, not core functionality. The worktree contains
+pre-existing tracked modifications in source, test, and notebook files. Even
+though tests pass, a public release or tag should not be cut from a dirty tree
+whose unrelated changes are not reviewed, committed, or intentionally reverted.
 
 ## Validation Performed
 
-- `git status --short --branch --ignored`: branch was `main...origin/main
-  [ahead 3]`; no tracked modifications before writing this report; ignored
-  local caches, build output, project caches, backups, and local demo artifacts
-  were present.
+- `git status --short --branch --ignored`: branch `main...origin/main [ahead
+  6]`; tracked modifications are present in `notebooks/04_project_profiles_workflow.ipynb`,
+  several `paper_workbench/*.py` modules, and several tests.
+- `git diff --stat`: 11 pre-existing modified files, 190 insertions and 194
+  deletions, mostly import cleanup plus one notebook diff.
 - `python -c "import paper_workbench; print(paper_workbench.__version__)"`:
   `3.5`.
 - `paperwb --help`: passed and labels stable starting points versus
   experimental or safety-sensitive workflows.
-- Help checks passed for representative groups: `project`, `template`,
-  `external`, `support`, `report`, `sync`, `backup`, `rebuild`,
-  `review-packet`, and `rules`.
 - `paperwb validate-registry projects/clean_demo/registry.csv --strict`:
   passed with no findings.
 - `paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry
   projects/clean_demo/registry.csv --strict`: passed with no findings.
 - `paperwb dashboard --project clean_demo --no-audit-log`: passed and reported
-  zero BibTeX, citation, workspace, rule, manuscript, graph, and claim-review
+  zero validation, citation, rule, manuscript, graph, and claim-review
   findings.
-- `paperwb support doctor --project clean_demo`: passed and redacted project
-  paths.
-- `paperwb compatibility matrix`: passed and documented historical workspace
-  support.
-- `paperwb workflow list`: passed and listed built-in recipes.
-- `paperwb claims projects/clean_demo/notes --output <tmp>`: first refused an
-  existing output, then passed with a fresh output path. The refusal is correct
-  overwrite protection.
+- `paperwb list --project clean_demo`: passed.
+- `paperwb note-template clean_demo_2026 --project clean_demo`: correctly
+  refused to overwrite the existing clean-demo note.
 - `paperwb report evidence-map --project clean_demo --out <tmp> --force`:
   passed.
-- `paperwb manuscript qa drafts/synthetic_good_section.md --project
-  zis_photocatalysis --out <tmp> --force`: passed.
-- `paperwb external list`: passed with no registered external workspaces in
-  this clone.
-- `python -m pytest -q`: passed.
-- `python scripts/check_docs.py`: passed and checked 187 Markdown doc files.
-- `python scripts/validate_notebooks.py`: passed and validated 8 notebooks.
-- `python scripts/data_safety_audit.py --out <tmp> --strict`: checked 860
+- `paperwb support redact-preview --project clean_demo`: passed and redacted
+  titles, paths, claim text, quotes/paraphrases, and local PDF paths.
+- `paperwb support bundle --project clean_demo --out <tmp> --force`: passed;
+  generated 13 diagnostic files and no PDFs, databases, archives, or raw audit
+  logs.
+- `paperwb compatibility inspect tests/fixtures/workspaces/v0_1_legacy_data`:
+  passed.
+- `paperwb workflow list`: passed.
+- `paperwb sync plan --project clean_demo --source data/examples/zotero_export.csv
+  --source-type zotero-csv --out <tmp> --json-out <tmp> --strict`: passed with
+  3 actions and 0 conflicts.
+- `python scripts/check_docs.py`: passed, 188 Markdown files checked.
+- `python scripts/validate_notebooks.py`: passed, 8 notebooks validated.
+- `python scripts/data_safety_audit.py --out <tmp> --strict`: checked 866
   repository files with 0 errors and 0 warnings.
+- Tracked unsafe-artifact scan for PDFs, cache DBs, backups, audit logs,
+  Python caches, `.paperwb`, `.idea`, `.DS_Store`, and build outputs: no
+  tracked matches.
+- `python -m pytest -q`: passed.
 - `python scripts/run_quality_gate.py local-diagnostic --out <tmp>`: passed
-  available checks: mypy scripts, pytest, CLI smoke workflow, notebook
-  validation, notebook metadata checks, and data-safety audit. Ruff
-  lint/format and distribution build checks were skipped because the relevant
-  modules were not installed in this interpreter.
+  available checks. Ruff lint, Ruff format, and distribution build were
+  skipped because optional dev/build modules were not installed in this
+  interpreter.
 
 ## Release Blockers
 
-None found for local dogfooding.
+1. **Dirty tracked worktree blocks public push, release tag, or public release
+   candidate.**
+
+   Current tracked modifications exist in:
+
+   - `notebooks/04_project_profiles_workflow.ipynb`
+   - `paper_workbench/cli.py`
+   - `paper_workbench/graph.py`
+   - `paper_workbench/importers.py`
+   - `paper_workbench/index.py`
+   - `paper_workbench/migration.py`
+   - `paper_workbench/projects.py`
+   - `paper_workbench/workflow.py`
+   - `tests/test_cli_stress.py`
+   - `tests/test_golden_reports.py`
+   - `tests/test_v0_2_validation.py`
+
+   The diffs appear to be small import cleanup plus notebook churn, but they
+   are still tracked source/test/notebook changes outside this review report.
+   They must be reviewed and either committed intentionally or removed before
+   public push/tag decisions.
 
 ## High-Priority Issues
 
-1. **External workspace validation output can expose private absolute paths if
-   written into tracked reports.**
+1. **Version story is confusing for a public audience.**
 
-   Evidence: `paper_workbench/external.py` renders external validation reports
-   with the registered workspace path and finding sources. The local config is
-   correctly ignored, and support bundles redact paths by default, but
-   `paperwb external validate NAME --out reports/example.md` can still create
-   a tracked Markdown report containing the private external path.
+   Package metadata is `3.5`, current readiness reports include v3.5 and
+   v3.0rc2 labels, and the README explains this. That is workable for private
+   dogfooding, but confusing for an external public push unless the maintainer
+   states clearly whether the release line is `3.5` or `v3.0rc2`.
 
-   Impact: this does not leak anything in the current repository, and it does
-   not copy PDFs, notes, drafts, or BibTeX into the repo. It is still a
-   high-priority privacy footgun because v3.5 explicitly exists to support
-   private real-project dogfooding.
+2. **The `note-template` first-use path is safe but awkward.**
 
-   Required fix before broader user recommendation: redact external paths by
-   default in external validation and external run summaries, add an explicit
-   `--show-paths` or `--verbose-local-only` escape hatch, and add tests that
-   `--out reports/...` does not contain private absolute paths by default.
+   The clean demo already has a note, so `paperwb note-template
+   clean_demo_2026 --project clean_demo` refuses to overwrite it. The refusal
+   is correct, but public docs and cookbook examples should steer new users to
+   either an empty dogfood project or an explicit `--output scratch/...` path
+   when demonstrating note-template generation.
+
+3. **Strict release validation was not completed locally.**
+
+   `local-diagnostic` passed, but Ruff lint/format and build checks were
+   skipped because optional dev/build tooling was not installed. CI installs
+   `.[dev]`, so this is not a product blocker. It is a high-priority release
+   process issue before any tag or public push claim.
 
 ## Medium-Priority Issues
 
-1. **Strict release validation depends on dev tooling that may be absent
-   locally.**
+1. **`paper_workbench/cli.py` remains a high-change-risk module.**
 
-   Evidence: local diagnostic quality gate skipped Ruff lint/format and build
-   distribution checks because those modules were unavailable. CI installs
-   `.[dev]`, so this is not a functional dogfooding blocker.
+   The CLI file is 4,046 lines and owns parser setup, command dispatch, output
+   preflight, project resolution, safety flags, and many workflow-specific
+   behaviors. Tests currently protect it, but future changes can easily create
+   inconsistent force/dry-run/output behavior.
 
-   Impact: maintainers need CI or an explicit dev install before calling a
-   release gate strict. Local dogfooding can continue.
+2. **Reports directory is historically useful but noisy.**
 
-2. **`paper_workbench/cli.py` remains the main maintainability risk.**
+   `reports/index.md` now indexes 245 Markdown reports. The report policy is
+   documented, but old v0/v1/v2/v3 reports remain in the root reports folder.
+   This is defensible provenance, but it is not a clean public landing
+   experience.
 
-   Evidence: `paper_workbench/cli.py` is 4,041 lines and still owns parser
-   setup, command dispatch, project/path resolution, output writes, force
-   flags, and audit behavior for many command groups.
+3. **v3.0rc2 reports are classified as historical by the generated report
+   index.**
 
-   Impact: current tests cover the behavior, but future changes can easily
-   introduce flag drift, inconsistent overwrite rules, or missed command
-   contracts.
+   The report-index generator keys off semantic version-like report names and
+   treats v3.5 as current. The v3.0rc2 cleanup reports are present but listed
+   under historical reports. This is technically consistent, but it reinforces
+   the version-label confusion.
 
-3. **Docs-command checking is useful but shallow.**
+4. **Docs-command validation is useful but shallow.**
 
-   Evidence: `scripts/check_docs.py` validates links, absolute-path hygiene,
-   and top-level command names, but it does not execute cookbook commands or
-   validate subcommand flags in examples.
+   `scripts/check_docs.py` catches links, absolute-path hygiene, and top-level
+   command names. It does not execute full cookbook recipes or validate every
+   subcommand flag sequence.
 
-   Impact: the docs are much cleaner than earlier releases, but cookbook drift
-   is still possible.
+5. **Experimental surface is still very broad.**
 
-4. **The reports directory is current but heavy.**
-
-   Evidence: `reports/index.md` indexes 240 Markdown reports. It correctly
-   identifies current v3.5 reports, but the historical report volume remains
-   high.
-
-   Impact: useful provenance, noisy maintainer experience. New users should
-   not browse the reports directory unaided.
-
-5. **Experimental subsystems are numerous enough to blur product focus.**
-
-   Evidence: experimental surfaces include sync, indexed search, local files,
-   manuscript QA, reading sessions, rules, graph exports, claim lifecycle,
-   workflow recipes, review packets, rebuilds, backup/restore/migration, and
-   synthetic generation.
-
-   Impact: all are local-first and tested, but maintainers should avoid
-   promoting them as stable until real dogfooding proves the contracts.
+   Sync, indexed search, local file sidecars, manuscript QA, reading sessions,
+   rules, graph exports, claim lifecycle, workflows, review packets,
+   incremental rebuilds, backups, migrations, and compatibility tools all
+   exist. They are local-first and tested, but the product can look larger than
+   its stable dogfooding core.
 
 ## Low-Priority Polish
 
-- `paperwb --help` is comprehensive but too broad to be a guided first-run
-  experience.
-- Output and safety flags are still not fully uniform across groups:
-  `--out`, `--report`, `--reports-dir`, `--json-out`, `--force`,
-  `--force-report`, and workflow-specific dry-run flags.
-- Historical v2 and early v3 docs remain useful for provenance but can distract
-  from the v3 entry path.
-- Public Python API boundaries are documented, but internal modules remain
-  importable without private naming.
-- Notebook validation is structural by default; full execution remains a
-  manual or selective check.
+- `paperwb --help` is comprehensive but too large for first-run orientation.
+- Safety-sensitive flags are not fully uniform across command groups
+  (`--out`, `--output`, `--report`, `--json-out`, `--force`,
+  `--force-report`, `--dry-run`, `--run-writes`).
+- Public Python API boundaries are documented, but most internal modules remain
+  importable by name.
+- Notebook validation is structural by default; full execution is selective.
+- Historical docs remain useful but make the docs tree feel dense.
 
 ## Data-Safety Risks
 
-- Current tracked data-safety audit: 860 files checked, 0 errors, 0 warnings.
+- Current tracked data-safety audit: 866 files checked, 0 errors, 0 warnings.
 - No tracked PDFs, SQLite/cache DBs, backup archives, raw audit logs, `.idea`
-  files, `.paperwb` state, Python caches, `.DS_Store`, `build/`, `dist/`, or
-  egg-info artifacts were found in committed file checks.
+  files, `.paperwb` state, Python caches, `.DS_Store`, `build/`, `dist/`,
+  scratch output, or egg-info artifacts were found by the tracked-file scan.
 - `.gitignore` covers `.paperwb-local/`, `.paperwb/`, nested `.paperwb/`,
-  SQLite/database files, rebuild metadata, backups, audit logs, scratch/tmp,
+  rebuild metadata, SQLite/database files, backups, audit logs, scratch/tmp,
   stress outputs, historical hostile-review drafts, and PDFs.
-- The tracked public dogfood demo uses placeholder filenames, placeholder
-  BibTeX keys, and synthetic registry rows. I did not find committed private
-  filenames or real BibTeX metadata in that demo.
-- Residual risk: ignored local artifacts are present from dogfooding and smoke
-  checks. They are ignored, but release packaging should be done from a clean
-  clone or after rerunning the data-safety audit.
-- High-priority residual risk: external validation reports are not path-redacted
-  by default if a user writes them to a tracked location.
+- Ignored local artifacts are present, including caches, project `.paperwb`
+  folders, backups, build output, `.DS_Store`, and local public-demo cache
+  folders. They are ignored, but public packaging should happen from a clean
+  clone or after another data-safety audit.
+- Support bundle smoke output contained generated diagnostic files only. It did
+  not include PDFs, databases, backup archives, raw audit logs, private paths,
+  claim bodies, or quote text.
+- Residual data-safety risk is user behavior: verbose/local-only outputs,
+  external workspace reports with `--show-paths`, or support bundles generated
+  outside safe mode must never be committed.
 
 ## Docs Mismatches
 
-- No blocking mismatch found in current v3 docs. `README.md`, `docs/index.md`,
-  `docs/STABLE_SURFACE_V3.md`, `docs/EXPERIMENTAL_FEATURES_V3.md`,
-  `docs/CLI_REFERENCE_V3.md`, `docs/PRIVATE_DOGFOODING.md`,
-  `docs/EXTERNAL_WORKSPACES.md`, and `docs/LOCAL_ONLY_CONFIG.md` match the
-  inspected CLI surface.
-- One safety wording gap: private external workspace docs correctly state that
-  config is ignored and support bundles are redacted, but they should warn more
-  explicitly that ordinary external validation reports currently include the
-  registered external path.
-- `reports/hostile_review_latest.md` was stale v3.4 content before this review
-  and is now refreshed.
+- No broken doc links were found by `scripts/check_docs.py`.
+- README now has a clear public entry point, but the `3.5` package version plus
+  `v3.0rc2` cleanup label can confuse external users.
+- `docs/CLI_REFERENCE_V3.md` includes a stable `note-template` example that is
+  not safe to run literally against `clean_demo` without an alternate output
+  path because the note already exists.
+- Historical docs and reports are intentionally retained; they should not be
+  presented as the current user journey.
 
 ## CLI Usability Issues
 
-- The first-run command inventory is large. The docs carry the guided
-  onboarding burden.
-- External workspace validation needs safer default redaction for output
-  reports.
-- Safety-sensitive commands still use varied flag names for force, dry-run, and
-  output destination.
-- Experimental commands are well labelled, but users can still discover them
-  before understanding the stable path.
+- New users need the README/docs path because the raw CLI surface is too large
+  to infer a workflow from `paperwb --help`.
+- `note-template` overwrite protection is correct, but the failure message is
+  terse and does not suggest `--output scratch/...` or using an empty project.
+- Experimental commands are discoverable from top-level help before users read
+  the stable/experimental boundary docs.
+- Output flags vary across groups and can be hard to remember.
 
 ## Overengineering Risks
 
-- The repository now includes project templates, dogfood scaffolds, external
-  workspace adapters, registry and BibTeX validation, structured notes and
-  claims, citation audits, evidence maps, manuscript QA, reading sessions,
-  imports/exports, sync planning, local search/indexing, backup/migration/
-  integrity, rules, dashboard, evidence graph, claim lifecycle, workflow
-  recipes, review packets, support bundles, compatibility inspection,
-  incremental rebuilds, quality gates, and a docs cookbook.
-- Do not add another major subsystem before real private dogfooding produces
-  concrete bugs.
-- v3.6 should tighten existing safety contracts, especially external workspace
-  redaction and command transcript testing.
+- The repository now contains enough subsystems to behave like a small local
+  research operating system: registry/BibTeX, notes/claims, reports, authoring,
+  manuscript QA, reading sessions, import/export, sync, search, backup,
+  migration, rules, dashboard, evidence graph, lifecycle tracking, workflow
+  runner, review packets, support bundles, compatibility, rebuilds, external
+  workspaces, quality gates, and a docs cookbook.
+- Do not add another major feature until the first private real project
+  produces concrete bug reports.
+- Near-term effort should focus on command-contract hardening, docs execution
+  tests, report archiving, and resolving the dirty worktree.
 
 ## Stale Generated Reports
 
-- `reports/index.md` is current for v3.5 and lists `hostile_review_latest.md`
-  as a current report.
-- Historical reports are intentionally retained. Their main risk is cognitive
-  noise, not current incorrectness.
-- Continue regenerating `reports/index.md` whenever current release reports
-  are added.
+- `reports/index.md` is generated and current for v3.5, with 245 Markdown
+  reports indexed.
+- Historical reports are intentionally retained and useful for provenance.
+- Old release-readiness and hostile-review reports should stay out of the main
+  first-run path.
+- The v3.0rc2 artifact policy and archive plan are present, but no archive move
+  has been performed.
 
 ## Missing Tests
 
-- Add tests that external validation and external run report outputs redact
-  registered workspace paths by default.
-- Add a regression test for the explicit opt-in path-revealing mode once it
-  exists.
-- Add transcript-style tests for the highest-value cookbook recipes:
-  first project, manual paper addition, metadata validation, note template,
-  claim extraction, evidence map, citation audit, dashboard, support bundle,
-  external workspace registration, and compatibility inspection.
-- Add stricter docs-command tests for subcommand flags used in cookbook pages.
-- Add a test or clear CLI contract for empty review-packet behavior.
-- Notebook checks are structural by default; selective execution coverage
-  remains thin.
+- Add an executable docs/cookbook smoke test for the first-run path, including
+  a non-overwriting note-template example.
+- Add a clean-worktree release gate or script check that fails public-release
+  validation when tracked source/test/notebook files are dirty.
+- Add stricter command-example validation for subcommand flags in cookbook
+  pages.
+- Add a report-index test or docs note covering rc-style labels such as
+  `v3_0_rc2`.
+- Add selective notebook execution coverage for the most important notebooks.
+- Add one strict local release-gate check in environments with `.[dev]`
+  installed, so skipped Ruff/build steps cannot be mistaken for a release pass.
 
 ## Recommended Blocker-Fix Sequence
 
-No release blocker fix is required before local dogfooding.
-
-Recommended next sequence:
-
-1. Fix the high-priority external-workspace path redaction issue.
-2. Add tests proving external reports do not leak private paths by default.
-3. Update private dogfooding docs to distinguish redacted diagnostic outputs
-   from local-only verbose outputs.
-4. Add transcript tests for the most important stable cookbook recipes.
-5. Keep v3.6 focused on tightening existing contracts, not adding features.
-
-## Post-Review Fix Status
-
-The high-priority external-workspace path redaction issue identified in this
-review has been fixed in the follow-up patch. External validation reports and
-external run summaries now redact private local paths by default, and
-`--show-paths` is the explicit local-only opt-in. Regression coverage was added
-in `tests/test_external_v3_5.py`.
+1. Resolve the dirty tracked files: review, commit intentionally, or revert
+   with user approval.
+2. Rerun `python -m pytest -q`.
+3. Rerun `python scripts/run_quality_gate.py release --out scratch/release_quality_gate.md`
+   in an environment with `.[dev]` installed.
+4. Fix the `note-template` documentation/usability issue by using an empty
+   project or `--output scratch/...` in public examples.
+5. Decide and document whether the public release identity is `3.5` or
+   `v3.0rc2`.
+6. Regenerate `reports/index.md` if any release reports change.
+7. Rerun `python scripts/data_safety_audit.py --out scratch/data_safety.md --strict`
+   before any public push or tag.
