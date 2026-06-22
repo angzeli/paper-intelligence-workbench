@@ -2,7 +2,7 @@
 
 Reports directory: .
 
-Markdown reports indexed: 240
+Markdown reports indexed: 245
 
 Versioned hostile-review drafts are omitted from this index; `hostile_review_latest.md` is the canonical current review.
 
@@ -22,6 +22,7 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [adversarial_test_summary_v0_10.md](adversarial_test_summary_v0_10.md)
 - [architecture_audit_v2_6.md](architecture_audit_v2_6.md)
 - [architecture_review_v1_8.md](architecture_review_v1_8.md)
+- [artifact_inventory_v3_0_rc2.md](artifact_inventory_v3_0_rc2.md)
 - [audit_log_demo_v0_9.md](audit_log_demo_v0_9.md)
 - [backup_manifest_demo_v0_9.md](backup_manifest_demo_v0_9.md)
 - [backup_manifest_demo_v2_3.md](backup_manifest_demo_v2_3.md)
@@ -73,8 +74,10 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [external_user_simulation_v1_0_rc.md](external_user_simulation_v1_0_rc.md)
 - [external_user_simulation_v2_0_rc.md](external_user_simulation_v2_0_rc.md)
 - [failure_mode_matrix_v0_10.md](failure_mode_matrix_v0_10.md)
+- [final_public_push_readiness_v3_0_rc2.md](final_public_push_readiness_v3_0_rc2.md)
 - [final_release_verdict_v2_0_rc.md](final_release_verdict_v2_0_rc.md)
 - [final_release_verdict_v3_0_rc.md](final_release_verdict_v3_0_rc.md)
+- [first_real_dogfooding_plan_v3_0_rc2.md](first_real_dogfooding_plan_v3_0_rc2.md)
 - [followups_v1_2.md](followups_v1_2.md)
 - [full_text_sidecar_demo_v0_5.md](full_text_sidecar_demo_v0_5.md)
 - [fyp_photocatalysis_theme_pack_v2_0.md](fyp_photocatalysis_theme_pack_v2_0.md)
@@ -155,10 +158,12 @@ Versioned hostile-review drafts are omitted from this index; `hostile_review_lat
 - [release_readiness_v2_5.md](release_readiness_v2_5.md)
 - [release_readiness_v2_6.md](release_readiness_v2_6.md)
 - [release_readiness_v3_0_rc.md](release_readiness_v3_0_rc.md)
+- [release_readiness_v3_0_rc2.md](release_readiness_v3_0_rc2.md)
 - [release_readiness_v3_1.md](release_readiness_v3_1.md)
 - [release_readiness_v3_2.md](release_readiness_v3_2.md)
 - [release_readiness_v3_3.md](release_readiness_v3_3.md)
 - [release_readiness_v3_4.md](release_readiness_v3_4.md)
+- [report_archive_plan_v3_0_rc2.md](report_archive_plan_v3_0_rc2.md)
 - [report_cleanup_recommendations_v2_0_rc.md](report_cleanup_recommendations_v2_0_rc.md)
 - [report_index_v0_4.md](report_index_v0_4.md)
 - [report_inventory_v2_0_rc.md](report_inventory_v2_0_rc.md)
