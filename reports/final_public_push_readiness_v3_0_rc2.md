@@ -2,17 +2,17 @@
 
 ## Verdict
 
-**Ready for private dogfooding only.**
+**Ready for private dogfooding. Public push is reasonable as an experimental repository after one strict release-gate run in a dev-tooling environment.**
 
-The committed repository appears functionally dogfoodable and locally safe, but the current worktree is not a clean public-release worktree because tracked code/test/notebook modifications existed before this cleanup pass.
+The committed repository appears functionally dogfoodable and locally safe. The tracked code/test/notebook modifications called out by the hostile review were reviewed and committed as import cleanup.
 
 ## Public Push Assessment
 
 Public push is reasonable as an experimental repository after:
 
-1. resolving the pre-existing tracked modifications
-2. rerunning full tests
-3. rerunning data-safety audit
+1. rerunning full tests
+2. rerunning data-safety audit
+3. running the strict release quality gate with `.[dev]` installed
 4. confirming no ignored local artifacts are staged
 5. deciding whether to archive historical reports
 
@@ -51,7 +51,7 @@ Public push is reasonable as an experimental repository after:
 
 ## Recommended Next Action
 
-Resolve or commit the pre-existing tracked modifications, then run:
+Install dev tooling if needed, then run:
 
 ```bash
 python -m pytest -q

@@ -184,6 +184,19 @@ def test_public_quickstarts_use_clean_demo_and_label_zis_as_imperfect():
     assert "green first-run validation path" in getting_started
 
 
+def test_public_docs_clarify_release_line_and_note_template_output_flag():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    cli_reference = (ROOT / "docs" / "CLI_REFERENCE_V3.md").read_text(encoding="utf-8")
+    cookbook = (ROOT / "docs" / "cookbook" / "index.md").read_text(encoding="utf-8")
+    readiness = (ROOT / "reports" / "release_readiness_v3_0_rc2.md").read_text(encoding="utf-8")
+
+    assert "Current release line and package metadata are `3.5`" in readme
+    assert "not a separate package version or rollback target" in readiness
+    for content in (cli_reference, cookbook):
+        assert "paperwb note-template clean_demo_2026 --project clean_demo --output scratch/clean_demo_note.md --force" in content
+        assert "paperwb note-template clean_demo_2026 --project clean_demo --out scratch/clean_demo_note.md" not in content
+
+
 def test_command_contracts_document_non_strict_validation_exit_behavior():
     content = (ROOT / "docs" / "COMMAND_CONTRACTS_V2.md").read_text(encoding="utf-8")
 

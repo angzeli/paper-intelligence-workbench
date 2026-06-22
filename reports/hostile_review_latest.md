@@ -15,26 +15,30 @@ git status.
 
 ## Release Verdict
 
-**Ready for private local dogfooding, not ready for a public push or tag from
-this worktree.**
+**Ready for private local dogfooding. Public push is reasonable as an
+experimental repository after the maintainer decides to publish, but no tag or
+push should happen automatically from this review.**
 
 The product surface is dogfoodable: package import works, the CLI loads, full
 pytest passes, docs and notebooks validate structurally, the data-safety audit
 reports zero findings, and representative stable/safety-sensitive workflows run
 without unsafe writes.
 
-The blocker is release hygiene, not core functionality. The worktree contains
-pre-existing tracked modifications in source, test, and notebook files. Even
-though tests pass, a public release or tag should not be cut from a dirty tree
-whose unrelated changes are not reviewed, committed, or intentionally reverted.
+The release-hygiene blocker found in this review was resolved during the
+follow-up fix pass by reviewing and committing the pending source/test/notebook
+cleanup. Public release still needs an explicit maintainer decision; this
+review did not push, tag, or publish anything.
 
 ## Validation Performed
 
-- `git status --short --branch --ignored`: branch `main...origin/main [ahead
-  6]`; tracked modifications are present in `notebooks/04_project_profiles_workflow.ipynb`,
-  several `paper_workbench/*.py` modules, and several tests.
-- `git diff --stat`: 11 pre-existing modified files, 190 insertions and 194
-  deletions, mostly import cleanup plus one notebook diff.
+- Initial `git status --short --branch --ignored`: branch
+  `main...origin/main [ahead 6]`; tracked modifications were present in
+  `notebooks/04_project_profiles_workflow.ipynb`, several `paper_workbench/*.py`
+  modules, and several tests.
+- Initial `git diff --stat`: 11 pre-existing modified files, 190 insertions
+  and 194 deletions, mostly import cleanup plus one notebook diff.
+- Follow-up fix pass: those tracked modifications were reviewed and committed
+  as unused-import cleanup.
 - `python -c "import paper_workbench; print(paper_workbench.__version__)"`:
   `3.5`.
 - `paperwb --help`: passed and labels stable starting points versus
@@ -71,57 +75,34 @@ whose unrelated changes are not reviewed, committed, or intentionally reverted.
   tracked matches.
 - `python -m pytest -q`: passed.
 - `python scripts/run_quality_gate.py local-diagnostic --out <tmp>`: passed
-  available checks. Ruff lint, Ruff format, and distribution build were
-  skipped because optional dev/build modules were not installed in this
-  interpreter.
+  available checks during review.
+- Follow-up fix pass installed the documented dev/build tooling and reran
+  `python scripts/run_quality_gate.py release --out <tmp>`: Ruff lint, Ruff
+  format check, mypy scripts, pytest, CLI smoke workflow, notebook validation,
+  notebook checks, data-safety audit, and distribution build all passed.
 
 ## Release Blockers
 
-1. **Dirty tracked worktree blocks public push, release tag, or public release
-   candidate.**
+None remaining after the follow-up blocker-fix pass.
 
-   Current tracked modifications exist in:
-
-   - `notebooks/04_project_profiles_workflow.ipynb`
-   - `paper_workbench/cli.py`
-   - `paper_workbench/graph.py`
-   - `paper_workbench/importers.py`
-   - `paper_workbench/index.py`
-   - `paper_workbench/migration.py`
-   - `paper_workbench/projects.py`
-   - `paper_workbench/workflow.py`
-   - `tests/test_cli_stress.py`
-   - `tests/test_golden_reports.py`
-   - `tests/test_v0_2_validation.py`
-
-   The diffs appear to be small import cleanup plus notebook churn, but they
-   are still tracked source/test/notebook changes outside this review report.
-   They must be reviewed and either committed intentionally or removed before
-   public push/tag decisions.
+Resolved blocker: the dirty tracked worktree was reviewed and committed as
+import cleanup. The current release process still requires a maintainer
+decision before public push or tagging.
 
 ## High-Priority Issues
 
-1. **Version story is confusing for a public audience.**
+None remaining after the follow-up blocker-fix pass.
 
-   Package metadata is `3.5`, current readiness reports include v3.5 and
-   v3.0rc2 labels, and the README explains this. That is workable for private
-   dogfooding, but confusing for an external public push unless the maintainer
-   states clearly whether the release line is `3.5` or `v3.0rc2`.
+Resolved high-priority items:
 
-2. **The `note-template` first-use path is safe but awkward.**
-
-   The clean demo already has a note, so `paperwb note-template
-   clean_demo_2026 --project clean_demo` refuses to overwrite it. The refusal
-   is correct, but public docs and cookbook examples should steer new users to
-   either an empty dogfood project or an explicit `--output scratch/...` path
-   when demonstrating note-template generation.
-
-3. **Strict release validation was not completed locally.**
-
-   `local-diagnostic` passed, but Ruff lint/format and build checks were
-   skipped because optional dev/build tooling was not installed. CI installs
-   `.[dev]`, so this is not a product blocker. It is a high-priority release
-   process issue before any tag or public push claim.
+- The README and readiness reports now state that `3.5` is the active release
+  line and that `v3.0rc2` is a historical cleanup-report label, not a package
+  version or rollback target.
+- Public `note-template` examples now use `--output scratch/... --force` for
+  clean-demo note-template generation instead of implying writes to the
+  existing clean-demo note path.
+- The strict release quality gate now passes in this local environment after
+  installing the documented dev/build tooling and fixing four Ruff findings.
 
 ## Medium-Priority Issues
 

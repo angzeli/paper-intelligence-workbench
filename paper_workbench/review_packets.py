@@ -162,7 +162,7 @@ def create_review_packet(
     files: list[str] = []
 
     def write_file(name: str, content: str) -> None:
-        path = write_text(target / name, content, force=force)
+        write_text(target / name, content, force=force)
         files.append(name)
 
     write_comment_template(items, target / "comments.csv", force=force)

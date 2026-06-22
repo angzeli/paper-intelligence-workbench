@@ -73,7 +73,7 @@ review.
 Purpose: create a user-editable note template.
 
 ```bash
-paperwb note-template clean_demo_2026 --project clean_demo --out scratch/clean_demo_note.md --force
+paperwb note-template clean_demo_2026 --project clean_demo --output scratch/clean_demo_note.md --force
 ```
 
 Expected output: a Markdown note template.

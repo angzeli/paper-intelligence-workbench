@@ -131,7 +131,7 @@ The strict release quality gate expects development tooling from `.[dev]`.
 
 ## Status
 
-Current package metadata is `3.5`. The `v3.0rc2` cleanup reports are release-hardening artifacts for deciding whether the repository is clean enough for a later public push or local tag. No release has been published from this repository.
+Current release line and package metadata are `3.5`. The `v3.0rc2` reports are historical release-hardening artifacts from the stabilization cycle, not a separate package version or rollback target. No release has been published from this repository.
 
 ## Author
 

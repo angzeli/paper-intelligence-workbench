@@ -114,7 +114,6 @@ def check_workspace_integrity(
     parsed_notes = []
     claims = []
     entries = []
-    theme_defs = []
     if registry.exists():
         papers = load_registry(registry)
     if notes.exists():
@@ -123,7 +122,7 @@ def check_workspace_integrity(
     if bibtex.exists():
         entries = parse_bibtex_file(bibtex)
     if themes.exists():
-        theme_defs = load_themes(themes)
+        load_themes(themes)
     if papers:
         findings.extend(validate_registry(papers, root=Path(profile.root) if profile else root_path, claims=claims))
     if entries or papers:

@@ -15,7 +15,7 @@ paperwb external validate fyp_zis_real --strict
 paperwb validate-registry projects/clean_demo/registry.csv --strict
 paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict
 paperwb list --project clean_demo
-paperwb note-template PAPER_ID --project clean_demo
+paperwb note-template clean_demo_2026 --project clean_demo --output scratch/clean_demo_note.md --force
 paperwb claims projects/clean_demo/notes --output scratch/claims.csv
 paperwb dashboard --project clean_demo --no-audit-log
 paperwb doctor --project clean_demo
@@ -109,6 +109,8 @@ formats are not frozen. Use `--dry-run` when available.
 
 - `--strict`: fail validation scripts on error-level findings.
 - `--out`: write a report or export.
+- `--output`: write note-template or claims output where that command uses
+  `--output` instead of `--out`.
 - `--force`: overwrite an existing output where supported.
 - `--dry-run`: plan without applying writes where supported.
 - `--project`: use a project profile under `projects/`.

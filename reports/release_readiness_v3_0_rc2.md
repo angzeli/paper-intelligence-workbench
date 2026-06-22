@@ -2,7 +2,7 @@
 
 ## Scope
 
-v3.0rc2 is a public-release cleanup and dogfooding-readiness label layered on top of package metadata `3.5`. It is not a package-version rollback.
+The active release line and package metadata are `3.5`. `v3.0rc2` is a historical public-release cleanup and dogfooding-readiness report label from the stabilization cycle. It is not a separate package version or rollback target.
 
 ## Cleanup Performed
 
@@ -29,15 +29,20 @@ v3.0rc2 is a public-release cleanup and dogfooding-readiness label layered on to
 - stable CLI smoke commands
 - external workspace redaction smoke commands
 
+## Fix Follow-up
+
+- The pre-existing tracked code, test, and notebook modifications called out by the latest hostile review were reviewed as unused-import cleanup and committed intentionally.
+- Public note-template examples now use `--output scratch/...` so users do not hit the existing clean-demo note path unless they explicitly use `--force`.
+- Public docs now state that `3.5` is the active release line and that `v3.0rc2` is a cleanup-report label.
+
 ## Known Limitations
 
-- The working tree had pre-existing tracked modifications in code, tests, and one notebook before this cleanup task. Resolve those before tagging or public release.
 - Strict release quality gate requires development tooling such as Ruff and build support to be installed.
 - Reports should be archived in a future dedicated cleanup after confirming docs and tests do not depend on current paths.
 - Experimental command schemas are not frozen.
 
 ## Verdict
 
-**Ready for private dogfooding only from this worktree.**
+**Ready for private dogfooding from this worktree after the blocker-fix pass.**
 
-Public push as an experimental repository is reasonable only after the pre-existing tracked modifications are reviewed, committed, or intentionally discarded, and after a final clean-clone data-safety audit.
+Public push as an experimental repository is reasonable after a final strict release quality gate in a dev-tooling environment and a final clean-clone data-safety audit.

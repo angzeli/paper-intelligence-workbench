@@ -171,7 +171,7 @@ def clear_index(index_path: str | Path, *, project_id: str | None = None) -> Non
 
 def rebuild_index(index_path: str | Path, records: list[IndexedRecord], *, project_id: str) -> IndexStatus:
     records = unique_indexed_records(records)
-    fts_enabled = init_index(index_path)
+    init_index(index_path)
     now = datetime.now(timezone.utc).isoformat()
     with _connect(index_path) as connection:
         has_fts = _has_fts_table(connection)
@@ -658,12 +658,12 @@ def _row_to_result(row: sqlite3.Row, query: str, *, exact: bool) -> SearchResult
 
 def _matched_field(row: sqlite3.Row, query: str, *, exact: bool) -> str:
     fields = ("title", "tags", "body_text")
-    for field in fields:
-        value = row[field].lower()
+    for field_name in fields:
+        value = row[field_name].lower()
         if exact and query.lower() in value:
-            return field
+            return field_name
         if not exact and all(term in value for term in query.lower().split()):
-            return field
+            return field_name
     return "body_text"
 
 
