@@ -14,8 +14,8 @@ from .bibtex import parse_bibtex_file
 from .errors import format_error_message
 from .io import load_json, read_text, write_text
 from .paths import display_path
-from .registry import REGISTRY_FIELDS, generate_paper_id, normalize_doi, normalize_title, parse_authors, paper_from_row, paper_to_row
-from .schema import Author, Paper, SourceType, ValidationFinding, enum_values
+from .registry import REGISTRY_FIELDS, generate_paper_id, normalize_doi, normalize_title, parse_authors, paper_from_row
+from .schema import Paper, SourceType, ValidationFinding
 from .tags import format_tags, parse_tags
 
 

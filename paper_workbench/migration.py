@@ -8,7 +8,7 @@ import shutil
 
 from . import __version__
 from .backups import BackupManifest, create_backup
-from .io import write_json, write_text
+from .io import write_json
 from .paths import default_bibtex_path, default_notes_dir, default_registry_path, default_reports_dir, default_themes_path, project_root
 from .projects import PROJECT_CONFIG, project_dir
 

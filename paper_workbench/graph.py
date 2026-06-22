@@ -6,7 +6,7 @@ tracked by the workbench. It does not infer scientific truth or invent claims.
 
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
@@ -19,9 +19,9 @@ from .claim_lifecycle import ClaimLifecycleRecord, lifecycle_status_for_claim
 from .claims import collect_notes
 from .io import write_text
 from .reading import ReadingSession, load_reading_sessions_with_warnings
-from .registry import display_authors, load_registry, normalize_title
-from .schema import BibTeXEntry, Claim, Paper, PaperNote, ProjectTheme, dataclass_to_plain
-from .tags import load_themes, normalize_tag, parse_tags, theme_by_tag
+from .registry import load_registry, normalize_title
+from .schema import BibTeXEntry, Paper, PaperNote, ProjectTheme, dataclass_to_plain
+from .tags import load_themes, normalize_tag, theme_by_tag
 
 
 PAPER = "paper"

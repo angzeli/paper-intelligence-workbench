@@ -4,7 +4,7 @@ import json
 import subprocess
 import sys
 
-from conftest import ROOT, STRESS_ZIS_PROJECT
+from conftest import STRESS_ZIS_PROJECT
 
 
 def run_cli(*args: str):

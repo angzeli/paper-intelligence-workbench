@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from paper_workbench.claims import collect_claims
 from paper_workbench.notes import parse_note
 from paper_workbench.registry import add_paper, load_registry, validate_registry
 

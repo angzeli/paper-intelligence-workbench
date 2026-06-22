@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 
 from paper_workbench.audit import citation_audit
 from paper_workbench.bibtex import parse_bibtex_file, validate_bibtex

@@ -168,7 +168,6 @@ from .reading import (
     finish_reading_session,
     followups_report,
     load_followup_state_with_warnings,
-    load_reading_sessions,
     load_reading_sessions_with_warnings,
     mark_followup_done,
     reading_queue_report,

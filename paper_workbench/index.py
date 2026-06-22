@@ -12,7 +12,7 @@ import sqlite3
 
 from .bibtex import parse_bibtex_file
 from .claims import collect_notes
-from .io import read_text, write_text
+from .io import read_text
 from .paths import display_path as _shared_display_path
 from .registry import display_authors, load_registry, normalize_doi, normalize_title
 from .schema import BibTeXEntry, Claim, Paper, PaperNote, ProjectTheme

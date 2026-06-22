@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 
 from .io import load_json, write_json
-from .paths import default_projects_dir, project_root
+from .paths import default_projects_dir
 from .registry import create_empty_registry
 from .schema import ProjectProfile
 from .errors import format_error_message

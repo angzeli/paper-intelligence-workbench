@@ -7,7 +7,6 @@ types and never execute arbitrary shell commands or Python code from JSON.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-import json
 from pathlib import Path
 from time import perf_counter
 from typing import Any
