@@ -36,11 +36,23 @@ Review the plan manually. Add only verified metadata to the registry.
 
 ## First Week
 
-1. Choose a small starter set.
-2. Validate registry and BibTeX after every batch.
-3. Generate note templates for papers you actually read.
-4. Fill claims manually with evidence locations.
-5. Generate evidence-map and citation-audit reports.
-6. Use dashboard and rules reports for cleanup before drafting.
+1. Create an external private workspace.
+2. Initialize the FYP photocatalysis dogfood project.
+3. Add 10-15 verified papers manually.
+4. Add BibTeX manually or through a reviewed Zotero export.
+5. Validate registry.
+6. Validate BibTeX.
+7. Generate note templates.
+8. Read papers manually.
+9. Write structured notes manually.
+10. Extract claims from the notes.
+11. Generate an evidence map.
+12. Generate a citation audit.
+13. Generate a writing packet or section outline.
+14. Draft one 600-1000 word subsection yourself.
+15. Run manuscript or draft QA as a heuristic audit.
+16. Review weak claims and missing evidence.
+17. Back up the project.
+18. Generate a sanitized support bundle only if needed.
 
 Do not use the tool to summarize papers automatically or write final prose.

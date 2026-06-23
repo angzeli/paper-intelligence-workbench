@@ -10,7 +10,7 @@ paperwb init
 paperwb project list
 paperwb template list
 paperwb dogfood create photocatalysis --project fyp_zis_lit_review
-paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_real
+paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_lit_review
 paperwb external validate fyp_zis_real --strict
 paperwb validate-registry projects/clean_demo/registry.csv --strict
 paperwb validate-bib projects/clean_demo/bibtex/library.bib --registry projects/clean_demo/registry.csv --strict

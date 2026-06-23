@@ -25,7 +25,7 @@ Keep the real workspace outside the repository:
 Register it locally:
 
 ```bash
-paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_real
+paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_lit_review
 paperwb external validate fyp_zis_real --strict
 ```
 

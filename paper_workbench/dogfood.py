@@ -42,8 +42,10 @@ def _theme(theme_id: str, name: str, tags: list[str], *, min_papers: int = 3) ->
 
 FYP_PHOTOCATALYSIS_THEMES: list[dict[str, Any]] = [
     _theme("metal-sulfide-photocatalysts", "Metal sulfide photocatalysts", ["metal-sulfide", "photocatalyst"]),
+    _theme("znin2s4-photocatalysis", "ZnIn2S4 photocatalysis", ["znin2s4", "photocatalysis", "co2-reduction"]),
     _theme("znin2s4-structure-phases", "ZnIn2S4 structure and phases", ["znin2s4", "structure", "phase"]),
     _theme("precursor-chemistry", "Precursor chemistry", ["precursor", "chemistry", "synthesis"]),
+    _theme("precursor-derived-thin-films", "Precursor-derived thin films", ["precursor-derived", "thin-film", "thermal-decomposition"]),
     _theme("xanthate-derived-thin-films", "Xanthate-derived thin films", ["xanthate", "thin-film", "precursor"]),
     _theme("thin-film-fabrication", "Thin-film fabrication", ["thin-film", "fabrication", "deposition"]),
     _theme("film-morphology", "Film morphology", ["morphology", "sem", "surface"]),
@@ -119,6 +121,7 @@ def create_dogfood_project(template_id: str, project_name: str, *, root: str | P
             write_text(project_root / "project_onboarding.md", project_onboarding_markdown(profile, resolved_template), force=True),
             write_text(project_root / "first_week_plan.md", first_week_plan_markdown(profile, resolved_template), force=True),
             write_text(project_root / "evidence_tracking_checklist.md", evidence_tracking_checklist_markdown(profile), force=True),
+            write_text(project_root / "fyp_lit_review_workflow.md", fyp_lit_review_workflow_markdown(profile, resolved_template), force=True),
             write_text(project_root / "templates" / "NOTE_TEMPLATE.md", BASE_NOTE_TEMPLATE, force=True),
         ]
     )
@@ -357,6 +360,36 @@ def evidence_tracking_checklist_markdown(profile: ProjectProfile) -> str:
 - [ ] Manuscript citations are known to local registry and BibTeX.
 - [ ] Weak themes are flagged before drafting.
 - [ ] Reports are regenerated after major note or registry edits.
+"""
+
+
+def fyp_lit_review_workflow_markdown(profile: ProjectProfile, template_id: str) -> str:
+    return f"""# FYP Literature-review Workflow: {profile.name}
+
+Template: `{template_id}`
+
+This workflow is a placeholder for future real dogfooding. It contains no real
+paper metadata, claims, citations, PDFs, or copied paper text.
+
+## First Real-use Loop
+
+1. Keep the real workspace outside this repository.
+2. Add 10-15 verified papers manually or through reviewed local import files.
+3. Validate registry and BibTeX after every batch.
+4. Generate note templates only for papers you are about to read.
+5. Read papers manually and write structured notes yourself.
+6. Extract claims from your notes, then review missing evidence locations.
+7. Generate evidence maps, citation audits, and writing packets.
+8. Draft one 600-1000 word subsection yourself.
+9. Run manuscript QA as a heuristic audit, not as final prose generation.
+10. Back up the external workspace before large edits.
+
+## Boundary
+
+- Do not copy PDFs into Git.
+- Do not paste copyrighted full text into committed examples.
+- Do not invent claims, citations, or metadata.
+- Do not treat weak evidence warnings as scientific truth.
 """
 
 

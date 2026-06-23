@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "ranking_notes": [
+    "Start with directly relevant ZnIn2S4 and thin-film fabrication papers.",
+    "Move papers with missing notes but included-in-review intent up the queue.",
+    "Use weak themes from evidence maps to choose follow-up reading."
+  ],
+  "important_tags": [
+    "znin2s4",
+    "xanthate",
+    "thin-film",
+    "charge-separation",
+    "photocorrosion",
+    "co2-reduction",
+    "cocatalyst"
+  ]
+}

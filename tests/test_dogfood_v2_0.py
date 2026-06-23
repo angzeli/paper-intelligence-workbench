@@ -34,6 +34,7 @@ def test_dogfood_create_photocatalysis_project_structure(tmp_path: Path) -> None
         "project_onboarding.md",
         "first_week_plan.md",
         "evidence_tracking_checklist.md",
+        "fyp_lit_review_workflow.md",
         "templates/NOTE_TEMPLATE.md",
     ):
         assert (project / relative).exists(), relative
@@ -43,7 +44,13 @@ def test_dogfood_create_photocatalysis_project_structure(tmp_path: Path) -> None
     assert load_registry(project / "registry.csv") == []
     theme_ids = {theme.theme_id for theme in load_themes(project / "themes.json")}
     assert len(theme_ids) == len(FYP_PHOTOCATALYSIS_THEMES)
-    assert {"znin2s4-structure-phases", "xanthate-derived-thin-films", "photocorrosion-stability"} <= theme_ids
+    assert {
+        "precursor-derived-thin-films",
+        "znin2s4-photocatalysis",
+        "znin2s4-structure-phases",
+        "xanthate-derived-thin-films",
+        "photocorrosion-stability",
+    } <= theme_ids
     assert not list(project.rglob("*.pdf"))
 
 

@@ -51,7 +51,7 @@ paperwb dogfood checklist --project fyp_zis_lit_review
 For real private data, keep the workspace outside this repository and register a local pointer:
 
 ```bash
-paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_real
+paperwb external add fyp_zis_real <external_workspace> --project fyp_zis_lit_review
 paperwb external validate fyp_zis_real --strict
 paperwb external run fyp_zis_real dashboard
 ```
