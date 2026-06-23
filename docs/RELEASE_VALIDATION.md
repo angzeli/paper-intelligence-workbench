@@ -42,4 +42,6 @@ paperwb dashboard --project clean_demo --no-audit-log
 - Do not push, tag, or publish with a failing release gate.
 - Do not treat `local-diagnostic` output as a release-gate pass.
 - The build step uses `--no-isolation` so local release validation does not
-  require a network-backed build dependency install.
+  require a network-backed build dependency install. Install `.[dev]` first so
+  the local environment has both `build` and the configured `setuptools`
+  backend.

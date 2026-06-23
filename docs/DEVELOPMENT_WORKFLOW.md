@@ -9,7 +9,8 @@ python -m pip install -e ".[dev]"
 ```
 
 The package has no runtime dependencies. Development extras add pytest, build,
-ruff, and mypy for local quality checks.
+setuptools, ruff, and mypy for local quality checks. `setuptools` is included
+because the release gate runs the distribution build without build isolation.
 
 ## Before Editing
 

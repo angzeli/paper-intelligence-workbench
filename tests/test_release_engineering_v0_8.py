@@ -208,6 +208,13 @@ def test_ci_runs_v0_8_release_checks():
     assert '"build", "--sdist", "--wheel"' in gate
 
 
+def test_dev_extra_includes_no_isolation_build_backend():
+    content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+
+    assert 'requires = ["setuptools>=69"]' in content
+    assert 'dev = ["pytest>=8", "build>=1", "setuptools>=69", "ruff>=0.6", "mypy>=1.8"]' in content
+
+
 def test_v2_stable_surface_uses_current_line_for_experimental_graph():
     content = (ROOT / "docs" / "STABLE_SURFACE_V2.md").read_text(encoding="utf-8")
 
